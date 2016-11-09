@@ -50,7 +50,7 @@ miyoutv単体でもChinachuクライアントとして動作しますが、全�
 
 ### Download
 
-[[https://github.com/search-future/miyou.tv/releases]]
+https://github.com/search-future/miyou.tv/releases
 
 ### miyoutv(Linux)
 ダウンロードしたパッケージを任意のディレクトリに展開して、ディレクトリ内のinstall.shを実行してください。
