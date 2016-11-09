@@ -1,0 +1,30 @@
+{
+  "mirakurunPath": "http://unix:/var/run/mirakurun.sock:/",
+  "chinachuDir": "/home/chinachu/chinachu/",
+  "schedulerIntervalTime": 3600000,
+  "extraDiskSpace": 50000000,
+  "recordSeconds": 3600,
+  "recordRules": [
+    {
+      "id": 3274001056
+    },
+    {
+      "id": 3273901048
+    },
+    {
+      "id": 3274201072
+    },
+    {
+      "id": 3274101064
+    },
+    {
+      "id": 3273801040
+    },
+    {
+      "id": 3273701032
+    },
+    {
+      "id": 3273601024
+    }
+  ]
+}

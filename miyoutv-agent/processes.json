@@ -1,0 +1,9 @@
+{
+  "apps": [{
+    "name": "miyoutv-agent",
+    "script": "miyoutv-agent.js",
+    "error_file": "/usr/local/var/log/miyoutv-agent.stderr.log",
+    "out_file": "/usr/local/var/log/miyoutv-agent.stdout.log",
+    "pid_file": "/usr/local/var/run/miyoutv-agent.pid"
+  }]
+}

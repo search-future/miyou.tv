@@ -1,0 +1,25 @@
+{
+  "name": "miyoutv-agent",
+  "description": "MiyouTV Backend Agent.",
+  "version": "0.4.0",
+  "author": {
+    "name": "takaaki, Brazil Ltd.",
+    "url": "http://razil.jp/"
+  },
+  "bugs": "https://github.com/search-future/miyou.tv/issues",
+  "engines": {
+    "node": ">=4"
+  },
+  "homepage": "http://miyou.tv/",
+  "keywords": [
+    "chinachu",
+    "dtv",
+    "dvr",
+    "mirakurun",
+    "miyoutv",
+    "tv"
+  ],
+  "license": "Apache-2.0",
+  "main": "miyoutv-agent.js",
+  "repository": "https://github.com/search-future/miyou.tv"
+}

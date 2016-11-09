@@ -1,0 +1,18 @@
+{
+  "root": true,
+  "env": {
+    "node": true,
+    "es6": true
+  },
+  "plugins": [
+    "node"
+  ],
+  "extends": [
+    "airbnb-base",
+    "plugin:node/recommended"
+  ],
+  "rules": {
+    "no-console": "off",
+    "node/shebang": "off"
+  }
+}
