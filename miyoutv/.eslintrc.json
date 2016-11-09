@@ -1,0 +1,22 @@
+{
+  "root": true,
+  "globals": {
+    "nw": true,
+    "agGrid": true,
+    "serialLoad": true
+  },
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "plugins": [
+    "node"
+  ],
+  "extends": [
+    "airbnb-base/legacy",
+    "plugin:node/recommended"
+  ],
+  "rules": {
+    "func-names": "off"
+  }
+}

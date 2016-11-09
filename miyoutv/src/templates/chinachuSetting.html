@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<!--
+Copyright 2016 Brazil Ltd.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<meta charset="UTF-8">
+<form class="chinachu-settings" name="chinachu">
+    <div class="modal-header">
+        <div class="modal-title">Chinachu 接続設定</div>
+    </div>
+    <div class="modal-body">
+        <div class="form-horizontal">
+            <div class="form-group has-feedback" ng-class="{'has-success': chinachu.url.$valid, 'has-warning': chinachu.url.$invalid}">
+                <label class="col-sm-3 control-label" for="chinachu-url">URL</label>
+                <div class="col-sm-9">
+                    <input id="chinachu-url" class="form-control" name="url" type="url" placeholder="http://127.0.0.1:10772" required ng-model="$ctrl.url">
+                    <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok': chinachu.url.$valid, 'glyphicon-warning-sign': chinachu.url.$invalid}"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label" for="chinachu-auth">認証</label>
+                <div class="col-sm-9">
+                    <div class="checkbox">
+                        <label>
+                        <input id="chinachu-auth" name="auth" type="checkbox" ng-model="$ctrl.auth"> ユーザー名とパスワードを使用する
+                    </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group has-feedback" ng-class="{'has-success': chinachu.user.$valid, 'has-warning': chinachu.user.$invalid}" ng-show="$ctrl.auth">
+                <label class="col-sm-3 control-label" for="chinachu-user">ユーザー</label>
+                <div class="col-sm-9">
+                    <input id="chinachu-user" class="form-control" name="user" type="text" ng-model="$ctrl.user" ng-required="$ctrl.auth" ng-disabled="!$ctrl.auth">
+                    <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok': chinachu.user.$valid, 'glyphicon-warning-sign': chinachu.user.$invalid}"></span>
+                </div>
+            </div>
+            <div class="form-group has-feedback" ng-class="{'has-success': chinachu.password.$valid, 'has-warning': chinachu.password.$invalid}" ng-show="$ctrl.auth">
+                <label class="col-sm-3 control-label" for="chinachu-password">パスワード</label>
+                <div class="col-sm-9">
+                    <input id="chinachu-password" class="form-control" name="password" type="password" ng-model="$ctrl.password" ng-required="$ctrl.auth" ng-disabled="!$ctrl.auth">
+                    <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok': chinachu.password.$valid, 'glyphicon-warning-sign': chinachu.password.$invalid}"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-save" ng-click="$ctrl.ok()">OK</button>
+        <button type="button" class="btn btn-cancel" ng-click="$ctrl.cancel()">キャンセル</button>
+    </div>
+</form>
