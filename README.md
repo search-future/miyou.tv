@@ -82,7 +82,7 @@ $ sudo ./pm2-uninstall.sh # サービス削除
   "mirakurunPath": "http://unix:/var/run/mirakurun.sock:/", // MirakurunのPath
   "chinachuDir": "/home/chinachu/chinachu/", // Chinachuのインストールパス
   "schedulerIntervalTime": 3600000, // スケジューラーの実行間隔(ms, 0で無効)
-  "extraDiskSpace": 100000000, // 録画ディスクの最小容量
+  "extraDiskSpace": 50000000, // 自動録画ファイルを削除して確保する空き容量(kB)
   "recordSeconds": 3600, // 録画時間(秒)
   "recordRules": [// 自動予約ルール
     {
