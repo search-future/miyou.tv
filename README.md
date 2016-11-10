@@ -14,7 +14,7 @@ ChinachuとMirakurunが導入されているLinux環境が必須です。
 クライアントPCは全録サーバと同一機で大丈夫です。また、全録サーバをLANの何処かに置き、クライアントPCで再生するといった使い方もできます。
 
 ## Demo
-|[![](https://search-future.github.io/miyou.tv/demo-player.png)](https://search-future.github.io/miyou.tv/demo-player.png)|[![](https://search-future.github.io/miyou.tv/demo-search.png)](https://search-future.github.io/miyou.tv/demo-search.png)|[![](https://search-future.github.io/miyou.tv/demo-programs.png)](https://search-future.github.io/miyou.tv/demo-programs.png)|[![](https://search-future.github.io/miyou.tv/demo-recorded.png)](https://search-future.github.io/miyou.tv/demo-recorded.png)|
+|![](https://search-future.github.io/miyou.tv/demo-player.png)|![](https://search-future.github.io/miyou.tv/demo-search.png)|![](https://search-future.github.io/miyou.tv/demo-programs.png)|![](https://search-future.github.io/miyou.tv/demo-recorded.png)|
 |---|---|---|---|
 
 ## Software which this repository includes
@@ -49,8 +49,7 @@ MiyouTVは**番組再生アプリケーションのmiyoutv**と**Chinachu補助�
 miyoutv単体でもChinachuクライアントとして動作しますが、全ての機能を利用するにはmiyoutv-agentの導入が必要です。
 
 ### Download
-
-https://github.com/search-future/miyou.tv/releases
+<https://github.com/search-future/miyou.tv/releases>
 
 ### miyoutv(Linux)
 ダウンロードしたパッケージを任意のディレクトリに展開して、ディレクトリ内のinstall.shを実行してください。
@@ -69,6 +68,7 @@ $ mv miyoutv-v*.*.* miyoutv
 3. pm2-installを実行します。
 
 ```
+$ cd miyoutv-agent
 $ sudo ./pm2-install.sh # サービス登録
 $ sudo pm2 start miyoutv-agent # 起動
 $ sudo pm2 restart miyoutv-agent # 再起動
@@ -86,7 +86,7 @@ $ sudo ./pm2-uninstall.sh # サービス削除
   "recordSeconds": 3600, // 録画時間(秒)
   "recordRules": [// 自動予約ルール
     {
-      "id": 3274001056 // MirakurunのサービスIDを持つオブジェクトを指定します
+      "id": 3274001056 // Mirakurunのserviceのidを持つオブジェクトを指定します
     },
     {
       "id": 3273901048
@@ -94,12 +94,22 @@ $ sudo ./pm2-uninstall.sh # サービス削除
   ]
 }
 ```
+サービス一覧を取得
+```
+$ tools/servicelist.js
+2016-11-10T02:40:31.920Z: Request "http://unix/api/channels".
+type: GR
+channel: 27
+        id: 3273601024 name: ＮＨＫ総合１・東京 sid: 1024
+        id: 3273601025 name: ＮＨＫ総合２・東京 sid: 1025
+        id: 3273601408 name: ＮＨＫ携帯Ｇ・東京 sid: 1408
+```
 
 ## Usage
 1. 展開したディレクトリのmiyoutvを実行してください。
 2. 上部ナビゲーションの設定メニューからChinachuの接続情報を設定します。
 3. コメントを表示するには設定メニューからモリタポアカウントを設定します。
-モリタポアカウントは http://moritapo.jp/ から取得できます。
+モリタポアカウントは<http://moritapo.jp/>から取得できます。
 4. 番組をマウスオーバーでサムネイル、コメント数が表示されます。
 5. 番組を選択して再生ボタンを押すか番組をダブルクリックで再生します。
 
