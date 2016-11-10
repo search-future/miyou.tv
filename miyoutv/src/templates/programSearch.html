@@ -42,7 +42,7 @@ limitations under the License.
                                 <span class="date" ng-bind="item.startAt | date:'M/d EEE HH:mm'"></span>
                                 <span class="channel" ng-bind="item.channel.name"></span>
                                 <span class="length" ng-bind="'(' + (item.duration / 60000) + '分)'"></span>
-                                <span class="label label-default" ng-init="category = $ctrl.getCategory(item)" ng-class="'label-' + category.name" ng-bind="category.localeName"></span>
+                                <span class="label label-default" ng-class="'label-' + item.item.categoryName.name" ng-bind="item.item.categoryName.localeName"></span>
                                 <span class="badge" ng-bind="item.commentCount"></span>
                             </div>
                             <div class="title" ng-bind="item.name"></div>

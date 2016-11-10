@@ -34,13 +34,6 @@ limitations under the License.
     $ctrl.sortRule = 'startAt:true';
     $ctrl.search = '';
 
-    $ctrl.getCategory = function (item) {
-      if (angular.isArray(item.genres)) {
-        return ChinachuService.convertCategory(item.genres[0].lv1);
-      }
-      return ChinachuService.convertCategory();
-    };
-
     $ctrl.request = function (item) {
       var program = item;
       var recorded;

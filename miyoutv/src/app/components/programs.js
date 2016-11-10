@@ -106,13 +106,6 @@ limitations under the License.
       viewport.scrollTop = calcPos(time);
     };
 
-    $ctrl.getCategory = function (item) {
-      if (angular.isArray(item.genres)) {
-        return ChinachuService.convertCategory(item.genres[0].lv1);
-      }
-      return ChinachuService.convertCategory();
-    };
-
     $ctrl.play = function (column, item) {
       if (column && item) {
         $location.url(['/channel/player', column.id, item.startAt].join('/'));

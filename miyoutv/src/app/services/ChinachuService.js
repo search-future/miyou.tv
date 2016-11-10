@@ -338,16 +338,6 @@ limitations under the License.
       var channelId = '';
       var column = {};
 
-      function getProgramFilter(networkId, serviceId) {
-        return function (a) {
-          return (
-            a.name &&
-            a.networkId === networkId &&
-            a.serviceId === serviceId
-          );
-        };
-      }
-
       for (ci = 0; ci < service.data.archive.channels.length; ci += 1) {
         channel = service.data.archive.channels[ci];
         for (si = 0; si < channel.services.length; si += 1) {
@@ -364,6 +354,7 @@ limitations under the License.
               channelService.networkId,
               channelService.serviceId
             ));
+          column.programs.forEach(setCategory);
           if (column.programs.length > 0) {
             table.push(column);
           }
@@ -371,6 +362,25 @@ limitations under the License.
         }
       }
       return table;
+
+      function getProgramFilter(networkId, serviceId) {
+        return function (a) {
+          return (
+            a.name &&
+            a.networkId === networkId &&
+            a.serviceId === serviceId
+          );
+        };
+      }
+
+      function setCategory(a) {
+        var program = a;
+        if (angular.isArray(program.genres)) {
+          program.categoryName = convertCategory(program.genres[0].lv1);
+        } else {
+          program.categoryName = convertCategory();
+        }
+      }
     }
 
     function recordedProgramTable() {

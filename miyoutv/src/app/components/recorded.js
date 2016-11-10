@@ -76,6 +76,10 @@ limitations under the License.
     $scope.$watch(function () {
       return ChinachuService.data.recorded;
     }, function (value) {
+      value.forEach(function (a) {
+        var program = a;
+        program.categoryName = ChinachuService.convertCategory(program.category);
+      });
       $ctrl.recorded = value;
     });
 

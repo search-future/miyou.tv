@@ -39,7 +39,7 @@ limitations under the License.
                         <span class="badge" ng-bind="item.commentCount"></span>
                         <span class="time text-primary" ng-bind="item.startAt | date:'HH:mm'"></span>
                         <span class="title text-primary" ng-bind="item.name"></span>
-                        <span class="label label-default" ng-init="category = $ctrl.getCategory(item)" ng-class="'label-' + category.name" ng-bind="category.localeName"></span>
+                        <span class="label label-default" ng-class="'label-' + item.item.categoryName.name" ng-bind="item.item.categoryName.localeName"></span>
                         <div class="detail" ng-bind="item.description"></div>
                         <div class="preview" ng-if="item.preview">
                             <img width="160" height="90" ng-src="{{item.preview}}">
