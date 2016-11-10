@@ -24,20 +24,23 @@ limitations under the License.
 
   function ProgramsCtrl(
     $scope,
-    $location,
     $element,
+    $location,
+    $timeout,
     ChinachuService,
     CommentService
   ) {
     var $ctrl = this;
+    var viewport = $element[0].getElementsByClassName('scrollable')[0];
     var selectColumn;
     var selectItem;
+    var timer;
+
     $ctrl.baseLength = 60;
     $ctrl.recorded = [];
     $ctrl.programs = [];
     $ctrl.dates = [];
     $ctrl.hours = [];
-    $ctrl.scrollPosY = 0;
     $ctrl.hHeaderStyle = {
       position: 'absolute',
       left: 0
@@ -45,62 +48,6 @@ limitations under the License.
     $ctrl.vHeaderStyle = {
       position: 'absolute',
       top: 0
-    };
-
-    function calcPos(time) {
-      var baseTime = new Date($ctrl.hours[0]);
-      var pos = ((time - baseTime) * $ctrl.baseLength) / 3600000;
-      if (pos < 0) {
-        pos = 0;
-      }
-      return pos;
-    }
-
-    function calcLength(start, end) {
-      var baseTime = new Date($ctrl.hours[0]);
-      var pos = ((start - baseTime) * $ctrl.baseLength) / 3600000;
-      var length = ((end - start) * $ctrl.baseLength) / 3600000;
-      var overLength = (pos + length) - ($ctrl.hours.length * $ctrl.baseLength);
-      if (pos < 0) {
-        length += pos;
-      }
-      if (overLength > 0) {
-        length -= overLength;
-      }
-      return length;
-    }
-
-    $ctrl.calcHourStyle = function () {
-      return {
-        height: $ctrl.baseLength + 'px',
-        lineHeight: $ctrl.baseLength + 'px'
-      };
-    };
-
-    $ctrl.calcColumnStyle = function () {
-      var start = $ctrl.hours[0];
-      var end;
-      var last = new Date($ctrl.hours[$ctrl.hours.length - 1]);
-
-      last.setHours(last.getHours() + 1);
-      end = last.getTime();
-      return {
-        top: calcPos(start) + 'px',
-        height: calcLength(start, end) + 'px'
-      };
-    };
-
-    $ctrl.calcItemStyle = function (item) {
-      if ($ctrl.selectItem() === item) {
-        return {
-          top: calcPos(item.startAt) + 'px',
-          minHeight: calcLength(item.startAt, item.startAt + item.duration) + 'px'
-        };
-      }
-      return {
-        top: calcPos(item.startAt) + 'px',
-        height: calcLength(item.startAt, item.startAt + item.duration) + 'px'
-      };
     };
 
     $ctrl.request = function (column, item) {
@@ -156,30 +103,7 @@ limitations under the License.
     };
 
     $ctrl.scrollToTime = function (time) {
-      var scrollableArea = $element[0].getElementsByClassName('scrollable')[0];
-      scrollableArea.scrollTop = calcPos(time);
-    };
-
-    $ctrl.isCurrentDate = function (time) {
-      var date;
-      var start;
-      var end;
-      var pos;
-
-      date = new Date(time);
-      date.setHours(0);
-      date.setMinutes(0);
-      date.setSeconds(0);
-      date.setMilliseconds(0);
-      start = date.getTime();
-      date.setDate(date.getDate() + 1);
-      end = date.getTime();
-      pos = $element[0].getElementsByClassName('scrollable')[0].scrollTop;
-
-      if (pos >= calcPos(start) && pos < calcPos(end)) {
-        return true;
-      }
-      return false;
+      viewport.scrollTop = calcPos(time);
     };
 
     $ctrl.getCategory = function (item) {
@@ -196,7 +120,7 @@ limitations under the License.
     };
 
     $ctrl.playColumn = function (column, $event) {
-      var baseTime = $ctrl.hours[0];
+      var baseTime = $ctrl.hours[0].time;
       var position = $event.target.scrollTop + $event.offsetY;
       var start = ((position * 3600000) / $ctrl.baseLength) + baseTime;
 
@@ -211,11 +135,36 @@ limitations under the License.
         return ChinachuService.data.recorded;
       }
     ], function () {
+      $ctrl.dates = [];
+      $ctrl.hours = [];
       $ctrl.programs = ChinachuService.recordedProgramTable();
-      $ctrl.dates = ChinachuService.recordedDates();
-      $ctrl.hours = ChinachuService.recordedHours();
+      ChinachuService.recordedDates().forEach(function (a) {
+        $ctrl.dates.push({
+          time: a,
+          isCurrent: isCurrentDate(a)
+        });
+      });
+      ChinachuService.recordedHours().forEach(function (a) {
+        $ctrl.hours.push({
+          time: a,
+          style: {
+            height: $ctrl.baseLength + 'px',
+            lineHeight: $ctrl.baseLength + 'px'
+          }
+        });
+      });
+      $ctrl.programs.forEach(function (a) {
+        var column = a;
+        var item;
+        var i;
+        column.style = calcColumnStyle(column);
+        for (i = 0; i < column.programs.length; i += 1) {
+          item = column.programs[i];
+          item.style = calcItemStyle(item);
+        }
+      });
+      updateView();
     });
-
     $scope.$watch(function () {
       return $location.search().search;
     }, function (value) {
@@ -224,10 +173,102 @@ limitations under the License.
       }
     });
 
-    angular.element($element[0].getElementsByClassName('scrollable')[0]).on('scroll', function (e) {
+    angular.element(viewport).on('scroll', function (e) {
       $ctrl.vHeaderStyle.left = e.target.scrollLeft + 'px';
       $ctrl.hHeaderStyle.top = e.target.scrollTop + 'px';
+      $timeout.cancel(timer);
+      timer = $timeout(updateView);
       $scope.$digest();
     });
+
+    function calcPos(time) {
+      var baseTime = new Date($ctrl.hours[0] ? $ctrl.hours[0].time : 0);
+      var pos = ((time - baseTime) * $ctrl.baseLength) / 3600000;
+      if (pos < 0) {
+        pos = 0;
+      }
+      return pos;
+    }
+
+    function calcLength(start, end) {
+      var baseTime = new Date($ctrl.hours[0] ? $ctrl.hours[0].time : 0);
+      var pos = ((start - baseTime) * $ctrl.baseLength) / 3600000;
+      var length = ((end - start) * $ctrl.baseLength) / 3600000;
+      var overLength = (pos + length) - ($ctrl.hours.length * $ctrl.baseLength);
+      if (pos < 0) {
+        length += pos;
+      }
+      if (overLength > 0) {
+        length -= overLength;
+      }
+      return length;
+    }
+
+    function calcColumnStyle() {
+      var start = $ctrl.hours[0] ? $ctrl.hours[0].time : 0;
+      var last = new Date($ctrl.hours[$ctrl.hours.length - 1].time);
+      var end;
+
+      last.setHours(last.getHours() + 1);
+      end = last.getTime();
+      return {
+        top: calcPos(start) + 'px',
+        height: calcLength(start, end) + 'px'
+      };
+    }
+
+    function calcItemStyle(item) {
+      if ($ctrl.selectItem() === item) {
+        return {
+          top: calcPos(item.startAt) + 'px',
+          minHeight: calcLength(item.startAt, item.startAt + item.duration) + 'px'
+        };
+      }
+      return {
+        top: calcPos(item.startAt) + 'px',
+        height: calcLength(item.startAt, item.startAt + item.duration) + 'px'
+      };
+    }
+
+    function isCurrentDate(time) {
+      var date;
+      var start;
+      var end;
+      var pos;
+
+      date = new Date(time);
+      date.setHours(0);
+      date.setMinutes(0);
+      date.setSeconds(0);
+      date.setMilliseconds(0);
+      start = date.getTime();
+      date.setDate(date.getDate() + 1);
+      end = date.getTime();
+      pos = viewport;
+
+      if (pos >= calcPos(start) && pos < calcPos(end)) {
+        return true;
+      }
+      return false;
+    }
+
+    function updateView() {
+      var top = viewport.scrollTop;
+      var bottom = viewport.scrollTop + viewport.clientHeight;
+
+      $ctrl.programs.forEach(function (a) {
+        var column = a;
+        var item;
+        var i;
+        column.enabled = true;
+        for (i = 0; i < column.programs.length; i += 1) {
+          item = column.programs[i];
+          item.enabled = (
+            calcPos(item.startAt) < bottom &&
+            calcPos(item.startAt + item.duration) > top
+          );
+        }
+      });
+    }
   }
 }());
