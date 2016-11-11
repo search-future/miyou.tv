@@ -18,7 +18,7 @@ limitations under the License.
 <div class="programs view-content" ng-init="$ctrl.baseLength=240;">
     <ul class="nav nav-pills">
         <li ng-repeat="date in $ctrl.dates" ng-class="{active: date.isCurrent}">
-            <a href="" ng-bind="date.time | date:'M/d EEE'" ng-click="$ctrl.scrollToTime(date)"></a>
+            <a href="" ng-bind="date.time | date:'M/d EEE'" ng-click="$ctrl.scrollToTime(date.time)"></a>
         </li>
     </ul>
     <div class="view-content-body scrollable" keep-scroll keep-bottom>

@@ -237,7 +237,7 @@ limitations under the License.
       start = date.getTime();
       date.setDate(date.getDate() + 1);
       end = date.getTime();
-      pos = viewport;
+      pos = viewport.scrollTop;
 
       if (pos >= calcPos(start) && pos < calcPos(end)) {
         return true;
@@ -249,6 +249,10 @@ limitations under the License.
       var top = viewport.scrollTop;
       var bottom = viewport.scrollTop + viewport.clientHeight;
 
+      $ctrl.dates.forEach(function (a) {
+        var date = a;
+        date.isCurrent = isCurrentDate(date.time);
+      });
       $ctrl.programs.forEach(function (a) {
         var column = a;
         var item;
