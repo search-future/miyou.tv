@@ -38,6 +38,7 @@ limitations under the License.
       user: user,
       password: password,
       reloadInterval: reloadInterval,
+      previewCacheLifetime: previewCacheLifetime,
       getUrl: getUrl,
       request: request,
       requestAll: requestAll,
@@ -60,7 +61,8 @@ limitations under the License.
         url: 'http://127.0.0.1:10772',
         user: '',
         password: '',
-        reloadInterval: 300000
+        reloadInterval: 300000,
+        previewCacheLifetime: 604800000
       },
       previewStack: [],
       previewProcessing: false,
@@ -68,7 +70,7 @@ limitations under the License.
     };
 
     loadSetting();
-    loadPreviewCache();
+    initPreviewCache();
     return service;
 
     function saveSetting() {
@@ -79,14 +81,15 @@ limitations under the License.
       angular.extend(props.setting, CommonService.loadLocalStorage('chinachu'));
     }
 
-    function savePreviewCache() {
-      CommonService.saveLocalStorage('chinachuPreviews', props.previewCache);
-    }
-
-    function loadPreviewCache() {
+    function initPreviewCache() {
       var time = Date.now();
       props.previewCache = (CommonService.loadLocalStorage('chinachuPreviews') || []).filter(function (a) {
-        return time - a.time > 604800000;
+        if (time - a.time < previewCacheLifetime()) {
+          return a.key;
+        } else if (angular.isString(a.key)) {
+          CommonService.remove('previews', a.key);
+        }
+        return false;
       });
     }
 
@@ -120,6 +123,14 @@ limitations under the License.
         saveSetting();
       }
       return props.setting.reloadInterval;
+    }
+
+    function previewCacheLifetime(value) {
+      if (!isNaN(value)) {
+        props.setting.previewCacheLifetime = parseInt(value, 10);
+        saveSetting();
+      }
+      return props.setting.previewCacheLifetime;
     }
 
     function getUrl(path) {
@@ -165,28 +176,25 @@ limitations under the License.
       var ext = /jpe?g$/.test(format) ? '.jpg' : '.png';
       var config = {
         params: params,
-        responseType: 'arraybuffer'
+        responseType: 'blob'
       };
-      var jsonParams = angular.toJson(params);
-      var cache = props.previewCache.filter(function (a) {
-        return a.id === id && a.format === format && a.params === jsonParams;
-      })[0];
+      var cache = loadPreviewCache(id, format, params);
       if (cache) {
-        deferred.resolve(cache.data);
+        deferred.resolve(cache);
       } else {
         request(['/api/recorded/' + id + '/preview' + ext].join(''), config).then(function (response) {
-          var dataUrl = URL.createObjectURL(new Blob([response.data], {
-            type: response.headers('content-type')
-          }));
-          deferred.resolve(dataUrl);
-          props.previewCache.push({
-            id: id,
-            format: format,
-            params: jsonParams,
-            time: Date.now(),
-            data: dataUrl
-          });
-          savePreviewCache();
+          var reader = new FileReader();
+
+          reader.onload = function () {
+            deferred.resolve(reader.result);
+            savePreviewCache(id, format, params, reader.result);
+            reader = null;
+          };
+          reader.onerror = function () {
+            deferred.reject(reader.error);
+            reader = null;
+          };
+          reader.readAsDataURL(response.data);
         }, deferred.reject, deferred.notify);
       }
       return deferred.promise;
@@ -194,20 +202,11 @@ limitations under the License.
 
     function requestPreview(id, format, params) {
       var deferred = $q.defer();
-      var jsonParams = angular.toJson(params);
-      var cache = props.previewCache.filter(function (a) {
-        return a.id === id && a.format === format && a.params === jsonParams;
-      })[0];
+      var cache = loadPreviewCache(id, format, params);
       if (cache) {
-        deferred.resolve(cache.data);
+        deferred.resolve(cache);
       } else {
-        props.previewStack.push({
-          id: id,
-          format: format,
-          params: params,
-          deferred: deferred
-        });
-        processPreviewStack();
+        pushPreviewStack(id, format, params, deferred);
       }
       return deferred.promise;
     }
@@ -217,15 +216,53 @@ limitations under the License.
       if (!props.previewProcessing && props.previewStack.length > 0) {
         props.previewProcessing = true;
         options = props.previewStack.pop();
-        requestPreviewNow(options.id, options.forEach, options.params)
+        requestPreviewNow(options.id, options.format, options.params)
           .then(function (data) {
             props.previewProcessing = false;
             options.deferred.resolve(data);
+            processPreviewStack();
           }, function (response) {
             props.previewProcessing = false;
             options.deferred.reject(response);
+            processPreviewStack();
           });
       }
+    }
+
+    function pushPreviewStack(id, format, params, deferred) {
+      props.previewStack.push({
+        id: id,
+        format: format,
+        params: params,
+        deferred: deferred
+      });
+      processPreviewStack();
+    }
+
+    function savePreviewCache(id, format, params, dataUrl) {
+      var jsonParams = angular.toJson(params);
+      var key = Date.now().toString(36);
+      props.previewCache.push({
+        id: id,
+        format: format,
+        params: jsonParams,
+        time: Date.now(),
+        key: key
+      });
+      if (CommonService.saveFile('previews', key, dataUrl)) {
+        CommonService.saveLocalStorage('chinachuPreviews', props.previewCache);
+      }
+    }
+
+    function loadPreviewCache(id, format, params) {
+      var jsonParams = angular.toJson(params);
+      var cache = props.previewCache.filter(function (a) {
+        return a.id === id && a.format === format && a.params === jsonParams;
+      })[0];
+      if (cache) {
+        return CommonService.loadFile('previews', cache.key);
+      }
+      return null;
     }
 
     function load(clear) {
