@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-(function (nw) {
+(function (path, fs, nw) {
   'use strict';
 
   angular.module('app')
@@ -34,6 +34,9 @@ limitations under the License.
       saveSessionStorage: saveSessionStorage,
       loadSessionStorage: loadSessionStorage,
       removeSessionStorage: removeSessionStorage,
+      saveFile: saveFile,
+      loadFile: loadFile,
+      removeFile: removeFile,
       trigger: trigger,
       triggered: triggered,
       isFullscreen: isFullscreen,
@@ -109,6 +112,57 @@ limitations under the License.
 
     function removeSessionStorage(key) {
       $window.sessionStorage.removeItem(key);
+    }
+
+    function saveFile(dirname, filename, value) {
+      var dirpath = path.resolve(nw.App.dataPath, dirname);
+      var filepath = path.join(nw.App.dataPath, dirname, filename);
+      var data;
+      if (angular.isObject(value)) {
+        data = angular.toJson(value);
+      } else {
+        data = value;
+      }
+      try {
+        fs.mkdirSync(dirpath);
+      } catch (e) {
+        if (e.code !== 'EEXIST') {
+          return false;
+        }
+      }
+      try {
+        fs.writeFileSync(filepath, data);
+      } catch (e) {
+        return false;
+      }
+      return true;
+    }
+
+    function loadFile(dirname, filename) {
+      var filepath = path.join(nw.App.dataPath, dirname, filename);
+      var data;
+      var value;
+
+      try {
+        data = fs.readFileSync(filepath, 'utf8');
+      } catch (e) {
+        return null;
+      }
+      try {
+        value = angular.fromJson(data);
+      } catch (e) {
+        value = data;
+      }
+      return value;
+    }
+
+    function removeFile(dirname, filename) {
+      var filepath = path.join(nw.App.dataPath, dirname, filename);
+      try {
+        fs.unlinkFileSync(filepath);
+      } catch (e) {
+        return;
+      }
     }
 
     function trigger(name, value) {
@@ -225,5 +279,7 @@ limitations under the License.
     }
   }
 }(
+  require('path'),
+  require('fs'),
   global.nw ? nw : require('nw.gui') // eslint-disable-line node/no-missing-require, node/no-unpublished-require
 ));
