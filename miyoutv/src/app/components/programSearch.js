@@ -42,9 +42,7 @@ limitations under the License.
         CommentService
           .requestCount(program.startAt, program.startAt + program.duration, program.channel)
           .then(function (value) {
-            if (!isNaN(value.data)) {
-              program.commentCount = value.data;
-            }
+            program.commentCount = value;
           });
       }
       if (angular.isUndefined(program.preview)) {

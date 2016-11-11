@@ -32,6 +32,8 @@ limitations under the License.
       token: token,
       info: info,
       data: data,
+      maxCommentCache: maxCommentCache,
+      countCacheLifetime: countCacheLifetime,
       comments: comments,
       enabled: enabled,
       delay: delay,
@@ -52,6 +54,8 @@ limitations under the License.
     };
     var props = {
       setting: {
+        maxCommentCache: 5,
+        countCacheLifetime: 604800000,
         delay: 0,
         duration: 5000,
         maxLines: 10,
@@ -60,6 +64,8 @@ limitations under the License.
       token: '',
       info: {},
       data: {},
+      commentCache: [],
+      countCache: [],
       comments: [],
       enabled: true,
       canceller: null,
@@ -69,6 +75,7 @@ limitations under the License.
     props.token = CommonService.loadLocalStorage('comment_token') || '';
     props.canceller = $q.defer();
     loadSetting();
+    loadCache();
 
     return service;
 
@@ -80,12 +87,24 @@ limitations under the License.
       angular.extend(props.setting, CommonService.loadLocalStorage('comment'));
     }
 
+    function saveCache() {
+      CommonService.saveLocalStorage('commentCache', props.commentCache);
+      CommonService.saveLocalStorage('commentCountCache', props.countCache);
+    }
+
+    function loadCache() {
+      var time = Date.now();
+      props.commentCache = (CommonService.loadLocalStorage('commentCache') || []);
+      props.countCache = (CommonService.loadLocalStorage('commentCountCache') || []).filter(function (a) {
+        return time - a.time < countCacheLifetime();
+      });
+    }
+
     function processData() {
       var result = angular.copy(props.data.data || props.data.comments) || [];
 
       result.forEach(function (a) {
         var comment = a;
-
         comment.playTime = a.time - offset();
         comment.text = a.text.replace(/>>[0-9-,]+\s*/g, '').trim();
       });
@@ -102,6 +121,22 @@ limitations under the License.
 
     function data() {
       return props.data;
+    }
+
+    function maxCommentCache(value) {
+      if (!isNaN(value)) {
+        props.setting.maxCommentCache = parseInt(value, 10);
+        saveSetting();
+      }
+      return props.setting.maxCommentCache;
+    }
+
+    function countCacheLifetime(value) {
+      if (!isNaN(value)) {
+        props.setting.countCacheLifetime = parseInt(value, 10);
+        saveSetting();
+      }
+      return props.setting.countCacheLifetime;
     }
 
     function comments() {
@@ -218,41 +253,106 @@ limitations under the License.
     }
 
     function request(start, end, channel) {
-      var conf = {
-        method: 'GET',
-        url: commentUrl,
-        headers: {
-          'X-MITEYOU-AUTH-TOKEN': token()
-        },
-        params: {
-          start: Math.floor(start / 1000),
-          end: Math.floor(end / 1000),
-          type: channel.type === 'GR' ? 'gro' : 'sat',
-          channel: resolveChannel(channel)
-        }
-      };
+      var conf = {};
+      var deferred = $q.defer();
+      var cache = getCommentCache(start, end, channel);
 
-      props.canceller.resolve();
-      props.canceller = $q.defer();
-      conf.timeout = props.canceller.promise;
-      return $http(conf);
+      if (cache) {
+        deferred.resolve(cache.data);
+      } else {
+        conf = {
+          method: 'GET',
+          url: commentUrl,
+          headers: {
+            'X-MITEYOU-AUTH-TOKEN': token()
+          },
+          params: {
+            start: Math.floor(start / 1000),
+            end: Math.floor(end / 1000),
+            type: channel.type === 'GR' ? 'gro' : 'sat',
+            channel: resolveChannel(channel)
+          }
+        };
+
+        props.canceller.resolve();
+        props.canceller = $q.defer();
+        conf.timeout = props.canceller.promise;
+        $http(conf).then(function (response) {
+          deferred.resolve(response.data);
+          setCommentCache(start, end, channel, response.data);
+        }, deferred.reject, deferred.notify);
+      }
+      return deferred.promise;
     }
 
     function requestCount(start, end, channel) {
-      var conf = {
-        method: 'GET',
-        url: commentUrl + '/count',
-        headers: {
-          'X-MITEYOU-AUTH-TOKEN': token()
-        },
-        params: {
-          start: Math.floor(start / 1000),
-          end: Math.floor(end / 1000),
-          type: channel.type === 'GR' ? 'gro' : 'sat',
-          channel: resolveChannel(channel)
-        }
-      };
-      return $http(conf);
+      var conf;
+      var deferred = $q.defer();
+      var cache = getCountCache(start, end, channel);
+
+      if (cache) {
+        deferred.resolve(cache.data);
+      } else {
+        conf = {
+          method: 'GET',
+          url: commentUrl + '/count',
+          headers: {
+            'X-MITEYOU-AUTH-TOKEN': token()
+          },
+          params: {
+            start: Math.floor(start / 1000),
+            end: Math.floor(end / 1000),
+            type: channel.type === 'GR' ? 'gro' : 'sat',
+            channel: resolveChannel(channel)
+          }
+        };
+        $http(conf).then(function (response) {
+          if (!isNaN(response.data)) {
+            deferred.resolve(response.data);
+            setCountCache(start, end, channel, response.data);
+          } else {
+            deferred.reject(response);
+          }
+        }, deferred.reject, deferred.notify);
+      }
+      return deferred.promise;
+    }
+
+    function setCommentCache(start, end, channel, value) {
+      props.commentCache.push({
+        start: start,
+        end: end,
+        channel: channel.id,
+        time: Date.now(),
+        data: value
+      });
+      while (props.commentCache.length > maxCommentCache) {
+        props.commentCache.shift();
+      }
+      saveCache();
+    }
+
+    function getCommentCache(start, end, channel) {
+      return props.commentCache.filter(function (a) {
+        return a.start === start && a.end === end && a.channel === channel.id;
+      })[0];
+    }
+
+    function setCountCache(start, end, channel, value) {
+      props.countCache.push({
+        start: start,
+        end: end,
+        channel: channel.id,
+        time: Date.now(),
+        data: value
+      });
+      saveCache();
+    }
+
+    function getCountCache(start, end, channel) {
+      return props.countCache.filter(function (a) {
+        return a.start === start && a.end === end && a.channel === channel.id;
+      })[0];
     }
 
     function load(start, end, channel) {
@@ -269,10 +369,10 @@ limitations under the License.
       };
       margin = Math.abs(delay()) + 10000;
       request(start - margin, end + margin, channel)
-        .then(function (response) {
-          props.data = response.data;
+        .then(function (value) {
+          props.data = value;
           processData();
-          deferred.resolve(response);
+          deferred.resolve(value);
         }, deferred.reject, deferred.notify);
       return deferred.promise;
     }
