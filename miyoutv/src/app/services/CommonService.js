@@ -30,8 +30,10 @@ limitations under the License.
       window: window,
       saveLocalStorage: saveLocalStorage,
       loadLocalStorage: loadLocalStorage,
+      removeLocalStorage: removeLocalStorage,
       saveSessionStorage: saveSessionStorage,
       loadSessionStorage: loadSessionStorage,
+      removeSessionStorage: removeSessionStorage,
       trigger: trigger,
       triggered: triggered,
       isFullscreen: isFullscreen,
@@ -82,6 +84,10 @@ limitations under the License.
       return value;
     }
 
+    function removeLocalStorage(key) {
+      $window.localStorage.removeItem(key);
+    }
+
     function saveSessionStorage(key, value) {
       if (angular.isObject(value)) {
         $window.sessionStorage.setItem(key, angular.toJson(value));
@@ -99,6 +105,10 @@ limitations under the License.
         value = $window.sessionStorage.getItem(key);
       }
       return value;
+    }
+
+    function removeSessionStorage(key) {
+      $window.sessionStorage.removeItem(key);
     }
 
     function trigger(name, value) {
