@@ -48,7 +48,7 @@ limitations under the License.
       CommentService
         .requestCount(program.start, program.end, program.channel)
         .then(function (value) {
-          program.commentCount = value.data;
+          program.commentCount = value;
         });
       ChinachuService.requestPreview(program.id, 'png', {
         pos: 70,
