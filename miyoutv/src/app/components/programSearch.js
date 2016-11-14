@@ -24,15 +24,23 @@ limitations under the License.
 
   function ProgramSearchCtrl(
     $scope,
-    $location,
     $element,
+    $location,
+    $timeout,
     ChinachuService,
     CommentService
   ) {
     var $ctrl = this;
-    var selectItem = null;
+    var viewport = $element[0].getElementsByClassName('scrollable')[0];
+    var selectItem;
+    var timer;
+
     $ctrl.sortRule = 'startAt:true';
     $ctrl.search = '';
+    $ctrl.scrollPos = {
+      top: 0,
+      bottom: 0
+    };
 
     $ctrl.request = function (item) {
       var program = item;
@@ -78,6 +86,13 @@ limitations under the License.
       return selectItem;
     };
 
+    $ctrl.calcViewStyle = function (height, count) {
+      return {
+        height: (height * count) + 'px',
+        paddingTop: (Math.floor(viewport.scrollTop / height) * height) + 'px'
+      };
+    };
+
     $scope.$watchGroup([
       function () {
         return ChinachuService.data.archive;
@@ -105,6 +120,7 @@ limitations under the License.
         }
       }
       $ctrl.programs = programs;
+      updateView();
     });
 
     $scope.$watch(function () {
@@ -127,5 +143,17 @@ limitations under the License.
     }, function (value) {
       $ctrl.search = value;
     });
+
+    angular.element(viewport).on('scroll', function () {
+      $timeout.cancel(timer);
+      timer = $timeout(updateView);
+    });
+
+    function updateView() {
+      var top = viewport.scrollTop;
+      var bottom = viewport.scrollTop + viewport.clientHeight;
+      $ctrl.scrollPos.top = top;
+      $ctrl.scrollPos.bottom = bottom;
+    }
   }
 }());

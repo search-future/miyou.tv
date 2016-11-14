@@ -24,19 +24,27 @@ limitations under the License.
 
   function RecordedCtrl(
     $scope,
+    $element,
     $location,
+    $timeout,
     CommonService,
     ChinachuService,
     CommentService
   ) {
     var $ctrl = this;
+    var viewport = $element[0].getElementsByClassName('scrollable')[0];
     var selectItem;
+    var timer;
 
     $ctrl.wuiUrl = ChinachuService.getUrl();
     $ctrl.recorded = [];
     $ctrl.recordedGroups = [];
     $ctrl.sortRule = 'start:true';
     $ctrl.search = '';
+    $ctrl.scrollPos = {
+      top: 0,
+      bottom: 0
+    };
 
     $ctrl.getCategory = function (item) {
       return ChinachuService.convertCategory(item.category);
@@ -71,6 +79,13 @@ limitations under the License.
       return selectItem;
     };
 
+    $ctrl.calcViewStyle = function (height, count) {
+      return {
+        height: (height * count) + 'px',
+        paddingTop: (Math.floor(viewport.scrollTop / height) * height) + 'px'
+      };
+    };
+
     $scope.$watch(function () {
       return ChinachuService.data.recorded;
     }, function (value) {
@@ -79,6 +94,7 @@ limitations under the License.
         program.categoryName = ChinachuService.convertCategory(program.category);
       });
       $ctrl.recorded = value;
+      updateView();
     });
 
     $scope.$watch(function () {
@@ -101,5 +117,17 @@ limitations under the License.
     }, function (value) {
       $ctrl.search = value;
     });
+
+    angular.element(viewport).on('scroll', function () {
+      $timeout.cancel(timer);
+      timer = $timeout(updateView);
+    });
+
+    function updateView() {
+      var top = viewport.scrollTop;
+      var bottom = viewport.scrollTop + viewport.clientHeight;
+      $ctrl.scrollPos.top = top;
+      $ctrl.scrollPos.bottom = bottom;
+    }
   }
 }());
