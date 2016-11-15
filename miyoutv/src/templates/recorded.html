@@ -27,7 +27,7 @@ limitations under the License.
             </div>
         </form>
     </div>
-    <div class="container-fluid view-content-body scrollable" keep-scroll>
+    <div class="container-fluid trim view-content-body scrollable" keep-scroll>
         <div class="media-list" ng-style="$ctrl.calcViewStyle(106, results.length)">
             <div class="media col-md-6 col-md-offset-3 clickable" ng-repeat="item in $ctrl.recorded | filter:$ctrl.search | orderBy:$ctrl.sortKey:$ctrl.sortReverse as results" ng-if="$index < $ctrl.scrollPos.bottom / 106 && $index > $ctrl.scrollPos.top / 106" ng-init="$ctrl.request(item)"
                 ng-class="{selected: $ctrl.selectItem() === item}" ng-click="$ctrl.selectItem(item)" ng-dblclick="$ctrl.play(item)">
