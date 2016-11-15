@@ -36,7 +36,8 @@ limitations under the License.
     var selectItem;
     var timer;
 
-    $ctrl.baseLength = 60;
+    $ctrl.baseWidth = 200;
+    $ctrl.baseHeight = 60;
     $ctrl.recorded = [];
     $ctrl.programs = [];
     $ctrl.dates = [];
@@ -113,7 +114,7 @@ limitations under the License.
     $ctrl.playColumn = function (column, $event) {
       var baseTime = $ctrl.hours[0].time;
       var position = $event.target.scrollTop + $event.offsetY;
-      var start = ((position * 3600000) / $ctrl.baseLength) + baseTime;
+      var start = ((position * 3600000) / $ctrl.baseHeight) + baseTime;
 
       $location.url(['/channel/player', column.id, start].join('/'));
     };
@@ -139,8 +140,8 @@ limitations under the License.
         $ctrl.hours.push({
           time: a,
           style: {
-            height: $ctrl.baseLength + 'px',
-            lineHeight: $ctrl.baseLength + 'px'
+            height: $ctrl.baseHeight + 'px',
+            lineHeight: $ctrl.baseHeight + 'px'
           }
         });
       });
@@ -183,25 +184,25 @@ limitations under the License.
 
     function calcPos(time) {
       var baseTime = new Date($ctrl.hours[0] ? $ctrl.hours[0].time : 0);
-      var pos = ((time - baseTime) * $ctrl.baseLength) / 3600000;
+      var pos = ((time - baseTime) * $ctrl.baseHeight) / 3600000;
       if (pos < 0) {
         pos = 0;
       }
       return pos;
     }
 
-    function calcLength(start, end) {
+    function calcHeight(start, end) {
       var baseTime = new Date($ctrl.hours[0] ? $ctrl.hours[0].time : 0);
-      var pos = ((start - baseTime) * $ctrl.baseLength) / 3600000;
-      var length = ((end - start) * $ctrl.baseLength) / 3600000;
-      var overLength = (pos + length) - ($ctrl.hours.length * $ctrl.baseLength);
+      var pos = ((start - baseTime) * $ctrl.baseHeight) / 3600000;
+      var height = ((end - start) * $ctrl.baseHeight) / 3600000;
+      var overHeight = (pos + height) - ($ctrl.hours.length * $ctrl.baseHeight);
       if (pos < 0) {
-        length += pos;
+        height += pos;
       }
-      if (overLength > 0) {
-        length -= overLength;
+      if (overHeight > 0) {
+        height -= overHeight;
       }
-      return length;
+      return height;
     }
 
     function calcColumnStyle() {
@@ -213,7 +214,7 @@ limitations under the License.
       end = last.getTime();
       return {
         top: calcPos(start) + 'px',
-        height: calcLength(start, end) + 'px'
+        height: calcHeight(start, end) + 'px'
       };
     }
 
@@ -221,12 +222,12 @@ limitations under the License.
       if ($ctrl.selectItem() === item) {
         return {
           top: calcPos(item.startAt) + 'px',
-          minHeight: calcLength(item.startAt, item.startAt + item.duration) + 'px'
+          minHeight: calcHeight(item.startAt, item.startAt + item.duration) + 'px'
         };
       }
       return {
         top: calcPos(item.startAt) + 'px',
-        height: calcLength(item.startAt, item.startAt + item.duration) + 'px'
+        height: calcHeight(item.startAt, item.startAt + item.duration) + 'px'
       };
     }
 
@@ -255,24 +256,31 @@ limitations under the License.
     function updateView() {
       var top = viewport.scrollTop;
       var bottom = viewport.scrollTop + viewport.clientHeight;
+      var left = viewport.scrollLeft;
+      var right = viewport.scrollLeft + viewport.clientWidth;
+      var column;
+      var item;
+      var ci;
+      var ii;
 
       $ctrl.dates.forEach(function (a) {
         var date = a;
         date.isCurrent = isCurrentDate(date.time);
       });
-      $ctrl.programs.forEach(function (a) {
-        var column = a;
-        var item;
-        var i;
-        column.enabled = true;
-        for (i = 0; i < column.programs.length; i += 1) {
-          item = column.programs[i];
+      for (ci = 0; ci < $ctrl.programs.length; ci += 1) {
+        column = $ctrl.programs[ci];
+        column.enabled = (
+          ci * $ctrl.baseWidth <= right &&
+          (ci + 1) * $ctrl.baseWidth >= left
+        );
+        for (ii = 0; ii < column.programs.length; ii += 1) {
+          item = column.programs[ii];
           item.enabled = (
-            calcPos(item.startAt) < bottom &&
-            calcPos(item.startAt + item.duration) > top
+            calcPos(item.startAt) <= bottom &&
+            calcPos(item.startAt + item.duration) >= top
           );
         }
-      });
+      }
     }
   }
 }());

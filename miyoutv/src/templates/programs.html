@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <meta charset="UTF-8">
-<div class="programs view-content" ng-init="$ctrl.baseLength=240;">
+<div class="programs view-content" ng-init="$ctrl.baseWidth = 200; $ctrl.baseHeight = 240;">
     <ul class="nav nav-pills">
         <li ng-repeat="date in $ctrl.dates" ng-class="{active: date.isCurrent}">
             <a href="" ng-bind="date.time | date:'M/d EEE'" ng-click="$ctrl.scrollToTime(date.time)"></a>
@@ -33,8 +33,8 @@ limitations under the License.
             </div>
         </div>
         <div class="program-table">
-            <div class="program-table-column" ng-repeat="column in $ctrl.programs" ng-if="column.enabled" ng-style="column.style" ng-dblclick="$ctrl.playColumn(column, $event)">
-                <div class="program-table-cell" ng-repeat="item in column.programs" ng-if="item.enabled" ng-style="item.style" ng-init="$ctrl.request(column, item)">
+            <div class="program-table-column" ng-repeat="column in $ctrl.programs" ng-style="column.style" ng-dblclick="$ctrl.playColumn(column, $event)">
+                <div class="program-table-cell" ng-repeat="item in column.programs" ng-if="column.enabled && item.enabled" ng-style="item.style" ng-init="$ctrl.request(column, item)">
                     <div class="program-table-content clickable" ng-class="{selected: $ctrl.selectItem() === item}" ng-click="$ctrl.select(column, item)" ng-dblclick="$ctrl.play(column, item)">
                         <span class="badge" ng-bind="item.commentCount"></span>
                         <span class="time text-primary" ng-bind="item.startAt | date:'HH:mm'"></span>
