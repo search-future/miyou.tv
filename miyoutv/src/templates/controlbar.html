@@ -16,39 +16,40 @@ limitations under the License.
 -->
 <meta charset="UTF-8">
 <form class="form-inline row trim top">
-    <div class="form-group col-xs-4">
+    <div class="form-group col-sm-4 col-sm-push-4 col-xs-12 text-center main-controller">
+        <button class="btn btn-default stepping-play" type="button" title="10秒戻す" ng-click="$ctrl.jumpBackward('11s')">
+            <img src="assets/10s-back.svg" alt="Backward">
+        </button>
+        <button class="btn btn-default play" type="button" title="再生" ng-hide="$ctrl.playing" ng-click="$ctrl.togglePause()">
+            <img src="assets/play.svg" alt="Play">
+        </button>
+        <button class="btn btn-default play" type="button" title="一時停止" ng-show="$ctrl.playing" ng-click="$ctrl.togglePause()">
+            <img src="assets/pause.svg" alt="Pause">
+        </button>
+        <button class="btn btn-default stepping-play" type="button" title="30秒進める" ng-click="$ctrl.jumpForward('29s')">
+            <img src="assets/30s-forward.svg" alt="Forward">
+        </button>
+    </div>
+    <div class="form-group col-sm-4 col-sm-pull-4 col-xs-6">
         <div class="input-group">
             <span class="input-group-btn">
                 <button class="btn btn-default" type="button" title="ミュート" ng-click="$ctrl.toggleMute()">
-                    <img ng-class="$ctrl.mute ? 'icon-on' : 'icon-off'" src="assets/volume_mute.svg">
-                    <img ng-class="$ctrl.mute ? 'icon-off' : 'icon-on'" src="assets/volume.svg">
-            </button>
+                    <img ng-show="$ctrl.mute" src="assets/volume_mute.svg" alt="Mute">
+                    <img ng-hide="$ctrl.mute" src="assets/volume.svg" alt="Mute">
+                </button>
             </span>
             <input class="form-control range-control volume" type="range" min="0" max="200" title="音量" ng-model="$ctrl.volume" ng-change="$ctrl.setVolume($ctrl.volume)" />
         </div>
     </div>
-    <div class="form-group col-xs-4 text-center main-controller">
-        <button class="btn btn-default stepping-play" type="button" title="10秒戻す" ng-click="$ctrl.jumpBackward('11s')">
-            <img src="assets/10s-back.svg" alt="">
-            </button>
-        <button class="btn btn-default play" type="button" title="再生" ng-hide="$ctrl.playing" ng-click="$ctrl.togglePause()">
-            <img src="assets/play.svg" alt="">
+    <div class="form-group col-sm-4 col-xs-6 text-right">
+        <button class="btn btn-default togglebutton" type="button" title="コメント" ng-class="{active: $ctrl.commentEnabled}" ng-click="$ctrl.toggleComment()">
+            <img src="assets/comments.svg" alt="Comment">
         </button>
-        <button class="btn btn-default play" type="button" title="一時停止" ng-show="$ctrl.playing" ng-click="$ctrl.togglePause()">
-            <img src="assets/pause.svg" alt="">
-        </button>
-        <button class="btn btn-default stepping-play" type="button" title="30秒進める" ng-click="$ctrl.jumpForward('29s')">
-            <img src="assets/30s-forward.svg" alt="">
-            </button>
-    </div>
-    <div class="form-group col-xs-4 text-right ">
-        <button class="btn btn-default togglebutton" type="button" title="コメント" ng-class="{active: $ctrl.commentEnabled}" ng-click="$ctrl.toggleComment()"><img src="assets/comments.svg" />
-        </button>
-
-        <button class="btn btn-default togglebutton" type="button" title="全画面表示" ng-class="{active: $ctrl.isFullscreen}" ng-click="$ctrl.toggleFullscreen()"><img src="assets/fullscreen.svg" />
+        <button class="btn btn-default togglebutton" type="button" title="全画面表示" ng-class="{active: $ctrl.isFullscreen}" ng-click="$ctrl.toggleFullscreen()">
+            <img src="assets/fullscreen.svg" alt="Fullscreen">
         </button>
         <button class="btn btn-default" type="button" title="サイドバー" ng-click="$ctrl.toggleSidebar()">
-            <img src="assets/tabs.svg" alt="">
+            <img src="assets/tabs.svg" alt="Sidebar">
         </button>
     </div>
 </form>

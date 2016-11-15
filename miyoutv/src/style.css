@@ -516,14 +516,6 @@ body {
     line-height: 60px;
 }
 
-.player-control .icon-on {
-    display: inline;
-}
-
-.player-control .icon-off {
-    display: none;
-}
-
 .player-control .play img {
     width: 44px;
 }
