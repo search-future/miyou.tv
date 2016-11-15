@@ -157,6 +157,15 @@ limitations under the License.
       updateView();
     });
     $scope.$watch(function () {
+      return selectItem;
+    }, function (newValue, oldValue) {
+      var newItem = newValue || {};
+      var oldItem = oldValue || {};
+
+      newItem.style = calcItemStyle(newItem);
+      oldItem.style = calcItemStyle(oldItem);
+    });
+    $scope.$watch(function () {
       return $location.search().search;
     }, function (value) {
       if (value) {
