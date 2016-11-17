@@ -50,8 +50,7 @@ limitations under the License.
       lastRecordTime: lastRecordTime,
       recordedDates: recordedDates,
       recordedHours: recordedHours,
-      programTable: programTable,
-      recordedProgramTable: recordedProgramTable,
+      recordedChannels: recordedChannels,
       groupBy: groupBy,
       channelFromLegacy: channelFromLegacy,
       serviceFromLegacy: serviceFromLegacy
@@ -271,10 +270,7 @@ limitations under the License.
       if (clear) {
         service.status = {};
         service.data.recorded = [];
-        service.data.archive = {
-          channels: [],
-          programs: []
-        };
+        service.data.archive = {};
       }
       request('/api/status.json', {
         cache: false
@@ -283,20 +279,6 @@ limitations under the License.
         request('/api/recorded.json', {
           cache: false
         }).then(function (recorded) {
-          recorded.data.forEach(function (a) {
-            var program = a;
-            var time = new Date(program.start);
-
-            program.date = new Date(
-              time.getFullYear(),
-              time.getMonth(),
-              time.getDate()
-            ).getTime();
-            program.weekDay = time.getDay();
-            program.channelId = program.channel.id;
-            program.channelName = program.channel.name;
-            program.categoryName = convertCategory(program.category).localeName;
-          });
           service.data.recorded = recorded.data;
           request('/archive.json', {
             cache: false
@@ -366,86 +348,26 @@ limitations under the License.
       return hours;
     }
 
-    function programTable() {
-      var table = [];
-      var ci = 0;
-      var si = 0;
-      var channel = {};
-      var channelService = [];
-      var channelId = '';
-      var column = {};
-
-      for (ci = 0; ci < service.data.archive.channels.length; ci += 1) {
-        channel = service.data.archive.channels[ci];
-        for (si = 0; si < channel.services.length; si += 1) {
-          channelService = channel.services[si];
-          channelId = [channel.type, channelService.serviceId].join('_');
-          column = {
-            id: channelId,
-            type: channel.type,
-            name: channelService.name,
-            programs: []
-          };
-          column.programs = service.data.archive.programs
-            .filter(getProgramFilter(
-              channelService.networkId,
-              channelService.serviceId
-            ));
-          column.programs.forEach(setCategory);
-          if (column.programs.length > 0) {
-            table.push(column);
-          }
-          channelService = null;
-        }
-      }
-      return table;
-
-      function getProgramFilter(networkId, serviceId) {
-        return function (a) {
-          return (
-            a.name &&
-            a.networkId === networkId &&
-            a.serviceId === serviceId
-          );
-        };
-      }
-
-      function setCategory(a) {
-        var program = a;
-        if (angular.isArray(program.genres)) {
-          program.categoryName = convertCategory(program.genres[0].lv1);
-        } else {
-          program.categoryName = convertCategory();
-        }
-      }
-    }
-
-    function recordedProgramTable() {
-      var start = firstRecordTime();
-      var end = lastRecordTime();
+    function recordedChannels() {
+      var recorded = service.data.recorded;
       var channels = [];
-      var table = [];
+      var program;
+      var ri;
+      var ci;
 
-      function timeFilter(a) {
-        return a.startAt < end && a.startAt + a.duration > start;
+      for (ri = 0; ri < recorded.length; ri += 1) {
+        program = recorded[ri];
+        for (ci = 0; ci < channels.length; ci += 1) {
+          if (program.channel.id === channels[ci].id) {
+            channels[ci] = program.channel;
+            break;
+          }
+        }
+        if (ci === channels.length) {
+          channels.push(program.channel);
+        }
       }
-
-      service.data.recorded.forEach(function (a) {
-        if (channels.indexOf(a.channel.id) < 0) {
-          channels.push(a.channel.id);
-        }
-      });
-      table = programTable().filter(function (a) {
-        var channel = a;
-
-        if (channels.indexOf(a.id) >= 0) {
-          channel.programs = a.programs.filter(timeFilter);
-          return channel.programs.length > 0;
-        }
-        return false;
-      });
-      channels = null;
-      return table;
+      return channels;
     }
 
     function groupBy(list, key, reverse) {

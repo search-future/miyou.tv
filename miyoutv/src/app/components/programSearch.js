@@ -100,23 +100,39 @@ limitations under the License.
       function () {
         return ChinachuService.data.recorded;
       }
-    ], function () {
+    ], function (values) {
+      var archive = values[0];
+      var channels = ChinachuService.recordedChannels();
+      var start = ChinachuService.firstRecordTime();
+      var end = ChinachuService.lastRecordTime();
       var programs = [];
-      var programTable = ChinachuService.recordedProgramTable();
-      var channel = {};
-      var program = {};
-      var ti = 0;
-      var pi = 0;
-      for (ti = 0; ti < programTable.length; ti += 1) {
-        channel = programTable[ti];
-        for (pi = 0; pi < channel.programs.length; pi += 1) {
-          program = channel.programs[pi];
-          program.channel = {
-            id: channel.id,
-            type: channel.type,
-            name: channel.name
-          };
-          programs.push(program);
+      var channel;
+      var service;
+      var item;
+      var ci;
+      var pi;
+
+      for (ci = 0; ci < channels.length; ci += 1) {
+        channel = channels[ci];
+        service = ChinachuService.serviceFromLegacy(channel);
+        if (archive.programs) {
+          for (pi = 0; pi < archive.programs.length; pi += 1) {
+            item = archive.programs[pi];
+            if (
+              item.networkId === service.networkId &&
+              item.serviceId === service.serviceId &&
+              item.startAt < end &&
+              item.startAt + item.duration > start
+            ) {
+              item.channel = channel;
+              if (angular.isArray(item.genres)) {
+                item.categoryName = ChinachuService.convertCategory(item.genres[0].lv1);
+              } else {
+                item.categoryName = ChinachuService.convertCategory();
+              }
+              programs.push(item);
+            }
+          }
         }
       }
       $ctrl.programs = programs;

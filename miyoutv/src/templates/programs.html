@@ -34,8 +34,8 @@ limitations under the License.
         </div>
         <div class="program-table">
             <div class="program-table-column" ng-repeat="column in $ctrl.programs" ng-style="column.style" ng-dblclick="$ctrl.playColumn(column, $event)">
-                <div class="program-table-cell" ng-repeat="item in column.programs" ng-if="column.enabled && item.enabled" ng-style="item.style" ng-init="$ctrl.request(column, item)">
-                    <div class="program-table-content clickable" ng-class="{selected: $ctrl.selectItem() === item}" ng-click="$ctrl.select(column, item)" ng-dblclick="$ctrl.play(column, item)">
+                <div class="program-table-cell" ng-repeat="item in column.programs" ng-if="column.enabled && item.enabled" ng-style="item.style" ng-init="$ctrl.request(item)">
+                    <div class="program-table-content clickable" ng-class="{selected: $ctrl.selectItem() === item}" ng-click="$ctrl.selectItem(item)" ng-dblclick="$ctrl.play(item)">
                         <span class="badge" ng-bind="item.commentCount"></span>
                         <span class="time text-primary" ng-bind="item.startAt | date:'HH:mm'"></span>
                         <span class="title text-primary" ng-bind="item.name"></span>
@@ -50,6 +50,6 @@ limitations under the License.
         </div>
     </div>
     <div class="form-inline now-playing">
-        <button class="btn btn-default" type="button" ng-click="$ctrl.play($ctrl.selectColumn(), $ctrl.selectItem())">再生</button>
+        <button class="btn btn-default" type="button" ng-click="$ctrl.play($ctrl.selectItem())">再生</button>
     </div>
 </div>

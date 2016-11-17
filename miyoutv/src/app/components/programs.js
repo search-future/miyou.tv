@@ -32,7 +32,6 @@ limitations under the License.
   ) {
     var $ctrl = this;
     var viewport = $element[0].getElementsByClassName('scrollable')[0];
-    var selectColumn;
     var selectItem;
     var timer;
 
@@ -51,13 +50,14 @@ limitations under the License.
       top: 0
     };
 
-    $ctrl.request = function (column, item) {
+    $ctrl.request = function (item) {
       var program = item;
       var recorded;
 
+
       if (angular.isUndefined(program.commentCount)) {
         CommentService
-          .requestCount(program.startAt, program.startAt + program.duration, column)
+          .requestCount(program.startAt, program.startAt + program.duration, program.channel)
           .then(function (value) {
             program.commentCount = value;
           });
@@ -65,7 +65,7 @@ limitations under the License.
       if (angular.isUndefined(program.preview)) {
         recorded = ChinachuService.data.recorded.filter(function (a) {
           return (
-            a.channel.id === column.id &&
+            a.channel.id === program.channel.id &&
             a.end > program.startAt &&
             a.start < program.startAt
           );
@@ -82,13 +82,6 @@ limitations under the License.
       }
     };
 
-    $ctrl.selectColumn = function (column) {
-      if (angular.isDefined(column)) {
-        selectColumn = column;
-      }
-      return selectColumn;
-    };
-
     $ctrl.selectItem = function (item) {
       if (angular.isDefined(item)) {
         selectItem = item;
@@ -96,18 +89,13 @@ limitations under the License.
       return selectItem;
     };
 
-    $ctrl.select = function (column, item) {
-      $ctrl.selectColumn(column);
-      $ctrl.selectItem(item);
-    };
-
     $ctrl.scrollToTime = function (time) {
       viewport.scrollTop = calcPos(time);
     };
 
-    $ctrl.play = function (column, item) {
-      if (column && item) {
-        $location.url(['/channel/player', column.id, item.startAt].join('/'));
+    $ctrl.play = function (item) {
+      if (item) {
+        $location.url(['/channel/player', item.channel.id, item.startAt].join('/'));
       }
     };
 
@@ -116,7 +104,7 @@ limitations under the License.
       var position = $event.target.scrollTop + $event.offsetY;
       var start = ((position * 3600000) / $ctrl.baseHeight) + baseTime;
 
-      $location.url(['/channel/player', column.id, start].join('/'));
+      $location.url(['/channel/player', column.channel.id, start].join('/'));
     };
 
     $scope.$watchGroup([
@@ -126,10 +114,21 @@ limitations under the License.
       function () {
         return ChinachuService.data.recorded;
       }
-    ], function () {
+    ], function (values) {
+      var archive = values[0];
+      var programs = [];
+      var channels = ChinachuService.recordedChannels();
+      var start = ChinachuService.firstRecordTime();
+      var end = ChinachuService.lastRecordTime();
+      var channel;
+      var column;
+      var item;
+      var ci;
+      var pi;
+
       $ctrl.dates = [];
       $ctrl.hours = [];
-      $ctrl.programs = ChinachuService.recordedProgramTable();
+
       ChinachuService.recordedDates().forEach(function (a) {
         $ctrl.dates.push({
           time: a,
@@ -145,16 +144,37 @@ limitations under the License.
           }
         });
       });
-      $ctrl.programs.forEach(function (a) {
-        var column = a;
-        var item;
-        var i;
+      for (ci = 0; ci < channels.length; ci += 1) {
+        channel = channels[ci];
+        column = ChinachuService.serviceFromLegacy(channel);
+        column.channel = channel;
         column.style = calcColumnStyle(column);
-        for (i = 0; i < column.programs.length; i += 1) {
-          item = column.programs[i];
-          item.style = calcItemStyle(item);
+        column.programs = [];
+        if (archive.programs) {
+          for (pi = 0; pi < archive.programs.length; pi += 1) {
+            item = archive.programs[pi];
+            if (
+              item.networkId === column.networkId &&
+              item.serviceId === column.serviceId &&
+              item.startAt < end &&
+              item.startAt + item.duration > start
+            ) {
+              item.channel = channel;
+              if (angular.isArray(item.genres)) {
+                item.categoryName = ChinachuService.convertCategory(item.genres[0].lv1);
+              } else {
+                item.categoryName = ChinachuService.convertCategory();
+              }
+              item.style = calcItemStyle(item);
+              column.programs.push(item);
+            }
+          }
         }
-      });
+        if (column.programs.length > 0) {
+          programs.push(column);
+        }
+      }
+      $ctrl.programs = programs;
       updateView();
     });
     $scope.$watch(function () {
