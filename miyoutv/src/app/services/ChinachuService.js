@@ -479,31 +479,35 @@ limitations under the License.
     }
 
     function channelFromLegacy(legacy) {
+      var channel;
+
       if (!angular.isObject(legacy)) {
         return {};
       }
-      return service.data.archive.channels.filter(function (a) {
-        return a.type === legacy.type && a.channel === legacy.channel;
-      })[0];
+      if (service.data.archive.channels) {
+        channel = service.data.archive.channels.filter(function (a) {
+          return a.type === legacy.type && a.channel === legacy.channel;
+        })[0];
+      }
+      return channel || {
+        type: legacy.type,
+        channel: legacy.channel,
+        name: legacy.name,
+        services: [{
+          id: legacy.id,
+          name: legacy.name,
+          serviceId: parseInt(legacy.sid, 10)
+        }]
+      };
     }
 
     function serviceFromLegacy(legacy) {
-      var channel = {};
-
       if (!angular.isObject(legacy)) {
         return {};
       }
-      channel = channelFromLegacy(legacy);
-      if (channel && channel.services) {
-        return channel.services.filter(function (a) {
-          return a.serviceId === parseInt(legacy.sid, 10);
-        })[0];
-      }
-      return {
-        id: legacy.id,
-        name: legacy.name,
-        serviceId: parseInt(legacy.sid, 10)
-      };
+      return channelFromLegacy(legacy).services.filter(function (a) {
+        return a.serviceId === parseInt(legacy.sid, 10);
+      })[0];
     }
   }
 }());
