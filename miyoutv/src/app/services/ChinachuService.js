@@ -281,7 +281,7 @@ limitations under the License.
         }).then(function (recorded) {
           service.data.recorded = recorded.data;
           request('/archive.json', {
-            cache: false
+            cache: true
           }).then(function (archive) {
             service.data.archive = archive.data;
             deferred.resolve(archive);
