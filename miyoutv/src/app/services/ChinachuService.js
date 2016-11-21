@@ -86,7 +86,7 @@ limitations under the License.
         if (time - a.time < previewCacheLifetime()) {
           return a.key;
         } else if (angular.isString(a.key)) {
-          CommonService.remove('previews', a.key);
+          CommonService.removeFile('previews', a.key);
         }
         return false;
       });
