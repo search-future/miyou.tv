@@ -50,9 +50,9 @@
   "license": "Apache-2.0",
   "main": "miyoutv/src/index.html",
   "optionalDependencies": {
-    "nw": "^0.12.3",
+    "nw": ">=0.12.3",
     "wcjs-prebuilt": "^3.0.0",
-    "webchimera.js": "^0.2.5"
+    "webchimera.js": "^0.2.7"
   },
   "repository": "https://github.com/search-future/miyou.tv",
   "scripts": {

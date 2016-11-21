@@ -8,18 +8,18 @@ then
     npm install nw@0.12.3 webchimera.js
 elif [ "$(uname)" = "Darwin" ]
 then
-    export WCJS_VERSION="v0.2.6"
+    export WCJS_VERSION="v0.2.7"
     export WCJS_RUNTIME="nw"
-    export WCJS_RUNTIME_VERSION="v0.17.3"
+    export WCJS_RUNTIME_VERSION="v0.18.1"
 
     npm install --no-optional
-    npm install nw@0.17.3 wcjs-prebuilt --nwjs_build_type=sdk
+    npm install nw@0.18.1 wcjs-prebuilt --nwjs_build_type=sdk
 
 else
-    export WCJS_VERSION="v0.2.6"
+    export WCJS_VERSION="v0.2.7"
     export WCJS_RUNTIME="nw"
-    export WCJS_RUNTIME_VERSION="v0.17.1"
+    export WCJS_RUNTIME_VERSION="v0.18.7"
 
     npm install --no-optional
-    npm install nw@0.17.1 wcjs-prebuilt --nwjs_build_type=sdk
+    npm install nw@0.18.7 wcjs-prebuilt --nwjs_build_type=sdk
 fi

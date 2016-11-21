@@ -30,7 +30,7 @@ const argOptions = {
     s: 'suffix',
   },
   default: {
-    'wcjs-version': 'v0.2.6',
+    'wcjs-version': 'v0.2.7',
     suffix: '',
     dev: false,
     design: false,
@@ -45,12 +45,12 @@ switch (process.platform) {
     );
     break;
   case 'darwin':
-    argOptions.default.version = 'v0.17.3';
+    argOptions.default.version = 'v0.18.1';
     argOptions.default.platform = 'osx64';
     break;
   case 'win32':
   default:
-    argOptions.default.version = 'v0.17.1';
+    argOptions.default.version = 'v0.18.7';
     argOptions.default.platform = process.arch === 'ia32' ? 'win32' : 'win64';
 }
 const argv = minimist(process.argv.slice(2), argOptions);
