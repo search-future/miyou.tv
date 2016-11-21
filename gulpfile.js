@@ -466,7 +466,7 @@ gulp.task('build:agent:resource', () => {
   merged.push(gulp
     .src([
       'miyoutv-agent/package.json',
-      'miyoutv-agent/miyoutv-agent.json',
+      'miyoutv-agent/processes.json',
       'miyoutv-agent/config.sample.json',
     ])
     .pipe(gulp.dest(buildDir)));
