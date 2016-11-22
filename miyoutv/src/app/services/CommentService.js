@@ -278,8 +278,12 @@ limitations under the License.
         props.canceller = $q.defer();
         conf.timeout = props.canceller.promise;
         $http(conf).then(function (response) {
-          deferred.resolve(response.data);
-          setCommentCache(start, end, channel, response.data);
+          if (response.data.EC) {
+            deferred.reject(response);
+          } else {
+            deferred.resolve(response.data);
+            setCommentCache(start, end, channel, response.data);
+          }
         }, deferred.reject, deferred.notify);
       }
       return deferred.promise;

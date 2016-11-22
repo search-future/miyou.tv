@@ -112,9 +112,10 @@ limitations under the License.
           value.channel.name,
           new Date(value.start).toLocaleString()
         ].join('\n'));
-        CommentService.load(value.start, value.end, value.channel).then(function (response) {
-          if (response.data.EC) {
-            switch (response.data.EC) {
+        CommentService.load(value.start, value.end, value.channel).catch(function (responce) {
+          console.log(responce);
+          if (responce.data) {
+            switch (responce.data.EC) {
               case 403:
                 $ctrl.alerts.push({
                   type: 'warning',
@@ -127,12 +128,12 @@ limitations under the License.
                   message: 'コメントの取得に失敗しました。'
                 });
             }
+          } else {
+            $ctrl.alerts.push({
+              type: 'danger',
+              message: 'コメントサーバーへの接続に失敗しました。'
+            });
           }
-        }, function () {
-          $ctrl.alerts.push({
-            type: 'danger',
-            message: 'コメントサーバーへの接続に失敗しました。'
-          });
         });
       }
     });
