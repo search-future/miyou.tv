@@ -172,34 +172,33 @@ global.module.paths.push(modulePath);
       });
   }
 
-  function run(CommonService) {
+  function run(CommonService, $window) {
     var win = CommonService.window();
 
+    win.on('close', function () {
+      CommonService.quit();
+    });
+    angular.element($window).on('move', saveWindowState);
+    angular.element($window).on('resize', saveWindowState);
+
+    loadWindowState();
+    win.show();
+
     function saveWindowState() {
-      var windowState = {};
-      windowState.x = win.x;
-      windowState.y = win.y;
-      windowState.width = win.width;
-      windowState.height = win.height;
+      var windowState = {
+        x: $window.screenX,
+        y: $window.screenY,
+        width: $window.outerWidth,
+        height: $window.outerHeight
+      };
       CommonService.saveLocalStorage('windowState', windowState);
     }
 
     function loadWindowState() {
       var windowState = CommonService.loadLocalStorage('windowState') || {};
-      win.x = windowState.x;
-      win.y = windowState.y;
-      win.width = windowState.width;
-      win.height = windowState.height;
+      $window.moveTo(windowState.x, windowState.y);
+      $window.resizeTo(windowState.width, windowState.height);
     }
-
-    win.on('close', function () {
-      CommonService.quit();
-    });
-    win.on('move', saveWindowState);
-    win.on('resize', saveWindowState);
-
-    loadWindowState();
-    win.show();
   }
   angular.module('app', ['ngAnimate', 'ngRoute', 'ui.bootstrap', 'agGrid', 'cfp.hotkeys'])
     .constant('commentUrl', commentUrl)
