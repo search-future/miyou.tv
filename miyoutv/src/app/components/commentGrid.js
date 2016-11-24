@@ -130,12 +130,16 @@ limitations under the License.
           checkedThreads.push(a.title);
         }
       });
-      CommentService.filter(function (comment) {
-        if (checkedThreads.indexOf(comment.title) < 0) {
-          return false;
-        }
-        return true;
-      });
+      if (checkedThreads.length > 0) {
+        CommentService.filter(function (comment) {
+          if (checkedThreads.indexOf(comment.title) < 0) {
+            return false;
+          }
+          return true;
+        });
+      } else {
+        CommentService.filter(null);
+      }
       $ctrl.gridOptions.api.setRowData(CommentService.filteredComments());
       checkedThreads = null;
     };
