@@ -83,21 +83,38 @@ function scheduler() {
   setTimeout(scheduler, commonOptions.schedulerIntervalTime);
 }
 
-function main() {
-  const promises = [];
+function reserver() {
+  const start = (
+    (Math.floor(Date.now() / commonOptions.recordSeconds / 1000) + 1) *
+    commonOptions.recordSeconds * 1000
+  );
+  const end = start + (commonOptions.recordSeconds * 1000);
+  reserve(commonOptions, start, end).then(
+    () => setTimeout(reserver, 60000),
+    () => setTimeout(reserver, 60000)
+  );
+}
 
+function sweeper() {
+  expire(commonOptions).then(
+    () => setTimeout(sweeper, 60000),
+    () => setTimeout(sweeper, 60000)
+  );
+}
+
+function main() {
+  if (commonOptions.archiveIntervalTime > 0) {
+    updater();
+  }
+  if (commonOptions.schedulerIntervalTime > 0) {
+    scheduler();
+  }
+  if (typeof commonOptions.recordRules === 'object' && commonOptions.recordRules.length > 0) {
+    reserver();
+  }
   if (commonOptions.extraDiskSpace > 0) {
-    promises.push(expire(commonOptions));
+    sweeper();
   }
-  if (commonOptions.recordRules.length > 0) {
-    const start = (
-      (Math.floor(Date.now() / commonOptions.recordSeconds / 1000) + 1) *
-      commonOptions.recordSeconds * 1000
-    );
-    const end = start + (commonOptions.recordSeconds * 1000);
-    promises.push(reserve(commonOptions, start, end));
-  }
-  Promise.all(promises).then(() => setTimeout(main, 60000), () => setTimeout(main, 60000));
 }
 
 try {
@@ -105,12 +122,5 @@ try {
   childProcess.execSync(`ionice -c 2 -n 7 -p ${process.pid}`);
 } catch (e) {
   console.error('%s: %s', new Date().toISOString(), e.message);
-}
-
-if (commonOptions.archiveIntervalTime > 0) {
-  updater();
-}
-if (commonOptions.schedulerIntervalTime > 0) {
-  scheduler();
 }
 main();
