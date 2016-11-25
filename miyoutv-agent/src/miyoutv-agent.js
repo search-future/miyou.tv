@@ -80,7 +80,7 @@ function updater() {
 
 function scheduler() {
   runScheduler(commonOptions);
-  setTimeout(scheduler, commonOptions.archiveIntervalTime);
+  setTimeout(scheduler, commonOptions.schedulerIntervalTime);
 }
 
 function main() {
