@@ -77,8 +77,10 @@ function reserve(options, start, end) {
             if (!isRecording) {
               const updateIndex = reserves.findIndex(a => a.id === id);
               if (updateIndex >= 0) {
+                console.log('%s: Update the reserve "%s".', new Date().toISOString(), id);
                 reserves[updateIndex] = createProgram(id, start, end, service, rule);
               } else {
+                console.log('%s: Add the reserve "%s".', new Date().toISOString(), id);
                 reserves.push(createProgram(id, start, end, service, rule));
               }
               yield sleep(10);
@@ -87,6 +89,7 @@ function reserve(options, start, end) {
         }
         try {
           fs.writeFileSync(options.reservesFile, JSON.stringify(reserves, null, '  '));
+          console.log('%s: Updated reserves file.', new Date().toISOString());
           resolve();
         } catch (e) {
           console.error('%s: %s', new Date().toISOString(), e.message);
