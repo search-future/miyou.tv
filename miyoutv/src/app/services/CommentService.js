@@ -229,6 +229,7 @@ limitations under the License.
     }
 
     function requestToken(email, password) {
+      var deferred = $q.defer();
       var conf = {
         method: 'POST',
         url: commentTokenUrl,
@@ -242,9 +243,15 @@ limitations under the License.
       };
 
       $http(conf).then(function (response) {
-        props.token = response.data.token;
-        CommonService.saveLocalStorage('comment_token', props.token);
-      });
+        if (response.data.token) {
+          props.token = response.data.token;
+          CommonService.saveLocalStorage('comment_token', props.token);
+          deferred.resolve(response);
+        } else {
+          deferred.reject(response);
+        }
+      }, deferred.reject, deferred.notify);
+      return deferred.promise;
     }
 
     function deleteToken() {

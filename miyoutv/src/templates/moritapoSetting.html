@@ -23,6 +23,7 @@ limitations under the License.
         <div class="form-group" ng-hide="$ctrl.hasToken">
             <div class="form-group">
                 <div uib-alert class="alert-info">コメントを表示するにはモリタポアカウントが必要です。</div>
+                <div uib-alert class="alert-warning" ng-show="$ctrl.hasAuthError">認証に失敗しました。メールアドレスとパスワードを確認してください。</div>
             </div>
             <div class="form-horizontal">
                 <div class="form-group has-feedback" ng-class="{'has-success': moritapo.email.$valid, 'has-warning': moritapo.email.$invalid}">

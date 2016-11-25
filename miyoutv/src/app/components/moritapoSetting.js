@@ -34,9 +34,19 @@ limitations under the License.
     $ctrl.hasToken = false;
     $ctrl.email = '';
     $ctrl.password = '';
+    $ctrl.hasAuthError = false;
 
     $ctrl.requestToken = function () {
-      CommentService.requestToken($ctrl.email, $ctrl.password);
+      CommentService.requestToken($ctrl.email, $ctrl.password).then(function () {
+        $ctrl.hasAuthError = false;
+      }, function (responce) {
+        switch (responce.data.EC) {
+          case 401:
+            $ctrl.hasAuthError = true;
+            break;
+          default:
+        }
+      });
     };
     $ctrl.deleteToken = function () {
       CommentService.deleteToken();
