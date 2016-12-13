@@ -25,6 +25,7 @@ limitations under the License.
   function ProgramSearchCtrl(
     $scope,
     $element,
+    $window,
     $location,
     $timeout,
     ChinachuService,
@@ -161,6 +162,10 @@ limitations under the License.
     });
 
     angular.element(viewport).on('scroll', function () {
+      $timeout.cancel(timer);
+      timer = $timeout(updateView);
+    });
+    angular.element($window).on('resize', function () {
       $timeout.cancel(timer);
       timer = $timeout(updateView);
     });

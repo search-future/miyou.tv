@@ -25,6 +25,7 @@ limitations under the License.
   function ProgramsCtrl(
     $scope,
     $element,
+    $window,
     $location,
     $timeout,
     ChinachuService,
@@ -200,6 +201,10 @@ limitations under the License.
       $timeout.cancel(timer);
       timer = $timeout(updateView);
       $scope.$digest();
+    });
+    angular.element($window).on('resize', function () {
+      $timeout.cancel(timer);
+      timer = $timeout(updateView);
     });
 
     function calcPos(time) {

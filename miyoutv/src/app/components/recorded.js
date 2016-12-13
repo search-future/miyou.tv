@@ -25,6 +25,7 @@ limitations under the License.
   function RecordedCtrl(
     $scope,
     $element,
+    $window,
     $location,
     $timeout,
     CommonService,
@@ -119,6 +120,10 @@ limitations under the License.
     });
 
     angular.element(viewport).on('scroll', function () {
+      $timeout.cancel(timer);
+      timer = $timeout(updateView);
+    });
+    angular.element($window).on('resize', function () {
       $timeout.cancel(timer);
       timer = $timeout(updateView);
     });
