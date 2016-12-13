@@ -367,6 +367,13 @@ limitations under the License.
           channels.push(program.channel);
         }
       }
+      channels.sort(function (a, b) {
+        var types = ['EX', 'CS', 'BS', 'GR'];
+        if (a.type !== b.type) {
+          return types.indexOf(b.type) - types.indexOf(a.type);
+        }
+        return parseInt(a.sid, 10) - parseInt(b.sid, 10);
+      });
       return channels;
     }
 
