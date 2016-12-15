@@ -171,6 +171,7 @@ limitations under the License.
       });
       $ctrl.threads = threads;
       $ctrl.gridOptions.api.setRowData(CommentService.filteredComments());
+      $ctrl.autoScroll = true;
       titles = null;
       threads = null;
     });
