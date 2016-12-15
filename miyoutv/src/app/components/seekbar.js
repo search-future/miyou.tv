@@ -38,18 +38,23 @@ limitations under the License.
     $ctrl.length = 0;
     $ctrl.clockTime = 0;
     $ctrl.end = 0;
+    $ctrl.isSeeking = false;
 
     $ctrl.previous = ChinachuPlayerService.channelPrevious;
     $ctrl.next = ChinachuPlayerService.channelNext;
 
     $ctrl.seek = function (position) {
-      PlayerService.position(position);
+      if ($ctrl.isSeeking) {
+        PlayerService.position(position);
+      }
     };
 
     $scope.$watch(function () {
       return PlayerService.position();
     }, function (value) {
-      $ctrl.position = value;
+      if (!$ctrl.isSeeking) {
+        $ctrl.position = value;
+      }
       $ctrl.time = PlayerService.formattedTime();
       $ctrl.length = PlayerService.formattedLength();
       $ctrl.clockTime = PlayerService.time() + CommentService.offset();
