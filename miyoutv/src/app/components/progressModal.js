@@ -28,7 +28,9 @@ limitations under the License.
   function ProgressModalCtrl() {
     var $ctrl = this;
 
-    $ctrl.title = $ctrl.resolve.title;
-    $ctrl.message = $ctrl.resolve.message;
+    $ctrl.$onInit = function () {
+      $ctrl.title = $ctrl.resolve.title;
+      $ctrl.message = $ctrl.resolve.message;
+    };
   }
 }());

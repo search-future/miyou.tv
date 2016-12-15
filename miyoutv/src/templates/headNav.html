@@ -19,25 +19,25 @@ limitations under the License.
     <div class="container-fluid">
         <div class="navbar-header">
             <button class="navbar-toggle collapsed" type="button" ng-click="$ctrl.isCollapsed = !$ctrl.isCollapsed">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </button>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
         </div>
         <div class="collapse navbar-collapse" uib-collapse="$ctrl.isCollapsed">
             <ul class="nav navbar-nav">
                 <li ng-class="{active: $ctrl.current === 'programs'}">
-                    <a href="#/programs" ng-click="$ctrl.isCollapsed = true">
+                    <a href="#!/programs" ng-click="$ctrl.isCollapsed = true">
                         <span class="glyphicon glyphicon-th"></span> 番組表
                     </a>
                 </li>
                 <li ng-class="{active: $ctrl.current === 'recorded'}">
-                    <a href="#/recorded" ng-click="$ctrl.isCollapsed = true">
+                    <a href="#!/recorded" ng-click="$ctrl.isCollapsed = true">
                         <span class="glyphicon glyphicon-th-list"></span> 録画一覧
                     </a>
                 </li>
                 <!--<li>
-                    <a href="#" ng-click="$ctrl.isCollapsed = true">
+                    <a href="#!/ranking" ng-click="$ctrl.isCollapsed = true">
                         <span class="glyphicon glyphicon-star"></span> ランキング
                     </a>
                 </li>-->
