@@ -38,9 +38,7 @@ limitations under the License.
     $ctrl.time = 0;
     $ctrl.commentEnabled = true;
     $ctrl.commentOptions = {};
-    $ctrl.sidebarCollapsed = (
-      CommonService.loadLocalStorage('sidebarCollapsed') === 'true'
-    );
+    $ctrl.sidebarCollapsed = Boolean(CommonService.loadLocalStorage('sidebarCollapsed'));
     $ctrl.mainHotkeys = {
       s: CommonService.back,
       space: PlayerService.togglePause,
