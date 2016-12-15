@@ -38,6 +38,8 @@ limitations under the License.
       enableColResize: true,
       enableSorting: true,
       suppressCellSelection: true,
+      suppressLoadingOverlay: true,
+      suppressNoRowsOverlay: true,
       columnDefs: [{
         colId: 'playTime',
         field: 'playTime',
