@@ -207,10 +207,11 @@ limitations under the License.
 
     function resolveChannel(channel) {
       var name = channel.name
-        .replace(/[Ａ-Ｚａ-ｚ０-９]/g, function (s) {
+        .replace(/[０-９Ａ-Ｚａ-ｚ：-？￥＄％-＊]/g, function (s) {
           return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
         })
         .replace('　', ' ')
+        .replace('!', '')
         .replace(/^(NHK[^0-9]+[0-9]).*$/, '$1');
 
       if (channelTable[name]) {
@@ -218,7 +219,9 @@ limitations under the License.
       }
       name = name
         .replace(/^([^0-9]+)[0-9]$/, '$1')
-        .replace(/HD$/, '');
+        .replace(/(◆.+|・[0-9]+)$/, '')
+        .replace(/HD$/, '')
+        .replace(/CH$/i, '');
       if (channelTable[name]) {
         return channelTable[name];
       }
