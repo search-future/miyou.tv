@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 var path = require('path');
-var execDir = path.dirname(process.execPath);
+var execDir = path.dirname(process.platform === 'darwin' ? path.join(process.execPath, '../../../Resources/app.nw') : process.execPath);
 var modulePath = path.join(execDir, 'node_modules');
 global.module.paths.push(modulePath);
 
