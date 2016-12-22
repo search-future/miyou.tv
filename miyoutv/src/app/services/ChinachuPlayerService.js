@@ -95,7 +95,7 @@ limitations under the License.
         return;
       }
       recorded = ChinachuService.data.recorded.filter(function (a) {
-        return a.channel.id === channel && a.end > start;
+        return String(a.channel.id) === String(channel) && a.end > start;
       });
       recorded.sort(function (a, b) {
         return a.end - b.end;
