@@ -39,6 +39,7 @@ limitations under the License.
       var service;
 
       $ctrl.program = {};
+      $ctrl.programList = [];
       if (value) {
         $ctrl.program.id = value.id;
         $ctrl.program.channel = value.channel.name;
@@ -49,15 +50,17 @@ limitations under the License.
         $ctrl.program.episode = value.episode;
         $ctrl.program.detail = value.detail;
         service = ChinachuService.serviceFromLegacy(value.channel);
-        $ctrl.programList = ChinachuService.data.archive.programs
-          .filter(function (a) {
-            return (
-              a.networkId === service.networkId &&
-              a.serviceId === service.serviceId &&
-              a.startAt < value.end &&
-              a.startAt + a.duration > value.start
-            );
-          });
+        if (ChinachuService.data.archive.programs) {
+          $ctrl.programList = ChinachuService.data.archive.programs
+            .filter(function (a) {
+              return (
+                a.networkId === service.networkId &&
+                a.serviceId === service.serviceId &&
+                a.startAt < value.end &&
+                a.startAt + a.duration > value.start
+              );
+            });
+        }
       }
     });
     $scope.$watch(function () {

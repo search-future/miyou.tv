@@ -111,7 +111,6 @@ limitations under the License.
           new Date(value.start).toLocaleString()
         ].join('\n'));
         CommentService.load(value.start, value.end, value.channel).catch(function (responce) {
-          console.log(responce);
           if (responce.data) {
             switch (responce.data.EC) {
               case 403:

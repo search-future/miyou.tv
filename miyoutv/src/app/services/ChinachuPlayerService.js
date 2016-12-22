@@ -27,7 +27,7 @@ limitations under the License.
     PlayerService
   ) {
     var service = {
-      program: {},
+      program: null,
       requestRecordedLength: requestRecordedLength,
       playRecorded: playRecorded,
       channelStart: channelStart,
