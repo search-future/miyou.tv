@@ -57,7 +57,7 @@ limitations under the License.
     };
     var props = {
       setting: {
-        url: 'http://127.0.0.1:10772',
+        url: 'http://127.0.0.1:20772',
         user: '',
         password: '',
         reloadInterval: 300000,
@@ -133,7 +133,7 @@ limitations under the License.
     }
 
     function getUrl(path) {
-      var wuiUrl = url() || 'http://127.0.0.1:10772';
+      var wuiUrl = url() || 'http://127.0.0.1:20772';
       var auth = [];
 
       if (!/^https?:\/\//.test(wuiUrl)) {
