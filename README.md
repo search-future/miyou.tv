@@ -64,6 +64,7 @@ $ mv miyoutv-v*.*.* miyoutv
 
 ### miyoutv-agent(Linux)
 **現在、miyoutv-agentはChinachu gammaに対応していません。miyoutv-agentはChinachu betaで使用してください。**
+
 1. miyoutv-agentパッケージを任意のディレクトリに展開してください。
 2. config.sample.jsonをconfig.jsonにコピーして、編集します。
 3. pm2-installを実行します。
