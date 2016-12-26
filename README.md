@@ -36,7 +36,7 @@ Chinachuでの全録を支援するプログラムです。以下の機能を持
 * [Node.js](http://nodejs.org/) `>=6.2.0`
 * [PM2](http://pm2.keymetrics.io/) `>=2.0.12`
 
-ChinachuとMirakurunが導入されている環境で動作します。
+Chinachu *beta*とMirakurunが導入されている環境で動作します。
 
 ### miyoutv(Linux)
 * [Node.js](http://nodejs.org/)
@@ -63,6 +63,7 @@ $ mv miyoutv-v*.*.* miyoutv
 ダウンロードしたパッケージを任意のディレクトリに展開してください。
 
 ### miyoutv-agent(Linux)
+**現在、miyoutv-agentはChinachu gammaに対応していません。miyoutv-agentはChinachu betaで使用してください。**
 1. miyoutv-agentパッケージを任意のディレクトリに展開してください。
 2. config.sample.jsonをconfig.jsonにコピーして、編集します。
 3. pm2-installを実行します。
