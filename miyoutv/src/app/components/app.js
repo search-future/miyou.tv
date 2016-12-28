@@ -36,12 +36,12 @@ limitations under the License.
     $ctrl.hotkeys = {
       // f5: CommonService.reload,
       f11: CommonService.toggleFullscreen,
-      'ctrl+w': CommonService.close,
+      'ctrl+w': CommonService.quitModal,
       esc: function () {
         if (CommonService.isFullscreen()) {
           CommonService.leaveFullscreen();
         } else {
-          CommonService.close();
+          CommonService.quitModal();
         }
       }
     };

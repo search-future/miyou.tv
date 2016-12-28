@@ -18,8 +18,7 @@ limitations under the License.
 
   var command = '';
   var dataPath = '';
-
-  if (process.platform === 'win32' && !process.env.VLC_PLUGIN_PATH) {
+  if (process.versions.nw && process.platform === 'win32' && !process.env.VLC_PLUGIN_PATH) {
     command = process.env.npm_lifecycle_script || process.execPath + ' ' + process.execArgv.join(' ');
     dataPath = path.resolve(nw.App.getDataPath(), '../Main');
     childProcess.exec([
@@ -30,10 +29,15 @@ limitations under the License.
     ].join(''), {
       env: {
         VLC_PLUGIN_PATH: path.join(
-          path.dirname(command), 'node_modules/wcjs-prebuilt/bin/plugins'
+          path.dirname(process.env.npm_lifecycle_script ? '.' : process.execPath), 'node_modules/wcjs-prebuilt/bin/plugins'
         )
       }
     });
     setTimeout(nw.App.quit, 0);
+  }
+  if (process.versions.electron) {
+    /* eslint-disable */
+    window.jQuery = window.$ = require('./bower_components/jquery/dist/jquery.min.js');
+    /* eslint-enable */
   }
 }(require('path'), require('child_process')));

@@ -173,17 +173,24 @@ global.module.paths.push(modulePath);
       });
   }
 
-  function run(CommonService, $window) {
+  function run($window, $timeout, CommonService) {
     var win = CommonService.window();
 
-    win.on('close', function () {
-      CommonService.quit();
-    });
     angular.element($window).on('move', saveWindowState);
     angular.element($window).on('resize', saveWindowState);
 
-    loadWindowState();
+    if (process.versions.nw) {
+      win.on('close', function () {
+        win.restore();
+        $timeout(function () {
+          saveWindowState();
+          win.close(true);
+        });
+      });
+    }
+
     win.show();
+    loadWindowState();
 
     function saveWindowState() {
       var windowState = {
@@ -192,7 +199,9 @@ global.module.paths.push(modulePath);
         width: $window.outerWidth,
         height: $window.outerHeight
       };
-      CommonService.saveLocalStorage('windowState', windowState);
+      if (process.versions.nw || !(win.isMinimized() || win.isMaximized() || win.isFullScreen())) {
+        CommonService.saveLocalStorage('windowState', windowState);
+      }
     }
 
     function loadWindowState() {

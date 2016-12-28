@@ -8,6 +8,7 @@ const concat = require('gulp-concat');
 const ngAnnotate = require('gulp-ng-annotate');
 const uglify = require('gulp-uglify');
 const nwb = require('nwjs-builder');
+const electronPackager = require('electron-packager');
 const jeditor = require('gulp-json-editor');
 const replace = require('gulp-replace');
 const env = require('gulp-env');
@@ -22,11 +23,13 @@ const insert = require('gulp-insert');
 const nwjc = path.resolve('node_modules/nw/nwjs/nwjc');
 
 const argOptions = {
-  string: ['version', 'platform', 'wcjs-version', 'suffix'],
+  string: ['version', 'arch', 'platform', 'runtime', 'wcjs-version', 'suffix'],
   boolean: ['dev', 'design', 'protect'],
   alias: {
     v: 'version',
+    a: 'arch',
     p: 'platform',
+    r: 'runtime',
     s: 'suffix',
   },
   default: {
@@ -35,23 +38,23 @@ const argOptions = {
     dev: false,
     design: false,
     protect: false,
+    platform: process.platform,
+    arch: process.arch,
   },
 };
 switch (process.platform) {
   case 'linux':
-    argOptions.default.version = 'v0.12.3';
-    argOptions.default.platform = (
-      process.arch === 'ia32' ? 'linux32' : 'linux64'
-    );
-    break;
-  case 'darwin':
-    argOptions.default.version = 'v0.18.1';
-    argOptions.default.platform = 'osx64';
+  default:
+    argOptions.default.runtime = 'electron';
+    argOptions.default.version = 'v0.36.7';
     break;
   case 'win32':
-  default:
-    argOptions.default.version = 'v0.18.7';
-    argOptions.default.platform = process.arch === 'ia32' ? 'win32' : 'win64';
+    argOptions.default.runtime = 'electron';
+    argOptions.default.version = 'v1.4.3';
+    break;
+  case 'darwin':
+    argOptions.default.runtime = 'electron';
+    argOptions.default.version = 'v1.4.3';
 }
 const argv = minimist(process.argv.slice(2), argOptions);
 
@@ -75,7 +78,7 @@ packages.miyoutv.buildName = [
   packages.miyoutv.manifest.version,
   argv.suffix,
   '-',
-  argv.platform,
+  argv.runtime,
 ].join('');
 packages.miyoutvAgent.buildName = [
   packages.miyoutvAgent.manifest.name,
@@ -103,8 +106,9 @@ gulp.task('build', ['build:miyoutv', 'build:agent']);
 /**
  * @task {build:miyoutv}
  * @order {1}
- * @arg {version,-v <version>} nwjs version
- * @arg {platform,-p <win32|win64|osx64|linux32|linux64>} platform
+ * @arg {version,-v <version>} runtime version
+ * @arg {platform,-p <win32|darwin|linux>} platform
+ * @arg {arch,-a <ia32|x64>} arch
  * @arg {wcjs-version <wcjs-version>} wcjs version
  * @arg {suffix,-s <suffix>} build suffix
  * @arg {dev} for developpers
@@ -149,19 +153,30 @@ gulp.task('build:clean_all', () => del(['miyoutv/dist/', 'build/miyoutv/']));
  * @task {build:miyoutv:resource}
  * @order {2}
  */
-gulp.task('build:miyoutv:resource', () =>
-  gulp
-  .src([
-    'miyoutv/src/**',
-    '!miyoutv/src/app.js',
-    '!miyoutv/src/app/',
-    '!miyoutv/src/app/**',
-    '!miyoutv/src/bower_components/',
-    '!miyoutv/src/bower_components/**',
-    '!miyoutv/src/install.sh',
-  ])
-  .pipe(gulp.dest('miyoutv/dist/'))
-);
+gulp.task('build:miyoutv:resource', () => {
+  const merged = [];
+  merged.push(gulp
+    .src([
+      'miyoutv/src/**',
+      '!miyoutv/src/app.js',
+      '!miyoutv/src/app/',
+      '!miyoutv/src/app/**',
+      '!miyoutv/src/bower_components/',
+      '!miyoutv/src/bower_components/**',
+      '!miyoutv/src/package.json',
+      '!miyoutv/src/install.sh',
+    ])
+    .pipe(gulp.dest('miyoutv/dist/')));
+  merged.push(gulp
+    .src('miyoutv/src/package.json')
+    .pipe(jeditor((json) => {
+      const result = json;
+      result.main = argv.version === 'nw' ? 'index.html' : 'index.js';
+      return result;
+    }))
+    .pipe(gulp.dest('miyoutv/dist/')));
+  eventStream.merge(merged);
+});
 
 /**
  * @task {build:miyoutv:bundle}
@@ -219,23 +234,74 @@ gulp.task('build:miyoutv:protect', (callback) => {
  * @order {2}
  */
 gulp.task('build:miyoutv:pack', (callback) => {
-  let version = argv.version;
-  const versionNumber = version.replace(/^v/, '').split('.');
-  if (
-    (argv.dev || argv.design) &&
-    (versionNumber[0] > 0 || versionNumber[1] >= 13)
-  ) {
-    version += '-sdk';
+  if (argv.runtime === 'nw') {
+    let version = argv.version;
+    let platform;
+    switch (argv.platform) {
+      case 'linux':
+      default:
+        platform = 'linux';
+        break;
+      case 'win32':
+        platform = 'win';
+        break;
+      case 'darwin':
+        platform = 'osx';
+    }
+    switch (argv.arch) {
+      case 'x64':
+      default:
+        platform += '64';
+        break;
+      case 'ia32':
+        platform += '32';
+    }
+    const versionNumber = version.replace(/^v/, '').split('.');
+    if (
+      (argv.dev || argv.design) &&
+      (versionNumber[0] > 0 || versionNumber[1] >= 13)
+    ) {
+      version += '-sdk';
+    }
+    nwb.commands.nwbuild('miyoutv/dist/', {
+      version,
+      platforms: platform,
+      outputDir: `build/${packages.miyoutv.buildName}`,
+      outputName: `${packages.miyoutv.manifest.name}-${argv.platform}-${argv.arch}`,
+      sideBySide: argv.dev || argv.design,
+      winIco: 'miyoutv/dist/miyoutv.ico',
+      macIcns: 'miyoutv/dist/miyoutv.icns',
+    }, callback);
+  } else {
+    const version = argv.version.replace(/^v/, '');
+    let icon;
+    switch (argv.platform) {
+      case 'win32':
+        icon = 'miyoutv/dist/miyoutv.ico';
+        break;
+      case 'darwin':
+        icon = 'miyoutv/dist/miyoutv.icns';
+        break;
+      default:
+    }
+    electronPackager({
+      overwrite: true,
+      version,
+      platform: argv.platform,
+      arch: argv.arch,
+      dir: 'miyoutv/dist/',
+      out: `build/${packages.miyoutv.buildName}/`,
+      asar: !argv.dev && !argv.design,
+      icon,
+      'version-string': {
+        CompanyName: 'Brazil Ltd.',
+        FileDescription: packages.miyoutv.manifest.name,
+        OriginalFilename: `${packages.miyoutv.manifest.name}.exe`,
+        ProductName: packages.miyoutv.manifest.name,
+        InternalName: packages.miyoutv.manifest.name,
+      },
+    }, callback);
   }
-  nwb.commands.nwbuild('miyoutv/dist/', {
-    version,
-    platforms: argv.platform,
-    outputDir: 'build/miyoutv/',
-    outputName: packages.miyoutv.buildName,
-    sideBySide: argv.dev || argv.design,
-    winIco: 'miyoutv/dist/miyoutv.ico',
-    macIcns: 'miyoutv/dist/miyoutv.icns',
-  }, callback);
 });
 
 /**
@@ -250,88 +316,32 @@ gulp.task('build:miyoutv:preinstall', () => {
   let installOptions;
   switch (argv.platform) {
     case 'win32':
-      buildDir = path.resolve('build/miyoutv/', packages.miyoutv.buildName);
-      manifestEditor = (json) => {
-        const result = json;
-        result['wcjs-prebuilt'] = {
-          arch: 'ia32',
-          platform: 'win',
-          version: argv['wcjs-version'],
-          runtime: 'nw',
-          runtimeVersion: argv.version,
-        };
-        result.optionalDependencies['webchimera.js'] = json.dependencies['webchimera.js'];
-        delete result.dependencies.nw;
-        delete result.dependencies['webchimera.js'];
-        return result;
-      };
-      installEnv = {
-        WCJS_ARCH: 'ia32',
-        WCJS_PLATFORM: 'win',
-        WCJS_VERSION: argv['wcjs-version'],
-        WCJS_RUNTIME: 'nw',
-        WCJS_RUNTIME_VERSION: argv.version,
-      };
-      installOptions = {
-        production: true,
-        noOptional: true,
-      };
-      break;
-    case 'win64':
-      buildDir = path.resolve('build/miyoutv/', packages.miyoutv.buildName);
-      manifestEditor = (json) => {
-        const result = json;
-        result['wcjs-prebuilt'] = {
-          arch: 'x64',
-          platform: 'win',
-          version: argv['wcjs-version'],
-          runtime: 'nw',
-          runtimeVersion: argv.version,
-        };
-        result.optionalDependencies['webchimera.js'] = json.dependencies['webchimera.js'];
-        delete result.dependencies.nw;
-        delete result.dependencies['webchimera.js'];
-        return result;
-      };
-      installEnv = {
-        WCJS_ARCH: 'x64',
-        WCJS_PLATFORM: 'win',
-        WCJS_VERSION: argv['wcjs-version'],
-        WCJS_RUNTIME: 'nw',
-        WCJS_RUNTIME_VERSION: argv.version,
-      };
-      installOptions = {
-        production: true,
-        noOptional: true,
-      };
-      break;
-    case 'osx64':
       buildDir = path.resolve(
-        'build/miyoutv/',
+        'build/',
         packages.miyoutv.buildName,
-        'MiyouTV.app/Contents/Resources/app.nw'
+        `${packages.miyoutv.manifest.name}-${argv.platform}-${argv.arch}`
       );
       manifestEditor = (json) => {
         const result = json;
         result['wcjs-prebuilt'] = {
-          arch: 'x64',
-          platform: 'osx',
+          arch: argv.arch,
+          platform: 'win',
           version: argv['wcjs-version'],
-          runtime: 'nw',
+          runtime: argv.runtime,
           runtimeVersion: argv.version,
         };
-        result.optionalDependencies['webchimera.js'] = (
-          json.dependencies['webchimera.js']
-        );
+        result.optionalDependencies['webchimera.js'] = json.dependencies['webchimera.js'];
         delete result.dependencies.nw;
+        delete result.dependencies.electron;
+        delete result.dependencies['electron-prebuilt'];
         delete result.dependencies['webchimera.js'];
         return result;
       };
       installEnv = {
-        WCJS_ARCH: 'x64',
-        WCJS_PLATFORM: 'osx',
+        WCJS_ARCH: argv.arch,
+        WCJS_PLATFORM: 'win',
         WCJS_VERSION: argv['wcjs-version'],
-        WCJS_RUNTIME: 'nw',
+        WCJS_RUNTIME: argv.runtime,
         WCJS_RUNTIME_VERSION: argv.version,
       };
       installOptions = {
@@ -339,15 +349,20 @@ gulp.task('build:miyoutv:preinstall', () => {
         noOptional: true,
       };
       break;
-    case 'linux32':
-    case 'linux64':
-      buildDir = path.resolve('build/miyoutv/', packages.miyoutv.buildName);
+    case 'linux':
+      buildDir = path.resolve(
+        'build/',
+        packages.miyoutv.buildName,
+        `${packages.miyoutv.manifest.name}-${argv.platform}-${argv.arch}`
+      );
       manifestEditor = (json) => {
         const result = json;
         if (argv.dev || argv.design) {
           result.window.toolbar = true;
         }
         delete result.dependencies.nw;
+        delete result.dependencies.electron;
+        delete result.dependencies['electron-prebuilt'];
         delete result.dependencies['wcjs-prebuilt'];
         return result;
       };
@@ -358,12 +373,53 @@ gulp.task('build:miyoutv:preinstall', () => {
       merged.push(gulp
         .src('miyoutv/src/install.sh')
         .pipe(replace(
+          /(npm_config_wcjs_runtime=).*/g,
+          `$1"${argv.runtime}"`
+        ))
+        .pipe(replace(
           /(npm_config_wcjs_runtime_version=).*/g,
           `$1"${argv.version.replace(/^v/, '')}"`
         ))
         .pipe(gulp.dest(buildDir, {
           mode: '0755',
         })));
+      break;
+    case 'darwin':
+      buildDir = path.resolve(
+        'build/',
+        packages.miyoutv.buildName,
+        `${packages.miyoutv.manifest.name}-${argv.platform}-${argv.arch}`,
+        `${packages.miyoutv.manifest.name}.app/Contents/Resources/`
+      );
+      manifestEditor = (json) => {
+        const result = json;
+        result['wcjs-prebuilt'] = {
+          arch: argv.arch,
+          platform: 'osx',
+          version: argv['wcjs-version'],
+          runtime: argv.runtime,
+          runtimeVersion: argv.version,
+        };
+        result.optionalDependencies['webchimera.js'] = (
+          json.dependencies['webchimera.js']
+        );
+        delete result.dependencies.nw;
+        delete result.dependencies.electron;
+        delete result.dependencies['electron-prebuilt'];
+        delete result.dependencies['webchimera.js'];
+        return result;
+      };
+      installEnv = {
+        WCJS_ARCH: argv.arch,
+        WCJS_PLATFORM: 'osx',
+        WCJS_VERSION: argv['wcjs-version'],
+        WCJS_RUNTIME: argv.runtime,
+        WCJS_RUNTIME_VERSION: argv.version,
+      };
+      installOptions = {
+        production: true,
+        noOptional: true,
+      };
       break;
     default:
   }
@@ -388,7 +444,7 @@ gulp.task('build:agent', ['build:agent:scripts', 'build:agent:resource']);
 gulp.task('build:agent:scripts', () => {
   const merged = [];
   const buildDir = path.resolve(
-    'build/miyoutv-agent/', packages.miyoutvAgent.buildName
+    'build/', packages.miyoutvAgent.buildName, packages.miyoutv.manifest.name
   );
   merged.push(gulp
     .src('miyoutv-agent/src/miyoutv-agent.js')
@@ -461,7 +517,7 @@ gulp.task('build:agent:scripts', () => {
 gulp.task('build:agent:resource', () => {
   const merged = [];
   const buildDir = path.resolve(
-    'build/miyoutv-agent/', packages.miyoutvAgent.buildName
+    'build/', packages.miyoutvAgent.buildName, packages.miyoutv.manifest.name
   );
   merged.push(gulp
     .src([

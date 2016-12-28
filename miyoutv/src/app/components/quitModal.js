@@ -31,7 +31,7 @@ limitations under the License.
 
     $ctrl.yes = function () {
       $ctrl.close();
-      CommonService.quit(true);
+      CommonService.quit();
     };
 
     $ctrl.no = function () {

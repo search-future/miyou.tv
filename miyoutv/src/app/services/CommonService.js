@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-(function (path, fs, nw) {
+(function (path, fs) {
   'use strict';
 
   angular.module('app')
@@ -39,11 +39,7 @@ limitations under the License.
       removeFile: removeFile,
       trigger: trigger,
       triggered: triggered,
-      isFullscreen: isFullscreen,
-      enterFullscreen: enterFullscreen,
-      leaveFullscreen: leaveFullscreen,
-      toggleFullscreen: toggleFullscreen,
-      quit: quit,
+      quitModal: quitModal,
       close: close,
       reload: reload,
       back: back,
@@ -60,7 +56,40 @@ limitations under the License.
       quitModal: null
     };
 
-    props.win = nw.Window.get();
+    /* eslint-disable */
+    if (process.versions.nw) {
+      var version = process.versions.nw.split('.');
+      if (parseInt(version[0], 10) > 0 || parseInt(version[1], 10) > 12) {
+        props.app = nw.App;
+        props.win = nw.Window.get();
+      } else {
+        props.app = require('nw.gui').App;
+        props.win = require('nw.gui').Window.get();
+      }
+      props.dataPath = props.app.dataPath;
+      service.isFullscreen = isFullscreen;
+      service.enterFullscreen = enterFullscreenNW;
+      service.leaveFullscreen = leaveFullscreenNW;
+      service.toggleFullscreen = toggleFullscreenNW;
+      service.quit = quitNW;
+    } else if (process.versions.electron) {
+      var version = process.versions.electron.split('.');
+      if (parseInt(version[0], 10) > 0) {
+        props.app = require('electron').remote.app;
+        props.win = require('electron').remote.getCurrentWindow();
+      } else {
+        props.app = require('remote').app;
+        props.win = require('remote').getCurrentWindow();
+      }
+      props.dataPath = props.app.getPath('userData');
+      service.isFullscreen = isFullscreen;
+      service.enterFullscreen = enterFullscreenElectron;
+      service.leaveFullscreen = leaveFullscreenElectron;
+      service.toggleFullscreen = toggleFullscreenElectron;
+      service.quit = quitElectron;
+    }
+    /* eslint-enable */
+
     props.isFullscreen = props.win.isFullscreen;
     return service;
 
@@ -115,8 +144,8 @@ limitations under the License.
     }
 
     function saveFile(dirname, filename, value) {
-      var dirpath = path.resolve(nw.App.dataPath, dirname);
-      var filepath = path.join(nw.App.dataPath, dirname, filename);
+      var dirpath = path.resolve(props.dataPath, dirname);
+      var filepath = path.join(props.dataPath, dirname, filename);
       var data;
       if (angular.isObject(value)) {
         data = angular.toJson(value);
@@ -139,7 +168,7 @@ limitations under the License.
     }
 
     function loadFile(dirname, filename) {
-      var filepath = path.join(nw.App.dataPath, dirname, filename);
+      var filepath = path.join(props.dataPath, dirname, filename);
       var data;
       var value;
 
@@ -157,7 +186,7 @@ limitations under the License.
     }
 
     function removeFile(dirname, filename) {
-      var filepath = path.join(nw.App.dataPath, dirname, filename);
+      var filepath = path.join(props.dataPath, dirname, filename);
       try {
         fs.unlinkFileSync(filepath);
       } catch (e) {
@@ -180,27 +209,37 @@ limitations under the License.
       return props.isFullscreen;
     }
 
-    function enterFullscreen() {
+    function enterFullscreenNW() {
       props.isFullscreen = true;
       props.win.enterFullscreen();
     }
 
-    function leaveFullscreen() {
+    function enterFullscreenElectron() {
+      props.isFullscreen = true;
+      props.win.setFullScreen(props.isFullscreen);
+    }
+
+    function leaveFullscreenNW() {
       props.isFullscreen = false;
       props.win.leaveFullscreen();
     }
 
-    function toggleFullscreen() {
+    function leaveFullscreenElectron() {
+      props.isFullscreen = false;
+      props.win.setFullScreen(props.isFullscreen);
+    }
+
+    function toggleFullscreenNW() {
       props.isFullscreen = !props.win.isFullscreen;
       props.win.toggleFullscreen();
     }
 
-    function quit(force) {
-      if (force) {
-        props.win.restore();
-        props.win.close(true);
-        return;
-      }
+    function toggleFullscreenElectron() {
+      props.isFullscreen = !props.win.isFullScreen();
+      props.win.setFullScreen(props.isFullscreen);
+    }
+
+    function quitModal() {
       if (!props.quitModal) {
         props.quitModal = $uibModal.open({
           component: 'quitModal',
@@ -213,7 +252,7 @@ limitations under the License.
     }
 
     function close() {
-      nw.App.closeAllWindows();
+      props.win.close();
     }
 
     function reload() {
@@ -222,6 +261,14 @@ limitations under the License.
 
     function back() {
       $window.history.back();
+    }
+
+    function quitNW() {
+      props.app.closeAllWindows();
+    }
+
+    function quitElectron() {
+      props.app.quit();
     }
 
     function formatTime(time) {
@@ -280,6 +327,5 @@ limitations under the License.
   }
 }(
   require('path'),
-  require('fs'),
-  global.nw ? nw : require('nw.gui') // eslint-disable-line node/no-missing-require, node/no-unpublished-require
+  require('fs')
 ));

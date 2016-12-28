@@ -8,6 +8,8 @@
   },
   "bugs": "https://github.com/search-future/miyou.tv/issues",
   "dependencies": {
+    "electron": "^1.3.1",
+    "electron-prebuilt": "^0.36.0",
     "nw": ">=0.12.3",
     "wcjs-prebuilt": "^3.0.0",
     "webchimera.js": "^0.2.7",
@@ -30,7 +32,7 @@
   "optionalDependencies": {},
   "repository": "https://github.com/search-future/miyou.tv",
   "scripts": {
-    "start": "nw"
+    "start": "electron index.js || nw"
   },
   "window": {
     "frame": true,
