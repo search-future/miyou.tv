@@ -517,7 +517,7 @@ gulp.task('build:agent:scripts', () => {
 gulp.task('build:agent:resource', () => {
   const merged = [];
   const buildDir = path.resolve(
-    'build/', packages.miyoutvAgent.buildName, packages.miyoutv.manifest.name
+    'build/', packages.miyoutvAgent.buildName, packages.miyoutvAgent.manifest.name
   );
   merged.push(gulp
     .src([
