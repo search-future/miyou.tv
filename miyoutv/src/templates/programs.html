@@ -17,8 +17,25 @@ limitations under the License.
 <meta charset="UTF-8">
 <div class="programs view-content" ng-init="$ctrl.baseWidth = 200; $ctrl.baseHeight = 240;">
     <ul class="nav nav-pills">
-        <li ng-repeat="date in $ctrl.dates" ng-class="{active: date.isCurrent}">
+        <li class="pull-left" ng-if="$ctrl.validArchive">
+            <form class="checkbox">
+                <label>
+                    <input type="checkbox" ng-model="$ctrl.useArchive">番組表データ
+                </label>
+            </form>
+        </li>
+        <li ng-repeat="date in $ctrl.dates" ng-class="{active: date.isCurrent, 'hidden-lg': $ctrl.dates.length > 11, 'hidden-md': $ctrl.dates.length > 9, 'hidden-sm': $ctrl.dates.length > 7, 'hidden-xs': $ctrl.dates.length > 3 }">
             <a href="" ng-bind="date.time | date:'M/d EEE'" ng-click="$ctrl.scrollToTime(date.time)"></a>
+        </li>
+        <li class="col-lg-3 col-md-4 col-sm-5 col-xs-10" ng-class="{'hidden-lg': $ctrl.dates.length <= 11, 'hidden-md': $ctrl.dates.length <= 9, 'hidden-sm': $ctrl.dates.length <= 7, 'hidden-xs': $ctrl.dates.length <= 3 }">
+            <div class="input-group input-xs">
+                <input class="form-control" type="text" uib-datepicker-popup="y/M/d EEE" datepicker-options="$ctrl.datepickerOptions" show-button-bar="false" popup-placement="bottom-right" is-open="$ctrl.datepickerOpened" ng-model="$ctrl.currentDate" ng-change="$ctrl.scrollToTime($ctrl.currentDate)">
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="button" ng-click="$ctrl.datepickerOpened = !$ctrl.datepickerOpened">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </button>
+                </div>
+            </div>
         </li>
     </ul>
     <div class="view-content-body scrollable" keep-scroll keep-bottom>
@@ -37,10 +54,10 @@ limitations under the License.
                 <div class="program-table-cell" ng-repeat="item in column.programs" ng-if="column.enabled && item.enabled" ng-style="item.style" ng-init="$ctrl.request(item)">
                     <div class="program-table-content clickable" ng-class="{selected: $ctrl.selectItem() === item}" ng-click="$ctrl.selectItem(item)" ng-dblclick="$ctrl.play(item)">
                         <span class="badge" ng-bind="item.commentCount"></span>
-                        <span class="time text-primary" ng-bind="item.startAt | date:'HH:mm'"></span>
-                        <span class="title text-primary" ng-bind="item.name"></span>
+                        <span class="time text-primary" ng-bind="item.start | date:'HH:mm'"></span>
+                        <span class="title text-primary" ng-bind="item.title"></span>
                         <span class="label label-default" ng-class="'label-' + item.categoryName.name" ng-bind="item.categoryName.localeName"></span>
-                        <div class="detail" ng-bind="item.description"></div>
+                        <div class="detail" ng-bind="item.detail"></div>
                         <div class="preview text-center" ng-if="item.preview">
                             <img width="160" height="90" ng-src="{{item.preview}}">
                         </div>

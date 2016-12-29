@@ -256,7 +256,24 @@ body {
     text-align: center;
 }
 
-.programs .nav-pills a {
+.programs input[type="text"] {
+    border-radius: 32px;
+    border: none;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+}
+
+.programs .input-group-btn .btn{
+    border-radius: 0 32px 32px 0;
+    border: none;
+    background-color: #333;
+    color: #fff;
+
+}
+
+.programs .nav-pills a,
+.programs .nav-pills .checkbox {
     color: #747474;
     border-bottom: 2px solid transparent;
     border-radius: 0;

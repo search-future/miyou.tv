@@ -61,10 +61,10 @@ limitations under the License.
       }, function (responce) {
         progressModal.close();
         if (responce.status === 404 && /archive\.json$/.test(responce.config.url)) {
-          CommonService.errorModal(
-            'MiyouTV Agent error',
-            '番組表を取得できませんでした。番組表は使用できません。'
-          );
+          // CommonService.errorModal(
+          //   'MiyouTV Agent error',
+          //   '番組表データを取得できませんでした。'
+          // );
         } else {
           chinachuErrorHandler();
         }

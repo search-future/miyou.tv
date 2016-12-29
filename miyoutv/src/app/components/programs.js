@@ -50,6 +50,13 @@ limitations under the License.
       position: 'absolute',
       top: 0
     };
+    $ctrl.datepickerOptions = {
+      formatMonth: 'M月',
+      formatDayTitle: 'y/M',
+      formatMonthTitle: 'y年',
+      showWeeks: false
+    };
+    $ctrl.useArchive = true;
 
     $ctrl.request = function (item) {
       var program = item;
@@ -58,7 +65,7 @@ limitations under the License.
 
       if (angular.isUndefined(program.commentCount)) {
         CommentService
-          .requestCount(program.startAt, program.startAt + program.duration, program.channel)
+          .requestCount(program.start, program.end, program.channel)
           .then(function (value) {
             program.commentCount = value;
           });
@@ -67,14 +74,14 @@ limitations under the License.
         recorded = ChinachuService.data.recorded.filter(function (a) {
           return (
             a.channel.id === program.channel.id &&
-            a.end > program.startAt &&
-            a.start < program.startAt
+            a.end > program.start &&
+            a.start <= program.start
           );
         })[0];
         if (recorded) {
           ChinachuService
             .requestPreview(recorded.id, 'png', {
-              pos: Math.floor((program.startAt - recorded.start) / 1000) + 70,
+              pos: Math.floor((program.start - recorded.start) / 1000) + 70,
               size: '160x90'
             }).then(function (value) {
               program.preview = value;
@@ -96,7 +103,7 @@ limitations under the License.
 
     $ctrl.play = function (item) {
       if (item) {
-        $location.url(['/channel/player', item.channel.id, item.startAt].join('/'));
+        $location.url(['/channel/player', item.channel.id, item.start].join('/'));
       }
     };
 
@@ -114,29 +121,47 @@ limitations under the License.
       },
       function () {
         return ChinachuService.data.recorded;
+      },
+      function () {
+        return $ctrl.useArchive;
       }
     ], function (values) {
       var archive = values[0];
+      var recorded = values[1];
       var programs = [];
-      var channels = ChinachuService.recordedChannels();
-      var start = ChinachuService.firstRecordTime();
-      var end = ChinachuService.lastRecordTime();
+      var filter;
+      var channels;
+      var start;
+      var end;
       var channel;
       var column;
       var item;
       var ci;
       var pi;
 
+      $ctrl.validArchive = false;
       $ctrl.dates = [];
       $ctrl.hours = [];
 
-      ChinachuService.recordedDates().forEach(function (a) {
+      if (archive.programs) {
+        filter = function (a) {
+          return a.isMiyoutvReserved;
+        };
+        $ctrl.validArchive = true;
+      }
+      channels = ChinachuService.recordedChannels(filter);
+      start = ChinachuService.firstRecordTime(filter);
+      end = ChinachuService.lastRecordTime(filter);
+      $ctrl.datepickerOptions.minDate = start;
+      $ctrl.datepickerOptions.maxDate = end;
+
+      ChinachuService.recordedDates(filter).forEach(function (a) {
         $ctrl.dates.push({
           time: a,
           isCurrent: isCurrentDate(a)
         });
       });
-      ChinachuService.recordedHours().forEach(function (a) {
+      ChinachuService.recordedHours(filter).forEach(function (a) {
         $ctrl.hours.push({
           time: a,
           style: {
@@ -145,20 +170,26 @@ limitations under the License.
           }
         });
       });
+
       for (ci = 0; ci < channels.length; ci += 1) {
         channel = channels[ci];
         column = ChinachuService.serviceFromLegacy(channel);
         column.channel = channel;
         column.style = calcColumnStyle(column);
         column.programs = [];
-        if (archive.programs) {
+        if ($ctrl.validArchive && $ctrl.useArchive) {
           for (pi = 0; pi < archive.programs.length; pi += 1) {
             item = archive.programs[pi];
+            item.start = item.startAt;
+            item.end = item.startAt + item.duration;
+            item.seconds = item.duration / 1000;
+            item.title = item.name;
+            item.detail = item.description;
             if (
               item.networkId === column.networkId &&
               item.serviceId === column.serviceId &&
-              item.startAt < end &&
-              item.startAt + item.duration > start
+              item.start < end &&
+              item.end > start
             ) {
               item.channel = channel;
               if (angular.isArray(item.genres)) {
@@ -170,13 +201,27 @@ limitations under the License.
               column.programs.push(item);
             }
           }
+        } else {
+          for (pi = 0; pi < recorded.length; pi += 1) {
+            item = recorded[pi];
+            if (
+              item.channel.id === column.channel.id &&
+              item.start < end &&
+              item.end > start
+            ) {
+              item.categoryName = ChinachuService.convertCategory(item.category);
+              item.style = calcItemStyle(item);
+              column.programs.push(item);
+            }
+          }
         }
         if (column.programs.length > 0) {
           programs.push(column);
         }
       }
       $ctrl.programs = programs;
-      updateView();
+      $timeout.cancel(timer);
+      timer = $timeout(updateView, 200);
     });
     $scope.$watch(function () {
       return selectItem;
@@ -191,7 +236,11 @@ limitations under the License.
       return $location.search().search;
     }, function (value) {
       if (value) {
-        $location.url('/programs/search/?search=' + value);
+        if (ChinachuService.data.archive.programs && $ctrl.useArchive) {
+          $location.url('/programs/search/?search=' + value);
+        } else {
+          $location.url('/recorded/?search=' + value);
+        }
       }
     });
 
@@ -199,7 +248,7 @@ limitations under the License.
       $ctrl.vHeaderStyle.left = e.target.scrollLeft + 'px';
       $ctrl.hHeaderStyle.top = e.target.scrollTop + 'px';
       $timeout.cancel(timer);
-      timer = $timeout(updateView);
+      timer = $timeout(updateView, 200);
       $scope.$digest();
     });
     angular.element($window).on('resize', function () {
@@ -246,13 +295,13 @@ limitations under the License.
     function calcItemStyle(item) {
       if ($ctrl.selectItem() === item) {
         return {
-          top: calcPos(item.startAt) + 'px',
-          minHeight: calcHeight(item.startAt, item.startAt + item.duration) + 'px'
+          top: calcPos(item.start) + 'px',
+          minHeight: calcHeight(item.start, item.end) + 'px'
         };
       }
       return {
-        top: calcPos(item.startAt) + 'px',
-        height: calcHeight(item.startAt, item.startAt + item.duration) + 'px'
+        top: calcPos(item.start) + 'px',
+        height: calcHeight(item.start, item.end) + 'px'
       };
     }
 
@@ -291,6 +340,9 @@ limitations under the License.
       $ctrl.dates.forEach(function (a) {
         var date = a;
         date.isCurrent = isCurrentDate(date.time);
+        if (date.isCurrent) {
+          $ctrl.currentDate = date.time;
+        }
       });
       for (ci = 0; ci < $ctrl.programs.length; ci += 1) {
         column = $ctrl.programs[ci];
@@ -301,8 +353,8 @@ limitations under the License.
         for (ii = 0; ii < column.programs.length; ii += 1) {
           item = column.programs[ii];
           item.enabled = (
-            calcPos(item.startAt) <= bottom &&
-            calcPos(item.startAt + item.duration) >= top
+            calcPos(item.start) < bottom &&
+            calcPos(item.end) > top
           );
         }
       }

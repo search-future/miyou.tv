@@ -279,13 +279,16 @@ limitations under the License.
         request('/api/recorded.json', {
           cache: false
         }).then(function (recorded) {
-          service.data.recorded = recorded.data;
           request('/archive.json', {
             cache: true
           }).then(function (archive) {
+            service.data.recorded = recorded.data;
             service.data.archive = archive.data;
             deferred.resolve(archive);
-          }, deferred.reject);
+          }, function (responce) {
+            service.data.recorded = recorded.data;
+            deferred.reject(responce);
+          });
         }, deferred.reject);
       }, deferred.reject, deferred.notify);
       return deferred.promise;
@@ -306,26 +309,28 @@ limitations under the License.
       return matchedCategory;
     }
 
-    function firstRecordTime() {
-      return Math.min.apply(null, service.data.recorded.filter(function (a) {
-        return a.autoExpire;
-      }).map(function (a) {
-        return a.start;
-      }));
+    function firstRecordTime(filter) {
+      return Math.min.apply(
+        null,
+        service.data.recorded.filter(filter || Boolean).map(function (a) {
+          return a.start;
+        })
+      );
     }
 
-    function lastRecordTime() {
-      return Math.max.apply(null, service.data.recorded.filter(function (a) {
-        return a.autoExpire;
-      }).map(function (a) {
-        return a.end;
-      }));
+    function lastRecordTime(filter) {
+      return Math.max.apply(
+        null,
+        service.data.recorded.filter(filter || Boolean).map(function (a) {
+          return a.end;
+        })
+      );
     }
 
-    function recordedDates() {
+    function recordedDates(filter) {
       var dates = [];
-      var start = new Date(firstRecordTime());
-      var end = new Date(lastRecordTime());
+      var start = new Date(firstRecordTime(filter));
+      var end = new Date(lastRecordTime(filter));
       var date = new Date(start.getFullYear(), start.getMonth(), start.getDate());
 
       while (date.getTime() < end.getTime()) {
@@ -335,10 +340,10 @@ limitations under the License.
       return dates;
     }
 
-    function recordedHours() {
+    function recordedHours(filter) {
       var hours = [];
-      var start = new Date(firstRecordTime());
-      var end = new Date(lastRecordTime());
+      var start = new Date(firstRecordTime(filter));
+      var end = new Date(lastRecordTime(filter));
       var hour = new Date(start.getFullYear(), start.getMonth(), start.getDate(), start.getHours());
 
       while (hour.getTime() < end.getTime()) {
@@ -348,8 +353,8 @@ limitations under the License.
       return hours;
     }
 
-    function recordedChannels() {
-      var recorded = service.data.recorded;
+    function recordedChannels(filter) {
+      var recorded = service.data.recorded.filter(filter || Boolean);
       var channels = [];
       var program;
       var ri;
