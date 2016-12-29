@@ -161,7 +161,7 @@ global.module.paths.push(modulePath);
           name: injector('player')
         }
       })
-      .when('/:mode/player/:channel/:time', {
+      .when('/:mode/player/:type/:sid/:start*-:end?', {
         template: '<player></player>',
         reloadOnSearch: false,
         resolve: {

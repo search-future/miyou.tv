@@ -57,7 +57,8 @@ limitations under the License.
       if (angular.isUndefined(program.preview)) {
         recorded = ChinachuService.data.recorded.filter(function (a) {
           return (
-            a.channel.id === program.channel.id &&
+            a.channel.type === program.channel.type &&
+            a.channel.sid === program.channel.sid &&
             a.end > program.startAt &&
             a.start < program.startAt
           );
@@ -76,7 +77,12 @@ limitations under the License.
 
     $ctrl.play = function (item) {
       if (item) {
-        $location.url(['/channel/player', item.channel.id, item.startAt].join('/'));
+        $location.url([
+          '/channel/player',
+          item.channel.type,
+          item.channel.sid,
+          item.startAt + '-' + (item.startAt + item.duration)
+        ].join('/'));
       }
     };
 

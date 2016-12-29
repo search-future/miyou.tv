@@ -363,7 +363,10 @@ limitations under the License.
       for (ri = 0; ri < recorded.length; ri += 1) {
         program = recorded[ri];
         for (ci = 0; ci < channels.length; ci += 1) {
-          if (program.channel.id === channels[ci].id) {
+          if (
+            program.channel.type === channels[ci].type &&
+            program.channel.sid === channels[ci].sid
+          ) {
             channels[ci] = program.channel;
             break;
           }

@@ -186,7 +186,12 @@ limitations under the License.
           ChinachuPlayerService.playRecorded($routeParams.id);
           break;
         case 'channel':
-          ChinachuPlayerService.channelStart($routeParams.channel, $routeParams.time);
+          ChinachuPlayerService.channelStart(
+            $routeParams.type,
+            parseInt($routeParams.sid, 10),
+            parseInt($routeParams.start, 10),
+            parseInt($routeParams.end, 10)
+          );
           $ctrl.mainHotkeys.p = ChinachuPlayerService.channelPrevious;
           $ctrl.mainHotkeys.n = ChinachuPlayerService.channelNext;
           break;

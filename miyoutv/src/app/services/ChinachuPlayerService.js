@@ -78,7 +78,7 @@ limitations under the License.
         });
     }
 
-    function channelStart(channel, start) {
+    function channelStart(type, sid, start, end) {
       var deregister = null;
       var recorded = [];
       var program = {};
@@ -88,14 +88,19 @@ limitations under the License.
           return ChinachuService.data.recorded.length;
         }, function (value) {
           if (value > 0) {
-            service.channelStart(channel, start);
+            service.channelStart(type, sid, start, end);
             deregister();
           }
         });
         return;
       }
       recorded = ChinachuService.data.recorded.filter(function (a) {
-        return String(a.channel.id) === String(channel) && a.end > start;
+        return (
+          a.channel.type === type &&
+          a.channel.sid === sid &&
+          a.end > start &&
+          (!end || a.start < end)
+        );
       });
       recorded.sort(function (a, b) {
         return a.end - b.end;
@@ -114,7 +119,11 @@ limitations under the License.
       var program = {};
 
       recorded = ChinachuService.data.recorded.filter(function (a) {
-        return a.channel.id === current.channel.id && a.start >= current.end;
+        return (
+          a.channel.type === current.channel.type &&
+          a.channel.sid === current.channel.sid &&
+          a.start >= current.end
+        );
       });
       if (recorded.length <= 0) {
         return;
@@ -133,7 +142,11 @@ limitations under the License.
       var recorded = [];
 
       recorded = ChinachuService.data.recorded.filter(function (a) {
-        return a.channel.id === current.channel.id && a.end <= current.start;
+        return (
+          a.channel.type === current.channel.type &&
+          a.channel.sid === current.channel.sid &&
+          a.end <= current.start
+        );
       });
       if (recorded.length <= 0) {
         return;

@@ -73,7 +73,8 @@ limitations under the License.
       if (angular.isUndefined(program.preview)) {
         recorded = ChinachuService.data.recorded.filter(function (a) {
           return (
-            a.channel.id === program.channel.id &&
+            a.channel.type === program.channel.type &&
+            a.channel.sid === program.channel.sid &&
             a.end > program.start &&
             a.start <= program.start
           );
@@ -107,7 +108,12 @@ limitations under the License.
 
     $ctrl.play = function (item) {
       if (item) {
-        $location.url(['/channel/player', item.channel.id, item.start].join('/'));
+        $location.url([
+          '/channel/player',
+          item.channel.type,
+          item.channel.sid,
+          item.start + '-' + item.end
+        ].join('/'));
       }
     };
 
@@ -116,7 +122,7 @@ limitations under the License.
       var position = $event.target.scrollTop + $event.offsetY;
       var start = ((position * 3600000) / $ctrl.baseHeight) + baseTime;
 
-      $location.url(['/channel/player', column.channel.id, start].join('/'));
+      $location.url(['/channel/player', column.channel.type, column.channel.sid, start].join('/'));
     };
 
     $scope.$watchGroup([
@@ -209,7 +215,8 @@ limitations under the License.
           for (pi = 0; pi < recorded.length; pi += 1) {
             item = recorded[pi];
             if (
-              item.channel.id === column.channel.id &&
+              item.channel.type === column.channel.type &&
+              item.channel.sid === column.channel.sid &&
               item.start < end &&
               item.end > start
             ) {
