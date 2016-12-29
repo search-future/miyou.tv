@@ -25,7 +25,7 @@ global.module.paths.push(modulePath);
   var commentTokenUrl = 'https://miteru.digitiminimi.com/a2sc.php/auth/moritapo';
   var channelTable = {
     GR_1024: 'NHK総合',
-    GR_1032: 'NHK Eテレ',
+    GR_1032: 'NHKEテレ',
     GR_1040: '日テレ',
     GR_1048: 'TBS',
     GR_1056: 'フジテレビ',
