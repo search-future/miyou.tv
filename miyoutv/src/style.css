@@ -417,39 +417,55 @@ body {
 }
 
 .label-news {
-    background-color: red;
+    background-color: #c06;
 }
 
 .label-sports {
-    background-color: pink;
+    background-color: #6c0;
 }
 
 .label-information {
-    background-color: violet;
+    background-color: #00c;
 }
 
 .label-drama {
-    background-color: purple;
+    background-color: #c00;
 }
 
 .label-music {
-    background-color: blue;
+    background-color: #c60;
 }
 
 .label-variety {
-    background-color: green;
+    background-color: #c0c;
 }
 
 .label-cinema {
-    background-color: #ffc801;
+    background-color: #0cc;
 }
 
 .label-anime {
-    background-color: orange;
+    background-color: #cc0;
+}
+
+.label-documentary {
+    background-color: #0c0;
+}
+
+.label-theater {
+    background-color: #0c6;
+}
+
+.label-hobby {
+    background-color: #6c0;
+}
+
+.label-welfare {
+    background-color: #666;
 }
 
 .label-etc {
-    background-color: #777;
+    background-color: #666;
 }
 
 
