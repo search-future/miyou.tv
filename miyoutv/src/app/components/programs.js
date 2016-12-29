@@ -28,6 +28,7 @@ limitations under the License.
     $window,
     $location,
     $timeout,
+    CommonService,
     ChinachuService,
     CommentService
   ) {
@@ -107,13 +108,26 @@ limitations under the License.
     };
 
     $ctrl.play = function (item) {
+      var recorded;
       if (item) {
-        $location.url([
-          '/channel/player',
-          item.channel.type,
-          item.channel.sid,
-          item.start + '-' + item.end
-        ].join('/'));
+        recorded = ChinachuService.data.recorded.filter(function (a) {
+          return (
+            a.channel.type === item.channel.type &&
+            a.channel.sid === item.channel.sid &&
+            a.end > item.start &&
+            a.start < item.end
+          );
+        });
+        if (recorded.length > 0) {
+          $location.url([
+            '/channel/player',
+            item.channel.type,
+            item.channel.sid,
+            item.start + '-' + item.end
+          ].join('/'));
+        } else {
+          CommonService.errorModal('', '録画データが見つかりません。');
+        }
       }
     };
 
@@ -121,8 +135,18 @@ limitations under the License.
       var baseTime = $ctrl.hours[0].time;
       var position = $event.target.scrollTop + $event.offsetY;
       var start = ((position * 3600000) / $ctrl.baseHeight) + baseTime;
-
-      $location.url(['/channel/player', column.channel.type, column.channel.sid, start].join('/'));
+      var recorded = ChinachuService.data.recorded.filter(function (a) {
+        return (
+          a.channel.type === column.channel.type &&
+          a.channel.sid === column.channel.sid &&
+          a.end > start
+        );
+      });
+      if (recorded.length > 0) {
+        $location.url(['/channel/player', column.channel.type, column.channel.sid, start].join('/'));
+      } else {
+        CommonService.errorModal('', '録画データが見つかりません。');
+      }
     };
 
     $scope.$watchGroup([

@@ -23,6 +23,7 @@ limitations under the License.
   function ChinachuPlayerService(
     $q,
     $rootScope,
+    CommonService,
     ChinachuService,
     PlayerService
   ) {
@@ -102,6 +103,11 @@ limitations under the License.
           (!end || a.start < end)
         );
       });
+
+      if (recorded.length <= 0) {
+        CommonService.errorModal('再生エラー', '録画データが見つかりません。');
+        return;
+      }
       recorded.sort(function (a, b) {
         return a.end - b.end;
       });
