@@ -66,13 +66,13 @@ global.module.paths.push(modulePath);
   };
   var categoryTable = [{
     name: 'news',
-    localeName: 'ニュース／報道'
+    localeName: 'ニュース/報道'
   }, {
     name: 'sports',
     localeName: 'スポーツ'
   }, {
     name: 'information',
-    localeName: '情報／ワイドショー'
+    localeName: '情報/ワイドショー'
   }, {
     name: 'drama',
     localeName: 'ドラマ'
@@ -81,25 +81,25 @@ global.module.paths.push(modulePath);
     localeName: '音楽'
   }, {
     name: 'variety',
-    localeName: 'バラエティー'
+    localeName: 'バラエティ'
   }, {
     name: 'cinema',
     localeName: '映画'
   }, {
     name: 'anime',
-    localeName: 'アニメ／特撮'
+    localeName: 'アニメ/特撮'
   }, {
-    name: 'information',
-    localeName: '情報／ワイドショー'
+    name: 'documentary',
+    localeName: 'ドキュメンタリー/教養'
   }, {
-    name: 'cinema',
-    localeName: '映画'
+    name: 'theater',
+    localeName: '劇場/公演'
   }, {
-    name: 'etc',
-    localeName: 'その他'
+    name: 'hobby',
+    localeName: '趣味/教育'
   }, {
-    name: 'etc',
-    localeName: 'その他'
+    name: 'welfare',
+    localeName: '福祉'
   }, {
     name: 'etc',
     localeName: 'その他'
