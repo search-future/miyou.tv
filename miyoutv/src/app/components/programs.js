@@ -81,7 +81,11 @@ limitations under the License.
         if (recorded) {
           ChinachuService
             .requestPreview(recorded.id, 'png', {
-              pos: Math.floor((program.start - recorded.start) / 1000) + 70,
+              pos: (
+                recorded.seconds > 70 ?
+                Math.floor((program.start - recorded.start) / 1000) + 70 :
+                10
+              ),
               size: '160x90'
             }).then(function (value) {
               program.preview = value;
