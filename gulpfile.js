@@ -171,7 +171,7 @@ gulp.task('build:miyoutv:resource', () => {
     .src('miyoutv/src/package.json')
     .pipe(jeditor((json) => {
       const result = json;
-      result.main = argv.version === 'nw' ? 'index.html' : 'index.js';
+      result.main = argv.runtime === 'nw' ? 'index.html' : 'index.js';
       return result;
     }))
     .pipe(gulp.dest('miyoutv/dist/')));
