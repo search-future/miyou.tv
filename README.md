@@ -46,8 +46,7 @@ ChinachuとMirakurunがインストールされたサーバとWebChimera.jsを�
 
 ## Installation
 MiyouTVは**番組再生アプリケーションのmiyoutv**と**Chinachu補助ツールのmiyoutv-agent**から構成されています。
-miyoutv単体でもChinachuクライアントとして動作しますが、全ての機能を利用するにはmiyoutv-agentの導入が必要です。
-
+miyoutv単体でChinachuクライアントとして動作します。EPGに依存しない全録システムを構築するにはChinachu betaとmiyoutv-agentが必要です。
 ### Download
 <https://github.com/search-future/miyou.tv/releases>
 
