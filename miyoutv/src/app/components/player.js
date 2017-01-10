@@ -111,12 +111,17 @@ limitations under the License.
           new Date(value.start).toLocaleString()
         ].join('\n'));
         CommentService.load(value.start, value.end, value.channel).catch(function (responce) {
-          if (responce.data) {
+          if (responce.noToken) {
+            $ctrl.alerts.push({
+              type: 'warning',
+              message: 'コメントを表示するにはモリタポアカウントを認証してください。'
+            });
+          } else if (responce.data) {
             switch (responce.data.EC) {
               case 403:
                 $ctrl.alerts.push({
                   type: 'warning',
-                  message: 'コメントサーバーの認証に失敗しました。設定からモリタポアカウントを認証してください。'
+                  message: 'コメントサーバーの認証に失敗しました。モリタポアカウントの認証をやり直してください。'
                 });
                 break;
               default:

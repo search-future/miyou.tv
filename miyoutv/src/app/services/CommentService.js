@@ -269,6 +269,10 @@ limitations under the License.
 
       if (cache) {
         deferred.resolve(cache.data);
+      } else if (token() === '') {
+        deferred.reject({
+          noToken: true
+        });
       } else {
         conf = {
           method: 'GET',
@@ -306,6 +310,10 @@ limitations under the License.
 
       if (cache) {
         deferred.resolve(cache.data);
+      } else if (token() === '') {
+        deferred.reject({
+          noToken: true
+        });
       } else {
         conf = {
           method: 'GET',
