@@ -75,7 +75,21 @@ limitations under the License.
       ChinachuService
         .request(['/api/recorded/', id, '.json'].join(''))
         .then(function (response) {
+          var programService;
+
           service.program = response.data;
+          if (ChinachuService.data.archive.programs) {
+            programService = ChinachuService.serviceFromLegacy(service.program.channel);
+            service.programList = ChinachuService.data.archive.programs
+              .filter(function (a) {
+                return (
+                  a.networkId === programService.networkId &&
+                  a.serviceId === programService.serviceId &&
+                  a.startAt < service.program.end &&
+                  a.startAt + a.duration > service.program.start
+                );
+              });
+          }
         });
     }
 
