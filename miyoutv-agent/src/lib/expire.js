@@ -26,6 +26,7 @@ function expire(options) {
         recorded = JSON.parse(fs.readFileSync(options.recordedFile));
       } catch (e) {
         console.error('%s: %s', new Date().toISOString(), e.message);
+        reject(e);
         return;
       }
       yield sleep(100);
@@ -51,6 +52,9 @@ function expire(options) {
           expiredRecords.push(record.id);
         } catch (e) {
           console.error('%s: %s', new Date().toISOString(), e.message);
+          if (e.code === 'ENOENT') {
+            expiredRecords.push(record.id);
+          }
         }
         yield sleep(100);
       }
