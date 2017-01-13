@@ -444,7 +444,7 @@ gulp.task('build:agent', ['build:agent:scripts', 'build:agent:resource']);
 gulp.task('build:agent:scripts', () => {
   const merged = [];
   const buildDir = path.resolve(
-    'build/', packages.miyoutvAgent.buildName, packages.miyoutv.manifest.name
+    'build/', packages.miyoutvAgent.buildName, packages.miyoutvAgent.manifest.name
   );
   merged.push(gulp
     .src('miyoutv-agent/src/miyoutv-agent.js')
