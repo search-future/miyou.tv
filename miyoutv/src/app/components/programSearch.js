@@ -125,11 +125,16 @@ limitations under the License.
         if (archive.programs) {
           for (pi = 0; pi < archive.programs.length; pi += 1) {
             item = archive.programs[pi];
+            item.start = item.startAt;
+            item.end = item.startAt + item.duration;
+            item.seconds = item.duration / 1000;
+            item.title = item.name;
+            item.detail = item.description;
             if (
               item.networkId === service.networkId &&
               item.serviceId === service.serviceId &&
-              item.startAt < end &&
-              item.startAt + item.duration > start
+              item.start < end &&
+              item.end > start
             ) {
               item.channel = channel;
               if (angular.isArray(item.genres)) {
