@@ -53,7 +53,8 @@ limitations under the License.
       recordedChannels: recordedChannels,
       groupBy: groupBy,
       channelFromLegacy: channelFromLegacy,
-      serviceFromLegacy: serviceFromLegacy
+      serviceFromLegacy: serviceFromLegacy,
+      generateFilterPattern: generateFilterPattern
     };
     var props = {
       setting: {
@@ -445,6 +446,64 @@ limitations under the License.
       return channelFromLegacy(legacy).services.filter(function (a) {
         return a.serviceId === parseInt(legacy.sid, 10);
       })[0];
+    }
+
+    function generateFilterPattern(string) {
+      var query = {
+        channel: {},
+        categoryName: {}
+      };
+      var options = string.replace('　', ' ');
+      var optionPettern = /([a-z]+): ?("[^"]*"|[^ ]+)?/g;
+      var option;
+      var key;
+      var value;
+
+      option = optionPettern.exec(options);
+      while (option !== null) {
+        key = option[1];
+        value = option[2].replace(/^"([^"]+)"$/, '$1');
+        switch (key) {
+          case 'ch':
+          case 'channel':
+            query.channel.$ = value;
+            break;
+          case 'chtype':
+          case 'channeltype':
+            query.channel.type = value;
+            break;
+          case 'chnum':
+          case 'channelnum':
+            query.channel.channel = value;
+            break;
+          case 'sid':
+          case 'serviceid':
+            query.channel.sid = value;
+            break;
+          case 'chname':
+          case 'channelname':
+          case 'service':
+          case 'servicename':
+            query.channel.name = value;
+            break;
+          case 'cat':
+          case 'category':
+          case 'genre':
+            query.categoryName.$ = value;
+            break;
+          case 'start':
+            query.start = new Date(value).getTime();
+            break;
+          case 'end':
+            query.end = new Date(value).getTime();
+            break;
+          default:
+            query[key] = value;
+        }
+        option = optionPettern.exec(options);
+      }
+      query.$ = options.replace(optionPettern, '').trim();
+      return query;
     }
   }
 }());

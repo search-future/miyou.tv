@@ -169,7 +169,7 @@ limitations under the License.
     $scope.$watch(function () {
       return $location.search().search;
     }, function (value) {
-      $ctrl.search = value;
+      $ctrl.search = ChinachuService.generateFilterPattern(value);
     });
 
     angular.element(viewport).on('scroll', function () {
