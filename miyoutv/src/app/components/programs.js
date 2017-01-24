@@ -149,6 +149,10 @@ limitations under the License.
       }
     };
 
+    $ctrl.search = function (value) {
+      $location.search('search', value);
+    };
+
     $scope.$watchGroup([
       function () {
         return ChinachuService.data.archive;

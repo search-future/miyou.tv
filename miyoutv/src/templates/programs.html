@@ -41,7 +41,7 @@ limitations under the License.
     <div class="view-content-body scrollable" keep-scroll keep-bottom>
         <div class="program-header program-header-horizontal" ng-style="$ctrl.hHeaderStyle">
             <div class="program-header-cell bg-primary" ng-repeat="channel in $ctrl.programs">
-                <div class="program-header-content" ng-bind="channel.name"></div>
+                <div class="program-header-content clickable" ng-bind="channel.name" ng-click="$ctrl.search('sid:' + channel.serviceId)"></div>
             </div>
         </div>
         <div class="program-header program-header-vertical" ng-style="$ctrl.vHeaderStyle">
@@ -55,8 +55,8 @@ limitations under the License.
                     <div class="program-table-content clickable" ng-class="{selected: $ctrl.selectItem() === item}" ng-click="$ctrl.selectItem(item)" ng-dblclick="$ctrl.play(item)">
                         <span class="badge" ng-bind="item.commentCount"></span>
                         <span class="time text-primary" ng-bind="item.start | date:'HH:mm'"></span>
-                        <span class="title text-primary" ng-bind="item.title"></span>
-                        <span class="label label-default" ng-class="'label-' + item.categoryName.name" ng-bind="item.categoryName.localeName"></span>
+                        <span class="title text-primary" ng-bind="item.title" ng-click="$ctrl.search(item.title)"></span>
+                        <span class="label label-default" ng-class="'label-' + item.categoryName.name" ng-bind="item.categoryName.localeName" ng-click="$ctrl.search('cat:' + item.categoryName.name)"></span>
                         <div class="detail" ng-bind="item.detail"></div>
                         <div class="preview text-center" ng-if="item.preview">
                             <img width="160" height="90" ng-src="{{item.preview}}">

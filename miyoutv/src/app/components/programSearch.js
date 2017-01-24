@@ -100,6 +100,10 @@ limitations under the License.
       };
     };
 
+    $ctrl.search = function (value) {
+      $location.search('search', value);
+    };
+
     $scope.$watchGroup([
       function () {
         return ChinachuService.data.archive;
@@ -169,7 +173,7 @@ limitations under the License.
     $scope.$watch(function () {
       return $location.search().search;
     }, function (value) {
-      $ctrl.search = ChinachuService.generateFilterPattern(value);
+      $ctrl.filterPattern = ChinachuService.generateFilterPattern(value);
     });
 
     angular.element(viewport).on('scroll', function () {
