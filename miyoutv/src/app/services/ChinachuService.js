@@ -453,7 +453,7 @@ limitations under the License.
         channel: {},
         categoryName: {}
       };
-      var options = string.replace('　', ' ');
+      var options = angular.isString(string) ? string.replace('　', ' ') : '';
       var optionPettern = /([a-z]+): ?("[^"]*"|[^ ]+)?/g;
       var option;
       var key;
@@ -462,7 +462,7 @@ limitations under the License.
       option = optionPettern.exec(options);
       while (option !== null) {
         key = option[1];
-        value = option[2].replace(/^"([^"]+)"$/, '$1');
+        value = angular.isString(option[2]) ? option[2].replace(/^"([^"]+)"$/, '$1') : '';
         switch (key) {
           case 'ch':
           case 'channel':

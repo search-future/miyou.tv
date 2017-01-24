@@ -48,7 +48,9 @@ limitations under the License.
     $scope.$watch(function () {
       return $route.current;
     }, function (value) {
-      $ctrl.current = value.locals.name;
+      if (value.locals) {
+        $ctrl.current = value.locals.name;
+      }
     });
   }
 }());
