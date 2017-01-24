@@ -33,11 +33,17 @@ limitations under the License.
     $ctrl.openChinachuSetting = CommonService.openChinachuSetting;
     $ctrl.openMoritapoSetting = CommonService.openMoritapoSetting;
     $ctrl.isCollapsed = true;
-    $ctrl.searchText = $location.search().search;
+    $ctrl.searchText = '';
 
     $ctrl.search = function () {
       $location.search('search', $ctrl.searchText);
     };
+
+    $scope.$watch(function () {
+      return $location.search().search;
+    }, function (value) {
+      $ctrl.searchText = value;
+    });
 
     $scope.$watch(function () {
       return $route.current;
