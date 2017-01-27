@@ -17,7 +17,7 @@ const eventStream = require('event-stream');
 const runSequence = require('run-sequence');
 const del = require('del');
 
-const webpack = require('gulp-webpack');
+const webpack = require('webpack-stream');
 const insert = require('gulp-insert');
 
 const nwjc = path.resolve('node_modules/nw/nwjs/nwjc');

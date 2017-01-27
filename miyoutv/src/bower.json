@@ -9,14 +9,14 @@
     }
   ],
   "dependencies": {
-    "ag-grid": "^7.0.2",
-    "angular": "~1.6.0",
-    "angular-animate": "~1.6.0",
-    "angular-bootstrap": "^2.3.1",
+    "ag-grid": "^7.2.2",
+    "angular": "~1.6.1",
+    "angular-animate": "~1.6.1",
+    "angular-bootstrap": "^2.4.0",
     "angular-hotkeys": "chieffancypants/angular-hotkeys#^1.7.0",
-    "angular-route": "~1.6.0",
+    "angular-route": "~1.6.1",
     "bootstrap": "^3.3.7",
-    "roboto-fontface": "^0.6.0"
+    "roboto-fontface": "^0.6.1"
   },
   "homepage": "http://miyou.tv/",
   "ignore": [
