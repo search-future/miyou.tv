@@ -52,11 +52,11 @@ limitations under the License.
         <div class="program-table">
             <div class="program-table-column" ng-repeat="column in $ctrl.programs" ng-style="column.style" ng-dblclick="$ctrl.playColumn(column, $event)">
                 <div class="program-table-cell" ng-repeat="item in column.programs" ng-if="column.enabled && item.enabled" ng-style="item.style" ng-init="$ctrl.request(item)">
-                    <div class="program-table-content clickable" ng-class="{selected: $ctrl.selectItem() === item}" ng-click="$ctrl.selectItem(item)" ng-dblclick="$ctrl.play(item)">
+                    <div class="program-table-content selectable" ng-class="{selected: $ctrl.selectItem() === item}" ng-click="$ctrl.selectItem(item)" ng-dblclick="$ctrl.play(item)">
                         <span class="badge" ng-bind="item.commentCount"></span>
                         <span class="time text-primary" ng-bind="item.start | date:'HH:mm'"></span>
-                        <span class="title text-primary" ng-bind="item.title" ng-click="$ctrl.search(item.title)"></span>
-                        <span class="label label-default" ng-class="'label-' + item.categoryName.name" ng-bind="item.categoryName.localeName" ng-click="$ctrl.search('cat:' + item.categoryName.name)"></span>
+                        <span class="title text-primary clickable" ng-bind="item.title" ng-click="$ctrl.search(item.title)"></span>
+                        <span class="label label-default clickable" ng-class="'label-' + item.categoryName.name" ng-bind="item.categoryName.localeName" ng-click="$ctrl.search('cat:' + item.categoryName.name)"></span>
                         <div class="detail" ng-bind="item.detail"></div>
                         <div class="preview text-center" ng-if="item.preview">
                             <img width="160" height="90" ng-src="{{item.preview}}">

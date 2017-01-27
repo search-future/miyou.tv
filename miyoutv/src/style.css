@@ -89,9 +89,22 @@ body {
     cursor: pointer;
 }
 
+.selectable {
+    cursor: default;
+}
+
+.selectable:hover {
+    outline: solid 2px -webkit-focus-ring-color;
+    z-index: 12;
+}
+
 .selected {
     outline: solid 2px #db705f;
     z-index: 11;
+}
+
+.selected:hover {
+    outline: solid 2px #db705f;
 }
 
 .range-control {

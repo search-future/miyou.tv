@@ -30,7 +30,7 @@ limitations under the License.
     <h2 class="text-center">検索結果</h2>
     <div class="container-fluid trim view-content-body scrollable" keep-scroll>
         <div class="media-list" ng-style="$ctrl.calcViewStyle(106, results.length)">
-            <div class="media col-md-6 col-md-offset-3 clickable" ng-repeat="item in $ctrl.programs | filter:$ctrl.filterPattern | orderBy:$ctrl.sortKey:$ctrl.sortReverse as results track by $index" ng-if="$index - 4 < $ctrl.scrollPos.bottom / 106 && $index + 4 > $ctrl.scrollPos.top / 106" ng-init="$ctrl.request(item)"
+            <div class="media col-md-6 col-md-offset-3 selectable" ng-repeat="item in $ctrl.programs | filter:$ctrl.filterPattern | orderBy:$ctrl.sortKey:$ctrl.sortReverse as results track by $index" ng-if="$index - 4 < $ctrl.scrollPos.bottom / 106 && $index + 4 > $ctrl.scrollPos.top / 106" ng-init="$ctrl.request(item)"
                 ng-class="{selected: $ctrl.selectItem() === item}" ng-click="$ctrl.selectItem(item)" ng-dblclick="$ctrl.play(item)">
                 <a class="media-left" href="" ng-click="$ctrl.play(item)">
                     <img class="preview" width="160" height="90" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=" ng-src="{{item.preview}}">
@@ -38,12 +38,12 @@ limitations under the License.
                 <div class="media-body">
                     <div class="info">
                         <span class="date" ng-bind="item.startAt | date:'M/d EEE HH:mm'"></span>
-                        <span class="channel" ng-bind="item.channel.name" ng-click="$ctrl.search('sid:' + item.channel.sid)"></span>
+                        <span class="channel clickable" ng-bind="item.channel.name" ng-click="$ctrl.search('sid:' + item.channel.sid)"></span>
                         <span class="length" ng-bind="'(' + (item.duration / 60000) + '分)'"></span>
-                        <span class="label label-default" ng-class="'label-' + item.categoryName.name" ng-bind="item.categoryName.localeName" ng-click="$ctrl.search('cat:' + item.categoryName.name)"></span>
+                        <span class="label label-default clickable" ng-class="'label-' + item.categoryName.name" ng-bind="item.categoryName.localeName" ng-click="$ctrl.search('cat:' + item.categoryName.name)"></span>
                         <span class="badge" ng-bind="item.commentCount"></span>
                     </div>
-                    <div class="title" ng-bind="item.name" ng-click="$ctrl.search(item.name)"></div>
+                    <div class="title clickable" ng-bind="item.name" ng-click="$ctrl.search(item.name)"></div>
                     <div class="detail" ng-bind="item.description"></div>
                 </div>
             </div>
