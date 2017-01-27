@@ -17,6 +17,8 @@ const fs = require('fs');
 const path = require('path');
 const mirakurunRequest = require('./lib/mirakurunRequest.js');
 
+const exit = process.exit;
+
 let mirakurunPath = process.argv[2];
 if (!mirakurunPath) {
   const configFile = path.resolve(
@@ -32,7 +34,7 @@ if (!mirakurunPath) {
   if (config && config.mirakurunPath) {
     mirakurunPath = config.mirakurunPath;
   } else {
-    process.exit(1);
+    exit(1);
   }
 }
 mirakurunRequest(mirakurunPath, '/api/channels').then((channels) => {
