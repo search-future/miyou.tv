@@ -10,16 +10,16 @@ elif [ "$(uname)" = "Darwin" ]
 then
     export WCJS_VERSION="v0.2.7"
     export WCJS_RUNTIME="electron"
-    export WCJS_RUNTIME_VERSION="v1.4.3"
+    export WCJS_RUNTIME_VERSION="v1.4.13"
 
     npm install --no-optional
-    npm install electron@1.4.3 wcjs-prebuilt
+    npm install electron@1.4.13 wcjs-prebuilt
 
 else
     export WCJS_VERSION="v0.2.7"
     export WCJS_RUNTIME="electron"
-    export WCJS_RUNTIME_VERSION="v1.4.3"
+    export WCJS_RUNTIME_VERSION="v1.4.13"
 
     npm install --no-optional
-    npm install electron@1.4.3 wcjs-prebuilt
+    npm install electron@1.4.13 wcjs-prebuilt
 fi

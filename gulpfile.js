@@ -50,11 +50,11 @@ switch (process.platform) {
     break;
   case 'win32':
     argOptions.default.runtime = 'electron';
-    argOptions.default.version = 'v1.4.3';
+    argOptions.default.version = 'v1.4.13';
     break;
   case 'darwin':
     argOptions.default.runtime = 'electron';
-    argOptions.default.version = 'v1.4.3';
+    argOptions.default.version = 'v1.4.13';
 }
 const argv = minimist(process.argv.slice(2), argOptions);
 
