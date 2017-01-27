@@ -5,8 +5,9 @@
   },
   "extends": "airbnb-base",
   "rules": {
+    "comma-dangle": "off",
     "import/no-extraneous-dependencies": [
-      2,
+      "error",
       {
         "devDependencies": [
           "**/gulpfile.js"

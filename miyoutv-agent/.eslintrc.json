@@ -12,6 +12,7 @@
     "plugin:node/recommended"
   ],
   "rules": {
+    "comma-dangle": "off",
     "no-console": "off",
     "node/shebang": "off"
   }
