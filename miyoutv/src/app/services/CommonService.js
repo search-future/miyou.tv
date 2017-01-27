@@ -188,9 +188,10 @@ limitations under the License.
     function removeFile(dirname, filename) {
       var filepath = path.join(props.dataPath, dirname, filename);
       try {
-        fs.unlinkFileSync(filepath);
+        fs.unlinkSync(filepath);
+        return true;
       } catch (e) {
-        return;
+        return false;
       }
     }
 
