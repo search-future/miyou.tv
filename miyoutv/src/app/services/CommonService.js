@@ -57,9 +57,8 @@ limitations under the License.
     };
 
     /* eslint-disable */
-    if (process.versions.nw) {
-      var version = process.versions.nw.split('.');
-      if (parseInt(version[0], 10) > 0 || parseInt(version[1], 10) > 12) {
+    if (process.versions.nw || process.versions['node-webkit']) {
+      if (process.versions.nw) {
         props.app = nw.App;
         props.win = nw.Window.get();
       } else {
