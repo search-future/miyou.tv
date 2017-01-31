@@ -330,7 +330,7 @@ body {
     padding-left: 25px;
     background-color: #333;
     box-shadow: 0 0 6px 2px rgba(0, 0, 0, 0.4);
-    z-index: 12;
+    z-index: 13;
 }
 
 .program-header-horizontal .program-header-cell {
@@ -435,7 +435,7 @@ body {
     position: fixed;
     bottom: 32px;
     right: 32px;
-    z-index: 10;
+    z-index: 13;
 }
 
 .programs .now-playing button,
