@@ -276,7 +276,7 @@ limitations under the License.
       request('/api/status.json', {
         cache: false
       }).then(function (status) {
-        service.status = status;
+        service.status = status.data;
         request('/api/recorded.json', {
           cache: false
         }).then(function (recorded) {
