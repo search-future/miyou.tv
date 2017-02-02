@@ -124,7 +124,8 @@ global.module.paths.push(modulePath);
     };
   }
 
-  function config($routeProvider) {
+  function config($routeProvider, $httpProvider) {
+    $httpProvider.useApplyAsync(true);
     $routeProvider
       .when('/programs', {
         template: '<programs></programs>',
