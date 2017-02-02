@@ -26,6 +26,7 @@ limitations under the License.
     $scope,
     $location,
     $interval,
+    toaster,
     CommonService,
     ChinachuService
   ) {
@@ -73,10 +74,11 @@ limitations under the License.
       }, function (responce) {
         progressModal.close();
         if (responce.status === 404 && /archive\.json$/.test(responce.config.url)) {
-          // CommonService.errorModal(
-          //   'MiyouTV Agent error',
-          //   '番組表データを取得できませんでした。'
-          // );
+          toaster.pop(
+            'info',
+            'MiyouTV Agent',
+            'データを取得できませんでした。録画情報を使用します。'
+          );
         } else {
           chinachuErrorHandler();
         }
