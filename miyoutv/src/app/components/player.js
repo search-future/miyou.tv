@@ -26,6 +26,7 @@ limitations under the License.
     $scope,
     $element,
     $routeParams,
+    toaster,
     CommonService,
     PlayerService,
     ChinachuPlayerService,
@@ -71,14 +72,8 @@ limitations under the License.
         CommonService.trigger('toggleSidebar');
       }
     };
-    $ctrl.alerts = [];
-
     $ctrl.toggleFullscreen = CommonService.toggleFullscreen;
     $ctrl.stop = PlayerService.stop;
-
-    $ctrl.closeAlert = function (index) {
-      $ctrl.alerts.splice(index, 1);
-    };
 
     $scope.$watch(function () {
       return CommonService.triggered('toggleSidebar');
@@ -112,28 +107,28 @@ limitations under the License.
         ].join('\n'));
         CommentService.load(value.start, value.end, value.channel).catch(function (responce) {
           if (responce.noToken) {
-            $ctrl.alerts.push({
+            toaster.pop({
               type: 'warning',
-              message: 'コメントを表示するにはモリタポアカウントを認証してください。'
+              body: 'コメントを表示するにはモリタポアカウントを認証してください。'
             });
           } else if (responce.data) {
             switch (responce.data.EC) {
               case 403:
-                $ctrl.alerts.push({
+                toaster.pop({
                   type: 'warning',
-                  message: 'コメントサーバーの認証に失敗しました。モリタポアカウントの認証をやり直してください。'
+                  body: 'コメントサーバーの認証に失敗しました。モリタポアカウントの認証をやり直してください。'
                 });
                 break;
               default:
-                $ctrl.alerts.push({
-                  type: 'danger',
-                  message: 'コメントの取得に失敗しました。'
+                toaster.pop({
+                  type: 'error',
+                  body: 'コメントの取得に失敗しました。'
                 });
             }
           } else {
-            $ctrl.alerts.push({
-              type: 'danger',
-              message: 'コメントサーバーへの接続に失敗しました。'
+            toaster.pop({
+              type: 'error',
+              body: 'コメントサーバーへの接続に失敗しました。'
             });
           }
         });

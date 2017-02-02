@@ -28,9 +28,6 @@ limitations under the License.
                 <span class="title" ng-bind="$ctrl.title"></span>
             </div>
         </div>
-        <div class="trim" uib-alert ng-repeat="alert in $ctrl.alerts" ng-class="'alert-' + (alert.type || 'info')" close="$ctrl.closeAlert($index)">
-            <span ng-bind="alert.message"></span>
-        </div>
     </div>
     <div class="view-content-body">
         <div class="container_fluid fit">
