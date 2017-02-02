@@ -45,6 +45,18 @@ limitations under the License.
         }
       }
     };
+    $ctrl.toasterOptions = {
+      'time-out': {
+        'toast-info': 5000,
+        'toast-wait': 0,
+        'toast-success': 5000,
+        'toast-error': 0,
+        'toast-warning': 10000
+      },
+      'close-button': true,
+      limit: 5,
+      'position-class': 'toast-top-right'
+    };
 
     $scope.$watch(function () {
       return CommonService.isFullscreen();

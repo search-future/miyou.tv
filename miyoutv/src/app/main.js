@@ -211,7 +211,7 @@ global.module.paths.push(modulePath);
       $window.resizeTo(windowState.width, windowState.height);
     }
   }
-  angular.module('app', ['ngAnimate', 'ngRoute', 'ui.bootstrap', 'agGrid', 'cfp.hotkeys'])
+  angular.module('app', ['ngAnimate', 'ngRoute', 'ui.bootstrap', 'agGrid', 'cfp.hotkeys', 'toaster'])
     .constant('commentUrl', commentUrl)
     .constant('commentTokenUrl', commentTokenUrl)
     .constant('channelTable', channelTable)

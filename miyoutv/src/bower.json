@@ -16,7 +16,8 @@
     "angular-hotkeys": "chieffancypants/angular-hotkeys#^1.7.0",
     "angular-route": "~1.6.1",
     "bootstrap": "^3.3.7",
-    "roboto-fontface": "^0.6.1"
+    "roboto-fontface": "^0.6.1",
+    "AngularJS-Toaster": "angularjs-toaster#^2.1.0"
   },
   "homepage": "http://miyou.tv/",
   "ignore": [

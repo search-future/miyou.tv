@@ -810,6 +810,10 @@ body {
     border-color: #dbff12 #dbff12 transparent transparent;
 }
 
+.toast-top-right {
+    top: 100px;
+}
+
 @media (min-width: 768px) {
     .nav-search {
         position: absolute;
