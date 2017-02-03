@@ -59,43 +59,6 @@ limitations under the License.
     };
     $ctrl.useArchive = true;
 
-    $ctrl.request = function (item) {
-      var program = item;
-      var recorded;
-
-
-      if (angular.isUndefined(program.commentCount)) {
-        CommentService
-          .requestCount(program.start, program.end, program.channel)
-          .then(function (value) {
-            program.commentCount = value;
-          });
-      }
-      if (angular.isUndefined(program.preview)) {
-        recorded = ChinachuService.data.recorded.filter(function (a) {
-          return (
-            a.channel.type === program.channel.type &&
-            a.channel.sid === program.channel.sid &&
-            a.end > program.start &&
-            a.start <= program.start
-          );
-        })[0];
-        if (recorded) {
-          ChinachuService
-            .requestPreview(recorded.id, 'png', {
-              pos: (
-                recorded.seconds > 70 ?
-                Math.floor((program.start - recorded.start) / 1000) + 70 :
-                10
-              ),
-              size: '160x90'
-            }).then(function (value) {
-              program.preview = value;
-            });
-        }
-      }
-    };
-
     $ctrl.selectItem = function (item) {
       if (angular.isDefined(item)) {
         selectItem = item;
@@ -223,6 +186,7 @@ limitations under the License.
             item.seconds = item.duration / 1000;
             item.title = item.name;
             item.detail = item.description;
+            item.isArchive = true;
             if (
               item.networkId === column.networkId &&
               item.serviceId === column.serviceId &&
@@ -250,6 +214,7 @@ limitations under the License.
             ) {
               item.categoryName = ChinachuService.convertCategory(item.category);
               item.style = calcItemStyle(item);
+              item.isArchive = false;
               column.programs.push(item);
             }
           }
@@ -389,13 +354,62 @@ limitations under the License.
           ci * $ctrl.baseWidth <= right &&
           (ci + 1) * $ctrl.baseWidth >= left
         );
-        for (ii = 0; ii < column.programs.length; ii += 1) {
-          item = column.programs[ii];
-          item.enabled = (
-            calcPos(item.start) < bottom &&
-            calcPos(item.end) > top
-          );
+        if (column.enabled) {
+          for (ii = 0; ii < column.programs.length; ii += 1) {
+            item = column.programs[ii];
+            item.enabled = (
+              calcPos(item.start) < bottom &&
+              calcPos(item.end) > top
+            );
+            if (item.enabled) {
+              initItem(item);
+            }
+          }
         }
+      }
+    }
+
+    function initItem(item) {
+      var program = item;
+      var basePreviewPos = item.seconds > 70 ? 70 : 10;
+      var recorded;
+      var previewId;
+      var previewPos;
+
+      if (angular.isUndefined(program.preview)) {
+        if (program.isArchive) {
+          recorded = ChinachuService.data.recorded.filter(function (a) {
+            return (
+              a.channel.type === program.channel.type &&
+              a.channel.sid === program.channel.sid &&
+              a.end > program.start &&
+              a.start <= program.start
+            );
+          })[0];
+          if (recorded) {
+            previewId = recorded.id;
+            previewPos = Math.floor((item.start - recorded.start) / 1000) + basePreviewPos;
+          }
+        } else {
+          previewId = program.id;
+          previewPos = basePreviewPos;
+        }
+        if (previewId) {
+          ChinachuService
+            .requestPreview(previewId, 'png', {
+              pos: previewPos,
+              size: '160x90'
+            }).then(function (value) {
+              program.preview = value;
+            });
+        }
+      }
+      if (angular.isUndefined(program.commentCount)) {
+        CommentService
+          .requestCount(program.start, program.end, program.channel)
+          .then(function (value) {
+            program.commentCount = value;
+          });
       }
     }
   }
