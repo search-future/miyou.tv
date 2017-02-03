@@ -332,10 +332,10 @@ limitations under the License.
     }
 
     function updateView() {
-      var top = viewport.scrollTop;
-      var bottom = viewport.scrollTop + viewport.clientHeight;
-      var left = viewport.scrollLeft;
-      var right = viewport.scrollLeft + viewport.clientWidth;
+      var top = viewport.scrollTop - $ctrl.baseHeight;
+      var bottom = viewport.scrollTop + viewport.clientHeight + $ctrl.baseHeight;
+      var left = viewport.scrollLeft - $ctrl.baseWidth;
+      var right = viewport.scrollLeft + viewport.clientWidth + $ctrl.baseWidth;
       var column;
       var item;
       var ci;
