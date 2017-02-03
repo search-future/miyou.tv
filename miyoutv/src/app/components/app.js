@@ -86,6 +86,27 @@ limitations under the License.
     });
 
     $scope.$watch(function () {
+      return ChinachuService.status;
+    }, function (value) {
+      if (angular.isObject(value) && angular.isObject(value.feature)) {
+        if (!value.feature.previewer) {
+          toaster.pop({
+            type: 'warning',
+            title: 'Chinachu config error',
+            body: 'Chinachuのプレビューが無効です。プレビューを表示できません。'
+          });
+        }
+        if (!value.feature.streamer) {
+          toaster.pop({
+            type: 'error',
+            title: 'Chinachu config error',
+            body: 'Chinachuのストリーム再生が無効です。録画を再生できません。'
+          });
+        }
+      }
+    });
+
+    $scope.$watch(function () {
       return ChinachuService.reloadInterval();
     }, function (value) {
       if (timer) {
