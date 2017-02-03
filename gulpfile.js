@@ -286,7 +286,7 @@ gulp.task('build:miyoutv:pack', (callback) => {
     }
     electronPackager({
       overwrite: true,
-      version,
+      electronVersion: version,
       platform: argv.platform,
       arch: argv.arch,
       dir: 'miyoutv/dist/',
