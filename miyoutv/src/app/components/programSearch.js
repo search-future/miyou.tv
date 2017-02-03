@@ -152,7 +152,7 @@ limitations under the License.
         }
       }
       $ctrl.programs = programs;
-      updateView();
+      timer = $timeout(updateView, 200);
     });
 
     $scope.$watch(function () {
@@ -178,7 +178,7 @@ limitations under the License.
 
     angular.element(viewport).on('scroll', function () {
       $timeout.cancel(timer);
-      timer = $timeout(updateView);
+      timer = $timeout(updateView, 200);
     });
     angular.element($window).on('resize', function () {
       $timeout.cancel(timer);

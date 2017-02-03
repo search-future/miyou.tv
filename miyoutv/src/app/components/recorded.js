@@ -98,7 +98,7 @@ limitations under the License.
         program.categoryName = ChinachuService.convertCategory(program.category);
       });
       $ctrl.recorded = value;
-      updateView();
+      timer = $timeout(updateView, 200);
     });
 
     $scope.$watch(function () {
@@ -124,7 +124,7 @@ limitations under the License.
 
     angular.element(viewport).on('scroll', function () {
       $timeout.cancel(timer);
-      timer = $timeout(updateView);
+      timer = $timeout(updateView, 200);
     });
     angular.element($window).on('resize', function () {
       $timeout.cancel(timer);
