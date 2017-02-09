@@ -134,18 +134,11 @@ global.module.paths.push(modulePath);
           name: injector('programs')
         }
       })
-      .when('/programs/search', {
-        template: '<program-search></program-search>',
+      .when('/list', {
+        template: '<list></list>',
         reloadOnSearch: false,
         resolve: {
-          name: injector('programs')
-        }
-      })
-      .when('/recorded', {
-        template: '<recorded></recorded>',
-        reloadOnSearch: false,
-        resolve: {
-          name: injector('recorded')
+          name: injector('list')
         }
       })
       .when('/setting', {

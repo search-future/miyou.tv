@@ -775,6 +775,7 @@ body {
     margin-top: 15px;
     border-bottom: 1px solid #ccc;
     padding: 0 0 15px;
+    height: 110px;
 }
 
 .media .date {

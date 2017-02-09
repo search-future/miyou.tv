@@ -28,6 +28,7 @@ limitations under the License.
     $window,
     $location,
     $timeout,
+    $q,
     CommonService,
     ChinachuService,
     CommentService
@@ -240,11 +241,11 @@ limitations under the License.
       return $location.search().search;
     }, function (value) {
       if (value) {
-        if (ChinachuService.data.archive.programs && $ctrl.useArchive) {
-          $location.url('/programs/search/?search=' + value);
-        } else {
-          $location.url('/recorded/?search=' + value);
-        }
+        $location.url([
+          '/list',
+          '?src=', $ctrl.source,
+          '&search=' + value
+        ].join(''));
       }
     });
 
