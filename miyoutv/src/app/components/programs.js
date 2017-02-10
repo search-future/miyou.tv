@@ -72,11 +72,13 @@ limitations under the License.
       if (item) {
         if (item.isRecorded) {
           $location.url([
-            '/channel/player',
-            item.channel.type,
-            item.channel.sid,
-            item.start + '-' + item.end
-          ].join('/'));
+            '/player',
+            '?mode=channel',
+            '&type=', item.channel.type,
+            '&sid=', item.channel.sid,
+            '&start=', item.start,
+            '&end=', item.end
+          ].join(''));
         } else {
           CommonService.errorModal('', '録画データが見つかりません。');
         }
@@ -95,7 +97,13 @@ limitations under the License.
         );
       });
       if (isRecorded) {
-        $location.url(['/channel/player', column.channel.type, column.channel.sid, start].join('/'));
+        $location.url([
+          '/player',
+          '?mode=channel',
+          '&type=', column.channel.type,
+          '&sid=', column.channel.sid,
+          '&start=', start
+        ].join(''));
       } else {
         CommonService.errorModal('', '録画データが見つかりません。');
       }

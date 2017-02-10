@@ -25,7 +25,7 @@ limitations under the License.
   function PlayerCtrl(
     $scope,
     $element,
-    $routeParams,
+    $location,
     toaster,
     CommonService,
     PlayerService,
@@ -34,7 +34,7 @@ limitations under the License.
   ) {
     var $ctrl = this;
 
-    $ctrl.mode = $routeParams.mode;
+    $ctrl.mode = 'recorded';
     $ctrl.title = '';
     $ctrl.time = 0;
     $ctrl.commentEnabled = true;
@@ -181,16 +181,18 @@ limitations under the License.
       CommonService.back();
     });
     $scope.$on('Player.Ready', function () {
-      switch ($routeParams.mode) {
+      var params = $location.search();
+      $ctrl.mode = params.mode;
+      switch (params.mode) {
         case 'recorded':
-          ChinachuPlayerService.playRecorded($routeParams.id);
+          ChinachuPlayerService.playRecorded(params.id);
           break;
         case 'channel':
           ChinachuPlayerService.channelStart(
-            $routeParams.type,
-            parseInt($routeParams.sid, 10),
-            parseInt($routeParams.start, 10),
-            parseInt($routeParams.end, 10)
+            params.type,
+            parseInt(params.sid, 10),
+            parseInt(params.start, 10),
+            parseInt(params.end, 10)
           );
           $ctrl.mainHotkeys.p = ChinachuPlayerService.channelPrevious;
           $ctrl.mainHotkeys.n = ChinachuPlayerService.channelNext;

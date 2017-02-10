@@ -148,14 +148,7 @@ global.module.paths.push(modulePath);
           name: injector('setting')
         }
       })
-      .when('/:mode/player/:id', {
-        template: '<player></player>',
-        reloadOnSearch: false,
-        resolve: {
-          name: injector('player')
-        }
-      })
-      .when('/:mode/player/:type/:sid/:start*-:end?', {
+      .when('/player', {
         template: '<player></player>',
         reloadOnSearch: false,
         resolve: {

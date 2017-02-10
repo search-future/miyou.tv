@@ -59,16 +59,22 @@ limitations under the License.
         if (item.isArchive) {
           if (item.isRecorded) {
             $location.url([
-              '/channel/player',
-              item.channel.type,
-              item.channel.sid,
-              item.start + '-' + item.end
-            ].join('/'));
+              '/player',
+              '?mode=channel',
+              '&type=', item.channel.type,
+              '&sid=', item.channel.sid,
+              '&start=', item.start,
+              '&end=', item.end
+            ].join(''));
           } else {
             CommonService.errorModal('', '録画データが見つかりません。');
           }
         } else {
-          $location.url(['/recorded/player/', item.id].join(''));
+          $location.url([
+            '/player',
+            '?mode=recorded',
+            '&id=', item.id
+          ].join(''));
         }
       }
     };
