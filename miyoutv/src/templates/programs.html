@@ -17,12 +17,14 @@ limitations under the License.
 <meta charset="UTF-8">
 <div class="programs view-content" ng-init="$ctrl.baseWidth = 200; $ctrl.baseHeight = 240;">
     <ul class="nav nav-pills">
-        <li class="pull-left" ng-if="$ctrl.validArchive">
-            <form class="checkbox">
-                <label>
-                    <input type="checkbox" ng-model="$ctrl.useArchive">番組表データ
-                </label>
-            </form>
+        <li class="pull-left form-inline" ng-if="$ctrl.archiveEnabled">
+            <div class="input-group">
+                <label class="input-group-addon control-label" for="source">データ</label>
+                <select id="source" class="form-control" name="source" ng-model="$ctrl.source" ng-change="$ctrl.scrollTo(0)">
+                    <option value="archive">番組表</option>
+                    <option value="recorded">録画済み</option>
+                </select>
+            </div>
         </li>
         <li ng-repeat="date in $ctrl.dates" ng-class="{active: date.isCurrent, 'hidden-lg': $ctrl.dates.length > 11, 'hidden-md': $ctrl.dates.length > 9, 'hidden-sm': $ctrl.dates.length > 7, 'hidden-xs': $ctrl.dates.length > 3 }">
             <a href="" ng-bind="date.time | date:'M/d EEE'" ng-click="$ctrl.scrollToTime(date.time)"></a>
@@ -45,7 +47,7 @@ limitations under the License.
             </div>
         </div>
         <div class="program-header program-header-vertical" ng-style="$ctrl.vHeaderStyle">
-            <div class="program-header-cell" ng-repeat="hour in $ctrl.hours" ng-style="hour.style">
+            <div class="program-header-cell" ng-repeat="hour in $ctrl.hours" ng-style="{height: $ctrl.baseHeight + 'px', lineHeight: $ctrl.baseHeight + 'px'}">
                 <div class="program-header-content" ng-bind="hour.time | date:'H'"></div>
             </div>
         </div>
