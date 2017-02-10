@@ -70,7 +70,7 @@ limitations under the License.
     };
     $ctrl.play = function (item) {
       if (item) {
-        if (isRecorded(item.channel.type, item.channel.sid, item.start, item.end)) {
+        if (item.isRecorded) {
           $location.url([
             '/channel/player',
             item.channel.type,
@@ -86,7 +86,15 @@ limitations under the License.
       var baseTime = $ctrl.hours[0].time;
       var position = $event.target.scrollTop + $event.offsetY;
       var start = ((position * 3600000) / $ctrl.baseHeight) + baseTime;
-      if (isRecorded(column.channel.type, column.channel.sid, start, start)) {
+      var isRecorded = ChinachuService.data.recorded.some(function (a) {
+        return (
+          a.channel.type === column.channel.type &&
+          a.channel.sid === column.channel.sid &&
+          a.end > start &&
+          a.start <= start
+        );
+      });
+      if (isRecorded) {
         $location.url(['/channel/player', column.channel.type, column.channel.sid, start].join('/'));
       } else {
         CommonService.errorModal('', '録画データが見つかりません。');
@@ -177,18 +185,6 @@ limitations under the License.
       $timeout.cancel(timer);
       timer = $timeout(updateView, 200);
     });
-
-    function isRecorded(type, sid, start, end) {
-      var recorded = ChinachuService.data.recorded.filter(function (a) {
-        return (
-          a.channel.type === type &&
-          a.channel.sid === sid &&
-          a.end > start &&
-          a.start < end
-        );
-      });
-      return recorded.length > 0;
-    }
 
     function miyoutvFilter(a) {
       return a.isMiyoutvReserved;
@@ -298,6 +294,7 @@ limitations under the License.
             item.detail = item.description;
             item.channel = channel;
             item.isArchive = true;
+            item.isRecorded = false;
             if (angular.isArray(item.genres)) {
               item.categoryName = ChinachuService.convertCategory(item.genres[0].lv1);
             } else {
@@ -342,6 +339,7 @@ limitations under the License.
             item.categoryName = ChinachuService.convertCategory(item.category);
             item.style = calcItemStyle(item);
             item.isArchive = false;
+            item.isRecorded = true;
             column.programs.push(item);
           }
         }
@@ -418,13 +416,11 @@ limitations under the License.
 
     function initItem(item) {
       var program = item;
-      var basePreviewPos = item.seconds > 70 ? 70 : 10;
       var recorded;
-      var previewId;
-      var previewPos;
+      var previewPos = 70;
 
-      if (angular.isUndefined(program.preview)) {
-        if (program.isArchive) {
+      if (program.isArchive) {
+        if (!program.isRecorded) {
           recorded = ChinachuService.data.recorded.filter(function (a) {
             return (
               a.channel.type === program.channel.type &&
@@ -434,22 +430,27 @@ limitations under the License.
             );
           })[0];
           if (recorded) {
-            previewId = recorded.id;
-            previewPos = Math.floor((item.start - recorded.start) / 1000) + basePreviewPos;
+            previewPos += Math.floor((item.start - recorded.start) / 1000);
+            program.isRecorded = true;
+            while (recorded.seconds < previewPos) {
+              previewPos = -30;
+            }
           }
-        } else {
-          previewId = program.id;
-          previewPos = basePreviewPos;
         }
-        if (previewId) {
-          ChinachuService
-            .requestPreview(previewId, 'png', {
-              pos: previewPos,
-              size: '160x90'
-            }).then(function (value) {
-              program.preview = value;
-            });
+      } else {
+        recorded = program;
+      }
+      if (angular.isUndefined(program.preview) && recorded) {
+        if (recorded.seconds < previewPos) {
+          previewPos = 10;
         }
+        ChinachuService
+          .requestPreview(recorded.id, 'png', {
+            pos: previewPos,
+            size: '160x90'
+          }).then(function (value) {
+            program.preview = value;
+          });
       }
       if (angular.isUndefined(program.commentCount)) {
         CommentService

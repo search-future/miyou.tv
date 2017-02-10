@@ -57,7 +57,7 @@ limitations under the License.
     $ctrl.play = function (item) {
       if (item) {
         if (item.isArchive) {
-          if (isRecorded(item)) {
+          if (item.isRecorded) {
             $location.url([
               '/channel/player',
               item.channel.type,
@@ -147,19 +147,6 @@ limitations under the License.
       timer = $timeout(updateView, 200);
     });
 
-    function isRecorded(item) {
-      var recorded = ChinachuService.data.recorded.filter(function (a) {
-        return (
-          a.channel.type === item.channel.type &&
-          a.channel.sid === item.channel.sid &&
-          a.end > item.start &&
-          a.start < item.end
-        );
-      });
-
-      return recorded.length > 0;
-    }
-
     function miyoutvFilter(a) {
       return a.isMiyoutvReserved;
     }
@@ -196,6 +183,7 @@ limitations under the License.
             item.title = item.name;
             item.detail = item.description;
             item.isArchive = true;
+            item.isRecorded = false;
             item.channel = channel;
             if (angular.isArray(item.genres)) {
               item.categoryName = ChinachuService.convertCategory(item.genres[0].lv1);
@@ -215,6 +203,8 @@ limitations under the License.
       recorded.forEach(function (a) {
         var program = a;
         program.categoryName = ChinachuService.convertCategory(program.category);
+        program.isArchive = false;
+        program.isRecorded = true;
       });
       return programs;
     }
@@ -244,13 +234,11 @@ limitations under the License.
 
     function initItem(item) {
       var program = item;
-      var basePreviewPos = item.seconds > 70 ? 70 : 10;
       var recorded;
-      var previewId;
-      var previewPos;
+      var previewPos = 70;
 
-      if (angular.isUndefined(program.preview)) {
-        if (program.isArchive) {
+      if (program.isArchive) {
+        if (!program.isRecorded) {
           recorded = ChinachuService.data.recorded.filter(function (a) {
             return (
               a.channel.type === program.channel.type &&
@@ -260,22 +248,27 @@ limitations under the License.
             );
           })[0];
           if (recorded) {
-            previewId = recorded.id;
-            previewPos = Math.floor((item.start - recorded.start) / 1000) + basePreviewPos;
+            previewPos += Math.floor((item.start - recorded.start) / 1000);
+            program.isRecorded = true;
+            while (recorded.seconds < previewPos) {
+              previewPos = -30;
+            }
           }
-        } else {
-          previewId = program.id;
-          previewPos = basePreviewPos;
         }
-        if (previewId) {
-          ChinachuService
-            .requestPreview(previewId, 'png', {
-              pos: previewPos,
-              size: '160x90'
-            }).then(function (value) {
-              program.preview = value;
-            });
+      } else {
+        recorded = program;
+      }
+      if (angular.isUndefined(program.preview) && recorded) {
+        if (recorded.seconds < previewPos) {
+          previewPos = 10;
         }
+        ChinachuService
+          .requestPreview(recorded.id, 'png', {
+            pos: previewPos,
+            size: '160x90'
+          }).then(function (value) {
+            program.preview = value;
+          });
       }
       if (angular.isUndefined(program.commentCount)) {
         CommentService
