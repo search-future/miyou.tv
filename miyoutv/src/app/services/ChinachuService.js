@@ -502,7 +502,7 @@ limitations under the License.
         }
         option = optionPettern.exec(options);
       }
-      query.$ = options.replace(optionPettern, '').trim();
+      query.$ = angular.isString(string) ? string.replace(optionPettern, '').trim() : '';
       return query;
     }
   }

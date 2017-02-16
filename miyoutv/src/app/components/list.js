@@ -89,12 +89,17 @@ limitations under the License.
       var rule = order.split(':');
       $location.search('order', rule[0]);
       $location.search('desc', rule[1] === 'true' ? 1 : 0);
+      $timeout.cancel(timer);
+      timer = $timeout(updateView, 200);
     });
     $scope.$watch(function () {
       return $location.search().search;
     }, function (value) {
       $ctrl.filterEnabled = !!value;
       $ctrl.filterPattern = ChinachuService.generateFilterPattern(value);
+      $ctrl.scrollTo(0);
+      $timeout.cancel(timer);
+      timer = $timeout(updateView, 200);
     });
     $scope.$watch(function () {
       return $location.search().src;

@@ -57,7 +57,6 @@ limitations under the License.
       formatMonthTitle: 'y年',
       showWeeks: false
     };
-    $ctrl.useArchive = true;
 
     $ctrl.selectItem = function (item) {
       if (angular.isDefined(item)) {

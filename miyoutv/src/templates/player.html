@@ -16,17 +16,15 @@ limitations under the License.
 -->
 <meta charset="UTF-8">
 <div class="player view-content">
-    <div class="container_fluid view-content-header player-header">
-        <div class="row trim">
-            <div class="col-xs-2 text-left pick">
-                <a class="btn" title="再生を終了" ng-click="$ctrl.stop()">
-                    <img src="assets/back.svg" width="24px">
-                </a>
-            </div>
-            <div class="col-xs-8 text-center">
-                <span class="channel" ng-bind="$ctrl.channel"></span>
-                <span class="title" ng-bind="$ctrl.title"></span>
-            </div>
+    <div class="view-content-header row trim bg-inverse">
+        <div class="col-xs-2 text-left">
+            <button class="btn btn-media" title="再生を終了" ng-click="$ctrl.stop()">
+                <img class="img-icon-md" src="assets/back.svg">
+            </button>
+        </div>
+        <div class="col-xs-8 text-center">
+            <span class="channel" ng-bind="$ctrl.channel"></span>
+            <span class="title" ng-bind="$ctrl.title"></span>
         </div>
     </div>
     <div class="view-content-body">
@@ -41,17 +39,17 @@ limitations under the License.
                     <seekbar mode="$ctrl.mode"></seekbar>
                 </div>
             </div>
-            <div class="col-lg-4 col-md-5 col-sm-6 col-xs-12 extend-vertical base-container player-sidebar" uib-collapse="$ctrl.sidebarCollapsed" horizontal>
-                <button class="close pull-right form-control-static" ng-click="$ctrl.sidebarCollapsed = true"><span class="glyphicon glyphicon-remove-sign"></span></button>
-                <uib-tabset type="pills">
+            <div class="sidebar col-lg-4 col-md-5 col-sm-6 col-xs-12 extend-vertical pick" uib-collapse="$ctrl.sidebarCollapsed" horizontal>
+                <button class="sidebar-close close" ng-click="$ctrl.sidebarCollapsed = true"><span class="glyphicon glyphicon-remove-sign"></span></button>
+                <uib-tabset type="tabs" class="sidebar-tabset extend-vertical nav-mtvblack nav-mtvblack-line">
                     <uib-tab heading="コメント">
-                        <comment-grid class="fit fit-tab tab-body inverse"></comment-grid>
+                        <comment-grid class="fit"></comment-grid>
                     </uib-tab>
                     <uib-tab heading="情報">
-                        <player-info class="fit fit-tab tab-body inverse"></player-info>
+                        <player-info></player-info>
                     </uib-tab>
                     <uib-tab heading="再生設定">
-                        <player-config class="fit fit-tab tab-body inverse"></player-config>
+                        <player-config></player-config>
                     </uib-tab>
                 </uib-tabset>
             </div>

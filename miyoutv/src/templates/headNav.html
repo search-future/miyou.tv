@@ -24,8 +24,8 @@ limitations under the License.
                 <span class="icon-bar"></span>
             </button>
         </div>
-        <div class="collapse navbar-collapse" uib-collapse="$ctrl.isCollapsed">
-            <ul class="nav navbar-nav">
+        <div class="collapse navbar-collapse row" uib-collapse="$ctrl.isCollapsed">
+            <ul class="nav nav-mtvblack navbar-nav col-sm-4">
                 <li ng-class="{active: $ctrl.current === 'programs'}">
                     <a href="#!/programs" ng-click="$ctrl.isCollapsed = true">
                         <span class="glyphicon glyphicon-th"></span> 番組表
@@ -42,17 +42,19 @@ limitations under the License.
                     </a>
                 </li>-->
             </ul>
-            <form class="navbar-form nav-search" ng-submit="$ctrl.search()">
-                <div class="form-group input-group">
-                    <span class="input-group-addon" id="basic-addon1">
-                        <span class="glyphicon glyphicon-search"></span>
-                    </span>
-                    <input type="text" class="form-control" placeholder="Search" ng-model="$ctrl.searchText">
-                </div>
-            </form>
-            <ul class="nav navbar-nav navbar-right">
-                <li class="dropdown" uib-dropdown>
-                    <a class="btn dropdown-toggle" uib-dropdown-toggle>
+            <div class="col-sm-4">
+                <form class="navbar-form text-center" ng-submit="$ctrl.search()">
+                    <div class="form-group input-group input-group-search">
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </span>
+                        <input type="text" class="form-control" placeholder="Search" ng-model="$ctrl.searchText">
+                    </div>
+                </form>
+            </div>
+            <ul class="nav nav-mtvblack navbar-nav navbar-right">
+                <li class="dropdown dropdown-inverse" uib-dropdown>
+                    <a class="dropdown-toggle clickable" uib-dropdown-toggle>
                         設定 <span class="glyphicon glyphicon-cog"></span>
                     </a>
                     <ul class="dropdown-menu" uib-dropdown-menu>

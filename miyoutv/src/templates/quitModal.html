@@ -15,13 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <meta charset="UTF-8">
-<div class="modal-header">
-    <span class="glyphicon glyphicon-question-sign text-danger"></span>
-</div>
-<div class="modal-body">
-    終了しますか？
-</div>
-<div class="modal-footer">
-    <button class="btn btn-danger" type="button" ng-click="$ctrl.yes()">はい</button>
-    <button class="btn btn-warning" type="button" ng-click="$ctrl.no()">いいえ</button>
-</div>
+<form class="modal-component">
+    <div class="modal-header">
+        <span class="glyphicon glyphicon-question-sign text-danger"></span>
+    </div>
+    <div class="modal-body">
+        終了しますか？
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-danger" type="button" ng-click="$ctrl.yes()">はい</button>
+        <button class="btn btn-warning" type="button" ng-click="$ctrl.no()">いいえ</button>
+    </div>
+</form>

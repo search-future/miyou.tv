@@ -16,34 +16,40 @@ limitations under the License.
 -->
 <meta charset="UTF-8">
 <div class="programs view-content" ng-init="$ctrl.baseWidth = 200; $ctrl.baseHeight = 240;">
-    <ul class="nav nav-pills">
-        <li class="pull-left form-inline" ng-if="$ctrl.archiveEnabled">
-            <div class="input-group">
-                <label class="input-group-addon control-label" for="source">データ</label>
-                <select id="source" class="form-control" name="source" ng-model="$ctrl.source" ng-change="$ctrl.scrollTo(0)">
-                    <option value="archive">番組表</option>
-                    <option value="recorded">録画済み</option>
-                </select>
-            </div>
-        </li>
-        <li ng-repeat="date in $ctrl.dates" ng-class="{active: date.isCurrent, 'hidden-lg': $ctrl.dates.length > 11, 'hidden-md': $ctrl.dates.length > 9, 'hidden-sm': $ctrl.dates.length > 7, 'hidden-xs': $ctrl.dates.length > 3 }">
-            <a href="" ng-bind="date.time | date:'M/d EEE'" ng-click="$ctrl.scrollToTime(date.time)"></a>
-        </li>
-        <li class="col-lg-3 col-md-4 col-sm-5 col-xs-10" ng-class="{'hidden-lg': $ctrl.dates.length <= 11, 'hidden-md': $ctrl.dates.length <= 9, 'hidden-sm': $ctrl.dates.length <= 7, 'hidden-xs': $ctrl.dates.length <= 3 }">
-            <div class="input-group input-xs">
-                <input class="form-control" type="text" uib-datepicker-popup="y/M/d EEE" datepicker-options="$ctrl.datepickerOptions" show-button-bar="false" popup-placement="bottom-right" is-open="$ctrl.datepickerOpened" ng-model="$ctrl.currentDate" ng-change="$ctrl.scrollToTime($ctrl.currentDate)">
-                <div class="input-group-btn">
-                    <button class="btn btn-default" type="button" ng-click="$ctrl.datepickerOpened = !$ctrl.datepickerOpened">
-                        <span class="glyphicon glyphicon-calendar"></span>
-                    </button>
+    <div class="view-content-header row trim bg-inverse">
+        <div class="col-lg-2 col-sm-3 col-xs-12">
+            <form class="form-horizontal" ng-if="$ctrl.archiveEnabled">
+                <div class="input-group input-group-dark input-sm" title="表示データ">
+                    <label class="input-group-addon control-label" for="source"><span class="glyphicon glyphicon-list-alt"></span></label>
+                    <select id="source" class="form-control" name="source" ng-model="$ctrl.source" ng-change="$ctrl.scrollTo(0)">
+                        <option value="archive">番組表</option>
+                        <option value="recorded">録画情報</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="col-lg-8 col-sm-6 col-xs-12">
+            <ul class="nav nav-mtvblack nav-mtvblack-line flex flex-row flex-center" ng-class="{'hidden-lg': $ctrl.dates.length > 8, 'hidden-md': $ctrl.dates.length > 5, 'hidden-sm': $ctrl.dates.length > 3, 'hidden-xs': $ctrl.dates.length > 2 }">
+                <li class="flex-item trim" ng-repeat="date in $ctrl.dates" ng-class="{active: date.isCurrent}">
+                    <a href="" ng-bind="date.time | date:'M/d EEE'" ng-click="$ctrl.scrollToTime(date.time)"></a>
+                </li>
+            </ul>
+            <div ng-class="{'hidden-lg': $ctrl.dates.length <= 8, 'hidden-md': $ctrl.dates.length <= 5, 'hidden-sm': $ctrl.dates.length <= 3, 'hidden-xs': $ctrl.dates.length <= 2 }">
+                <div class="input-group input-group-dark input-sm">
+                    <input class="form-control text-center" type="text" uib-datepicker-popup="y/M/d EEE" datepicker-options="$ctrl.datepickerOptions" show-button-bar="false" popup-placement="bottom-right" is-open="$ctrl.datepickerOpened" ng-model="$ctrl.currentDate" ng-change="$ctrl.scrollToTime($ctrl.currentDate)">
+                    <div class="input-group-btn" title="日付を選択">
+                        <button class="btn btn-dark" type="button" ng-click="$ctrl.datepickerOpened = !$ctrl.datepickerOpened">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </button>
+                    </div>
                 </div>
             </div>
-        </li>
-    </ul>
+        </div>
+    </div>
     <div class="view-content-body scrollable" keep-scroll keep-bottom>
         <div class="program-header program-header-horizontal" ng-style="$ctrl.hHeaderStyle">
             <div class="program-header-cell bg-primary" ng-repeat="channel in $ctrl.programs">
-                <div class="program-header-content clickable" ng-bind="channel.name" ng-click="$ctrl.search('sid:' + channel.serviceId)"></div>
+                <div class="program-header-content clickable" title="チャンネルで検索" ng-bind="channel.name" ng-click="$ctrl.search('sid:' + channel.serviceId)"></div>
             </div>
         </div>
         <div class="program-header program-header-vertical" ng-style="$ctrl.vHeaderStyle">
@@ -57,10 +63,14 @@ limitations under the License.
                     <div class="program-table-content selectable" ng-class="{selected: $ctrl.selectItem() === item}" ng-click="$ctrl.selectItem(item)" ng-dblclick="$ctrl.play(item)">
                         <span class="badge" ng-bind="item.commentCount"></span>
                         <span class="time text-primary" ng-bind="item.start | date:'HH:mm'"></span>
-                        <span class="title text-primary clickable" ng-bind="item.title" ng-click="$ctrl.search(item.title)"></span>
-                        <span class="label label-default clickable" ng-class="'label-' + item.categoryName.name" ng-bind="item.categoryName.localeName" ng-click="$ctrl.search('cat:' + item.categoryName.name)"></span>
+                        <span class="title text-primary quick-search quick-search-hidden">
+                            <span ng-bind="item.title"></span> <span class="glyphicon glyphicon-search quick-search-btn" title="番組名で検索" ng-click="$ctrl.search(item.title)"></span>
+                        </span>
+                        <span class="label quick-search" ng-class="'label-' + item.categoryName.name">
+                            <span ng-bind="item.categoryName.localeName"></span> <span class="glyphicon glyphicon-search quick-search-btn" title="カテゴリで検索" ng-click="$ctrl.search('cat:' + item.categoryName.name)"></span>
+                        </span>
                         <div class="detail" ng-bind="item.detail"></div>
-                        <div class="preview text-center" ng-if="item.preview">
+                        <div class="preview text-center" ng-if="item.preview" ng-click="$ctrl.play(item)">
                             <img width="160" height="90" ng-src="{{item.preview}}">
                         </div>
                     </div>
@@ -68,7 +78,7 @@ limitations under the License.
             </div>
         </div>
     </div>
-    <div class="form-inline now-playing">
-        <button class="btn btn-default" type="button" ng-click="$ctrl.play($ctrl.selectItem())">再生</button>
-    </div>
+    <form class="form-play">
+        <button class="btn btn-play" type="button" title="選択した番組を再生" ng-click="$ctrl.play($ctrl.selectItem())">再生</button>
+    </form>
 </div>

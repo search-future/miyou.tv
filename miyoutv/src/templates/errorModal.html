@@ -15,14 +15,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <meta charset="UTF-8">
-<div class="modal-header">
-    <div class="modal-title">
-        <span class="glyphicon glyphicon-warning-sign text-warning"></span>
-        <span ng-bind="$ctrl.title"></span>
+<form class="modal-component">
+    <div class="modal-header">
+        <div class="modal-title">
+            <span class="glyphicon glyphicon-warning-sign text-warning"></span>
+            <span ng-bind="$ctrl.title"></span>
+        </div>
     </div>
-</div>
-<div class="modal-body" ng-bind="$ctrl.message">
-</div>
-<div class="modal-footer">
-    <button class="btn btn-warning" type="button" ng-click="$ctrl.ok()">OK</button>
-</div>
+    <div class="modal-body" ng-bind="$ctrl.message">
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-warning" type="button" ng-click="$ctrl.ok()">OK</button>
+    </div>
+</form>

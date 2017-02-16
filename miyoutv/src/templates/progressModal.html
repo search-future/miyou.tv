@@ -15,13 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <meta charset="UTF-8">
-<div class="modal-header">
-    <div class="modal-title">
-        <span class="glyphicon glyphicon-info-sign text-info"></span>
-        <span ng-bind="$ctrl.title"></span>
+<div class="modal-component">
+    <div class="modal-header">
+        <div class="modal-title">
+            <span class="glyphicon glyphicon-info-sign text-info"></span>
+            <span ng-bind="$ctrl.title"></span>
+        </div>
     </div>
-</div>
-<div class="modal-body">
-    <uib-progressbar class="progress-striped active" value="50"></uib-progressbar>
-    <div ng-bind="$ctrl.message"></div>
+    <div class="modal-body">
+        <uib-progressbar class="progress-striped active" value="50"></uib-progressbar>
+        <div ng-bind="$ctrl.message"></div>
+    </div>
 </div>

@@ -15,21 +15,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <meta charset="UTF-8">
-<form class="row trim bottom">
-    <div class="form-group col-xs-12 trim">
-        <div class="input-group">
+<form class="seekbar row trim">
+    <div class="form-group col-xs-12">
+        <div class="input-group input-group-media">
             <span class="input-group-btn">
-            <button class="btn btn-default" type="button" ng-show="$ctrl.mode === 'channel'" ng-click="$ctrl.previous()">
-                <img src="assets/step-backward.svg" alt="">
-            </button>
+                <button class="btn btn-media" type="button" ng-show="$ctrl.mode === 'channel'" ng-click="$ctrl.previous()">
+                    <img class="img-icon-md" src="assets/step-backward.svg" alt="">
+                </button>
             </span>
             <span class="input-group-addon clickable" ng-show="$ctrl.clockTime" ng-bind="$ctrl.isClock ? ($ctrl.clockTime | date:'HH:mm:ss') : $ctrl.time" ng-click="$ctrl.isClock = !$ctrl.isClock"></span>
-            <input class="form-control range-control seekbar" type="range" step="0.00001" min="0" max="1" ng-model="$ctrl.position" ng-mousedown="$ctrl.isSeeking = true" ng-mouseup="$ctrl.isSeeking = false" ng-change="$ctrl.seek($ctrl.position)">
+            <input class="form-control form-control-range" type="range" step="0.00001" min="0" max="1" ng-model="$ctrl.position" ng-mousedown="$ctrl.isSeeking = true" ng-mouseup="$ctrl.isSeeking = false" ng-change="$ctrl.seek($ctrl.position)">
             <span class="input-group-addon clickable" ng-show="$ctrl.end" ng-bind="$ctrl.isClock ? ($ctrl.end | date:'HH:mm:ss') : $ctrl.length" ng-click="$ctrl.isClock = !$ctrl.isClock"></span>
             <span class="input-group-btn">
-            <button class="btn btn-default" type="button" ng-click="$ctrl.next()" ng-show="$ctrl.mode === 'channel'">
-            <img src="assets/step-forward.svg" alt="">
-            </button>
+                <button class="btn btn-media" type="button" ng-click="$ctrl.next()" ng-show="$ctrl.mode === 'channel'">
+                    <img class="img-icon-md" src="assets/step-forward.svg" alt="">
+                </button>
             </span>
         </div>
     </div>

@@ -15,91 +15,83 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <meta charset="UTF-8">
-<div class="panel panel-default">
+<div class="panel panel-dark borderless trim">
     <div class="panel-heading">再生設定</div>
     <div class="panel-body">
-        <form name="player">
-            <div class="form-horizontal">
-                <div class="form-group row">
-                    <label class="col-xs-6 control-label" for="player-rate">再生速度</label>
-                    <div class="col-xs-6">
-                        <input id="player-rate" class="form-control" name="rate" type="number" step="0.1" min="0.1" max="64" ng-model="$ctrl.player.rate" ng-change="$ctrl.svc.player.rate($ctrl.player.rate)">
-                    </div>
+        <form class="form-horizontal" name="player">
+            <div class="form-group form-group-dark">
+                <label class="col-xs-6 control-label" for="player-rate">再生速度</label>
+                <div class="col-xs-6">
+                    <input id="player-rate" class="form-control" name="rate" type="number" step="0.1" min="0.1" max="64" ng-model="$ctrl.player.rate" ng-change="$ctrl.svc.player.rate($ctrl.player.rate)">
                 </div>
             </div>
         </form>
     </div>
 </div>
-<div class="panel panel-default">
+<div class="panel panel-dark borderless trim">
     <div class="panel-heading">ビデオ設定</div>
     <div class="panel-body">
-        <form name="video">
-            <div class="form-horizontal">
-                <div class="form-group row">
-                    <label class="col-xs-6 control-label" for="player-video-deinterlace">インターレース解除</label>
-                    <div class="col-xs-6">
-                        <select id="player-video-deinterlace" class="form-control" name="deinterlace" ng-model="$ctrl.player.deinterlace" ng-options="value as name for (name, value) in $ctrl.deinterlaceList" ng-change="$ctrl.svc.player.deinterlace($ctrl.player.deinterlace)"></select>
-                    </div>
+        <form class="form-horizontal" name="video">
+            <div class="form-group form-group-dark">
+                <label class="col-xs-6 control-label" for="player-video-deinterlace">インターレース解除</label>
+                <div class="col-xs-6">
+                    <select id="player-video-deinterlace" class="form-control" name="deinterlace" ng-model="$ctrl.player.deinterlace" ng-options="value as name for (name, value) in $ctrl.deinterlaceList" ng-change="$ctrl.svc.player.deinterlace($ctrl.player.deinterlace)"></select>
                 </div>
-                <div class="form-group row">
-                    <label class="col-xs-6 control-label" for="player-video-aspectratio">アスペクト比</label>
-                    <div class="col-xs-6">
-                        <select id="player-video-aspectratio" class="form-control" name="aspectratio" ng-model="$ctrl.player.aspectRatio" ng-options="value as name for (name, value) in $ctrl.aspectRatioList" ng-change="$ctrl.svc.player.aspectRatio($ctrl.player.aspectRatio)"></select>
-                    </div>
+            </div>
+            <div class="form-group form-group-dark">
+                <label class="col-xs-6 control-label" for="player-video-aspectratio">アスペクト比</label>
+                <div class="col-xs-6">
+                    <select id="player-video-aspectratio" class="form-control" name="aspectratio" ng-model="$ctrl.player.aspectRatio" ng-options="value as name for (name, value) in $ctrl.aspectRatioList" ng-change="$ctrl.svc.player.aspectRatio($ctrl.player.aspectRatio)"></select>
                 </div>
             </div>
         </form>
     </div>
 </div>
-<div class="panel panel-default">
+<div class="panel panel-dark borderless trim">
     <div class="panel-heading">オーディオ設定</div>
     <div class="panel-body">
-        <form name="audio">
-            <div class="form-horizontal">
-                <div class="form-group row">
-                    <label class="col-xs-6 control-label" for="player-audio-track">音声トラック</label>
-                    <div class="col-xs-6">
-                        <select id="player-audio-track" class="form-control" name="track" ng-model="$ctrl.player.audioTrack" ng-options="name as value for (name, value) in $ctrl.audioTrackList" ng-change="$ctrl.svc.player.audioTrack($ctrl.player.audioTrack)"></select>
-                    </div>
+        <form class="form-horizontal" name="audio">
+            <div class="form-group form-group-dark">
+                <label class="col-xs-6 control-label" for="player-audio-track">音声トラック</label>
+                <div class="col-xs-6">
+                    <select id="player-audio-track" class="form-control" name="track" ng-model="$ctrl.player.audioTrack" ng-options="name as value for (name, value) in $ctrl.audioTrackList" ng-change="$ctrl.svc.player.audioTrack($ctrl.player.audioTrack)"></select>
                 </div>
-                <div class="form-group row">
-                    <label class="col-xs-6 control-label" for="player-audio-channel">音声チャンネル</label>
-                    <div class="col-xs-6">
-                        <select id="player-audio-channel" class="form-control" name="channel" ng-model="$ctrl.player.audioChannel" ng-disabled="!$ctrl.player.audioChannel" ng-options="value as name for (name, value) in $ctrl.audioChannelList" ng-change="$ctrl.svc.player.audioChannel($ctrl.player.audioChannel)"></select>
-                    </div>
+            </div>
+            <div class="form-group form-group-dark">
+                <label class="col-xs-6 control-label" for="player-audio-channel">音声チャンネル</label>
+                <div class="col-xs-6">
+                    <select id="player-audio-channel" class="form-control" name="channel" ng-model="$ctrl.player.audioChannel" ng-disabled="!$ctrl.player.audioChannel" ng-options="value as name for (name, value) in $ctrl.audioChannelList" ng-change="$ctrl.svc.player.audioChannel($ctrl.player.audioChannel)"></select>
                 </div>
             </div>
         </form>
     </div>
 </div>
-<div class="panel panel-default">
+<div class="panel panel-dark borderless trim">
     <div class="panel-heading">コメント設定</div>
     <div class="panel-body">
-        <form name="comment">
-            <div class="form-horizontal">
-                <div class="form-group row">
-                    <label class="col-xs-6 control-label" for="player-comment-duration">表示時間（秒）</label>
-                    <div class="col-xs-6">
-                        <input id="player-comment-duration" class="form-control" name="duration" type="number" step="0.5" min="0.5" ng-model="$ctrl.comment.duration" ng-change="$ctrl.svc.comment.duration($ctrl.comment.duration * 1000)">
-                    </div>
+        <form class="form-horizontal" name="comment">
+            <div class="form-group form-group-dark">
+                <label class="col-xs-6 control-label" for="player-comment-duration">表示時間（秒）</label>
+                <div class="col-xs-6">
+                    <input id="player-comment-duration" class="form-control" name="duration" type="number" step="0.5" min="0.5" ng-model="$ctrl.comment.duration" ng-change="$ctrl.svc.comment.duration($ctrl.comment.duration * 1000)">
                 </div>
-                <div class="form-group row">
-                    <label class="col-xs-6 control-label" for="player-comment-delay">遅延表示（秒）</label>
-                    <div class="col-xs-6">
-                        <input id="player-comment-delay" class="form-control" name="delay" type="number" step="0.5" ng-model="$ctrl.comment.delay" ng-change="$ctrl.svc.comment.delay($ctrl.comment.delay * 1000)">
-                    </div>
+            </div>
+            <div class="form-group form-group-dark">
+                <label class="col-xs-6 control-label" for="player-comment-delay">遅延表示（秒）</label>
+                <div class="col-xs-6">
+                    <input id="player-comment-delay" class="form-control" name="delay" type="number" step="0.5" ng-model="$ctrl.comment.delay" ng-change="$ctrl.svc.comment.delay($ctrl.comment.delay * 1000)">
                 </div>
-                <div class="form-group row">
-                    <label class="col-xs-6 control-label" for="player-comment-maxlines">表示ライン数</label>
-                    <div class="col-xs-6">
-                        <input id="player-comment-maxlines" class="form-control" name="maxlines" type="number" min="1" ng-model="$ctrl.comment.maxLines" ng-change="$ctrl.svc.comment.maxLines($ctrl.comment.maxLines)">
-                    </div>
+            </div>
+            <div class="form-group form-group-dark">
+                <label class="col-xs-6 control-label" for="player-comment-maxlines">表示ライン数</label>
+                <div class="col-xs-6">
+                    <input id="player-comment-maxlines" class="form-control" name="maxlines" type="number" min="1" ng-model="$ctrl.comment.maxLines" ng-change="$ctrl.svc.comment.maxLines($ctrl.comment.maxLines)">
                 </div>
-                <div class="form-group row">
-                    <label class="col-xs-6 control-label" for="player-comment-maxitems">同時コメント表示数</label>
-                    <div class="col-xs-6">
-                        <input id="player-comment-maxitems" class="form-control" name="maxitems" type="number" min="1" ng-model="$ctrl.comment.maxItems" ng-change="$ctrl.svc.comment.maxItems($ctrl.comment.maxItems)">
-                    </div>
+            </div>
+            <div class="form-group form-group-dark">
+                <label class="col-xs-6 control-label" for="player-comment-maxitems">同時コメント表示数</label>
+                <div class="col-xs-6">
+                    <input id="player-comment-maxitems" class="form-control" name="maxitems" type="number" min="1" ng-model="$ctrl.comment.maxItems" ng-change="$ctrl.svc.comment.maxItems($ctrl.comment.maxItems)">
                 </div>
             </div>
         </form>

@@ -243,7 +243,8 @@ limitations under the License.
       if (!props.quitModal) {
         props.quitModal = $uibModal.open({
           component: 'quitModal',
-          size: 'sm'
+          size: 'sm',
+          windowClass: 'modal-container'
         });
         props.quitModal.closed.then(function () {
           props.quitModal = null;
@@ -286,6 +287,7 @@ limitations under the License.
       var modal = $uibModal.open({
         component: 'errorModal',
         size: 'sm',
+        windowClass: 'modal-container',
         resolve: {
           title: function () {
             return title;
@@ -302,6 +304,7 @@ limitations under the License.
       return $uibModal.open({
         backdrop: 'static',
         component: 'progressModal',
+        windowClass: 'modal-container',
         resolve: {
           title: function () {
             return title;
@@ -315,13 +318,15 @@ limitations under the License.
 
     function openChinachuSetting() {
       return $uibModal.open({
-        component: 'chinachuSetting'
+        component: 'chinachuSetting',
+        windowClass: 'modal-container'
       });
     }
 
     function openMoritapoSetting() {
       return $uibModal.open({
-        component: 'moritapoSetting'
+        component: 'moritapoSetting',
+        windowClass: 'modal-container'
       });
     }
   }
