@@ -16,7 +16,7 @@ limitations under the License.
 -->
 <meta charset="UTF-8">
 <div class="flex flex-column extend-vertical">
-    <form class="flex-item form-thread row trim" name="threads">
+    <form class="flex-item form-thread" name="threads">
         <uib-dropdown class="dropdown dropdown-inverse dropdown-thread" auto-close="outsideClick">
             <uib-dropdown-toggle class="btn btn-dark">
                 スレッド選択
@@ -24,7 +24,7 @@ limitations under the License.
             </uib-dropdown-toggle>
             <ul class="dropdown-menu" uib-dropdown-menu>
                 <li ng-repeat="thread in $ctrl.threads">
-                    <div class="checkbox text-nowrap trim" title="{{thread.title}}">
+                    <div class="checkbox text-nowrap" title="{{thread.title}}">
                         <label>
                             <input type="checkbox" name="thread" ng-model="thread.checked" ng-change="$ctrl.updateFilter()">{{thread.title}}
                         </label>

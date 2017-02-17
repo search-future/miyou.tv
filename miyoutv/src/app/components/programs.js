@@ -30,7 +30,8 @@ limitations under the License.
     $timeout,
     CommonService,
     ChinachuService,
-    CommentService
+    CommentService,
+    categoryTable
   ) {
     var $ctrl = this;
     var viewport = $element[0].getElementsByClassName('scrollable')[0];
@@ -57,6 +58,12 @@ limitations under the License.
       formatMonthTitle: 'y年',
       showWeeks: false
     };
+    $ctrl.categories = categoryTable.filter(function (a) {
+      return a.name !== 'etc';
+    });
+    $ctrl.categories.push(categoryTable.filter(function (a) {
+      return a.name === 'etc';
+    })[0]);
 
     $ctrl.selectItem = function (item) {
       if (angular.isDefined(item)) {
@@ -107,9 +114,12 @@ limitations under the License.
         CommonService.errorModal('', '録画データが見つかりません。');
       }
     };
-
     $ctrl.search = function (value) {
       $location.search('search', value);
+    };
+    $ctrl.updateView = function () {
+      $timeout.cancel(timer);
+      timer = $timeout(updateView, 200);
     };
 
     $scope.$watch(function () {
@@ -388,10 +398,22 @@ limitations under the License.
       var bottom = viewport.scrollTop + viewport.clientHeight + $ctrl.baseHeight;
       var left = viewport.scrollLeft - $ctrl.baseWidth;
       var right = viewport.scrollLeft + viewport.clientWidth + $ctrl.baseWidth;
+      var checkedCategories = [];
+      var categoryFilterEnabled = false;
       var column;
       var item;
       var ci;
       var ii;
+
+      $ctrl.categories.forEach(function (a) {
+        if (a.checked) {
+          checkedCategories.push(a.name);
+        }
+      });
+      categoryFilterEnabled = (
+        checkedCategories.length > 0 &&
+        checkedCategories.length < $ctrl.categories.length
+      );
 
       $ctrl.dates.forEach(function (a) {
         var date = a;
@@ -411,7 +433,8 @@ limitations under the License.
             item = column.programs[ii];
             item.enabled = (
               calcPos(item.start) < bottom &&
-              calcPos(item.end) > top
+              calcPos(item.end) > top &&
+              (!categoryFilterEnabled || checkedCategories.indexOf(item.categoryName.name) >= 0)
             );
             if (item.enabled) {
               initItem(item);

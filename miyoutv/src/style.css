@@ -328,20 +328,44 @@ Components
   color: #fff;
 }
 
-.dropdown-thread {
-  float: left;
+.dropdown-inverse .checkbox label {
+  color: #e6e6e6;
+}
+
+.dropdown-inverse .checkbox label:hover {
+  color: #fff;
+}
+
+.dropdown-category {
+  float: right;
+  padding: 5px 10px;
   width: 100%;
 }
 
-.dropdown-thread .dropdown-menu {
-  background: #111;
-  margin: 0;
-  overflow: hidden;
-  width: 100%;
+.dropdown-category .dropdown-toggle {
+  display: block;
+  text-align: left;
 }
 
-.dropdown-thread .dropdown-menu li {
-  padding: 0 10px;
+.dropdown-category .dropdown-menu {
+  margin-top: -5px;
+  min-width: 100%;
+}
+
+.dropdown-thread .dropdown-menu,
+.dropdown-category .dropdown-menu {
+  max-height: 320px;
+  overflow: auto;
+}
+
+.dropdown-thread .checkbox,
+.dropdown-category .checkbox {
+  margin: 0 10px;
+}
+
+.dropdown-thread .checkbox label,
+.dropdown-category .checkbox label {
+  width: 100%;
 }
 
 

@@ -45,6 +45,25 @@ limitations under the License.
                 </div>
             </div>
         </div>
+        <div class="col-lg-2 col-sm-3 col-xs-12">
+            <uib-dropdown class="dropdown dropdown-inverse dropdown-category" auto-close="outsideClick">
+                <uib-dropdown-toggle class="btn btn-dark">
+                    番組カテゴリ
+                    <span class="pull-right">
+                            <span class="caret"></span>
+                    </span>
+                </uib-dropdown-toggle>
+                <ul class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
+                    <li ng-repeat="category in $ctrl.categories">
+                        <div class="checkbox text-nowrap" title="{{category.localeName}}">
+                            <label>
+                            <input type="checkbox" name="category" ng-model="category.checked" ng-change="$ctrl.updateView()">{{category.localeName}}
+                        </label>
+                        </div>
+                    </li>
+                </ul>
+            </uib-dropdown>
+        </div>
     </div>
     <div class="view-content-body scrollable" keep-scroll keep-bottom>
         <div class="program-header program-header-horizontal" ng-style="$ctrl.hHeaderStyle">
