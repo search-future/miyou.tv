@@ -103,7 +103,7 @@ limitations under the License.
           value.id,
           value.fullTitle,
           value.channel.name,
-          new Date(value.start).toLocaleString()
+          CommonService.formatDate(value.start, 'yyyy/MM/dd(EEE) A HHHH:mm:ss')
         ].join('\n'));
         CommentService.load(value.start, value.end, value.channel).catch(function (responce) {
           if (responce.noToken) {
@@ -148,8 +148,8 @@ limitations under the License.
           new Date(ChinachuPlayerService.program.start).toLocaleString(),
           'コメント取得完了',
           '検索チャンネル: ' + info.query,
-          '取得開始: ' + new Date(info.start).toLocaleString(),
-          '取得終了: ' + new Date(info.end).toLocaleString(),
+          '取得開始: ' + CommonService.formatDate(info.start, 'yyyy/MM/dd(EEE) A HHHH:mm:ss'),
+          '取得終了: ' + CommonService.formatDate(info.end, 'yyyy/MM/dd(EEE) A HHHH:mm:ss'),
           'コメント数: ' + (value.data ? value.data.length : 0)
         ].join('\n'));
       }

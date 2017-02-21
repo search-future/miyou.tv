@@ -55,7 +55,7 @@ limitations under the License.
                 </a>
                 <div class="media-body">
                     <div class="info">
-                        <span class="date" ng-bind="item.start | date:'M/d EEE HH:mm'"></span>
+                        <span class="date" ng-bind="item.displayTime"></span>
                         <span class="channel quick-search quick-search-hidden">
                             <span ng-bind="item.channel.name"></span> <span class="glyphicon glyphicon-search quick-search-btn" title="チャンネルで検索" ng-click="$ctrl.search('sid:' + item.channel.sid)"></span>
                         </span>

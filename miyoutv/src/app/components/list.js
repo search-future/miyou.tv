@@ -193,6 +193,7 @@ limitations under the License.
             item.seconds = item.duration / 1000;
             item.title = item.name;
             item.detail = item.description;
+            item.displayTime = CommonService.formatDate(item.start, 'M/d EEE A HHHH:mm');
             item.isArchive = true;
             item.isRecorded = false;
             item.channel = channel;
@@ -213,7 +214,9 @@ limitations under the License.
 
       recorded.forEach(function (a) {
         var program = a;
+
         program.categoryName = ChinachuService.convertCategory(program.category);
+        program.displayTime = CommonService.formatDate(program.start, 'M/d EEE A HHHH:mm');
         program.isArchive = false;
         program.isRecorded = true;
       });

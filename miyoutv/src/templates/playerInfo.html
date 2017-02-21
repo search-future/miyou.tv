@@ -28,11 +28,11 @@ limitations under the License.
         </div>
         <div class="row">
             <div class="col-xs-4">開始日時</div>
-            <div class="col-xs-8" ng-bind="$ctrl.program.start | date:'yyyy/MM/dd HH:mm:ss'"></div>
+            <div class="col-xs-8" ng-bind="$ctrl.program.displayStartTime"></div>
         </div>
         <div class="row">
             <div class="col-xs-4">終了日時</div>
-            <div class="col-xs-8" ng-bind="$ctrl.program.end | date:'yyyy/MM/dd HH:mm:ss'"></div>
+            <div class="col-xs-8" ng-bind="$ctrl.program.displayEndTime"></div>
         </div>
         <div class="row">
             <div class="col-xs-4">ジャンル</div>
@@ -58,8 +58,8 @@ limitations under the License.
     <div class="panel-body">
         <div class="row" ng-repeat="program in $ctrl.programList">
             <div class="col-xs-4">
-                <span class="start" ng-bind="program.startAt | date:'MM/dd HH:mm'"></span> ～
-                <span class="end" ng-bind="program.startAt + program.duration  | date:'MM/dd HH:mm'"></span>
+                <span class="start" ng-bind="program.displayStartTime"></span> ～
+                <span class="end" ng-bind="program.displayEndTime"></span>
             </div>
             <div class="col-xs-8">
                 <div class="panel-heading" ng-bind="program.name"></div>
@@ -78,11 +78,11 @@ limitations under the License.
         </div>
         <div class="row">
             <div class="col-xs-4">開始日時</div>
-            <div class="col-xs-8" ng-bind="$ctrl.comment.start | date:'yyyy/MM/dd HH:mm:ss'"></div>
+            <div class="col-xs-8" ng-bind="$ctrl.comment.displayStartTime"></div>
         </div>
         <div class="row">
             <div class="col-xs-4">終了日時</div>
-            <div class="col-xs-8" ng-bind="$ctrl.comment.end | date:'yyyy/MM/dd HH:mm:ss'"></div>
+            <div class="col-xs-8" ng-bind="$ctrl.comment.displayEndTime"></div>
         </div>
         <div class="row">
             <div class="col-xs-4">取得モード</div>

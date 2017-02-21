@@ -24,6 +24,7 @@ limitations under the License.
 
   function PlayerInfoCtrl(
     $scope,
+    CommonService,
     ChinachuService,
     ChinachuPlayerService,
     CommentService
@@ -47,12 +48,24 @@ limitations under the License.
         $ctrl.program.title = value.fullTitle;
         $ctrl.program.episode = value.episode;
         $ctrl.program.detail = value.detail;
+        $ctrl.program.displayStartTime = CommonService.formatDate(value.start, 'yyyy/MM/dd(EEE) A HHHH:mm');
+        $ctrl.program.displayEndTime = CommonService.formatDate(value.end, 'yyyy/MM/dd(EEE) A HHHH:mm');
       }
     });
     $scope.$watch(function () {
       return ChinachuPlayerService.programList;
     }, function (value) {
-      $ctrl.programList = value;
+      var programList = value;
+
+      if (angular.isArray(programList)) {
+        programList.forEach(function (a) {
+          var program = a;
+
+          program.displayStartTime = CommonService.formatDate(program.startAt, 'MM/dd A HHHH:mm');
+          program.displayEndTime = CommonService.formatDate(program.startAt + program.duration, 'MM/dd A HHHH:mm');
+        });
+      }
+      $ctrl.programList = programList;
     });
     $scope.$watch(function () {
       return CommentService.info();
@@ -65,6 +78,8 @@ limitations under the License.
       $ctrl.comment.start = value.start;
       $ctrl.comment.end = value.end;
       $ctrl.comment.query = value.query;
+      $ctrl.comment.displayStartTime = CommonService.formatDate(value.start, 'yyyy/MM/dd(EEE) A HHHH:mm:ss');
+      $ctrl.comment.displayEndTime = CommonService.formatDate(value.end, 'yyyy/MM/dd(EEE) A HHHH:mm:ss');
     });
     $scope.$watch(function () {
       return CommentService.data();

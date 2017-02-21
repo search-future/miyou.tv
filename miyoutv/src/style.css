@@ -479,7 +479,7 @@ Components
   margin-bottom: 16px;
 }
 
-.modal-component input {
+.modal-component .form-control {
   background-color: #333;
   border: none;
   color: #fff;
@@ -494,6 +494,11 @@ Components
   height: 44px;
   margin-top: 20px;
   width: 120px;
+}
+
+.modal-component legend {
+  color: #fff;
+  font-size: 18px;
 }
 
 

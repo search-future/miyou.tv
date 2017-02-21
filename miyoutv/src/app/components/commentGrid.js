@@ -24,7 +24,6 @@ limitations under the License.
 
   function CommentGridCtrl(
     $scope,
-    $filter,
     CommonService,
     CommentService,
     PlayerService
@@ -57,12 +56,12 @@ limitations under the License.
         colId: 'time',
         field: 'time',
         headerName: '時刻',
-        width: 70,
+        width: 90,
         cellStyle: {
           textAlign: 'right'
         },
         cellRenderer: function (params) {
-          var time = $filter('date')(params.value, 'HH:mm:ss');
+          var time = CommonService.formatDate(params.value, 'A HHHH:mm:ss');
 
           return ['<div title="', time, '">', time, '</div>'].join('');
         }

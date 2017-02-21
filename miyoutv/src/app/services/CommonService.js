@@ -23,6 +23,7 @@ limitations under the License.
     $rootScope,
     $window,
     $location,
+    $filter,
     $route,
     $uibModal
   ) {
@@ -44,8 +45,11 @@ limitations under the License.
       reload: reload,
       back: back,
       formatTime: formatTime,
+      convertHour: convertHour,
+      formatDate: formatDate,
       errorModal: errorModal,
       progressModal: progressModal,
+      openViewSetting: openViewSetting,
       openChinachuSetting: openChinachuSetting,
       openMoritapoSetting: openMoritapoSetting
     };
@@ -283,6 +287,36 @@ limitations under the License.
       return sign + ((h > 0) ? [h, m, s] : [m, s]).join(':');
     }
 
+    function convertHour(time, format) {
+      var hour = new Date(time).getHours();
+      var savedFormat = loadLocalStorage('hourFormat') || '';
+      var hourFormat = angular.isDefined(format) ? format : savedFormat;
+      var formatArray = hourFormat.split(':');
+      var start = angular.isNumber(loadLocalStorage('hourFirst')) ? loadLocalStorage('hourFirst') : 4;
+      var limit = 24;
+
+      if (formatArray.length === 2) {
+        start = !isNaN(formatArray[0]) ? parseInt(formatArray[0], 10) : start;
+        limit = !isNaN(formatArray[1]) ? parseInt(formatArray[1], 10) : limit;
+      }
+      return (((hour + limit) - start) % limit) + start;
+    }
+
+    function formatDate(time, format, hourFormat) {
+      var hour = convertHour(time, hourFormat);
+      var savedHourFormat = loadLocalStorage('hourFormat') || '';
+      var useMarker = /12$/.test(angular.isString(hourFormat) ? hourFormat : savedHourFormat);
+      var convertedFormat = format.replace(
+        'HHHH', String(100 + hour).slice(1)
+      ).replace(
+        'HHH', String(hour)
+      ).replace(
+        'A', useMarker ? 'a' : ''
+      );
+
+      return $filter('date')(time, convertedFormat);
+    }
+
     function errorModal(title, message, callback) {
       var modal = $uibModal.open({
         component: 'errorModal',
@@ -313,6 +347,13 @@ limitations under the License.
             return message;
           }
         }
+      });
+    }
+
+    function openViewSetting() {
+      return $uibModal.open({
+        component: 'ViewSetting',
+        windowClass: 'modal-container'
       });
     }
 

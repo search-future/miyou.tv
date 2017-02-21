@@ -27,6 +27,7 @@ limitations under the License.
 
   function SeekbarCtrl(
     $scope,
+    CommonService,
     PlayerService,
     ChinachuPlayerService,
     CommentService
@@ -57,8 +58,8 @@ limitations under the License.
       }
       $ctrl.time = PlayerService.formattedTime();
       $ctrl.length = PlayerService.formattedLength();
-      $ctrl.clockTime = PlayerService.time() + CommentService.offset();
-      $ctrl.end = PlayerService.length() + CommentService.offset();
+      $ctrl.clockTime = CommonService.formatDate(PlayerService.time() + CommentService.offset(), 'A HHHH:mm:ss');
+      $ctrl.endTime = CommonService.formatDate(PlayerService.length() + CommentService.offset(), 'A HHHH:mm:ss');
     });
   }
 }());

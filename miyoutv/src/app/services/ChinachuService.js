@@ -335,7 +335,7 @@ limitations under the License.
       var date = new Date(start.getFullYear(), start.getMonth(), start.getDate());
 
       while (date.getTime() < end.getTime()) {
-        dates.push(date.getTime());
+        dates.push(new Date(date));
         date.setDate(date.getDate() + 1);
       }
       return dates;
@@ -348,7 +348,7 @@ limitations under the License.
       var hour = new Date(start.getFullYear(), start.getMonth(), start.getDate(), start.getHours());
 
       while (hour.getTime() < end.getTime()) {
-        hours.push(hour.getTime());
+        hours.push(new Date(hour));
         hour.setHours(hour.getHours() + 1);
       }
       return hours;

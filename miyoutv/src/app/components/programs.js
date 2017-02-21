@@ -72,7 +72,7 @@ limitations under the License.
       return selectItem;
     };
     $ctrl.scrollToTime = function (time) {
-      viewport.scrollTop = calcPos(time);
+      viewport.scrollTop = calcPos(new Date(time).getTime());
     };
     $ctrl.play = function (item) {
       if (item) {
@@ -136,6 +136,12 @@ limitations under the License.
       },
       function () {
         return $ctrl.source;
+      },
+      function () {
+        return CommonService.loadLocalStorage('hourFirst');
+      },
+      function () {
+        return CommonService.loadLocalStorage('hourFormat');
       }
     ], function (values) {
       var archive = values[0];
@@ -237,7 +243,7 @@ limitations under the License.
       var pos;
 
       date = new Date(time);
-      date.setHours(0);
+      date.setHours(CommonService.loadLocalStorage('hourFirst'));
       date.setMinutes(0);
       date.setSeconds(0);
       date.setMilliseconds(0);
@@ -256,16 +262,20 @@ limitations under the License.
       var dates = ChinachuService.recordedDates(useFilter ? miyoutvFilter : null);
       var hours = ChinachuService.recordedHours(useFilter ? miyoutvFilter : null);
       var i;
+      var date;
 
       for (i = 0; i < dates.length; i += 1) {
+        date = new Date(dates[i]);
+        date.setHours(CommonService.loadLocalStorage('hourFirst'));
         $ctrl.dates.push({
-          time: dates[i],
+          time: date,
           isCurrent: false
         });
       }
       for (i = 0; i < hours.length; i += 1) {
         $ctrl.hours.push({
-          time: hours[i]
+          time: hours[i],
+          hour: CommonService.convertHour(hours[i])
         });
       }
     }
@@ -310,6 +320,7 @@ limitations under the License.
             item.title = item.name;
             item.detail = item.description;
             item.channel = channel;
+            item.displayTime = CommonService.formatDate(item.start, 'A HHHH:mm');
             item.isArchive = true;
             item.isRecorded = false;
             if (angular.isArray(item.genres)) {
@@ -355,6 +366,7 @@ limitations under the License.
           ) {
             item.categoryName = ChinachuService.convertCategory(item.category);
             item.style = calcItemStyle(item);
+            item.displayTime = CommonService.formatDate(item.start, 'A HHHH:mm');
             item.isArchive = false;
             item.isRecorded = true;
             column.programs.push(item);

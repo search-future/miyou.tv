@@ -23,9 +23,9 @@ limitations under the License.
                     <img class="img-icon-md" src="assets/step-backward.svg" alt="">
                 </button>
             </span>
-            <span class="input-group-addon clickable" ng-show="$ctrl.clockTime" ng-bind="$ctrl.isClock ? ($ctrl.clockTime | date:'HH:mm:ss') : $ctrl.time" ng-click="$ctrl.isClock = !$ctrl.isClock"></span>
+            <span class="input-group-addon clickable" ng-show="$ctrl.clockTime" ng-bind="$ctrl.isClock ? $ctrl.clockTime : $ctrl.time" ng-click="$ctrl.isClock = !$ctrl.isClock"></span>
             <input class="form-control form-control-range" type="range" step="0.00001" min="0" max="1" ng-model="$ctrl.position" ng-mousedown="$ctrl.isSeeking = true" ng-mouseup="$ctrl.isSeeking = false" ng-change="$ctrl.seek($ctrl.position)">
-            <span class="input-group-addon clickable" ng-show="$ctrl.end" ng-bind="$ctrl.isClock ? ($ctrl.end | date:'HH:mm:ss') : $ctrl.length" ng-click="$ctrl.isClock = !$ctrl.isClock"></span>
+            <span class="input-group-addon clickable" ng-show="$ctrl.endTime" ng-bind="$ctrl.isClock ? $ctrl.endTime : $ctrl.length" ng-click="$ctrl.isClock = !$ctrl.isClock"></span>
             <span class="input-group-btn">
                 <button class="btn btn-media" type="button" ng-click="$ctrl.next()" ng-show="$ctrl.mode === 'channel'">
                     <img class="img-icon-md" src="assets/step-forward.svg" alt="">
