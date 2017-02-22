@@ -416,6 +416,8 @@ limitations under the License.
       var item;
       var ci;
       var ii;
+      var countStart;
+      var countEnd;
 
       $ctrl.categories.forEach(function (a) {
         if (a.checked) {
@@ -426,7 +428,6 @@ limitations under the License.
         checkedCategories.length > 0 &&
         checkedCategories.length < $ctrl.categories.length
       );
-
       $ctrl.dates.forEach(function (a) {
         var date = a;
         date.isCurrent = isCurrentDate(date.time);
@@ -441,6 +442,8 @@ limitations under the License.
           (ci + 1) * $ctrl.baseWidth >= left
         );
         if (column.enabled) {
+          countStart = 0;
+          countEnd = 0;
           for (ii = 0; ii < column.programs.length; ii += 1) {
             item = column.programs[ii];
             item.enabled = (
@@ -449,8 +452,26 @@ limitations under the License.
               (!categoryFilterEnabled || checkedCategories.indexOf(item.categoryName.name) >= 0)
             );
             if (item.enabled) {
+              if (angular.isUndefined(item.count)) {
+                if (!countStart || countStart > item.start) {
+                  countStart = item.start;
+                }
+                if (!countEnd || countEnd < item.end) {
+                  countEnd = item.end;
+                }
+              }
               initItem(item);
             }
+          }
+          if (countStart && countEnd) {
+            CommentService.request('intervals', {
+              params: {
+                start: countStart,
+                end: countEnd,
+                channel: CommentService.resolveChannel(column.channel),
+                interval: '1m'
+              }
+            }).then(getCounter(ci));
           }
         }
       }
@@ -494,13 +515,31 @@ limitations under the License.
             program.preview = value;
           });
       }
-      if (angular.isUndefined(program.commentCount)) {
-        CommentService
-          .requestCount(program.start, program.end, program.channel)
-          .then(function (value) {
-            program.commentCount = value;
+    }
+
+    function getCounter(columnIndex) {
+      return function (result) {
+        if (
+          angular.isObject(result) &&
+          angular.isObject(result.data) &&
+          angular.isObject(result.data.data) &&
+          angular.isArray(result.data.data.intervals)
+        ) {
+          $ctrl.programs[columnIndex].programs.filter(function (a) {
+            return a.enabled && angular.isUndefined(a.count);
+          }).forEach(function (item) {
+            var program = item;
+            var commentCount = 0;
+
+            result.data.data.intervals.filter(function (interval) {
+              return interval.start >= program.start && interval.start < program.end;
+            }).forEach(function (b) {
+              commentCount += b.n_hits;
+            });
+            program.count = commentCount;
           });
-      }
+        }
+      };
     }
   }
 }());

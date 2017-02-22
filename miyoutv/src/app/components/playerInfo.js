@@ -84,7 +84,7 @@ limitations under the License.
     $scope.$watch(function () {
       return CommentService.data();
     }, function (value) {
-      $ctrl.comment.count = value.data ? value.data.length : 0;
+      $ctrl.comment.count = angular.isObject(value) ? value.n_hits : 0;
     });
   }
 }());

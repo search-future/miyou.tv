@@ -250,6 +250,7 @@ limitations under the License.
       var program = item;
       var recorded;
       var previewPos = 70;
+      var channel;
 
       if (program.isArchive) {
         if (!program.isRecorded) {
@@ -284,12 +285,28 @@ limitations under the License.
             program.preview = value;
           });
       }
-      if (angular.isUndefined(program.commentCount)) {
-        CommentService
-          .requestCount(program.start, program.end, program.channel)
-          .then(function (value) {
-            program.commentCount = value;
-          });
+
+      if (angular.isUndefined(item.count)) {
+        channel = CommentService.resolveChannel(item.channel);
+        CommentService.request('comments', {
+          params: {
+            channel: channel,
+            start: item.start,
+            end: item.end,
+            limit: 0
+          }
+        }).then(function (responce) {
+          var commentCount;
+          if (
+            angular.isObject(responce) &&
+            angular.isObject(responce.data) &&
+            angular.isObject(responce.data.data) &&
+            angular.isNumber(responce.data.data.n_hits)
+          ) {
+            commentCount = responce.data.data.n_hits;
+            program.count = commentCount;
+          }
+        });
       }
     }
   }
