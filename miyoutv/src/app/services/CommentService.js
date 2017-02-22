@@ -48,6 +48,7 @@ limitations under the License.
       requestToken: requestToken,
       deleteToken: deleteToken,
       request: request,
+      requestComments: requestComments,
       requestCount: requestCount,
       load: load,
       filteredComments: filteredComments
@@ -101,7 +102,7 @@ limitations under the License.
     }
 
     function processData() {
-      var result = angular.copy(props.data.data || props.data.comments) || [];
+      var result = angular.copy(props.data.comments) || [];
 
       result.forEach(function (a) {
         var comment = a;
@@ -262,8 +263,20 @@ limitations under the License.
       CommonService.saveLocalStorage('comment_token', props.token);
     }
 
-    function request(start, end, channel) {
-      var conf = {};
+    function request(path, config) {
+      var conf;
+      conf = {
+        method: 'GET',
+        url: [commentUrl, path].join('/'),
+        headers: {
+          'X-MITEYOU-AUTH-TOKEN': token()
+        }
+      };
+      conf = angular.extend(conf, config);
+      return $http(conf);
+    }
+
+    function requestComments(start, end, channel) {
       var deferred = $q.defer();
       var cache = getCommentCache(start, end, channel);
 
@@ -274,29 +287,25 @@ limitations under the License.
           noToken: true
         });
       } else {
-        conf = {
-          method: 'GET',
-          url: commentUrl,
-          headers: {
-            'X-MITEYOU-AUTH-TOKEN': token()
-          },
-          params: {
-            start: Math.floor(start / 1000),
-            end: Math.floor(end / 1000),
-            type: channel.type === 'GR' ? 'gro' : 'sat',
-            channel: resolveChannel(channel)
-          }
-        };
-
         props.canceller.resolve();
         props.canceller = $q.defer();
-        conf.timeout = props.canceller.promise;
-        $http(conf).then(function (response) {
-          if (response.data.EC) {
+        request('comments', {
+          params: {
+            start: start,
+            end: end,
+            channel: resolveChannel(channel)
+          }
+        }, {
+          timeout: props.canceller.promise
+        }).then(function (response) {
+          if (
+            response.data.EC ||
+            !angular.isObject(response.data)
+          ) {
             deferred.reject(response);
           } else {
-            deferred.resolve(response.data);
-            setCommentCache(start, end, channel, response.data);
+            deferred.resolve(response.data.data);
+            setCommentCache(start, end, channel, response.data.data);
           }
         }, deferred.reject, deferred.notify);
       }
@@ -304,7 +313,6 @@ limitations under the License.
     }
 
     function requestCount(start, end, channel) {
-      var conf;
       var deferred = $q.defer();
       var cache = getCountCache(start, end, channel);
 
@@ -315,23 +323,19 @@ limitations under the License.
           noToken: true
         });
       } else {
-        conf = {
-          method: 'GET',
-          url: commentUrl + '/count',
-          headers: {
-            'X-MITEYOU-AUTH-TOKEN': token()
-          },
-          params: {
-            start: Math.floor(start / 1000),
-            end: Math.floor(end / 1000),
-            type: channel.type === 'GR' ? 'gro' : 'sat',
-            channel: resolveChannel(channel)
-          }
-        };
-        $http(conf).then(function (response) {
-          if (!isNaN(response.data)) {
-            deferred.resolve(response.data);
-            setCountCache(start, end, channel, response.data);
+        request('comments', {
+          start: start,
+          end: end,
+          channel: resolveChannel(channel),
+          limit: 0
+        }).then(function (response) {
+          if (
+            angular.isObject(response.data) &&
+            angular.isObject(response.data.data) &&
+            !isNaN(response.data.data.n_hits)
+          ) {
+            deferred.resolve(response.data.data.n_hits);
+            setCountCache(start, end, channel, response.data.data.n_hits);
           } else {
             deferred.reject(response);
           }
@@ -390,7 +394,7 @@ limitations under the License.
         query: resolveChannel(channel)
       };
       margin = Math.abs(delay()) + 10000;
-      request(start - margin, end + margin, channel)
+      requestComments(start - margin, end + margin, channel)
         .then(function (value) {
           props.data = value;
           processData();

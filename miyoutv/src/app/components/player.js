@@ -139,7 +139,7 @@ limitations under the License.
     }, function (value) {
       var info;
 
-      if (value.status === 'OK') {
+      if (angular.isObject(value)) {
         info = CommentService.info();
         PlayerService.setScreenText([
           ChinachuPlayerService.program.id,
@@ -150,7 +150,7 @@ limitations under the License.
           '検索チャンネル: ' + info.query,
           '取得開始: ' + CommonService.formatDate(info.start, 'yyyy/MM/dd(EEE) A HHHH:mm:ss'),
           '取得終了: ' + CommonService.formatDate(info.end, 'yyyy/MM/dd(EEE) A HHHH:mm:ss'),
-          'コメント数: ' + (value.data ? value.data.length : 0)
+          'コメント数: ' + value.n_hits || 0
         ].join('\n'));
       }
     });
