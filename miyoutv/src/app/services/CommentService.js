@@ -25,8 +25,7 @@ limitations under the License.
     $httpParamSerializer,
     CommonService,
     commentUrl,
-    commentTokenUrl,
-    channelTable
+    commentTokenUrl
   ) {
     var service = {
       token: token,
@@ -207,29 +206,17 @@ limitations under the License.
     }
 
     function resolveChannel(channel) {
-      var name = channel.name
+      return channel.name
         .replace(/[０-９Ａ-Ｚａ-ｚ：-？￥＄％-＊]/g, function (s) {
           return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
         })
         .replace('　', ' ')
         .replace('!', '')
-        .replace(/^(NHK[^0-9]+[0-9]).*$/, '$1');
-
-      if (channelTable[name]) {
-        return channelTable[name];
-      }
-      name = name
+        .replace(/^(NHK[^0-9]+[0-9]).*$/, '$1')
         .replace(/^([^0-9]+)[0-9]$/, '$1')
         .replace(/(◆.+|・[0-9]+)$/, '')
         .replace(/HD$/, '')
         .replace(/CH$/i, '');
-      if (channelTable[name]) {
-        return channelTable[name];
-      }
-      if (channelTable[channel.id]) {
-        return channelTable[channel.id];
-      }
-      return name;
     }
 
     function requestToken(email, password) {

@@ -23,47 +23,7 @@ global.module.paths.push(modulePath);
 
   var commentUrl = 'https://miteru.digitiminimi.com/a2sc.php/miyou';
   var commentTokenUrl = 'https://miteru.digitiminimi.com/a2sc.php/auth/moritapo';
-  var channelTable = {
-    GR_1024: 'NHK総合',
-    GR_1032: 'NHKEテレ',
-    GR_1040: '日テレ',
-    GR_1048: 'TBS',
-    GR_1056: 'フジテレビ',
-    GR_1064: 'テレビ朝日',
-    GR_1072: 'テレビ東京',
-    GR_23608: 'TOKYO MX1',
-    GR_23610: 'TOKYO MX2',
-    GR_24632: 'tvk',
-    GR_24656: '群馬テレビ',
-    GR_27704: 'チバテレ',
-    GR_28728: 'とちぎテレビ',
-    GR_29752: 'テレ玉',
-    BS_101: 'NHKBS1',
-    BS_103: 'NHKBSプレミアム',
-    BS_141: 'BS日テレ',
-    BS_151: 'BS朝日',
-    BS_161: 'BS-TBS',
-    BS_171: 'BSジャパン',
-    BS_181: 'BSフジ',
-    BS_191: 'WOWOWプライム',
-    BS_192: 'WOWOWライブ',
-    BS_193: 'WOWOWシネマ',
-    BS_200: 'スターチャンネル',
-    BS_201: 'スターチャンネル',
-    BS_202: 'スターチャンネル',
-    BS_211: 'BS11イレブン',
-    BS_222: 'BS12トゥエルビ',
-    BS_231: '放送大学',
-    BS_232: '放送大学',
-    BS_233: '放送大学',
-    BS_236: 'BSアニマックス',
-    BS_238: 'FOXスポーツエンタ',
-    BS_241: 'BSスカパー',
-    BS_252: 'イマジカBS',
-    BS_255: 'BS日本映画専門',
-    BS_256: 'ディズニーチャンネル',
-    BS_258: 'ディーライフ'
-  };
+
   var categoryTable = [{
     name: 'news',
     localeName: 'ニュース/報道'
@@ -200,7 +160,6 @@ global.module.paths.push(modulePath);
   angular.module('app', ['ngAnimate', 'ngRoute', 'ui.bootstrap', 'agGrid', 'cfp.hotkeys', 'toaster'])
     .constant('commentUrl', commentUrl)
     .constant('commentTokenUrl', commentTokenUrl)
-    .constant('channelTable', channelTable)
     .constant('categoryTable', categoryTable)
     .constant('playerRateLimit', playerRateLimit)
     .config(config)
