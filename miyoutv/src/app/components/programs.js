@@ -37,6 +37,7 @@ limitations under the License.
     var viewport = $element[0].getElementsByClassName('scrollable')[0];
     var selectItem;
     var timer;
+    var countMode = 'speed';
 
     $ctrl.baseWidth = 200;
     $ctrl.baseHeight = 60;
@@ -195,6 +196,30 @@ limitations under the License.
           '&search=' + value
         ].join(''));
       }
+    });
+    $scope.$watch(function () {
+      return CommonService.loadLocalStorage('countMode');
+    }, function (newValue, oldValue) {
+      var countChanged = newValue !== oldValue;
+      var ci;
+      var column;
+      var ii;
+      var item;
+      countMode = newValue;
+
+      for (ci = 0; ci < $ctrl.programs.length; ci += 1) {
+        column = $ctrl.programs[ci];
+        for (ii = 0; ii < column.programs.length; ii += 1) {
+          item = column.programs[ii];
+          item.enabled = false;
+          if (countChanged) {
+            delete item.count;
+          }
+        }
+      }
+
+      $timeout.cancel(timer);
+      timer = $timeout(updateView, 200);
     });
 
     angular.element(viewport).on('scroll', function (e) {
@@ -452,7 +477,7 @@ limitations under the License.
               (!categoryFilterEnabled || checkedCategories.indexOf(item.categoryName.name) >= 0)
             );
             if (item.enabled) {
-              if (angular.isUndefined(item.count)) {
+              if (countMode !== 'none' && angular.isUndefined(item.count)) {
                 if (!countStart || countStart > item.start) {
                   countStart = item.start;
                 }
@@ -463,7 +488,7 @@ limitations under the License.
               initItem(item);
             }
           }
-          if (countStart && countEnd) {
+          if (countMode !== 'none' && countStart && countEnd) {
             CommentService.request('intervals', {
               params: {
                 start: countStart,
@@ -483,7 +508,7 @@ limitations under the License.
       var previewPos = 70;
 
       if (program.isArchive) {
-        if (!program.isRecorded) {
+        if (!program.isRecorded || angular.isUndefined(program.preview)) {
           recorded = ChinachuService.data.recorded.filter(function (a) {
             return (
               a.channel.type === program.channel.type &&
@@ -530,13 +555,26 @@ limitations under the License.
           }).forEach(function (item) {
             var program = item;
             var commentCount = 0;
+            var commentSpeed = 0;
 
             result.data.data.intervals.filter(function (interval) {
               return interval.start >= program.start && interval.start < program.end;
             }).forEach(function (b) {
               commentCount += b.n_hits;
             });
-            program.count = commentCount;
+            commentSpeed = (commentCount / (program.seconds / 60));
+            switch (countMode) {
+              case 'speed':
+                program.count = commentSpeed.toFixed(1);
+                break;
+              case 'comment':
+              default:
+                program.count = commentCount;
+            }
+            program.countDetail = [
+              'コメント数: ' + commentCount,
+              '勢い： ' + commentSpeed.toFixed(1) + '/分'
+            ].join('\n');
           });
         }
       };

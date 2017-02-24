@@ -80,7 +80,7 @@ limitations under the License.
             <div class="program-table-column" ng-repeat="column in $ctrl.programs" ng-style="column.style" ng-dblclick="$ctrl.playColumn(column, $event)">
                 <div class="program-table-cell" ng-repeat="item in column.programs" ng-if="column.enabled && item.enabled" ng-style="item.style">
                     <div class="program-table-content selectable" ng-class="{selected: $ctrl.selectItem() === item}" ng-click="$ctrl.selectItem(item)" ng-dblclick="$ctrl.play(item)">
-                        <span class="badge" ng-bind="item.commentCount"></span>
+                        <span class="badge" title="{{item.countDetail}}" ng-bind="item.count"></span>
                         <span class="time text-primary" ng-bind="item.displayTime"></span>
                         <span class="title text-primary quick-search quick-search-hidden">
                             <span ng-bind="item.title"></span> <span class="glyphicon glyphicon-search quick-search-btn" title="番組名で検索" ng-click="$ctrl.search(item.title)"></span>

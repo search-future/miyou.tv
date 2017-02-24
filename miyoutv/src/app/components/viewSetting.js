@@ -19,13 +19,16 @@
   ) {
     var $ctrl = this;
 
+    $ctrl.countMode = 'speed';
     $ctrl.hourFirst = '4';
     $ctrl.hourFormat = '';
 
     $ctrl.ok = function () {
+      var countMode = $ctrl.countMode;
       var hourFirst = parseInt($ctrl.hourFirst, 10);
       var hourFormat = $ctrl.hourFormat;
 
+      CommonService.saveLocalStorage('countMode', countMode);
       CommonService.saveLocalStorage('hourFirst', hourFirst);
       CommonService.saveLocalStorage('hourFormat', hourFormat);
       $ctrl.close();
@@ -40,6 +43,11 @@
       var hour = parseInt(value, 10);
 
       $ctrl.autoFormatName = [hour, '-', (hour + 24) - 1].join('');
+    });
+    $scope.$watch(function () {
+      return CommonService.loadLocalStorage('countMode');
+    }, function (value) {
+      $ctrl.countMode = value || 'speed';
     });
     $scope.$watch(function () {
       return CommonService.loadLocalStorage('hourFirst');

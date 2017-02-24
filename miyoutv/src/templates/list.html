@@ -63,7 +63,7 @@ limitations under the License.
                         <span class="label quick-search" ng-class="'label-' + item.categoryName.name">
                             <span ng-bind="item.categoryName.localeName"></span> <span class="glyphicon glyphicon-search quick-search-btn" title="カテゴリで検索" ng-click="$ctrl.search('cat:' + item.categoryName.name)"></span>
                         </span>
-                        <span class="badge" ng-bind="item.commentCount"></span>
+                        <span class="badge" title="{{item.countDetail}}" ng-bind="item.count"></span>
                     </div>
                     <div class="title quick-search quick-search-hidden">
                         <span ng-bind="item.title"></span> <span class="glyphicon glyphicon-search quick-search-btn" title="番組名で検索" ng-click="$ctrl.search(item.title)"></span>

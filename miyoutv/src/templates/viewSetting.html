@@ -22,6 +22,19 @@ limitations under the License.
     <div class="modal-body">
         <div class="form-horizontal">
             <fieldset>
+                <legend>番組情報</legend>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" for="countmode">カウント</label>
+                    <div class="col-sm-9">
+                        <select id="countmode" class="form-control" name="countmode" ng-model="$ctrl.countMode">
+                            <option value="comment">コメント数</option>
+                            <option value="speed">勢い(コメント数/分)</option>
+                            <option value="none">非表示</option>
+                        </select>
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset>
                 <legend>時刻</legend>
                 <div class="form-group">
                     <label class="col-sm-3 control-label" for="hourfirst">1日の始まり</label>

@@ -37,6 +37,7 @@ limitations under the License.
     var viewport = $element[0].getElementsByClassName('scrollable')[0];
     var selectItem;
     var timer;
+    var countMode = 'speed';
 
     $ctrl.programs = [];
     $ctrl.source = 'archive';
@@ -105,6 +106,23 @@ limitations under the License.
       return $location.search().src;
     }, function (value) {
       $ctrl.source = value || 'archive';
+    });
+    $scope.$watch(function () {
+      return CommonService.loadLocalStorage('countMode');
+    }, function (newValue, oldValue) {
+      var countChanged = newValue !== oldValue;
+      countMode = newValue;
+
+      $ctrl.programs.forEach(function (a) {
+        var program = a;
+        program.enabled = false;
+        if (countChanged) {
+          delete program.count;
+        }
+      });
+
+      $timeout.cancel(timer);
+      timer = $timeout(updateView, 200);
     });
     $scope.$watchGroup([function () {
       return $location.search().order;
@@ -286,7 +304,7 @@ limitations under the License.
           });
       }
 
-      if (angular.isUndefined(item.count)) {
+      if (countMode !== 'none' && angular.isUndefined(item.count)) {
         channel = CommentService.resolveChannel(item.channel);
         CommentService.request('comments', {
           params: {
@@ -297,6 +315,7 @@ limitations under the License.
           }
         }).then(function (responce) {
           var commentCount;
+          var commentSpeed;
           if (
             angular.isObject(responce) &&
             angular.isObject(responce.data) &&
@@ -304,7 +323,19 @@ limitations under the License.
             angular.isNumber(responce.data.data.n_hits)
           ) {
             commentCount = responce.data.data.n_hits;
-            program.count = commentCount;
+            commentSpeed = (commentCount / (program.seconds / 60));
+            switch (countMode) {
+              case 'speed':
+                program.count = commentSpeed.toFixed(1);
+                break;
+              case 'comment':
+              default:
+                program.count = commentCount;
+            }
+            program.countDetail = [
+              'コメント数: ' + commentCount,
+              '勢い： ' + commentSpeed.toFixed(1) + '/分'
+            ].join('\n');
           }
         });
       }
