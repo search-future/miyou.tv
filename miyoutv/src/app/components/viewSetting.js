@@ -20,15 +20,18 @@
     var $ctrl = this;
 
     $ctrl.countMode = 'speed';
+    $ctrl.previewEnabled = true;
     $ctrl.hourFirst = '4';
     $ctrl.hourFormat = '';
 
     $ctrl.ok = function () {
       var countMode = $ctrl.countMode;
+      var previewEnabled = $ctrl.previewEnabled;
       var hourFirst = parseInt($ctrl.hourFirst, 10);
       var hourFormat = $ctrl.hourFormat;
 
       CommonService.saveLocalStorage('countMode', countMode);
+      CommonService.saveLocalStorage('previewEnabled', previewEnabled);
       CommonService.saveLocalStorage('hourFirst', hourFirst);
       CommonService.saveLocalStorage('hourFormat', hourFormat);
       $ctrl.close();
@@ -48,6 +51,11 @@
       return CommonService.loadLocalStorage('countMode');
     }, function (value) {
       $ctrl.countMode = value || 'speed';
+    });
+    $scope.$watch(function () {
+      return CommonService.loadLocalStorage('previewEnabled');
+    }, function (value) {
+      $ctrl.previewEnabled = typeof value === 'boolean' ? value : true;
     });
     $scope.$watch(function () {
       return CommonService.loadLocalStorage('hourFirst');

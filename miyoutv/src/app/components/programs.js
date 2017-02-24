@@ -38,6 +38,7 @@ limitations under the License.
     var selectItem;
     var timer;
     var countMode = 'speed';
+    var previewEnabled = true;
 
     $ctrl.baseWidth = 200;
     $ctrl.baseHeight = 60;
@@ -197,15 +198,18 @@ limitations under the License.
         ].join(''));
       }
     });
-    $scope.$watch(function () {
+    $scope.$watchGroup([function () {
       return CommonService.loadLocalStorage('countMode');
-    }, function (newValue, oldValue) {
-      var countChanged = newValue !== oldValue;
+    }, function () {
+      return CommonService.loadLocalStorage('previewEnabled');
+    }], function (newValues, oldValues) {
+      var countChanged = newValues[0] !== oldValues[0];
       var ci;
       var column;
       var ii;
       var item;
-      countMode = newValue;
+      countMode = newValues[0];
+      previewEnabled = typeof newValues[1] === 'boolean' ? newValues[1] : true;
 
       for (ci = 0; ci < $ctrl.programs.length; ci += 1) {
         column = $ctrl.programs[ci];
@@ -214,6 +218,9 @@ limitations under the License.
           item.enabled = false;
           if (countChanged) {
             delete item.count;
+          }
+          if (!previewEnabled) {
+            delete item.preview;
           }
         }
       }
@@ -508,7 +515,7 @@ limitations under the License.
       var previewPos = 70;
 
       if (program.isArchive) {
-        if (!program.isRecorded || angular.isUndefined(program.preview)) {
+        if (!program.isRecorded || (previewEnabled && angular.isUndefined(program.preview))) {
           recorded = ChinachuService.data.recorded.filter(function (a) {
             return (
               a.channel.type === program.channel.type &&
@@ -528,7 +535,7 @@ limitations under the License.
       } else {
         recorded = program;
       }
-      if (angular.isUndefined(program.preview) && recorded) {
+      if (previewEnabled && angular.isUndefined(program.preview) && recorded) {
         if (recorded.seconds < previewPos) {
           previewPos = 10;
         }
@@ -537,7 +544,9 @@ limitations under the License.
             pos: previewPos,
             size: '160x90'
           }).then(function (value) {
-            program.preview = value;
+            if (previewEnabled) {
+              program.preview = value;
+            }
           });
       }
     }

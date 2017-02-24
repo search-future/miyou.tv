@@ -38,6 +38,7 @@ limitations under the License.
     var selectItem;
     var timer;
     var countMode = 'speed';
+    var previewEnabled = true;
 
     $ctrl.programs = [];
     $ctrl.source = 'archive';
@@ -107,17 +108,23 @@ limitations under the License.
     }, function (value) {
       $ctrl.source = value || 'archive';
     });
-    $scope.$watch(function () {
+    $scope.$watchGroup([function () {
       return CommonService.loadLocalStorage('countMode');
-    }, function (newValue, oldValue) {
-      var countChanged = newValue !== oldValue;
-      countMode = newValue;
+    }, function () {
+      return CommonService.loadLocalStorage('previewEnabled');
+    }], function (newValues, oldValues) {
+      var countChanged = newValues[0] !== oldValues[0];
+      countMode = newValues[0];
+      previewEnabled = typeof newValues[1] === 'boolean' ? newValues[1] : true;
 
       $ctrl.programs.forEach(function (a) {
         var program = a;
         program.enabled = false;
         if (countChanged) {
           delete program.count;
+        }
+        if (!previewEnabled) {
+          delete program.preview;
         }
       });
 
@@ -271,7 +278,7 @@ limitations under the License.
       var channel;
 
       if (program.isArchive) {
-        if (!program.isRecorded) {
+        if (!program.isRecorded || (previewEnabled && angular.isUndefined(program.preview))) {
           recorded = ChinachuService.data.recorded.filter(function (a) {
             return (
               a.channel.type === program.channel.type &&
@@ -291,7 +298,7 @@ limitations under the License.
       } else {
         recorded = program;
       }
-      if (angular.isUndefined(program.preview) && recorded) {
+      if (previewEnabled && angular.isUndefined(program.preview) && recorded) {
         if (recorded.seconds < previewPos) {
           previewPos = 10;
         }
@@ -300,7 +307,9 @@ limitations under the License.
             pos: previewPos,
             size: '160x90'
           }).then(function (value) {
-            program.preview = value;
+            if (previewEnabled) {
+              program.preview = value;
+            }
           });
       }
 
