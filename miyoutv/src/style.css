@@ -272,15 +272,11 @@ Components
 }
 
 .form-control-range::-webkit-slider-runnable-track {
-  background: #888;
-  border: 2px solid #888;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
   cursor: pointer;
   height: 1px;
-}
-
-.form-control-range:focus::-webkit-slider-runnable-track {
-  background: #f1f1f1;
 }
 
 .form-control-range::-webkit-slider-thumb {
@@ -590,6 +586,18 @@ Components
 }
 
 
+/* Fill container */
+
+.fill-container {
+  display: block;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+
 /*
  Containers
 ---------- */
@@ -809,6 +817,22 @@ Components
 
 .controlbar .form-control {
   height: 60px;
+}
+
+.seekbar .sliderchart {
+  padding: 5px;
+}
+
+.seekbar .sliderchart .chart-separator {
+  fill: none;
+  stroke: #888;
+  stroke-width: 1px;
+}
+
+.seekbar .sliderchart .chart-line {
+  fill: none;
+  stroke: #7f75ff;
+  stroke-width: 3px;
 }
 
 .fullscreen .player-header {

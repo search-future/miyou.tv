@@ -24,7 +24,16 @@ limitations under the License.
                 </button>
             </span>
             <span class="input-group-addon clickable" ng-show="$ctrl.clockTime" ng-bind="$ctrl.isClock ? $ctrl.clockTime : $ctrl.time" ng-click="$ctrl.isClock = !$ctrl.isClock"></span>
-            <input class="form-control form-control-range" type="range" step="0.00001" min="0" max="1" ng-model="$ctrl.position" ng-mousedown="$ctrl.isSeeking = true" ng-mouseup="$ctrl.isSeeking = false" ng-change="$ctrl.seek($ctrl.position)">
+            <div class="base-container clearfix">
+                <input class="form-control form-control-range pick" type="range" step="0.00001" min="0" max="1" list="separators" ng-model="$ctrl.position" ng-mousedown="$ctrl.isSeeking = true" ng-mouseup="$ctrl.isSeeking = false" ng-change="$ctrl.seek($ctrl.position)">
+                <svg class="fill-container sliderchart" width="100%" height="100%" viewbox="0 0 100 100" preserveaspectratio="none">
+                    <polyline class="chart-line" ng-attr-points="{{$ctrl.chartPoints}}" vector-effect="non-scaling-stroke"></polyline>
+                    <line class="chart-separator" ng-attr-x1="{{separator * 100}}" ng-attr-y1="0" ng-attr-x2="{{separator * 100}}" ng-attr-y2="100" ng-repeat="separator in $ctrl.separators" vector-effect="non-scaling-stroke"></line>
+                </svg>
+                <datalist id="separators">
+                    <option ng-repeat="separator in $ctrl.separators" ng-value="separator"></option>
+                </datalist>
+            </div>
             <span class="input-group-addon clickable" ng-show="$ctrl.endTime" ng-bind="$ctrl.isClock ? $ctrl.endTime : $ctrl.length" ng-click="$ctrl.isClock = !$ctrl.isClock"></span>
             <span class="input-group-btn">
                 <button class="btn btn-media" type="button" ng-click="$ctrl.next()" ng-show="$ctrl.mode === 'channel'">

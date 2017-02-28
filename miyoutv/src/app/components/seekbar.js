@@ -33,6 +33,7 @@ limitations under the License.
     CommentService
   ) {
     var $ctrl = this;
+    var countTable = [];
 
     $ctrl.isClock = true;
     $ctrl.time = 0;
@@ -60,6 +61,89 @@ limitations under the License.
       $ctrl.length = PlayerService.formattedLength();
       $ctrl.clockTime = CommonService.formatDate(PlayerService.time() + CommentService.offset(), 'A HHHH:mm:ss');
       $ctrl.endTime = CommonService.formatDate(PlayerService.length() + CommentService.offset(), 'A HHHH:mm:ss');
+    });
+
+    $scope.$watch(function () {
+      return CommentService.info();
+    }, function (value) {
+      var margin = Math.abs(CommentService.delay()) + 10000;
+
+      CommentService.request('intervals', {
+        start: value.start - margin,
+        end: value.end + margin,
+        channel: value.query,
+        interval: '1m',
+        fill: 1
+      }).then(function (result) {
+        if (
+          angular.isObject(result) &&
+          angular.isObject(result.data) &&
+          angular.isObject(result.data.data) &&
+          angular.isArray(result.data.data.intervals)
+
+        ) {
+          countTable = result.data.data.intervals;
+        }
+      });
+    });
+    $scope.$watchGroup([function () {
+      return ChinachuPlayerService.programList;
+    }, function () {
+      return CommentService.offset();
+    }, function () {
+      return PlayerService.length();
+    }], function (values) {
+      var list = values[0];
+      var offset = values[1];
+      var length = values[2];
+
+      $ctrl.separators = [];
+      if (
+        angular.isArray(list) &&
+        length
+      ) {
+        list.forEach(function (a) {
+          var position = (a.startAt - offset) / length;
+          $ctrl.separators.push(Math.floor(position * 100000) / 100000);
+        });
+      }
+    });
+    $scope.$watchGroup([function () {
+      return countTable;
+    }, function () {
+      return CommentService.offset();
+    }, function () {
+      return PlayerService.length();
+    }], function (values) {
+      var data = values[0];
+      var offset = values[1] - 60000;
+      var length = values[2];
+      var width = 100;
+      var height = 100;
+      var max;
+      var xscale;
+      var yscale;
+      var i;
+      var x;
+      var y;
+      var points = [];
+
+      if (length) {
+        max = Math.max.apply(null, data.map(function (a) {
+          return a.n_hits;
+        }));
+        xscale = width / length;
+        yscale = height / max;
+
+        for (i = 0; i < data.length; i += 1) {
+          x = (data[i].start - offset) * xscale;
+          y = height - (data[i].n_hits * yscale);
+          points.push([x, y].join(','));
+        }
+        $ctrl.chartPoints = points.join(' ');
+      } else {
+        $ctrl.chartPoints = '';
+      }
     });
   }
 }());
