@@ -93,9 +93,8 @@ limitations under the License.
       }
     };
     $ctrl.playColumn = function (column, $event) {
-      var baseTime = $ctrl.hours[0].time;
       var position = $event.target.scrollTop + $event.offsetY;
-      var start = ((position * 3600000) / $ctrl.baseHeight) + baseTime;
+      var start = calcTime(position);
       var isRecorded = ChinachuService.data.recorded.some(function (a) {
         return (
           a.channel.type === column.channel.type &&
@@ -245,8 +244,13 @@ limitations under the License.
       return a.isMiyoutvReserved;
     }
 
+    function calcTime(pos) {
+      var baseTime = new Date($ctrl.hours[0] ? $ctrl.hours[0].time : 0).getTime();
+      return ((pos * 3600000) / $ctrl.baseHeight) + baseTime;
+    }
+
     function calcPos(time) {
-      var baseTime = new Date($ctrl.hours[0] ? $ctrl.hours[0].time : 0);
+      var baseTime = new Date($ctrl.hours[0] ? $ctrl.hours[0].time : 0).getTime();
       var pos = ((time - baseTime) * $ctrl.baseHeight) / 3600000;
       if (pos < 0) {
         pos = 0;
@@ -255,7 +259,7 @@ limitations under the License.
     }
 
     function calcHeight(start, end) {
-      var baseTime = new Date($ctrl.hours[0] ? $ctrl.hours[0].time : 0);
+      var baseTime = new Date($ctrl.hours[0] ? $ctrl.hours[0].time : 0).getTime();
       var pos = ((start - baseTime) * $ctrl.baseHeight) / 3600000;
       var height = ((end - start) * $ctrl.baseHeight) / 3600000;
       var overHeight = (pos + height) - ($ctrl.hours.length * $ctrl.baseHeight);
@@ -272,7 +276,7 @@ limitations under the License.
       var date;
       var start;
       var end;
-      var pos;
+      var currentTime;
 
       date = new Date(time);
       date.setHours(CommonService.loadLocalStorage('hourFirst'));
@@ -282,12 +286,9 @@ limitations under the License.
       start = date.getTime();
       date.setDate(date.getDate() + 1);
       end = date.getTime();
-      pos = viewport.scrollTop;
+      currentTime = calcTime(viewport.scrollTop);
 
-      if (pos >= calcPos(start) && pos < calcPos(end)) {
-        return true;
-      }
-      return false;
+      return currentTime >= start && currentTime < end;
     }
 
     function initTimeHeader(useFilter) {
@@ -442,6 +443,8 @@ limitations under the License.
       var bottom = viewport.scrollTop + viewport.clientHeight + $ctrl.baseHeight;
       var left = viewport.scrollLeft - $ctrl.baseWidth;
       var right = viewport.scrollLeft + viewport.clientWidth + $ctrl.baseWidth;
+      var start = calcTime(top);
+      var end = calcTime(bottom);
       var checkedCategories = [];
       var categoryFilterEnabled = false;
       var column;
@@ -479,8 +482,8 @@ limitations under the License.
           for (ii = 0; ii < column.programs.length; ii += 1) {
             item = column.programs[ii];
             item.enabled = (
-              calcPos(item.start) < bottom &&
-              calcPos(item.end) > top &&
+              item.start < end &&
+              item.end > start &&
               (!categoryFilterEnabled || checkedCategories.indexOf(item.categoryName.name) >= 0)
             );
             if (item.enabled) {
