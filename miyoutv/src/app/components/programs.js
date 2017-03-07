@@ -227,10 +227,26 @@ limitations under the License.
       $timeout.cancel(timer);
       timer = $timeout(updateView, 200);
     });
+    $scope.$watchGroup([function () {
+      return viewport.scrollWidth;
+    }, function () {
+      return viewport.scrollHeight;
+    }], function (values) {
+      var height = values[1];
+      var search = $location.search();
+      if (search.x && search.y) {
+        viewport.scrollLeft = search.x;
+        viewport.scrollTop = search.y;
+      } else {
+        viewport.scrollTop = height;
+      }
+    });
 
     angular.element(viewport).on('scroll', function (e) {
       $ctrl.vHeaderStyle.left = e.target.scrollLeft + 'px';
       $ctrl.hHeaderStyle.top = e.target.scrollTop + 'px';
+      $location.search('x', e.target.scrollLeft);
+      $location.search('y', e.target.scrollTop);
       $timeout.cancel(timer);
       timer = $timeout(updateView, 200);
       $scope.$digest();

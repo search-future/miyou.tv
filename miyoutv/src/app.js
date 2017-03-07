@@ -33,6 +33,5 @@ limitations under the License.
 
   loadDir('app/');
   loadDir('app/components/');
-  loadDir('app/directives/');
   loadDir('app/services/');
 }(require('path'), require('fs')));

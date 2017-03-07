@@ -65,7 +65,7 @@ limitations under the License.
             </uib-dropdown>
         </div>
     </div>
-    <div class="view-content-body scrollable" keep-scroll keep-bottom>
+    <div class="view-content-body scrollable">
         <div class="program-header program-header-horizontal" ng-style="$ctrl.hHeaderStyle">
             <div class="program-header-cell bg-primary" ng-repeat="channel in $ctrl.programs">
                 <div class="program-header-content clickable" title="チャンネルで検索" ng-bind="channel.name" ng-click="$ctrl.search('sid:' + channel.serviceId)"></div>

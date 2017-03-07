@@ -46,7 +46,7 @@ limitations under the License.
         </form>
     </div>
     <h2 class="text-center" ng-show="$ctrl.filterEnabled">検索結果</h2>
-    <div class="container-fluid trim view-content-body scrollable" keep-scroll>
+    <div class="container-fluid trim view-content-body scrollable">
         <div class="media-list-program" ng-style="$ctrl.viewStyle">
             <div class="media col-md-6 col-md-offset-3 selectable" ng-repeat="item in $ctrl.filteredPrograms=($ctrl.programs | filter:$ctrl.filterPattern | orderBy:$ctrl.sortKey:$ctrl.sortReverse)" ng-if="item.enabled" ng-class="{selected: $ctrl.selectItem() === item}"
                 ng-click="$ctrl.selectItem(item)" ng-dblclick="$ctrl.play(item)">

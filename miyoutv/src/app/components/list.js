@@ -173,8 +173,17 @@ limitations under the License.
       $timeout.cancel(timer);
       timer = $timeout(updateView, 200);
     });
+    $scope.$watch(function () {
+      return viewport.scrollHeight;
+    }, function () {
+      var search = $location.search();
+      if (search.y) {
+        viewport.scrollTop = search.y;
+      }
+    });
 
-    angular.element(viewport).on('scroll', function () {
+    angular.element(viewport).on('scroll', function (e) {
+      $location.search('y', e.target.scrollTop);
       $timeout.cancel(timer);
       timer = $timeout(updateView, 200);
     });
