@@ -19,12 +19,14 @@ limitations under the License.
   angular.module('app')
     .component('commentScreen', {
       template: [
+        '<div ng-show="$ctrl.enabled">',
         '<div',
         'ng-repeat="comment in $ctrl.comments"',
         'ng-show="comment.visible"',
         'ng-style="comment.style"',
         'ng-bind="comment.text"',
-        '></div>'
+        '></div>',
+        '</div>'
       ].join(' '),
       controller: CommentScreenCtrl,
       bindings: {
@@ -100,7 +102,7 @@ limitations under the License.
       cp = 0;
       $timeout(function () {
         for (i = 0; i < $ctrl.comments.length; i += 1) {
-          $ctrl.comments[i].element = $element.children().eq(i);
+          $ctrl.comments[i].element = $element.children().children().eq(i);
           initComment($ctrl.comments[i]);
         }
       });
