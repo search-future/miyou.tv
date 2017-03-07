@@ -26,7 +26,10 @@ limitations under the License.
         'ng-bind="comment.text"',
         '></div>'
       ].join(' '),
-      controller: CommentScreenCtrl
+      controller: CommentScreenCtrl,
+      bindings: {
+        enabled: '<'
+      }
     });
 
   function CommentScreenCtrl(
@@ -47,7 +50,7 @@ limitations under the License.
     $ctrl.comments = [];
 
     $scope.$watch(function () {
-      return CommentService.enabled();
+      return $ctrl.enabled;
     }, function (value) {
       if (!value) {
         $ctrl.comments.forEach(function (a) {
@@ -114,7 +117,7 @@ limitations under the License.
       var start = 0;
       var end = 0;
 
-      if (!CommentService.enabled()) {
+      if (!$ctrl.enabled) {
         return;
       }
       start = oldValue + offset;

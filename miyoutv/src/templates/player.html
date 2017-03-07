@@ -32,10 +32,10 @@ limitations under the License.
             <div class="extend-vertical flex flex-column pick" ng-class="!$ctrl.sidebarCollapsed ? 'col-lg-8 col-md-7 col-sm-6 hidden-xs' : ''" hotkey="$ctrl.mainHotkeys">
                 <div class="screen flex-item flex-fill base-container">
                     <video-screen class="video-screen fit" ng-dblclick="$ctrl.toggleFullscreen()"></video-screen>
-                    <comment-screen class="comment-screen fit" ng-show="$ctrl.commentEnabled"></comment-screen>
+                    <comment-screen class="comment-screen fit" ng-show="$ctrl.commentEnabled" enabled="$ctrl.commentEnabled"></comment-screen>
                 </div>
                 <div class="player-control flex-item">
-                    <controlbar></controlbar>
+                    <controlbar comment-enabled="$ctrl.commentEnabled"></controlbar>
                     <seekbar mode="$ctrl.mode"></seekbar>
                 </div>
             </div>

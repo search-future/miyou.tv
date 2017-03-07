@@ -19,7 +19,10 @@ limitations under the License.
   angular.module('app')
     .component('controlbar', {
       templateUrl: 'templates/controlbar.html',
-      controller: ControlbarCtrl
+      controller: ControlbarCtrl,
+      bindings: {
+        commentEnabled: '='
+      }
     });
 
   function ControlbarCtrl(
@@ -34,7 +37,6 @@ limitations under the License.
     $ctrl.playing = false;
     $ctrl.mute = false;
     $ctrl.volume = 100;
-    $ctrl.commentEnabled = true;
     $ctrl.stop = CommonService.back;
     $ctrl.togglePause = PlayerService.togglePause;
     $ctrl.speedUp = PlayerService.speedUp;
@@ -48,7 +50,7 @@ limitations under the License.
     $ctrl.toggleFullscreen = CommonService.toggleFullscreen;
 
     $ctrl.toggleComment = function () {
-      CommentService.enabled(!CommentService.enabled());
+      $ctrl.commentEnabled = !$ctrl.commentEnabled;
     };
 
     $ctrl.toggleSidebar = function () {
@@ -74,11 +76,6 @@ limitations under the License.
       return PlayerService.volume();
     }, function (value) {
       $ctrl.volume = value;
-    });
-    $scope.$watch(function () {
-      return CommentService.enabled();
-    }, function (value) {
-      $ctrl.commentEnabled = value;
     });
   }
 }());

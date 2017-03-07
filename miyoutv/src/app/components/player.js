@@ -155,9 +155,8 @@ limitations under the License.
       }
     });
     $scope.$watch(function () {
-      return CommentService.enabled();
+      return $ctrl.commentEnabled;
     }, function (value) {
-      $ctrl.commentEnabled = value;
       if (value) {
         PlayerService.setScreenText('コメント表示');
       } else {
