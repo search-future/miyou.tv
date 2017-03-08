@@ -30,11 +30,8 @@ limitations under the License.
     var $ctrl = this;
 
     $ctrl.svc = {
-      player: PlayerService,
-      comment: CommentService
+      player: PlayerService
     };
-    $ctrl.player = {};
-    $ctrl.comment = {};
     $ctrl.deinterlaceList = {
       無効: '',
       ブレンド: 'blend',
@@ -63,17 +60,17 @@ limitations under the License.
     $scope.$watch(function () {
       return PlayerService.rate();
     }, function (value) {
-      $ctrl.player.rate = Math.round(value * 100) / 100;
+      $ctrl.playerRate = Math.round(value * 100) / 100;
     });
     $scope.$watch(function () {
       return PlayerService.deinterlace();
     }, function (value) {
-      $ctrl.player.deinterlace = value;
+      $ctrl.playerDeinterlace = value;
     });
     $scope.$watch(function () {
       return PlayerService.aspectRatio();
     }, function (value) {
-      $ctrl.player.aspectRatio = value;
+      $ctrl.playerAspectRatio = value;
     });
     $scope.$watch(function () {
       return PlayerService.audioTrackCount();
@@ -90,7 +87,7 @@ limitations under the License.
     $scope.$watch(function () {
       return PlayerService.audioTrack();
     }, function (value) {
-      $ctrl.player.audioTrack = String(value >= 0 ? value : 0);
+      $ctrl.playerAudioTrack = String(value >= 0 ? value : 0);
       if (value > 0) {
         $ctrl.audioChannelList = {
           ステレオ: 1,
@@ -108,27 +105,27 @@ limitations under the License.
     $scope.$watch(function () {
       return PlayerService.audioChannel();
     }, function (value) {
-      $ctrl.player.audioChannel = value;
+      $ctrl.playerAudioChannel = value;
     });
     $scope.$watch(function () {
       return CommentService.delay();
     }, function (value) {
-      $ctrl.comment.delay = value / 1000;
+      $ctrl.commentDelay = value / 1000;
     });
     $scope.$watch(function () {
       return CommentService.duration();
     }, function (value) {
-      $ctrl.comment.duration = value / 1000;
+      $ctrl.commentDuration = value / 1000;
     });
     $scope.$watch(function () {
       return CommentService.maxLines();
     }, function (value) {
-      $ctrl.comment.maxLines = value;
+      $ctrl.commentMaxLines = value;
     });
     $scope.$watch(function () {
       return CommentService.maxItems();
     }, function (value) {
-      $ctrl.comment.maxItems = value;
+      $ctrl.commentMaxItems = value;
     });
   }
 }());
