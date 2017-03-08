@@ -20,6 +20,7 @@ limitations under the License.
     .component('seekbar', {
       bindings: {
         mode: '=',
+        offset: '<',
         chartData: '<'
       },
       templateUrl: 'templates/seekbar.html',
@@ -30,8 +31,7 @@ limitations under the License.
     $scope,
     CommonService,
     PlayerService,
-    ChinachuPlayerService,
-    CommentService
+    ChinachuPlayerService
   ) {
     var $ctrl = this;
 
@@ -59,14 +59,18 @@ limitations under the License.
       }
       $ctrl.time = PlayerService.formattedTime();
       $ctrl.length = PlayerService.formattedLength();
-      $ctrl.clockTime = CommonService.formatDate(PlayerService.time() + CommentService.offset(), 'A HHHH:mm:ss');
-      $ctrl.endTime = CommonService.formatDate(PlayerService.length() + CommentService.offset(), 'A HHHH:mm:ss');
+      $ctrl.clockTime = $ctrl.time;
+      $ctrl.endTime = $ctrl.length;
+      if ($ctrl.offset) {
+        $ctrl.clockTime = CommonService.formatDate(PlayerService.time() + $ctrl.offset, 'A HHHH:mm:ss');
+        $ctrl.endTime = CommonService.formatDate(PlayerService.length() + $ctrl.offset, 'A HHHH:mm:ss');
+      }
     });
 
     $scope.$watchGroup([function () {
       return ChinachuPlayerService.programList;
     }, function () {
-      return CommentService.offset();
+      return $ctrl.offset;
     }, function () {
       return PlayerService.length();
     }], function (values) {
@@ -77,6 +81,7 @@ limitations under the License.
       $ctrl.separators = [];
       if (
         angular.isArray(list) &&
+        offset &&
         length
       ) {
         list.forEach(function (a) {
@@ -88,12 +93,12 @@ limitations under the License.
     $scope.$watchGroup([function () {
       return $ctrl.chartData;
     }, function () {
-      return CommentService.offset();
+      return $ctrl.offset;
     }, function () {
       return PlayerService.length();
     }], function (values) {
       var data = values[0];
-      var offset = values[1] - 60000;
+      var offset = values[1];
       var length = values[2];
       var width = 100;
       var height = 100;
@@ -109,6 +114,13 @@ limitations under the License.
         max = Math.max.apply(null, data.map(function (a) {
           return a.n_hits;
         }));
+        if (offset) {
+          offset -= 60000;
+        } else if (angular.isObject(data[0])) {
+          offset = data[0].start - 60000;
+        } else {
+          offset = 0;
+        }
         xscale = width / length;
         yscale = height / max;
 

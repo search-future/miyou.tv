@@ -19,7 +19,10 @@ limitations under the License.
   angular.module('app')
     .component('commentGrid', {
       templateUrl: 'templates/commentGrid.html',
-      controller: CommentGridCtrl
+      controller: CommentGridCtrl,
+      bindings: {
+        options: '<'
+      }
     });
 
   function CommentGridCtrl(
@@ -31,6 +34,7 @@ limitations under the License.
     var $ctrl = this;
     var autoScrolling = false;
 
+    $ctrl.options = {};
     $ctrl.autoScroll = true;
     $ctrl.gridOptions = {
       rowSelection: 'single',
@@ -141,8 +145,7 @@ limitations under the License.
       } else {
         CommentService.filter(null);
       }
-      $ctrl.gridOptions.api.setRowData(CommentService.filteredComments());
-      checkedThreads = null;
+      updateData();
     };
 
     $ctrl.autoScrollChanged = function () {
@@ -153,6 +156,12 @@ limitations under the License.
         }]);
       }
     };
+
+    $scope.$watch(function () {
+      return $ctrl.options.offset;
+    }, function () {
+      updateData();
+    });
 
     $scope.$watch(function () {
       return CommentService.comments();
@@ -169,8 +178,8 @@ limitations under the License.
         }
       });
       $ctrl.threads = threads;
-      $ctrl.gridOptions.api.setRowData(CommentService.filteredComments());
       $ctrl.autoScroll = true;
+      updateData();
       titles = null;
       threads = null;
     });
@@ -185,5 +194,17 @@ limitations under the License.
         autoScrolling = true;
       }
     });
+
+    function updateData() {
+      var data = CommentService.filteredComments();
+      if (angular.isNumber($ctrl.options.offset)) {
+        data.forEach(function (a) {
+          var comment = a;
+
+          comment.playTime = a.time - $ctrl.options.offset;
+        });
+      }
+      $ctrl.gridOptions.api.setRowData(data);
+    }
   }
 }());

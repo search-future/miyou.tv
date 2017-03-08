@@ -38,7 +38,13 @@ limitations under the License.
     $ctrl.title = '';
     $ctrl.time = 0;
     $ctrl.commentEnabled = true;
-    $ctrl.options = {};
+    $ctrl.options = {
+      commentDelay: 0,
+      commentDuration: 5000,
+      commentMaxLines: 10,
+      commentMaxItems: 50
+    };
+    $ctrl.commentOptions = {};
     $ctrl.sidebarCollapsed = Boolean(CommonService.loadLocalStorage('sidebarCollapsed'));
     $ctrl.mainHotkeys = {
       s: CommonService.back,
@@ -63,10 +69,10 @@ limitations under the License.
         PlayerService.jumpForward('29s');
       },
       'shift+left': function () {
-        CommentService.decreaseDelay(500);
+        $ctrl.options.commentDelay -= 500;
       },
       'shift+right': function () {
-        CommentService.increaseDelay(500);
+        $ctrl.options.commentDelay += 500;
       },
       'ctrl+s': function () {
         CommonService.trigger('toggleSidebar');
@@ -74,6 +80,8 @@ limitations under the License.
     };
     $ctrl.toggleFullscreen = CommonService.toggleFullscreen;
     $ctrl.stop = PlayerService.stop;
+
+    $ctrl.$onInit = loadSetting;
 
     $scope.$watch(function () {
       return CommonService.triggered('toggleSidebar');
@@ -100,6 +108,7 @@ limitations under the License.
       if (value) {
         $ctrl.title = value.fullTitle;
         $ctrl.channel = value.channel.name;
+        $ctrl.commentOptions.offset = value.start - $ctrl.options.commentDelay;
         PlayerService.setScreenText([
           value.id,
           value.fullTitle,
@@ -107,7 +116,7 @@ limitations under the License.
           CommonService.formatDate(value.start, 'yyyy/MM/dd(EEE) A HHHH:mm:ss')
         ].join('\n'));
 
-        margin = Math.abs(CommentService.delay()) + 10000;
+        margin = Math.abs($ctrl.options.commentDelay) + 10000;
         CommentService.request('intervals', {
           params: {
             start: value.start - margin,
@@ -242,50 +251,35 @@ limitations under the License.
     }, function (value) {
       PlayerService.audioChannel(value);
     });
-    $scope.$watch(function () {
-      return CommentService.duration();
-    }, function (value) {
-      $ctrl.options.commentDuration = value;
-    });
+
     $scope.$watch(function () {
       return $ctrl.options.commentDuration;
     }, function (value) {
-      CommentService.duration(value);
-    });
-    $scope.$watch(function () {
-      return CommentService.delay();
-    }, function (value) {
-      $ctrl.options.commentDelay = value;
-      if (value >= 0) {
-        PlayerService.setScreenText('コメント後退 ' + Math.abs(value / 1000) + '秒');
-      } else {
-        PlayerService.setScreenText('コメント前進 ' + Math.abs(value / 1000) + '秒');
-      }
+      $ctrl.commentOptions.duration = value;
+      saveSetting();
     });
     $scope.$watch(function () {
       return $ctrl.options.commentDelay;
-    }, function (value) {
-      CommentService.delay(value);
-    });
-    $scope.$watch(function () {
-      return CommentService.maxLines();
-    }, function (value) {
-      $ctrl.options.commentMaxLines = value;
+    }, function (newValue, oldValue) {
+      $ctrl.commentOptions.offset -= newValue - oldValue;
+      saveSetting();
+      if (newValue >= 0) {
+        PlayerService.setScreenText('コメント後退 ' + Math.abs(newValue / 1000) + '秒');
+      } else {
+        PlayerService.setScreenText('コメント前進 ' + Math.abs(newValue / 1000) + '秒');
+      }
     });
     $scope.$watch(function () {
       return $ctrl.options.commentMaxLines;
     }, function (value) {
-      CommentService.maxLines(value);
-    });
-    $scope.$watch(function () {
-      return CommentService.maxItems();
-    }, function (value) {
-      $ctrl.options.commentMaxItems = value;
+      $ctrl.commentOptions.maxLines = value;
+      saveSetting();
     });
     $scope.$watch(function () {
       return $ctrl.options.commentMaxItems;
     }, function (value) {
-      CommentService.maxItems(value);
+      $ctrl.commentOptions.maxItems = value;
+      saveSetting();
     });
 
     $scope.$on('Player.EncounteredError', function () {
@@ -305,7 +299,7 @@ limitations under the License.
           ChinachuPlayerService.channelStart(
             params.type,
             parseInt(params.sid, 10),
-            parseInt(params.start, 10),
+            parseInt(params.start, 10) + $ctrl.options.commentDelay,
             parseInt(params.end, 10)
           );
           $ctrl.mainHotkeys.p = ChinachuPlayerService.channelPrevious;
@@ -314,5 +308,31 @@ limitations under the License.
         default:
       }
     });
+
+    function saveSetting() {
+      var setting = {
+        delay: $ctrl.options.commentDelay,
+        duration: $ctrl.options.commentDuration,
+        maxLines: $ctrl.options.commentMaxLines,
+        maxItems: $ctrl.options.commentMaxItems
+      };
+      CommonService.saveLocalStorage('comment', setting);
+    }
+
+    function loadSetting() {
+      var setting = CommonService.loadLocalStorage('comment') || {};
+      if (angular.isNumber(setting.delay)) {
+        $ctrl.options.commentDelay = setting.delay;
+      }
+      if (angular.isNumber(setting.duration)) {
+        $ctrl.options.commentDuration = setting.duration;
+      }
+      if (angular.isNumber(setting.maxLines)) {
+        $ctrl.options.commentMaxLines = setting.maxLines;
+      }
+      if (angular.isNumber(setting.maxItems)) {
+        $ctrl.options.commentMaxItems = setting.maxItems;
+      }
+    }
   }
 }());

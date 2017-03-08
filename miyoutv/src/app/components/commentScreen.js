@@ -28,7 +28,8 @@ limitations under the License.
       ].join(' '),
       controller: CommentScreenCtrl,
       bindings: {
-        enabled: '<'
+        enabled: '<',
+        options: '<'
       }
     });
 
@@ -47,6 +48,7 @@ limitations under the License.
     var dp = 0;
     var cp = 0;
 
+    $ctrl.options = {};
     $ctrl.comments = [];
 
     $scope.$watch(function () {
@@ -61,17 +63,17 @@ limitations under the License.
       }
     });
     $scope.$watch(function () {
-      return CommentService.offset();
+      return $ctrl.options.offset;
     }, function (value) {
       offset = value || offset;
     });
     $scope.$watch(function () {
-      return CommentService.duration();
+      return $ctrl.options.duration;
     }, function (value) {
       duration = value || duration;
     });
     $scope.$watch(function () {
-      return CommentService.maxLines();
+      return $ctrl.options.maxLines;
     }, function (value) {
       var max = value || 10;
 
@@ -79,7 +81,7 @@ limitations under the License.
       adjustLines();
     });
     $scope.$watch(function () {
-      return CommentService.maxItems();
+      return $ctrl.options.maxItems;
     }, function (value) {
       var max = value || 50;
       var i = 0;

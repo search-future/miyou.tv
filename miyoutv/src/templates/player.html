@@ -32,18 +32,18 @@ limitations under the License.
             <div class="extend-vertical flex flex-column pick" ng-class="!$ctrl.sidebarCollapsed ? 'col-lg-8 col-md-7 col-sm-6 hidden-xs' : ''" hotkey="$ctrl.mainHotkeys">
                 <div class="screen flex-item flex-fill base-container">
                     <video-screen class="video-screen fit" ng-dblclick="$ctrl.toggleFullscreen()"></video-screen>
-                    <comment-screen class="comment-screen fit" ng-show="$ctrl.commentEnabled" enabled="$ctrl.commentEnabled"></comment-screen>
+                    <comment-screen class="comment-screen fit" ng-show="$ctrl.commentEnabled" options="$ctrl.commentOptions"></comment-screen>
                 </div>
                 <div class="player-control flex-item">
                     <controlbar comment-enabled="$ctrl.commentEnabled"></controlbar>
-                    <seekbar mode="$ctrl.mode" chart-data="$ctrl.chartData"></seekbar>
+                    <seekbar mode="$ctrl.mode" offset="$ctrl.commentOptions.offset" chart-data="$ctrl.chartData"></seekbar>
                 </div>
             </div>
             <div class="sidebar col-lg-4 col-md-5 col-sm-6 col-xs-12 extend-vertical pick" uib-collapse="$ctrl.sidebarCollapsed" horizontal>
                 <button class="sidebar-close close" ng-click="$ctrl.sidebarCollapsed = true"><span class="glyphicon glyphicon-remove-sign"></span></button>
                 <uib-tabset type="tabs" class="sidebar-tabset extend-vertical nav-mtvblack nav-mtvblack-line">
                     <uib-tab heading="コメント">
-                        <comment-grid class="fit"></comment-grid>
+                        <comment-grid class="fit" options="$ctrl.commentOptions"></comment-grid>
                     </uib-tab>
                     <uib-tab heading="情報">
                         <player-info></player-info>
