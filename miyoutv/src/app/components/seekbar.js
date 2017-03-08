@@ -19,7 +19,8 @@ limitations under the License.
   angular.module('app')
     .component('seekbar', {
       bindings: {
-        mode: '='
+        mode: '=',
+        chartData: '<'
       },
       templateUrl: 'templates/seekbar.html',
       controller: SeekbarCtrl
@@ -33,7 +34,6 @@ limitations under the License.
     CommentService
   ) {
     var $ctrl = this;
-    var countTable = [];
 
     $ctrl.isClock = true;
     $ctrl.time = 0;
@@ -63,29 +63,6 @@ limitations under the License.
       $ctrl.endTime = CommonService.formatDate(PlayerService.length() + CommentService.offset(), 'A HHHH:mm:ss');
     });
 
-    $scope.$watch(function () {
-      return CommentService.info();
-    }, function (value) {
-      var margin = Math.abs(CommentService.delay()) + 10000;
-
-      CommentService.request('intervals', {
-        start: value.start - margin,
-        end: value.end + margin,
-        channel: value.query,
-        interval: '1m',
-        fill: 1
-      }).then(function (result) {
-        if (
-          angular.isObject(result) &&
-          angular.isObject(result.data) &&
-          angular.isObject(result.data.data) &&
-          angular.isArray(result.data.data.intervals)
-
-        ) {
-          countTable = result.data.data.intervals;
-        }
-      });
-    });
     $scope.$watchGroup([function () {
       return ChinachuPlayerService.programList;
     }, function () {
@@ -109,7 +86,7 @@ limitations under the License.
       }
     });
     $scope.$watchGroup([function () {
-      return countTable;
+      return $ctrl.chartData;
     }, function () {
       return CommentService.offset();
     }, function () {
@@ -128,17 +105,20 @@ limitations under the License.
       var y;
       var points = [];
 
-      if (length) {
+      if (length && angular.isArray(data)) {
         max = Math.max.apply(null, data.map(function (a) {
           return a.n_hits;
         }));
         xscale = width / length;
         yscale = height / max;
 
+        points.push([0, height].join(','));
         for (i = 0; i < data.length; i += 1) {
-          x = (data[i].start - offset) * xscale;
-          y = height - (data[i].n_hits * yscale);
-          points.push([x, y].join(','));
+          if (data[i].start >= offset) {
+            x = (data[i].start - offset) * xscale;
+            y = height - (data[i].n_hits * yscale);
+            points.push([x, y].join(','));
+          }
         }
         $ctrl.chartPoints = points.join(' ');
       } else {

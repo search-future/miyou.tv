@@ -95,6 +95,7 @@ limitations under the License.
     $scope.$watch(function () {
       return ChinachuPlayerService.program;
     }, function (value) {
+      var margin;
       $ctrl.comments = [];
       if (value) {
         $ctrl.title = value.fullTitle;
@@ -105,6 +106,28 @@ limitations under the License.
           value.channel.name,
           CommonService.formatDate(value.start, 'yyyy/MM/dd(EEE) A HHHH:mm:ss')
         ].join('\n'));
+
+        margin = Math.abs(CommentService.delay()) + 10000;
+        CommentService.request('intervals', {
+          params: {
+            start: value.start - margin,
+            end: value.end + margin,
+            channel: CommentService.resolveChannel(value.channel),
+            interval: '1m',
+            fill: 1
+          }
+        }).then(function (result) {
+          if (
+            angular.isObject(result) &&
+            angular.isObject(result.data) &&
+            angular.isObject(result.data.data) &&
+            angular.isArray(result.data.data.intervals)
+
+          ) {
+            $ctrl.chartData = result.data.data.intervals;
+          }
+        });
+
         CommentService.load(value.start, value.end, value.channel).catch(function (responce) {
           if (responce.noToken) {
             toaster.pop({
