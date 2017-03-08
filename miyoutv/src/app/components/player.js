@@ -38,7 +38,7 @@ limitations under the License.
     $ctrl.title = '';
     $ctrl.time = 0;
     $ctrl.commentEnabled = true;
-    $ctrl.commentOptions = {};
+    $ctrl.options = {};
     $ctrl.sidebarCollapsed = Boolean(CommonService.loadLocalStorage('sidebarCollapsed'));
     $ctrl.mainHotkeys = {
       s: CommonService.back,
@@ -164,13 +164,105 @@ limitations under the License.
       }
     });
     $scope.$watch(function () {
+      return PlayerService.audioTrackCount();
+    }, function (value) {
+      $ctrl.audioTrackCount = value;
+    });
+    $scope.$watch(function () {
+      return PlayerService.rate();
+    }, function (value) {
+      $ctrl.options.playerRate = value;
+    });
+    $scope.$watch(function () {
+      return $ctrl.options.playerRate;
+    }, function (value) {
+      PlayerService.rate(value);
+    });
+    $scope.$watch(function () {
+      return PlayerService.deinterlace();
+    }, function (value) {
+      $ctrl.options.playerDeinterlace = value;
+    });
+    $scope.$watch(function () {
+      return $ctrl.options.playerDeinterlace;
+    }, function (value) {
+      PlayerService.deinterlace(value);
+    });
+    $scope.$watch(function () {
+      return PlayerService.aspectRatio();
+    }, function (value) {
+      $ctrl.options.playerAspectRatio = value;
+    });
+    $scope.$watch(function () {
+      return $ctrl.options.playerAspectRatio;
+    }, function (value) {
+      PlayerService.aspectRatio(value);
+    });
+    $scope.$watch(function () {
+      return PlayerService.audioTrack();
+    }, function (value) {
+      $ctrl.options.playerAudioTrack = value;
+      $ctrl.hasSurround = PlayerService.audioChannel(5) === 5;
+    });
+    $scope.$watch(function () {
+      return $ctrl.options.playerAudioTrack;
+    }, function (value) {
+      PlayerService.audioTrack(value);
+    });
+    $scope.$watch(function () {
+      return PlayerService.audioChannel();
+    }, function (value) {
+      $ctrl.options.playerAudioChannel = value;
+    });
+    $scope.$watch(function () {
+      return $ctrl.options.playerAudioChannel;
+    }, function (value) {
+      PlayerService.audioChannel(value);
+    });
+    $scope.$watch(function () {
+      return CommentService.duration();
+    }, function (value) {
+      $ctrl.options.commentDuration = value;
+    });
+    $scope.$watch(function () {
+      return $ctrl.options.commentDuration;
+    }, function (value) {
+      CommentService.duration(value);
+    });
+    $scope.$watch(function () {
       return CommentService.delay();
     }, function (value) {
+      $ctrl.options.commentDelay = value;
       if (value >= 0) {
         PlayerService.setScreenText('コメント後退 ' + Math.abs(value / 1000) + '秒');
       } else {
         PlayerService.setScreenText('コメント前進 ' + Math.abs(value / 1000) + '秒');
       }
+    });
+    $scope.$watch(function () {
+      return $ctrl.options.commentDelay;
+    }, function (value) {
+      CommentService.delay(value);
+    });
+    $scope.$watch(function () {
+      return CommentService.maxLines();
+    }, function (value) {
+      $ctrl.options.commentMaxLines = value;
+    });
+    $scope.$watch(function () {
+      return $ctrl.options.commentMaxLines;
+    }, function (value) {
+      CommentService.maxLines(value);
+    });
+    $scope.$watch(function () {
+      return CommentService.maxItems();
+    }, function (value) {
+      $ctrl.options.commentMaxItems = value;
+    });
+    $scope.$watch(function () {
+      return $ctrl.options.commentMaxItems;
+    }, function (value) {
+      CommentService.maxItems(value);
     });
 
     $scope.$on('Player.EncounteredError', function () {

@@ -19,19 +19,19 @@ limitations under the License.
   angular.module('app')
     .component('playerConfig', {
       templateUrl: 'templates/playerConfig.html',
-      controller: PlayerConfigCtrl
+      controller: PlayerConfigCtrl,
+      bindings: {
+        options: '=',
+        audioTrackCount: '<',
+        hasSurround: '<'
+      }
     });
 
   function PlayerConfigCtrl(
-    $scope,
-    PlayerService,
-    CommentService
+    $scope
   ) {
     var $ctrl = this;
 
-    $ctrl.svc = {
-      player: PlayerService
-    };
     $ctrl.deinterlaceList = {
       無効: '',
       ブレンド: 'blend',
@@ -58,22 +58,7 @@ limitations under the License.
     $ctrl.audioChannelList = null;
 
     $scope.$watch(function () {
-      return PlayerService.rate();
-    }, function (value) {
-      $ctrl.playerRate = Math.round(value * 100) / 100;
-    });
-    $scope.$watch(function () {
-      return PlayerService.deinterlace();
-    }, function (value) {
-      $ctrl.playerDeinterlace = value;
-    });
-    $scope.$watch(function () {
-      return PlayerService.aspectRatio();
-    }, function (value) {
-      $ctrl.playerAspectRatio = value;
-    });
-    $scope.$watch(function () {
-      return PlayerService.audioTrackCount();
+      return $ctrl.audioTrackCount;
     }, function (value) {
       var tracks = [];
       var i = 0;
@@ -84,8 +69,48 @@ limitations under the License.
       }
       $ctrl.audioTrackList = tracks;
     });
+
     $scope.$watch(function () {
-      return PlayerService.audioTrack();
+      return $ctrl.options.playerRate;
+    }, function (value) {
+      $ctrl.playerRate = Math.round(value * 100) / 100;
+    });
+    $scope.$watch(function () {
+      return $ctrl.playerRate;
+    }, function (value) {
+      if (angular.isNumber(value)) {
+        $ctrl.options.playerRate = value;
+      }
+    });
+
+    $scope.$watch(function () {
+      return $ctrl.options.playerDeinterlace;
+    }, function (value) {
+      $ctrl.playerDeinterlace = value;
+    });
+    $scope.$watch(function () {
+      return $ctrl.playerDeinterlace;
+    }, function (value) {
+      if (angular.isString(value)) {
+        $ctrl.options.playerDeinterlace = value;
+      }
+    });
+
+    $scope.$watch(function () {
+      return $ctrl.options.playerAspectRatio;
+    }, function (value) {
+      $ctrl.playerAspectRatio = value;
+    });
+    $scope.$watch(function () {
+      return $ctrl.playerAspectRatio;
+    }, function (value) {
+      if (angular.isString(value)) {
+        $ctrl.options.playerAspectRatio = value;
+      }
+    });
+
+    $scope.$watch(function () {
+      return $ctrl.options.playerAudioTrack;
     }, function (value) {
       $ctrl.playerAudioTrack = String(value >= 0 ? value : 0);
       if (value > 0) {
@@ -95,7 +120,7 @@ limitations under the License.
           右: 4,
           ステレオ反転: 2
         };
-        if (PlayerService.audioChannel(5) === 5) {
+        if ($ctrl.hasSurround) {
           $ctrl.audioChannelList['ドルビーサラウンド'] = 5;
         }
       } else {
@@ -103,29 +128,76 @@ limitations under the License.
       }
     });
     $scope.$watch(function () {
-      return PlayerService.audioChannel();
+      return $ctrl.playerAudioTrack;
+    }, function (value) {
+      if (!isNaN(value)) {
+        $ctrl.options.playerAudioTrack = parseInt(value, 10);
+      }
+    });
+
+    $scope.$watch(function () {
+      return $ctrl.options.playerAudioChannel;
     }, function (value) {
       $ctrl.playerAudioChannel = value;
     });
     $scope.$watch(function () {
-      return CommentService.delay();
+      return $ctrl.playerAudioChannel;
     }, function (value) {
-      $ctrl.commentDelay = value / 1000;
+      if (angular.isNumber(value)) {
+        $ctrl.options.playerAudioChannel = value;
+      }
     });
+
     $scope.$watch(function () {
-      return CommentService.duration();
+      return $ctrl.options.commentDuration;
     }, function (value) {
       $ctrl.commentDuration = value / 1000;
     });
     $scope.$watch(function () {
-      return CommentService.maxLines();
+      return $ctrl.commentDuration;
+    }, function (value) {
+      if (angular.isNumber(value)) {
+        $ctrl.options.commentDuration = value * 1000;
+      }
+    });
+
+    $scope.$watch(function () {
+      return $ctrl.options.commentDelay;
+    }, function (value) {
+      $ctrl.commentDelay = value / 1000;
+    });
+    $scope.$watch(function () {
+      return $ctrl.commentDelay;
+    }, function (value) {
+      if (angular.isNumber(value)) {
+        $ctrl.options.commentDelay = value * 1000;
+      }
+    });
+
+    $scope.$watch(function () {
+      return $ctrl.options.commentMaxLines;
     }, function (value) {
       $ctrl.commentMaxLines = value;
     });
     $scope.$watch(function () {
-      return CommentService.maxItems();
+      return $ctrl.commentMaxLines;
+    }, function (value) {
+      if (angular.isNumber(value)) {
+        $ctrl.options.commentMaxLines = value;
+      }
+    });
+
+    $scope.$watch(function () {
+      return $ctrl.options.commentMaxItems;
     }, function (value) {
       $ctrl.commentMaxItems = value;
+    });
+    $scope.$watch(function () {
+      return $ctrl.commentMaxItems;
+    }, function (value) {
+      if (angular.isNumber(value)) {
+        $ctrl.options.commentMaxItems = value;
+      }
     });
   }
 }());
