@@ -28,8 +28,7 @@ limitations under the License.
   function ControlbarCtrl(
     $scope,
     CommonService,
-    PlayerService,
-    CommentService
+    PlayerService
   ) {
     var $ctrl = this;
 
@@ -43,8 +42,6 @@ limitations under the License.
     $ctrl.speedDown = PlayerService.speedDown;
     $ctrl.jumpForward = PlayerService.jumpForward;
     $ctrl.jumpBackward = PlayerService.jumpBackward;
-    $ctrl.decreaseDelay = CommentService.decreaseDelay;
-    $ctrl.increaseDelay = CommentService.increaseDelay;
     $ctrl.toggleMute = PlayerService.toggleMute;
     $ctrl.setVolume = PlayerService.volume;
     $ctrl.toggleFullscreen = CommonService.toggleFullscreen;
