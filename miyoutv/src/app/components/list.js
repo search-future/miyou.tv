@@ -236,6 +236,7 @@ limitations under the License.
             } else {
               item.categoryName = ChinachuService.convertCategory();
             }
+            delete item.count;
             programs.push(item);
           }
         }
@@ -253,6 +254,7 @@ limitations under the License.
         program.displayTime = CommonService.formatDate(program.start, 'M/d EEE A HHHH:mm');
         program.isArchive = false;
         program.isRecorded = true;
+        delete program.count;
       });
       return programs;
     }
@@ -284,7 +286,7 @@ limitations under the License.
       var program = item;
       var recorded;
       var previewPos = 70;
-      var channel;
+      var commentQuery;
 
       if (program.isArchive) {
         if (!program.isRecorded || (previewEnabled && angular.isUndefined(program.preview))) {
@@ -323,10 +325,10 @@ limitations under the License.
       }
 
       if (countMode !== 'none' && angular.isUndefined(item.count)) {
-        channel = CommentService.resolveChannel(item.channel);
+        commentQuery = resolveQuery(item.channel);
         CommentService.request('comments', {
           params: {
-            channel: channel,
+            channel: commentQuery,
             start: item.start,
             end: item.end,
             limit: 0
@@ -357,6 +359,15 @@ limitations under the License.
           }
         });
       }
+    }
+
+    function resolveQuery(channel) {
+      var queries = CommonService.loadLocalStorage('commentQueries') || {};
+      var query = queries[channel.name];
+      if (angular.isUndefined(query)) {
+        query = CommentService.resolveChannel(channel);
+      }
+      return query;
     }
   }
 }());

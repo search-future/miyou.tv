@@ -354,6 +354,7 @@ limitations under the License.
         column = ChinachuService.serviceFromLegacy(channel);
         column.channel = channel;
         column.style = calcColumnStyle(column);
+        column.commentQuery = resolveQuery(channel);
         column.programs = [];
         for (pi = 0; pi < archive.programs.length; pi += 1) {
           item = archive.programs[pi];
@@ -378,6 +379,7 @@ limitations under the License.
               item.categoryName = ChinachuService.convertCategory();
             }
             item.style = calcItemStyle(item);
+            delete item.count;
             column.programs.push(item);
           }
         }
@@ -404,6 +406,7 @@ limitations under the License.
         column = ChinachuService.serviceFromLegacy(channel);
         column.channel = channel;
         column.style = calcColumnStyle(column);
+        column.commentQuery = resolveQuery(channel);
         column.programs = [];
         for (pi = 0; pi < recorded.length; pi += 1) {
           item = recorded[pi];
@@ -418,6 +421,7 @@ limitations under the License.
             item.displayTime = CommonService.formatDate(item.start, 'A HHHH:mm');
             item.isArchive = false;
             item.isRecorded = true;
+            delete item.count;
             column.programs.push(item);
           }
         }
@@ -452,6 +456,15 @@ limitations under the License.
         top: calcPos(item.start) + 'px',
         height: calcHeight(item.start, item.end) + 'px'
       };
+    }
+
+    function resolveQuery(channel) {
+      var queries = CommonService.loadLocalStorage('commentQueries') || {};
+      var query = queries[channel.name];
+      if (angular.isUndefined(query)) {
+        query = CommentService.resolveChannel(channel);
+      }
+      return query;
     }
 
     function updateView() {
@@ -519,7 +532,7 @@ limitations under the License.
               params: {
                 start: countStart,
                 end: countEnd,
-                channel: CommentService.resolveChannel(column.channel),
+                channel: column.commentQuery,
                 interval: '1m'
               }
             }).then(getCounter(ci));
