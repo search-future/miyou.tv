@@ -38,6 +38,7 @@ limitations under the License.
     $ctrl.title = '';
     $ctrl.time = 0;
     $ctrl.commentEnabled = true;
+    $ctrl.commentInfo = {};
     $ctrl.options = {
       commentDelay: 0,
       commentDuration: 5000,
@@ -131,7 +132,6 @@ limitations under the License.
             angular.isObject(result.data) &&
             angular.isObject(result.data.data) &&
             angular.isArray(result.data.data.intervals)
-
           ) {
             $ctrl.chartData = result.data.data.intervals;
           }
@@ -173,6 +173,7 @@ limitations under the License.
 
       if (angular.isObject(value)) {
         info = CommentService.info();
+        info.count = value.n_hits || 0;
         PlayerService.setScreenText([
           ChinachuPlayerService.program.id,
           ChinachuPlayerService.program.fullTitle,
@@ -182,8 +183,9 @@ limitations under the License.
           '検索チャンネル: ' + info.query,
           '取得開始: ' + CommonService.formatDate(info.start, 'yyyy/MM/dd(EEE) A HHHH:mm:ss'),
           '取得終了: ' + CommonService.formatDate(info.end, 'yyyy/MM/dd(EEE) A HHHH:mm:ss'),
-          'コメント数: ' + value.n_hits || 0
+          'コメント数: ' + info.count
         ].join('\n'));
+        $ctrl.commentInfo = info;
       }
     });
     $scope.$watch(function () {

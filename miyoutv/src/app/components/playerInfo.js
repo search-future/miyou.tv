@@ -19,15 +19,17 @@ limitations under the License.
   angular.module('app')
     .component('playerInfo', {
       templateUrl: 'templates/playerInfo.html',
-      controller: PlayerInfoCtrl
+      controller: PlayerInfoCtrl,
+      bindings: {
+        commentInfo: '<'
+      }
     });
 
   function PlayerInfoCtrl(
     $scope,
     CommonService,
     ChinachuService,
-    ChinachuPlayerService,
-    CommentService
+    ChinachuPlayerService
   ) {
     var $ctrl = this;
 
@@ -68,7 +70,7 @@ limitations under the License.
       $ctrl.programList = programList;
     });
     $scope.$watch(function () {
-      return CommentService.info();
+      return $ctrl.commentInfo;
     }, function (value) {
       $ctrl.comment = {};
       if (value.channel) {
@@ -82,9 +84,9 @@ limitations under the License.
       $ctrl.comment.displayEndTime = CommonService.formatDate(value.end, 'yyyy/MM/dd(EEE) A HHHH:mm:ss');
     });
     $scope.$watch(function () {
-      return CommentService.data();
+      return $ctrl.commentInfo.count;
     }, function (value) {
-      $ctrl.comment.count = angular.isObject(value) ? value.n_hits : 0;
+      $ctrl.comment.count = value || 0;
     });
   }
 }());
