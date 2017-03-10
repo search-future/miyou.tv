@@ -21,20 +21,22 @@ limitations under the License.
       templateUrl: 'templates/commentGrid.html',
       controller: CommentGridCtrl,
       bindings: {
-        options: '<'
+        options: '<',
+        data: '<',
+        threads: '='
       }
     });
 
   function CommentGridCtrl(
     $scope,
     CommonService,
-    CommentService,
     PlayerService
   ) {
     var $ctrl = this;
     var autoScrolling = false;
 
     $ctrl.options = {};
+    $ctrl.data = [];
     $ctrl.autoScroll = true;
     $ctrl.gridOptions = {
       rowSelection: 'single',
@@ -111,11 +113,13 @@ limitations under the License.
           $ctrl.autoScroll = false;
         }
       },
-      onViewportChanged: function () {
-        if (autoScrolling) {
-          autoScrolling = false;
-        } else {
-          $ctrl.autoScroll = false;
+      onBodyScroll: function (e) {
+        if (e.direction === 'vertical') {
+          if (autoScrolling) {
+            autoScrolling = false;
+          } else {
+            $ctrl.autoScroll = false;
+          }
         }
       },
       onRowDoubleClicked: function () {
@@ -125,27 +129,6 @@ limitations under the License.
           PlayerService.time(selectedtRows[0].playTime);
         }
       }
-    };
-
-    $ctrl.updateFilter = function () {
-      var checkedThreads = [];
-
-      $ctrl.threads.forEach(function (a) {
-        if (a.checked) {
-          checkedThreads.push(a.title);
-        }
-      });
-      if (checkedThreads.length > 0) {
-        CommentService.filter(function (comment) {
-          if (checkedThreads.indexOf(comment.title) < 0) {
-            return false;
-          }
-          return true;
-        });
-      } else {
-        CommentService.filter(null);
-      }
-      updateData();
     };
 
     $ctrl.autoScrollChanged = function () {
@@ -159,31 +142,13 @@ limitations under the License.
 
     $scope.$watch(function () {
       return $ctrl.options.offset;
-    }, function () {
-      updateData();
-    });
-
+    }, updateData);
+    $scope.$watchCollection(function () {
+      return $ctrl.data;
+    }, updateData);
     $scope.$watch(function () {
-      return CommentService.comments();
-    }, function (value) {
-      var titles = [];
-      var threads = [];
-
-      value.forEach(function (a) {
-        if (titles.indexOf(a.title) < 0) {
-          titles.push(a.title);
-          threads.push({
-            title: a.title
-          });
-        }
-      });
-      $ctrl.threads = threads;
-      $ctrl.autoScroll = true;
-      updateData();
-      titles = null;
-      threads = null;
-    });
-
+      return $ctrl.threads;
+    }, updateData, true);
     $scope.$watch(function () {
       return PlayerService.time();
     }, function (newValue, oldValue) {
@@ -196,11 +161,12 @@ limitations under the License.
     });
 
     function updateData() {
-      var data = CommentService.filteredComments();
+      var data = $ctrl.data.filter(function (a) {
+        return a.enabled !== false;
+      });
       if (angular.isNumber($ctrl.options.offset)) {
         data.forEach(function (a) {
           var comment = a;
-
           comment.playTime = a.time - $ctrl.options.offset;
         });
       }

@@ -73,10 +73,6 @@ limitations under the License.
       return $ctrl.commentInfo;
     }, function (value) {
       $ctrl.comment = {};
-      if (value.channel) {
-        $ctrl.comment.channel = value.channel.name;
-        $ctrl.comment.type = value.channel.type === 'GR' ? '地上波' : '衛星波';
-      }
       $ctrl.comment.start = value.start;
       $ctrl.comment.end = value.end;
       $ctrl.comment.query = value.query;

@@ -26,7 +26,7 @@ limitations under the License.
                 <li ng-repeat="thread in $ctrl.threads">
                     <div class="checkbox text-nowrap" title="{{thread.title}}">
                         <label>
-                            <input type="checkbox" name="thread" ng-model="thread.checked" ng-change="$ctrl.updateFilter()">{{thread.title}}
+                            <input type="checkbox" name="thread" ng-model="thread.enabled">{{thread.title}}
                         </label>
                     </div>
                 </li>

@@ -31,7 +31,8 @@ limitations under the License.
       controller: CommentScreenCtrl,
       bindings: {
         enabled: '<',
-        options: '<'
+        options: '<',
+        data: '<'
       }
     });
 
@@ -39,14 +40,12 @@ limitations under the License.
     $scope,
     $element,
     $timeout,
-    CommentService,
     PlayerService
   ) {
     var $ctrl = this;
     var offset = 0;
     var duration = 5000;
     var lines = [];
-    var commentData = [];
     var dp = 0;
     var cp = 0;
 
@@ -107,12 +106,10 @@ limitations under the License.
         }
       });
     });
-    $scope.$watchGroup([function () {
-      return CommentService.comments();
-    }, function () {
-      return CommentService.filter();
-    }], function () {
-      commentData = CommentService.filteredComments();
+    $scope.$watchCollection(function () {
+      return $ctrl.data;
+    }, function (value) {
+      $ctrl.data = value;
       dp = 0;
     });
     $scope.$watch(function () {
@@ -141,12 +138,12 @@ limitations under the License.
           comment.visible = false;
         });
       }
-      while (dp < commentData.length) {
-        if (commentData[dp].time >= end) {
+      while (dp < $ctrl.data.length) {
+        if ($ctrl.data[dp].time >= end) {
           break;
         }
-        if (commentData[dp].time >= start) {
-          deployComment(commentData[dp], newValue);
+        if ($ctrl.data[dp].enabled !== false && $ctrl.data[dp].time >= start) {
+          deployComment($ctrl.data[dp], newValue);
         }
         dp += 1;
       }
