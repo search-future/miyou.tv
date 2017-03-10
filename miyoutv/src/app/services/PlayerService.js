@@ -75,6 +75,7 @@ limitations under the License.
     };
     var props = {
       overwriteLength: 0,
+      preseekTime: 0,
       screenText: '',
       aspectRatio: '16:9',
       deinterlace: 'discard',
