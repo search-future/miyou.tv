@@ -1,3 +1,4 @@
+
 /*
 Copyright 2016 Brazil Ltd.
 
@@ -324,6 +325,10 @@ Components
   color: #fff;
 }
 
+.dropdown-inverse .dropdown-header {
+  color: #fff;
+}
+
 .dropdown-inverse .checkbox label {
   color: #e6e6e6;
 }
@@ -348,19 +353,22 @@ Components
   min-width: 100%;
 }
 
-.dropdown-thread .dropdown-menu,
-.dropdown-category .dropdown-menu {
+.dropdown-category .dropdown-menu,
+.dropdown-channel .dropdown-menu,
+.dropdown-thread .dropdown-menu {
   max-height: 320px;
   overflow: auto;
 }
 
-.dropdown-thread .checkbox,
-.dropdown-category .checkbox {
+.dropdown-category .checkbox,
+.dropdown-channel .checkbox,
+.dropdown-thread .checkbox {
   margin: 0 10px;
 }
 
-.dropdown-thread .checkbox label,
-.dropdown-category .checkbox label {
+.dropdown-category .checkbox label,
+.dropdown-channel .checkbox label,
+.dropdown-thread .checkbox label {
   width: 100%;
 }
 

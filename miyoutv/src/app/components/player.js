@@ -32,6 +32,7 @@ limitations under the License.
     CommentService
   ) {
     var $ctrl = this;
+    var channelOrder = ['gr', 'bs', 'cs'];
 
     $ctrl.mode = 'recorded';
     $ctrl.title = '';
@@ -48,6 +49,7 @@ limitations under the License.
     $ctrl.commentInfo = {};
     $ctrl.commentIntervals = [];
     $ctrl.comments = [];
+    $ctrl.commentChannels = [];
     $ctrl.commentThreads = [];
     $ctrl.sidebarCollapsed = Boolean(CommonService.loadLocalStorage('sidebarCollapsed'));
 
@@ -86,7 +88,26 @@ limitations under the License.
     $ctrl.toggleFullscreen = CommonService.toggleFullscreen;
     $ctrl.stop = PlayerService.stop;
 
-    $ctrl.$onInit = loadSetting;
+    $ctrl.$onInit = function () {
+      loadSetting();
+      CommentService.request('channels').then(function (responce) {
+        if (
+          angular.isObject(responce) &&
+          angular.isObject(responce.data) &&
+          angular.isObject(responce.data.data) &&
+          angular.isArray(responce.data.data.channels)
+        ) {
+          responce.data.data.channels.sort(function (a, b) {
+            var aType = channelOrder.indexOf(a.type.slice(0, 2));
+            var aNum = parseInt(a.type.slice(2), 10);
+            var bType = channelOrder.indexOf(b.type.slice(0, 2));
+            var bNum = parseInt(b.type.slice(2), 10);
+            return ((aType - bType) * 100) + (aNum - bNum);
+          });
+          $ctrl.commentChannels = responce.data.data.channels;
+        }
+      });
+    };
 
     $scope.$watch(function () {
       return CommonService.triggered('toggleSidebar');
@@ -151,16 +172,10 @@ limitations under the License.
       return ChinachuPlayerService.program;
     }, function (value) {
       $ctrl.commentIntervals = [];
-      $ctrl.comments = [];
       if (value) {
         $ctrl.title = value.fullTitle;
         $ctrl.channel = value.channel.name;
         $ctrl.commentOptions.offset = value.start - $ctrl.options.commentDelay;
-        $ctrl.commentInfo = {
-          start: value.start,
-          end: value.end,
-          query: CommentService.resolveChannel(value.channel)
-        };
         PlayerService.setScreenText([
           value.id,
           value.fullTitle,
@@ -235,30 +250,77 @@ limitations under the License.
         PlayerService.setScreenText('コメント非表示');
       }
     });
+    $scope.$watchGroup([function () {
+      return ChinachuPlayerService.program;
+    }, function () {
+      return $ctrl.commentChannels;
+    }], function (values) {
+      var program = values[0];
+      var commentChannels = values[1];
+      var channels;
+      $ctrl.commentIntervals = [];
+      if (program && commentChannels.length > 0) {
+        $ctrl.commentInfo.start = program.start;
+        $ctrl.commentInfo.end = program.end;
+        $ctrl.commentInfo.query = resolveQuery(program.channel);
+        channels = $ctrl.commentInfo.query.split('||');
+        $ctrl.commentChannels.forEach(function (a) {
+          var channel = a;
+          if (channels.indexOf(channel.id) >= 0) {
+            channel.enabled = true;
+          }
+        });
+        channels = null;
+      }
+    });
     $scope.$watch(function () {
-      return $ctrl.commentInfo;
+      return $ctrl.commentChannels;
     }, function (value) {
-      var margin = Math.abs($ctrl.options.commentDelay) + 10000;
-      CommentService.request('intervals', {
-        params: {
-          start: value.start - margin,
-          end: value.end + margin,
-          channel: value.query,
-          interval: '1m',
-          fill: 1
-        }
-      }).then(function (result) {
-        if (
-          angular.isObject(result) &&
-          angular.isObject(result.data) &&
-          angular.isObject(result.data.data) &&
-          angular.isArray(result.data.data.intervals)
-
-        ) {
-          $ctrl.commentIntervals = result.data.data.intervals;
-          $ctrl.commentInfo.count = result.data.data.n_hits;
+      var enabledChannels = [];
+      value.forEach(function (a) {
+        if (a.enabled) {
+          enabledChannels.push(a.id);
         }
       });
+      $ctrl.commentInfo.query = enabledChannels.join('||');
+      enabledChannels = null;
+    }, true);
+    $scope.$watchGroup([function () {
+      return $ctrl.commentInfo.start;
+    }, function () {
+      return $ctrl.commentInfo.end;
+    }, function () {
+      return $ctrl.commentInfo.query;
+    }], function (value) {
+      var start = value[0];
+      var end = value[1];
+      var query = value[2];
+      var margin = Math.abs($ctrl.options.commentDelay) + 10000;
+      $ctrl.commentInfo.count = 0;
+      $ctrl.comments = [];
+      if (start && end && query) {
+        saveQuery();
+        CommentService.request('intervals', {
+          params: {
+            start: start - margin,
+            end: end + margin,
+            channel: query,
+            interval: '1m',
+            fill: 1
+          }
+        }).then(function (result) {
+          if (
+            angular.isObject(result) &&
+            angular.isObject(result.data) &&
+            angular.isObject(result.data.data) &&
+            angular.isArray(result.data.data.intervals)
+
+          ) {
+            $ctrl.commentIntervals = result.data.data.intervals;
+            $ctrl.commentInfo.count = result.data.data.n_hits;
+          }
+        });
+      }
     });
     $scope.$watchCollection(function () {
       return $ctrl.comments;
@@ -392,6 +454,24 @@ limitations under the License.
       if (angular.isNumber(setting.maxItems)) {
         $ctrl.options.commentMaxItems = setting.maxItems;
       }
+    }
+
+    function saveQuery() {
+      var queries;
+      if ($ctrl.channel && $ctrl.commentInfo.query) {
+        queries = CommonService.loadLocalStorage('commentQueries') || {};
+        queries[$ctrl.channel] = $ctrl.commentInfo.query;
+        CommonService.saveLocalStorage('commentQueries', queries);
+      }
+    }
+
+    function resolveQuery(channel) {
+      var queries = CommonService.loadLocalStorage('commentQueries') || {};
+      var query = queries[channel.name];
+      if (angular.isUndefined(query)) {
+        query = CommentService.resolveChannel(channel);
+      }
+      return query;
     }
   }
 }());

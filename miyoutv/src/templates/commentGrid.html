@@ -17,9 +17,48 @@ limitations under the License.
 <meta charset="UTF-8">
 <div class="flex flex-column extend-vertical">
     <form class="flex-item form-thread" name="threads">
+        <uib-dropdown class="dropdown dropdown-inverse dropdown-channel" auto-close="disabled">
+            <uib-dropdown-toggle class="btn btn-dark">
+                チャンネル
+                <span class="caret"></span>
+            </uib-dropdown-toggle>
+            <ul class="dropdown-menu" uib-dropdown-menu>
+                <li ng-repeat="channel in $ctrl.channels | filter:{enabled: 'true'}">
+                    <div class="checkbox text-nowrap" title="{{channel.id}}">
+                        <label>
+                            <input type="checkbox" name="channel" ng-model="channel.enabled">{{channel.id}}
+                        </label>
+                    </div>
+                </li>
+                <li class="dropdown-header">地上</li>
+                <li ng-repeat="channel in $ctrl.channels | filter:{type: 'gr', enabled: '!true'}">
+                    <div class="checkbox text-nowrap" title="{{channel.id}}">
+                        <label>
+                            <input type="checkbox" name="channel" ng-model="channel.enabled" ng-disabled="$ctrl.channelCount >= 5">{{channel.id}}
+                        </label>
+                    </div>
+                </li>
+                <li class="dropdown-header">BS</li>
+                <li ng-repeat="channel in $ctrl.channels | filter:{type: 'bs', enabled: '!true'}">
+                    <div class="checkbox text-nowrap" title="{{channel.id}}">
+                        <label>
+                            <input type="checkbox" name="channel" ng-model="channel.enabled" ng-disabled="$ctrl.channelCount >= 5">{{channel.id}}
+                        </label>
+                    </div>
+                </li>
+                <li class="dropdown-header">CS</li>
+                <li ng-repeat="channel in $ctrl.channels | filter:{type: 'cs', enabled: '!true'}">
+                    <div class="checkbox text-nowrap" title="{{channel.id}}">
+                        <label>
+                            <input type="checkbox" name="channel" ng-model="channel.enabled" ng-disabled="$ctrl.channelCount >= 5">{{channel.id}}
+                        </label>
+                    </div>
+                </li>
+            </ul>
+        </uib-dropdown>
         <uib-dropdown class="dropdown dropdown-inverse dropdown-thread" auto-close="outsideClick">
             <uib-dropdown-toggle class="btn btn-dark">
-                スレッド選択
+                スレッド
                 <span class="caret"></span>
             </uib-dropdown-toggle>
             <ul class="dropdown-menu" uib-dropdown-menu>

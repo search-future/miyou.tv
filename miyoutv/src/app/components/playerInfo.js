@@ -72,17 +72,15 @@ limitations under the License.
     $scope.$watch(function () {
       return $ctrl.commentInfo;
     }, function (value) {
-      $ctrl.comment = {};
-      $ctrl.comment.start = value.start;
-      $ctrl.comment.end = value.end;
-      $ctrl.comment.query = value.query;
-      $ctrl.comment.displayStartTime = CommonService.formatDate(value.start, 'yyyy/MM/dd(EEE) A HHHH:mm:ss');
-      $ctrl.comment.displayEndTime = CommonService.formatDate(value.end, 'yyyy/MM/dd(EEE) A HHHH:mm:ss');
-    });
-    $scope.$watch(function () {
-      return $ctrl.commentInfo.count;
-    }, function (value) {
-      $ctrl.comment.count = value || 0;
-    });
+      if (angular.isObject(value)) {
+        $ctrl.comment = {};
+        $ctrl.comment.start = value.start;
+        $ctrl.comment.end = value.end;
+        $ctrl.comment.query = (value.query || '').replace(/\|\|/g, ',');
+        $ctrl.comment.displayStartTime = CommonService.formatDate(value.start, 'yyyy/MM/dd(EEE) A HHHH:mm:ss');
+        $ctrl.comment.displayEndTime = CommonService.formatDate(value.end, 'yyyy/MM/dd(EEE) A HHHH:mm:ss');
+        $ctrl.comment.count = value.count || 0;
+      }
+    }, true);
   }
 }());

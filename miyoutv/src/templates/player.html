@@ -43,7 +43,7 @@ limitations under the License.
                 <button class="sidebar-close close" ng-click="$ctrl.sidebarCollapsed = true"><span class="glyphicon glyphicon-remove-sign"></span></button>
                 <uib-tabset type="tabs" class="sidebar-tabset extend-vertical nav-mtvblack nav-mtvblack-line">
                     <uib-tab heading="コメント">
-                        <comment-grid class="fit" options="$ctrl.commentOptions" threads="$ctrl.commentThreads" data="$ctrl.comments"></comment-grid>
+                        <comment-grid class="fit" options="$ctrl.commentOptions" channels="$ctrl.commentChannels" threads="$ctrl.commentThreads" data="$ctrl.comments"></comment-grid>
                     </uib-tab>
                     <uib-tab heading="情報">
                         <player-info comment-info="$ctrl.commentInfo"></player-info>

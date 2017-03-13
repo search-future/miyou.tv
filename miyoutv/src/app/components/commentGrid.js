@@ -23,6 +23,7 @@ limitations under the License.
       bindings: {
         options: '<',
         data: '<',
+        channels: '=',
         threads: '='
       }
     });
@@ -140,6 +141,15 @@ limitations under the License.
       }
     };
 
+    $scope.$watch(function () {
+      return $ctrl.channels;
+    }, function (value) {
+      if (angular.isArray(value)) {
+        $ctrl.channelCount = value.filter(function (a) {
+          return a.enabled;
+        }).length;
+      }
+    }, true);
     $scope.$watch(function () {
       return $ctrl.options.offset;
     }, updateData);
