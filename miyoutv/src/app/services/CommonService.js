@@ -38,8 +38,6 @@ limitations under the License.
       saveFile: saveFile,
       loadFile: loadFile,
       removeFile: removeFile,
-      trigger: trigger,
-      triggered: triggered,
       quitModal: quitModal,
       close: close,
       reload: reload,
@@ -55,7 +53,6 @@ limitations under the License.
     };
     var props = {
       win: null,
-      triggers: {},
       isFullscreen: false,
       quitModal: null
     };
@@ -196,17 +193,6 @@ limitations under the License.
       } catch (e) {
         return false;
       }
-    }
-
-    function trigger(name, value) {
-      props.triggers[name] = angular.isDefined(value) ? value : true;
-    }
-
-    function triggered(name) {
-      var value = props.triggers[name];
-
-      delete props.triggers[name];
-      return value;
     }
 
     function isFullscreen() {
