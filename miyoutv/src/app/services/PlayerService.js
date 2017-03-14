@@ -79,7 +79,7 @@ limitations under the License.
       screenText: '',
       aspectRatio: '16:9',
       deinterlace: 'discard',
-      settingTextEnabled: false,
+      active: false,
       deinterlaceList: [
         'blend',
         'bob',
@@ -106,7 +106,9 @@ limitations under the License.
         return aspectRatio();
       }
     ], function () {
-      saveSetting();
+      if (props.active) {
+        saveSetting();
+      }
     });
     $rootScope.$on('$destroy',
       $rootScope.$on('Player.FrameReady', function (event, frame) {
@@ -121,19 +123,15 @@ limitations under the License.
     );
     $rootScope.$on('$destroy',
       $rootScope.$on('Player.MediaChanged', function () {
-        var deregister1 = null;
-        props.settingTextEnabled = false;
-        deregister1 = $rootScope.$on('Player.Playing',
+        var deregister = null;
+        props.active = false;
+        deregister = $rootScope.$on('Player.Playing',
           function () {
-            var deregister2 = $rootScope.$on('Player.PositionChanged',
-              function () {
-                loadSetting();
-                time(preseekTime());
-                preseekTime(0);
-                props.settingTextEnabled = true;
-                deregister2();
-              });
-            deregister1();
+            loadSetting();
+            time(preseekTime());
+            preseekTime(0);
+            props.active = true;
+            deregister();
           });
       })
     );
@@ -174,12 +172,6 @@ limitations under the License.
         aspectRatio(setting.aspectRatio);
       } else {
         aspectRatio(props.aspectRatio);
-      }
-    }
-
-    function showSettingText(text) {
-      if (props.settingTextEnabled) {
-        setScreenText(text);
       }
     }
 
@@ -250,7 +242,7 @@ limitations under the License.
       if (!isNaN(value)) {
         service.player.position = parseFloat(value);
         message = formattedTime();
-        showSettingText(message);
+        setScreenText(message);
       }
       return service.player.position;
     }
@@ -284,7 +276,7 @@ limitations under the License.
           service.player.volume = parseInt(value, 10);
         }
         message = '音量 ' + volume() + '%';
-        showSettingText(message);
+        setScreenText(message);
       }
       return service.player.volume;
     }
@@ -312,12 +304,15 @@ limitations under the License.
           service.player.input.rate = newRate;
         }
         message = '再生速度 x' + (Math.round(rate() * 100) / 100);
-        showSettingText(message);
+        setScreenText(message);
       }
       return service.player.input.rate;
     }
 
     function play(mrl) {
+      if (mrl) {
+        props.active = false;
+      }
       service.player.play(mrl);
     }
 
@@ -330,6 +325,7 @@ limitations under the License.
     }
 
     function stop() {
+      props.active = false;
       service.player.stop();
     }
 
@@ -355,7 +351,7 @@ limitations under the License.
         } else {
           message = '音声無効';
         }
-        showSettingText(message);
+        setScreenText(message);
       }
       return service.player.audio.track;
     }
@@ -397,7 +393,7 @@ limitations under the License.
         } else {
           message = '映像無効';
         }
-        showSettingText(message);
+        setScreenText(message);
       }
       return service.player.video.track;
     }
@@ -442,7 +438,7 @@ limitations under the License.
         } else {
           message = '字幕無効';
         }
-        showSettingText(message);
+        setScreenText(message);
       }
       return service.player.subtitles.track;
     }
@@ -533,8 +529,10 @@ limitations under the License.
       volume(volume() - value);
     }
 
-    function setScreenText(text) {
-      props.screenText = text;
+    function setScreenText(text, force) {
+      if (force || props.active) {
+        props.screenText = text;
+      }
     }
 
     function getScreenText() {

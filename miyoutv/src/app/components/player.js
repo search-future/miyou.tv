@@ -174,7 +174,7 @@ limitations under the License.
           value.fullTitle,
           value.channel.name,
           CommonService.formatDate(value.start, 'yyyy/MM/dd(EEE) A HHHH:mm:ss')
-        ].join('\n'));
+        ].join('\n'), true);
       }
     });
     $scope.$watch(function () {
