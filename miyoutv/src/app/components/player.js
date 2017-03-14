@@ -82,7 +82,7 @@ limitations under the License.
         $ctrl.options.commentDelay += 500;
       },
       'ctrl+s': function () {
-        CommonService.trigger('toggleSidebar');
+        $ctrl.sidebarCollapsed = !$ctrl.sidebarCollapsed;
       }
     };
     $ctrl.toggleFullscreen = CommonService.toggleFullscreen;
@@ -109,13 +109,6 @@ limitations under the License.
       });
     };
 
-    $scope.$watch(function () {
-      return CommonService.triggered('toggleSidebar');
-    }, function (value) {
-      if (value) {
-        $ctrl.sidebarCollapsed = !$ctrl.sidebarCollapsed;
-      }
-    });
     $scope.$watch(function () {
       return $ctrl.sidebarCollapsed;
     }, function (value) {

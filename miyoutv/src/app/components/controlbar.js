@@ -21,7 +21,8 @@ limitations under the License.
       templateUrl: 'templates/controlbar.html',
       controller: ControlbarCtrl,
       bindings: {
-        commentEnabled: '='
+        commentEnabled: '=',
+        sidebarCollapsed: '='
       }
     });
 
@@ -51,7 +52,7 @@ limitations under the License.
     };
 
     $ctrl.toggleSidebar = function () {
-      CommonService.trigger('toggleSidebar');
+      $ctrl.sidebarCollapsed = !$ctrl.sidebarCollapsed;
     };
 
     $scope.$watch(function () {

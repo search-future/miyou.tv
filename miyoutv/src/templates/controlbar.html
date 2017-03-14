@@ -51,7 +51,7 @@ limitations under the License.
             <button class="btn btn-media btn-toggle" type="button" title="全画面表示" ng-class="{active: $ctrl.isFullscreen}" ng-click="$ctrl.toggleFullscreen()">
                 <img class="img-icon-md" src="assets/fullscreen.svg" alt="Fullscreen">
             </button>
-            <button class="btn btn-media" type="button" title="サイドバー" ng-click="$ctrl.toggleSidebar()">
+            <button class="btn btn-media btn-toggle" type="button" title="サイドバー" ng-class="{active: !$ctrl.sidebarCollapsed}" ng-click="$ctrl.toggleSidebar()">
                 <img class="img-icon-md" src="assets/tabs.svg" alt="Sidebar">
             </button>
         </div>
