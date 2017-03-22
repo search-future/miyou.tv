@@ -107,15 +107,16 @@ limitations under the License.
     });
 
     $scope.$watch(function () {
-      return ChinachuService.reloadInterval();
+      return CommonService.loadLocalStorage('backendReloadInterval');
     }, function (value) {
-      if (timer) {
-        $interval.cancel(timer);
-      }
-      if (value > 0) {
+      var time = angular.isNumber(value) ? value : 300000;
+      if (time > 0) {
+        if (timer) {
+          $interval.cancel(timer);
+        }
         timer = $interval(function () {
           ChinachuService.load().catch(chinachuErrorHandler);
-        }, value);
+        }, time);
       }
     });
 
