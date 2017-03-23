@@ -207,7 +207,7 @@ limitations under the License.
       var ci;
       var pi;
 
-      channels = ChinachuService.recordedChannels(miyoutvFilter);
+      channels = recordedChannels(miyoutvFilter);
       start = Math.min.apply(
         null,
         ChinachuService.data.recorded.filter(miyoutvFilter).map(function (a) {
@@ -251,6 +251,31 @@ limitations under the License.
         }
       }
       return programs;
+    }
+
+    function recordedChannels(filter) {
+      var recorded = ChinachuService.data.recorded.filter(filter || Boolean);
+      var channels = [];
+      var program;
+      var ri;
+      var ci;
+
+      for (ri = 0; ri < recorded.length; ri += 1) {
+        program = recorded[ri];
+        for (ci = 0; ci < channels.length; ci += 1) {
+          if (
+            program.channel.type === channels[ci].type &&
+            program.channel.sid === channels[ci].sid
+          ) {
+            channels[ci] = program.channel;
+            break;
+          }
+        }
+        if (ci === channels.length) {
+          channels.push(program.channel);
+        }
+      }
+      return channels;
     }
 
     function programsFromRecorded(recorded) {
