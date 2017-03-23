@@ -36,7 +36,7 @@ limitations under the License.
                 </div>
                 <div class="player-control flex-item">
                     <controlbar comment-enabled="$ctrl.commentEnabled" sidebar-collapsed="$ctrl.sidebarCollapsed"></controlbar>
-                    <seekbar mode="$ctrl.mode" offset="$ctrl.commentOptions.offset" chart-data="$ctrl.commentIntervals"></seekbar>
+                    <seekbar mode="$ctrl.mode" offset="$ctrl.commentOptions.offset" chart-data="$ctrl.commentIntervals" program-list="$ctrl.programList"></seekbar>
                 </div>
             </div>
             <div class="sidebar col-lg-4 col-md-5 col-sm-6 col-xs-12 extend-vertical pick" uib-collapse="$ctrl.sidebarCollapsed" horizontal>
@@ -46,7 +46,7 @@ limitations under the License.
                         <comment-grid class="fit" options="$ctrl.commentOptions" channels="$ctrl.commentChannels" threads="$ctrl.commentThreads" data="$ctrl.comments"></comment-grid>
                     </uib-tab>
                     <uib-tab heading="情報">
-                        <player-info comment-info="$ctrl.commentInfo"></player-info>
+                        <player-info comment-info="$ctrl.commentInfo" program-list="$ctrl.programList"></player-info>
                     </uib-tab>
                     <uib-tab heading="再生設定">
                         <player-config options="$ctrl.options" audio-track-count="$ctrl.audioTrackCount" has-surround="$ctrl.hasSurround"></player-config>

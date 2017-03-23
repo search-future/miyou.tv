@@ -21,7 +21,8 @@ limitations under the License.
       templateUrl: 'templates/playerInfo.html',
       controller: PlayerInfoCtrl,
       bindings: {
-        commentInfo: '<'
+        commentInfo: '<',
+        programList: '<'
       }
     });
 
@@ -35,12 +36,12 @@ limitations under the License.
 
     $ctrl.program = {};
     $ctrl.comment = {};
+    $ctrl.programList = [];
 
     $scope.$watch(function () {
       return ChinachuPlayerService.program;
     }, function (value) {
       $ctrl.program = {};
-      $ctrl.programList = [];
       if (value) {
         $ctrl.program.id = value.id;
         $ctrl.program.channel = value.channel.name;
@@ -55,7 +56,7 @@ limitations under the License.
       }
     });
     $scope.$watch(function () {
-      return ChinachuPlayerService.programList;
+      return $ctrl.programList;
     }, function (value) {
       var programList = value;
 
@@ -67,7 +68,6 @@ limitations under the License.
           program.displayEndTime = CommonService.formatDate(program.startAt + program.duration, 'MM/dd A HHHH:mm');
         });
       }
-      $ctrl.programList = programList;
     });
     $scope.$watch(function () {
       return $ctrl.commentInfo;

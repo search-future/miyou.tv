@@ -395,6 +395,13 @@ limitations under the License.
       $ctrl.commentOptions.maxItems = value;
       saveSetting();
     });
+    $scope.$watch(function () {
+      return ChinachuPlayerService.programList;
+    }, function (value) {
+      if (angular.isArray(value)) {
+        $ctrl.programList = value;
+      }
+    });
 
     $scope.$on('Player.EncounteredError', function () {
       PlayerService.stop();

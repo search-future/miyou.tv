@@ -21,7 +21,8 @@ limitations under the License.
       bindings: {
         mode: '=',
         offset: '<',
-        chartData: '<'
+        chartData: '<',
+        programList: '<'
       },
       templateUrl: 'templates/seekbar.html',
       controller: SeekbarCtrl
@@ -68,7 +69,7 @@ limitations under the License.
     });
 
     $scope.$watchGroup([function () {
-      return ChinachuPlayerService.programList;
+      return $ctrl.programList;
     }, function () {
       return $ctrl.offset;
     }, function () {
