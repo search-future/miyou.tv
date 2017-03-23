@@ -29,6 +29,7 @@ limitations under the License.
     CommonService,
     PlayerService,
     ChinachuPlayerService,
+    ChinachuService,
     CommentService
   ) {
     var $ctrl = this;
@@ -164,17 +165,38 @@ limitations under the License.
     $scope.$watch(function () {
       return ChinachuPlayerService.program;
     }, function (value) {
+      var program = value;
+
       $ctrl.commentIntervals = [];
-      if (value) {
+      if (program) {
         $ctrl.title = value.fullTitle;
         $ctrl.channel = value.channel.name;
         $ctrl.commentOptions.offset = value.start - $ctrl.options.commentDelay;
         PlayerService.setScreenText([
-          value.id,
-          value.fullTitle,
-          value.channel.name,
-          CommonService.formatDate(value.start, 'yyyy/MM/dd(EEE) A HHHH:mm:ss')
+          program.id,
+          program.fullTitle,
+          program.channel.name,
+          CommonService.formatDate(program.start, 'yyyy/MM/dd(EEE) A HHHH:mm:ss')
         ].join('\n'), true);
+        ChinachuService.request('/archive.json').then(function (response) {
+          var programService;
+          if (
+            angular.isObject(response) &&
+            angular.isObject(response.data) &&
+            angular.isArray(response.data.programs)
+          ) {
+            programService = ChinachuService.serviceFromLegacy(program.channel);
+            $ctrl.programList = response.data.programs.filter(function (a) {
+              return (
+                a.networkId === programService.networkId &&
+                a.serviceId === programService.serviceId &&
+                a.startAt < program.end &&
+                a.startAt + a.duration > program.start
+              );
+            });
+          }
+          program = null;
+        });
       }
     });
     $scope.$watch(function () {
@@ -394,13 +416,6 @@ limitations under the License.
     }, function (value) {
       $ctrl.commentOptions.maxItems = value;
       saveSetting();
-    });
-    $scope.$watch(function () {
-      return ChinachuPlayerService.programList;
-    }, function (value) {
-      if (angular.isArray(value)) {
-        $ctrl.programList = value;
-      }
     });
 
     $scope.$on('Player.EncounteredError', function () {
