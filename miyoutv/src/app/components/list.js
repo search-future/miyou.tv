@@ -208,9 +208,18 @@ limitations under the License.
       var pi;
 
       channels = ChinachuService.recordedChannels(miyoutvFilter);
-      start = ChinachuService.firstRecordTime(miyoutvFilter);
-      end = ChinachuService.lastRecordTime(miyoutvFilter);
-
+      start = Math.min.apply(
+        null,
+        ChinachuService.data.recorded.filter(miyoutvFilter).map(function (a) {
+          return a.start;
+        })
+      );
+      end = Math.max.apply(
+        null,
+        ChinachuService.data.recorded.filter(miyoutvFilter).map(function (a) {
+          return a.end;
+        })
+      );
       for (ci = 0; ci < channels.length; ci += 1) {
         channel = channels[ci];
         service = ChinachuService.serviceFromLegacy(channel);
