@@ -86,24 +86,50 @@ limitations under the License.
     });
 
     $scope.$watch(function () {
-      return ChinachuService.status;
-    }, function (value) {
-      if (angular.isObject(value) && angular.isObject(value.feature)) {
-        if (!value.feature.previewer) {
-          toaster.pop({
-            type: 'warning',
-            title: 'Chinachu config error',
-            body: 'Chinachuのプレビューが無効です。プレビューを表示できません。'
-          });
+      return ChinachuService.getUrl();
+    }, function () {
+      ChinachuService.request('/api/status.json').then(function (response) {
+        var status;
+        if (
+          angular.isObject(response) &&
+          angular.isObject(response.data) &&
+          angular.isObject(response.data.feature)
+        ) {
+          status = response.data;
+          if (angular.isObject(status) && angular.isObject(status.feature)) {
+            if (!status.feature.previewer) {
+              toaster.pop({
+                type: 'warning',
+                title: 'Chinachu config error',
+                body: 'Chinachuのプレビューが無効です。プレビューを表示できません。'
+              });
+            }
+            if (!status.feature.streamer) {
+              toaster.pop({
+                type: 'error',
+                title: 'Chinachu config error',
+                body: 'Chinachuのストリーム再生が無効です。録画を再生できません。'
+              });
+            }
+          }
+        } else {
+          CommonService.errorModal(
+            'Chinachu request error',
+            'Chinachuのステータスを確認できませんでした。設定を確認してください。',
+            function () {
+              CommonService.openChinachuSetting();
+            }
+          );
         }
-        if (!value.feature.streamer) {
-          toaster.pop({
-            type: 'error',
-            title: 'Chinachu config error',
-            body: 'Chinachuのストリーム再生が無効です。録画を再生できません。'
-          });
-        }
-      }
+      }, function () {
+        CommonService.errorModal(
+          'Chinachu request error',
+          'Chinachuに接続できませんでした。設定を確認してください。',
+          function () {
+            CommonService.openChinachuSetting();
+          }
+        );
+      });
     });
 
     $scope.$watch(function () {
