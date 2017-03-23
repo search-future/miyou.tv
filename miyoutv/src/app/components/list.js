@@ -34,6 +34,8 @@ limitations under the License.
     CommentService
   ) {
     var $ctrl = this;
+    var archive = {};
+    var recorded = [];
     var viewport = $element[0].getElementsByClassName('scrollable')[0];
     var selectItem;
     var timer;
@@ -84,6 +86,37 @@ limitations under the License.
       viewport.scrollTop = value;
     };
 
+    $scope.$watch(function () {
+      return ChinachuService.getUrl();
+    }, function () {
+      archive = {};
+      recorded = [];
+      ChinachuService.request('/archive.json').then(function (archiveResponse) {
+        if (
+          angular.isObject(archiveResponse) &&
+          angular.isObject(archiveResponse.data)
+        ) {
+          archive = archiveResponse.data;
+        }
+        ChinachuService.request('/api/recorded.json').then(function (recordedResponse) {
+          if (
+            angular.isObject(recordedResponse) &&
+            angular.isArray(recordedResponse.data)
+          ) {
+            recorded = recordedResponse.data;
+          }
+        });
+      }, function () {
+        ChinachuService.request('/api/recorded.json').then(function (recordedResponse) {
+          if (
+            angular.isObject(recordedResponse) &&
+            angular.isArray(recordedResponse.data)
+          ) {
+            recorded = recordedResponse.data;
+          }
+        });
+      });
+    });
     $scope.$watch(function () {
       return $ctrl.sortRule;
     }, function (value) {
@@ -141,15 +174,13 @@ limitations under the License.
       $ctrl.sortRule = [values[0], values[1] ? 'true' : 'false'].join(':');
     });
     $scope.$watchGroup([function () {
-      return ChinachuService.data.archive;
-    }, function () {
-      return ChinachuService.data.recorded;
-    }, function () {
       return $ctrl.source;
+    }, function () {
+      return archive;
+    }, function () {
+      return recorded;
     }], function (values) {
-      var archive = values[0];
-      var recorded = values[1];
-      var source = values[2];
+      var source = values[0];
 
       $location.search('src', source);
       if (archive.programs) {
@@ -196,7 +227,7 @@ limitations under the License.
       return a.isMiyoutvReserved;
     }
 
-    function programsFromArchive(archive) {
+    function programsFromArchive() {
       var programs = [];
       var channels;
       var start;
@@ -210,13 +241,13 @@ limitations under the License.
       channels = recordedChannels(miyoutvFilter);
       start = Math.min.apply(
         null,
-        ChinachuService.data.recorded.filter(miyoutvFilter).map(function (a) {
+        recorded.filter(miyoutvFilter).map(function (a) {
           return a.start;
         })
       );
       end = Math.max.apply(
         null,
-        ChinachuService.data.recorded.filter(miyoutvFilter).map(function (a) {
+        recorded.filter(miyoutvFilter).map(function (a) {
           return a.end;
         })
       );
@@ -254,14 +285,14 @@ limitations under the License.
     }
 
     function recordedChannels(filter) {
-      var recorded = ChinachuService.data.recorded.filter(filter || Boolean);
+      var data = recorded.filter(filter || Boolean);
       var channels = [];
       var program;
       var ri;
       var ci;
 
-      for (ri = 0; ri < recorded.length; ri += 1) {
-        program = recorded[ri];
+      for (ri = 0; ri < data.length; ri += 1) {
+        program = data[ri];
         for (ci = 0; ci < channels.length; ci += 1) {
           if (
             program.channel.type === channels[ci].type &&
@@ -278,10 +309,10 @@ limitations under the License.
       return channels;
     }
 
-    function programsFromRecorded(recorded) {
+    function programsFromRecorded() {
       var programs = recorded;
 
-      recorded.forEach(function (a) {
+      programs.forEach(function (a) {
         var program = a;
 
         program.categoryName = ChinachuService.convertCategory(program.category);
@@ -318,13 +349,13 @@ limitations under the License.
 
     function initItem(item) {
       var program = item;
-      var recorded;
+      var recordedProgram;
       var previewPos = 70;
       var commentQuery;
 
       if (program.isArchive) {
         if (!program.isRecorded || (previewEnabled && angular.isUndefined(program.preview))) {
-          recorded = ChinachuService.data.recorded.filter(function (a) {
+          recordedProgram = recorded.filter(function (a) {
             return (
               a.channel.type === program.channel.type &&
               a.channel.sid === program.channel.sid &&
@@ -332,23 +363,23 @@ limitations under the License.
               a.start <= program.start
             );
           })[0];
-          if (recorded) {
-            previewPos += Math.floor((item.start - recorded.start) / 1000);
+          if (recordedProgram) {
+            previewPos += Math.floor((item.start - recordedProgram.start) / 1000);
             program.isRecorded = true;
-            while (recorded.seconds < previewPos) {
+            while (recordedProgram.seconds < previewPos) {
               previewPos = -30;
             }
           }
         }
       } else {
-        recorded = program;
+        recordedProgram = program;
       }
-      if (previewEnabled && angular.isUndefined(program.preview) && recorded) {
-        if (recorded.seconds < previewPos) {
+      if (previewEnabled && angular.isUndefined(program.preview) && recordedProgram) {
+        if (recordedProgram.seconds < previewPos) {
           previewPos = 10;
         }
         ChinachuService
-          .requestPreview(recorded.id, 'png', {
+          .requestPreview(recordedProgram.id, 'png', {
             pos: previewPos,
             size: '160x90'
           }).then(function (value) {
