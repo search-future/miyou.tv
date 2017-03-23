@@ -21,6 +21,7 @@ limitations under the License.
       templateUrl: 'templates/playerInfo.html',
       controller: PlayerInfoCtrl,
       bindings: {
+        recordInfo: '<',
         commentInfo: '<',
         programList: '<'
       }
@@ -29,8 +30,7 @@ limitations under the License.
   function PlayerInfoCtrl(
     $scope,
     CommonService,
-    ChinachuService,
-    ChinachuPlayerService
+    ChinachuService
   ) {
     var $ctrl = this;
 
@@ -39,7 +39,7 @@ limitations under the License.
     $ctrl.programList = [];
 
     $scope.$watch(function () {
-      return ChinachuPlayerService.program;
+      return $ctrl.recordInfo;
     }, function (value) {
       $ctrl.program = {};
       if (value) {

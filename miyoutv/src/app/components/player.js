@@ -165,18 +165,17 @@ limitations under the License.
     $scope.$watch(function () {
       return ChinachuPlayerService.program;
     }, function (value) {
-      var program = value;
-
       $ctrl.commentIntervals = [];
-      if (program) {
+      if (angular.isObject(value)) {
+        $ctrl.program = value;
         $ctrl.title = value.fullTitle;
         $ctrl.channel = value.channel.name;
         $ctrl.commentOptions.offset = value.start - $ctrl.options.commentDelay;
         PlayerService.setScreenText([
-          program.id,
-          program.fullTitle,
-          program.channel.name,
-          CommonService.formatDate(program.start, 'yyyy/MM/dd(EEE) A HHHH:mm:ss')
+          value.id,
+          value.fullTitle,
+          value.channel.name,
+          CommonService.formatDate(value.start, 'yyyy/MM/dd(EEE) A HHHH:mm:ss')
         ].join('\n'), true);
         ChinachuService.request('/archive.json').then(function (response) {
           var programService;
@@ -185,17 +184,16 @@ limitations under the License.
             angular.isObject(response.data) &&
             angular.isArray(response.data.programs)
           ) {
-            programService = ChinachuService.serviceFromLegacy(program.channel);
+            programService = ChinachuService.serviceFromLegacy($ctrl.program.channel);
             $ctrl.programList = response.data.programs.filter(function (a) {
               return (
                 a.networkId === programService.networkId &&
                 a.serviceId === programService.serviceId &&
-                a.startAt < program.end &&
-                a.startAt + a.duration > program.start
+                a.startAt < $ctrl.program.end &&
+                a.startAt + a.duration > $ctrl.program.start
               );
             });
           }
-          program = null;
         });
       }
     });
