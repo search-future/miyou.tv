@@ -94,7 +94,7 @@ limitations under the License.
       }
     };
     $ctrl.playColumn = function (column, $event) {
-      var position = $event.target.scrollTop + $event.offsetY;
+      var position = viewport.scrollTop + $event.offsetY;
       var start = calcTime(position);
       var isRecorded = recorded.some(function (a) {
         return (
