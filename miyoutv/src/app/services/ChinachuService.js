@@ -286,9 +286,9 @@ limitations under the License.
             service.data.recorded = recorded.data;
             service.data.archive = archive.data;
             deferred.resolve(archive);
-          }, function (responce) {
+          }, function (response) {
             service.data.recorded = recorded.data;
-            deferred.reject(responce);
+            deferred.reject(response);
           });
         }, deferred.reject);
       }, deferred.reject, deferred.notify);

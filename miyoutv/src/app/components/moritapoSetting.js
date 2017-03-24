@@ -39,8 +39,8 @@ limitations under the License.
     $ctrl.requestToken = function () {
       CommentService.requestToken($ctrl.email, $ctrl.password).then(function () {
         $ctrl.hasAuthError = false;
-      }, function (responce) {
-        switch (responce.data.EC) {
+      }, function (response) {
+        switch (response.data.EC) {
           case 401:
             $ctrl.hasAuthError = true;
             break;

@@ -71,9 +71,9 @@ limitations under the License.
       var progressModal = CommonService.progressModal('Chinachuに接続中', 'Chinachuからデータを取得しています。');
       ChinachuService.load(true).then(function () {
         progressModal.close();
-      }, function (responce) {
+      }, function (response) {
         progressModal.close();
-        if (responce.status === 404 && /archive\.json$/.test(responce.config.url)) {
+        if (response.status === 404 && /archive\.json$/.test(response.config.url)) {
           toaster.pop(
             'info',
             'MiyouTV Agent',

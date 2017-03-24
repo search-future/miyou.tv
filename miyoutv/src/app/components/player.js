@@ -91,21 +91,21 @@ limitations under the License.
 
     $ctrl.$onInit = function () {
       loadSetting();
-      CommentService.request('channels').then(function (responce) {
+      CommentService.request('channels').then(function (response) {
         if (
-          angular.isObject(responce) &&
-          angular.isObject(responce.data) &&
-          angular.isObject(responce.data.data) &&
-          angular.isArray(responce.data.data.channels)
+          angular.isObject(response) &&
+          angular.isObject(response.data) &&
+          angular.isObject(response.data.data) &&
+          angular.isArray(response.data.data.channels)
         ) {
-          responce.data.data.channels.sort(function (a, b) {
+          response.data.data.channels.sort(function (a, b) {
             var aType = channelOrder.indexOf(a.type.slice(0, 2));
             var aNum = parseInt(a.type.slice(2), 10);
             var bType = channelOrder.indexOf(b.type.slice(0, 2));
             var bNum = parseInt(b.type.slice(2), 10);
             return ((aType - bType) * 100) + (aNum - bNum);
           });
-          $ctrl.commentChannels = responce.data.data.channels;
+          $ctrl.commentChannels = response.data.data.channels;
         }
       });
     };
@@ -142,14 +142,14 @@ limitations under the License.
               end: requestTargets[requestTargets.length - 1].start + 60000,
               channel: $ctrl.commentInfo.query
             }
-          }).then(function (responce) {
+          }).then(function (response) {
             if (
-              angular.isObject(responce) &&
-              angular.isObject(responce.data) &&
-              angular.isObject(responce.data.data) &&
-              angular.isArray(responce.data.data.comments)
+              angular.isObject(response) &&
+              angular.isObject(response.data) &&
+              angular.isObject(response.data.data) &&
+              angular.isArray(response.data.data.comments)
             ) {
-              responce.data.data.comments.forEach(function (a) {
+              response.data.data.comments.forEach(function (a) {
                 var comment = a;
                 comment.text = comment.text.replace(/>>[0-9-,]+\s*/g, '').trim();
                 $ctrl.comments.push(comment);
@@ -263,6 +263,36 @@ limitations under the License.
         PlayerService.setScreenText('コメント非表示');
       }
     });
+    $scope.$watch(function () {
+      return $ctrl.options.commentDuration;
+    }, function (value) {
+      $ctrl.commentOptions.duration = value;
+      saveSetting();
+    });
+    $scope.$watch(function () {
+      return $ctrl.options.commentDelay;
+    }, function (newValue, oldValue) {
+      $ctrl.commentOptions.offset -= newValue - oldValue;
+      saveSetting();
+      if (newValue >= 0) {
+        PlayerService.setScreenText('コメント後退 ' + Math.abs(newValue / 1000) + '秒');
+      } else {
+        PlayerService.setScreenText('コメント前進 ' + Math.abs(newValue / 1000) + '秒');
+      }
+    });
+    $scope.$watch(function () {
+      return $ctrl.options.commentMaxLines;
+    }, function (value) {
+      $ctrl.commentOptions.maxLines = value;
+      saveSetting();
+    });
+    $scope.$watch(function () {
+      return $ctrl.options.commentMaxItems;
+    }, function (value) {
+      $ctrl.commentOptions.maxItems = value;
+      saveSetting();
+    });
+
     $scope.$watchGroup([function () {
       return ChinachuPlayerService.program;
     }, function () {
@@ -386,35 +416,6 @@ limitations under the License.
       }
       enabledThreads = null;
     }, true);
-    $scope.$watch(function () {
-      return $ctrl.options.commentDuration;
-    }, function (value) {
-      $ctrl.commentOptions.duration = value;
-      saveSetting();
-    });
-    $scope.$watch(function () {
-      return $ctrl.options.commentDelay;
-    }, function (newValue, oldValue) {
-      $ctrl.commentOptions.offset -= newValue - oldValue;
-      saveSetting();
-      if (newValue >= 0) {
-        PlayerService.setScreenText('コメント後退 ' + Math.abs(newValue / 1000) + '秒');
-      } else {
-        PlayerService.setScreenText('コメント前進 ' + Math.abs(newValue / 1000) + '秒');
-      }
-    });
-    $scope.$watch(function () {
-      return $ctrl.options.commentMaxLines;
-    }, function (value) {
-      $ctrl.commentOptions.maxLines = value;
-      saveSetting();
-    });
-    $scope.$watch(function () {
-      return $ctrl.options.commentMaxItems;
-    }, function (value) {
-      $ctrl.commentOptions.maxItems = value;
-      saveSetting();
-    });
 
     $scope.$on('Player.EncounteredError', function () {
       PlayerService.stop();

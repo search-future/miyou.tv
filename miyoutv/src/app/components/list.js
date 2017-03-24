@@ -398,16 +398,16 @@ limitations under the License.
             end: item.end,
             limit: 0
           }
-        }).then(function (responce) {
+        }).then(function (response) {
           var commentCount;
           var commentSpeed;
           if (
-            angular.isObject(responce) &&
-            angular.isObject(responce.data) &&
-            angular.isObject(responce.data.data) &&
-            angular.isNumber(responce.data.data.n_hits)
+            angular.isObject(response) &&
+            angular.isObject(response.data) &&
+            angular.isObject(response.data.data) &&
+            angular.isNumber(response.data.data.n_hits)
           ) {
-            commentCount = responce.data.data.n_hits;
+            commentCount = response.data.data.n_hits;
             commentSpeed = (commentCount / (program.seconds / 60));
             switch (countMode) {
               case 'speed':

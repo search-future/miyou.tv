@@ -696,12 +696,12 @@ limitations under the License.
     }
 
     function getCounter(columnIndex) {
-      return function (result) {
+      return function (response) {
         if (
-          angular.isObject(result) &&
-          angular.isObject(result.data) &&
-          angular.isObject(result.data.data) &&
-          angular.isArray(result.data.data.intervals)
+          angular.isObject(response) &&
+          angular.isObject(response.data) &&
+          angular.isObject(response.data.data) &&
+          angular.isArray(response.data.data.intervals)
         ) {
           $ctrl.programs[columnIndex].programs.filter(function (a) {
             return a.enabled && angular.isUndefined(a.count);
@@ -710,7 +710,7 @@ limitations under the License.
             var commentCount = 0;
             var commentSpeed = 0;
 
-            result.data.data.intervals.filter(function (interval) {
+            response.data.data.intervals.filter(function (interval) {
               return interval.start >= program.start && interval.start < program.end;
             }).forEach(function (b) {
               commentCount += b.n_hits;
