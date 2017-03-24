@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-(function () {
+(function (url, http) {
   'use strict';
 
   angular.module('app')
@@ -28,11 +28,11 @@ limitations under the License.
     toaster,
     CommonService,
     PlayerService,
-    ChinachuPlayerService,
     ChinachuService,
     CommentService
   ) {
     var $ctrl = this;
+    var recorded = [];
     var channelOrder = ['gr', 'bs', 'cs'];
 
     $ctrl.mode = 'recorded';
@@ -64,6 +64,8 @@ limitations under the License.
       b: PlayerService.toggleAudioTrack,
       v: PlayerService.toggleSubtitlesTrack,
       m: PlayerService.toggleMute,
+      p: previous,
+      n: next,
       'ctrl+up': function () {
         PlayerService.increaseVolume(5);
       },
@@ -88,9 +90,27 @@ limitations under the License.
     };
     $ctrl.toggleFullscreen = CommonService.toggleFullscreen;
     $ctrl.stop = PlayerService.stop;
+    $ctrl.next = next;
+    $ctrl.previous = previous;
 
     $ctrl.$onInit = function () {
+      var params = $location.search();
       loadSetting();
+      $ctrl.mode = params.mode;
+      switch (params.mode) {
+        case 'recorded':
+          playRecorded(params.id);
+          break;
+        case 'channel':
+          playChannel(
+            params.type,
+            parseInt(params.sid, 10),
+            parseInt(params.start, 10) + $ctrl.options.commentDelay,
+            parseInt(params.end, 10)
+          );
+          break;
+        default:
+      }
       CommentService.request('channels').then(function (response) {
         if (
           angular.isObject(response) &&
@@ -160,41 +180,6 @@ limitations under the License.
             }
           });
         }
-      }
-    });
-    $scope.$watch(function () {
-      return ChinachuPlayerService.program;
-    }, function (value) {
-      $ctrl.commentIntervals = [];
-      if (angular.isObject(value)) {
-        $ctrl.program = value;
-        $ctrl.title = value.fullTitle;
-        $ctrl.channel = value.channel.name;
-        $ctrl.commentOptions.offset = value.start - $ctrl.options.commentDelay;
-        PlayerService.setScreenText([
-          value.id,
-          value.fullTitle,
-          value.channel.name,
-          CommonService.formatDate(value.start, 'yyyy/MM/dd(EEE) A HHHH:mm:ss')
-        ].join('\n'), true);
-        ChinachuService.request('/archive.json').then(function (response) {
-          var programService;
-          if (
-            angular.isObject(response) &&
-            angular.isObject(response.data) &&
-            angular.isArray(response.data.programs)
-          ) {
-            programService = ChinachuService.serviceFromLegacy($ctrl.program.channel);
-            $ctrl.programList = response.data.programs.filter(function (a) {
-              return (
-                a.networkId === programService.networkId &&
-                a.serviceId === programService.serviceId &&
-                a.startAt < $ctrl.program.end &&
-                a.startAt + a.duration > $ctrl.program.start
-              );
-            });
-          }
-        });
       }
     });
     $scope.$watch(function () {
@@ -294,7 +279,7 @@ limitations under the License.
     });
 
     $scope.$watchGroup([function () {
-      return ChinachuPlayerService.program;
+      return $ctrl.program;
     }, function () {
       return $ctrl.commentChannels;
     }], function (values) {
@@ -417,32 +402,151 @@ limitations under the License.
       enabledThreads = null;
     }, true);
 
+    $scope.$on('Player.EndReached', next);
     $scope.$on('Player.EncounteredError', function () {
       PlayerService.stop();
     });
     $scope.$on('Player.Stopped', function () {
       CommonService.back();
     });
-    $scope.$on('Player.Ready', function () {
-      var params = $location.search();
-      $ctrl.mode = params.mode;
-      switch (params.mode) {
-        case 'recorded':
-          ChinachuPlayerService.playRecorded(params.id);
-          break;
-        case 'channel':
-          ChinachuPlayerService.channelStart(
-            params.type,
-            parseInt(params.sid, 10),
-            parseInt(params.start, 10) + $ctrl.options.commentDelay,
-            parseInt(params.end, 10)
-          );
-          $ctrl.mainHotkeys.p = ChinachuPlayerService.channelPrevious;
-          $ctrl.mainHotkeys.n = ChinachuPlayerService.channelNext;
-          break;
-        default:
+
+
+    function playRecorded(id) {
+      var mrl = ChinachuService.getUrl(['/api/recorded', id, 'watch.m2ts?c:v=copy&c:a=copy'].join('/'));
+      $ctrl.program = null;
+      ChinachuService.request(['/api/recorded/', id, '.json'].join('')).then(function (recordedResponse) {
+        if (
+          angular.isObject(recordedResponse) &&
+          angular.isObject(recordedResponse.data)
+        ) {
+          $ctrl.program = recordedResponse.data;
+          $ctrl.title = $ctrl.program.fullTitle;
+          $ctrl.channel = $ctrl.program.channel.name;
+          $ctrl.commentOptions.offset = $ctrl.program.start - $ctrl.options.commentDelay;
+          PlayerService.overwriteLength($ctrl.program.seconds * 1000);
+
+          ChinachuService.request('/archive.json').then(function (archiveResponse) {
+            var programService;
+            if (
+              angular.isObject(archiveResponse) &&
+              angular.isObject(archiveResponse.data) &&
+              angular.isArray(archiveResponse.data.programs)
+            ) {
+              programService = ChinachuService.serviceFromLegacy($ctrl.program.channel);
+              $ctrl.programList = archiveResponse.data.programs.filter(function (a) {
+                return (
+                  a.networkId === programService.networkId &&
+                  a.serviceId === programService.serviceId &&
+                  a.startAt < $ctrl.program.end &&
+                  a.startAt + a.duration > $ctrl.program.start
+                );
+              });
+            }
+          });
+          ChinachuService.request(['/api/recorded', id, 'file.json'].join('/')).then(function (fileResponse) {
+            var fileSize;
+            var chinachuUrl;
+            var request;
+            if (
+              angular.isObject(fileResponse) &&
+              angular.isObject(fileResponse.data)
+            ) {
+              fileSize = fileResponse.data.size;
+              chinachuUrl = url.parse(ChinachuService.getUrl());
+              request = http.request({
+                method: 'GET',
+                protocol: chinachuUrl.protocol,
+                hostname: chinachuUrl.hostname,
+                port: chinachuUrl.port,
+                path: ['/api/recorded', id, 'watch.m2ts?c:v=copy&c:a=copy&ss=10&t=10'].join('/'),
+                auth: chinachuUrl.auth,
+                timeout: 10000
+              }, function (watchResponse) {
+                var streamSize = watchResponse.headers['content-length'];
+                var ms = (fileSize * 10000) / streamSize;
+                PlayerService.overwriteLength(ms);
+                playWithInfo(mrl);
+              });
+              request.on('error', function () {
+                playWithInfo(mrl);
+              });
+              request.end();
+            }
+          }, function () {
+            playWithInfo(mrl);
+          });
+        }
+      });
+    }
+
+    function playWithInfo(mrl) {
+      PlayerService.play(mrl);
+      PlayerService.setScreenText([
+        $ctrl.program.id,
+        $ctrl.program.fullTitle,
+        $ctrl.program.channel.name,
+        CommonService.formatDate($ctrl.program.start, 'yyyy/MM/dd(EEE) A HHHH:mm:ss')
+      ].join('\n'), true);
+    }
+
+    function playChannel(type, sid, start, end) {
+      ChinachuService.request('/api/recorded.json').then(function (response) {
+        var program;
+        if (
+          angular.isObject(response) &&
+          angular.isArray(response.data)
+        ) {
+          response.data.sort(function (a, b) {
+            return a.end - b.end;
+          });
+          recorded = response.data;
+          program = recorded.filter(function (a) {
+            return (
+              a.channel.type === type &&
+              a.channel.sid === sid &&
+              a.end > start &&
+              (!end || a.start < end)
+            );
+          })[0];
+          if (program) {
+            PlayerService.preseekTime(start - program.start);
+            playRecorded(program.id);
+          } else {
+            CommonService.errorModal('Player Error', '録画データが見つかりません。');
+          }
+        } else {
+          CommonService.errorModal('Chinachu Error', '録画データが取得できませんでした。');
+        }
+      }, function () {
+        CommonService.errorModal('Chinachu Error', 'Chinachuとの通信に失敗しました。');
+      });
+    }
+
+    function next() {
+      var program = recorded.filter(function (a) {
+        return (
+          a.channel.type === $ctrl.program.channel.type &&
+          a.channel.sid === $ctrl.program.channel.sid &&
+          a.start >= $ctrl.program.end
+        );
+      })[0];
+      if (program) {
+        playRecorded(program.id);
       }
-    });
+    }
+
+    function previous() {
+      var program = recorded.filter(function (a) {
+        return (
+          a.channel.type === $ctrl.program.channel.type &&
+          a.channel.sid === $ctrl.program.channel.sid &&
+          a.end <= $ctrl.program.start
+        );
+      })[0];
+      if (program) {
+        playRecorded(program.id);
+      }
+    }
 
     function saveSetting() {
       var setting = {
@@ -488,4 +592,4 @@ limitations under the License.
       return query;
     }
   }
-}());
+}(require('url'), require('http')));

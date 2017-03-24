@@ -22,7 +22,9 @@ limitations under the License.
         mode: '=',
         offset: '<',
         chartData: '<',
-        programList: '<'
+        programList: '<',
+        next: '&',
+        previous: '&'
       },
       templateUrl: 'templates/seekbar.html',
       controller: SeekbarCtrl
@@ -31,8 +33,7 @@ limitations under the License.
   function SeekbarCtrl(
     $scope,
     CommonService,
-    PlayerService,
-    ChinachuPlayerService
+    PlayerService
   ) {
     var $ctrl = this;
 
@@ -43,8 +44,6 @@ limitations under the License.
     $ctrl.end = 0;
     $ctrl.isSeeking = false;
 
-    $ctrl.previous = ChinachuPlayerService.channelPrevious;
-    $ctrl.next = ChinachuPlayerService.channelNext;
 
     $ctrl.seek = function (position) {
       if ($ctrl.isSeeking) {

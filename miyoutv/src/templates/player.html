@@ -36,7 +36,7 @@ limitations under the License.
                 </div>
                 <div class="player-control flex-item">
                     <controlbar comment-enabled="$ctrl.commentEnabled" sidebar-collapsed="$ctrl.sidebarCollapsed"></controlbar>
-                    <seekbar mode="$ctrl.mode" offset="$ctrl.commentOptions.offset" chart-data="$ctrl.commentIntervals" program-list="$ctrl.programList"></seekbar>
+                    <seekbar mode="$ctrl.mode" offset="$ctrl.commentOptions.offset" chart-data="$ctrl.commentIntervals" program-list="$ctrl.programList" next="$ctrl.next()" previous="$ctrl.previous()"></seekbar>
                 </div>
             </div>
             <div class="sidebar col-lg-4 col-md-5 col-sm-6 col-xs-12 extend-vertical pick" uib-collapse="$ctrl.sidebarCollapsed" horizontal>
