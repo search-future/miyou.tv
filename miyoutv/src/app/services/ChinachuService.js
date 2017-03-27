@@ -37,31 +37,21 @@ limitations under the License.
       url: url,
       user: user,
       password: password,
-      reloadInterval: reloadInterval,
       previewCacheLifetime: previewCacheLifetime,
       getUrl: getUrl,
       request: request,
       requestAll: requestAll,
       requestPreview: requestPreview,
       requestPreviewNow: requestPreviewNow,
-      load: load,
       convertCategory: convertCategory,
-      firstRecordTime: firstRecordTime,
-      lastRecordTime: lastRecordTime,
-      recordedDates: recordedDates,
-      recordedHours: recordedHours,
-      recordedChannels: recordedChannels,
-      groupBy: groupBy,
       channelFromLegacy: channelFromLegacy,
-      serviceFromLegacy: serviceFromLegacy,
-      generateFilterPattern: generateFilterPattern
+      serviceFromLegacy: serviceFromLegacy
     };
     var props = {
       setting: {
         url: 'http://127.0.0.1:20772',
         user: '',
         password: '',
-        reloadInterval: 300000,
         previewCacheLifetime: 604800000
       },
       previewStack: [],
@@ -83,14 +73,17 @@ limitations under the License.
 
     function initPreviewCache() {
       var time = Date.now();
-      props.previewCache = (CommonService.loadLocalStorage('chinachuPreviews') || []).filter(function (a) {
-        if (time - a.time < previewCacheLifetime()) {
-          return a.key;
-        } else if (angular.isString(a.key)) {
-          CommonService.removeFile('previews', a.key);
-        }
-        return false;
-      });
+      var previewCache = CommonService.loadLocalStorage('chinachuPreviews');
+      if (angular.isArray(previewCache) && previewCache.length > 0) {
+        props.previewCache = [];
+        previewCache.forEach(function (a) {
+          if (time - a.time < previewCacheLifetime()) {
+            props.previewCache.push(a);
+          } else if (angular.isString(a.key)) {
+            CommonService.removeFile('previews', a.key);
+          }
+        });
+      }
     }
 
     function url(value) {
@@ -115,14 +108,6 @@ limitations under the License.
         saveSetting();
       }
       return props.setting.password;
-    }
-
-    function reloadInterval(value) {
-      if (!isNaN(value)) {
-        props.setting.reloadInterval = parseInt(value, 10);
-        saveSetting();
-      }
-      return props.setting.reloadInterval;
     }
 
     function previewCacheLifetime(value) {
@@ -265,36 +250,6 @@ limitations under the License.
       return null;
     }
 
-    function load(clear) {
-      var deferred = $q.defer();
-
-      if (clear) {
-        service.status = {};
-        service.data.recorded = [];
-        service.data.archive = {};
-      }
-      request('/api/status.json', {
-        cache: false
-      }).then(function (status) {
-        service.status = status.data;
-        request('/api/recorded.json', {
-          cache: false
-        }).then(function (recorded) {
-          request('/archive.json', {
-            cache: true
-          }).then(function (archive) {
-            service.data.recorded = recorded.data;
-            service.data.archive = archive.data;
-            deferred.resolve(archive);
-          }, function (response) {
-            service.data.recorded = recorded.data;
-            deferred.reject(response);
-          });
-        }, deferred.reject);
-      }, deferred.reject, deferred.notify);
-      return deferred.promise;
-    }
-
     function convertCategory(category) {
       var matchedCategory = null;
       if (angular.isNumber(category)) {
@@ -308,112 +263,6 @@ limitations under the License.
         matchedCategory = categoryTable[categoryTable.length - 1];
       }
       return matchedCategory;
-    }
-
-    function firstRecordTime(filter) {
-      return Math.min.apply(
-        null,
-        service.data.recorded.filter(filter || Boolean).map(function (a) {
-          return a.start;
-        })
-      );
-    }
-
-    function lastRecordTime(filter) {
-      return Math.max.apply(
-        null,
-        service.data.recorded.filter(filter || Boolean).map(function (a) {
-          return a.end;
-        })
-      );
-    }
-
-    function recordedDates(filter) {
-      var dates = [];
-      var start = new Date(firstRecordTime(filter));
-      var end = new Date(lastRecordTime(filter));
-      var date = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-
-      while (date.getTime() < end.getTime()) {
-        dates.push(new Date(date));
-        date.setDate(date.getDate() + 1);
-      }
-      return dates;
-    }
-
-    function recordedHours(filter) {
-      var hours = [];
-      var start = new Date(firstRecordTime(filter));
-      var end = new Date(lastRecordTime(filter));
-      var hour = new Date(start.getFullYear(), start.getMonth(), start.getDate(), start.getHours());
-
-      while (hour.getTime() < end.getTime()) {
-        hours.push(new Date(hour));
-        hour.setHours(hour.getHours() + 1);
-      }
-      return hours;
-    }
-
-    function recordedChannels(filter) {
-      var recorded = service.data.recorded.filter(filter || Boolean);
-      var channels = [];
-      var program;
-      var ri;
-      var ci;
-
-      for (ri = 0; ri < recorded.length; ri += 1) {
-        program = recorded[ri];
-        for (ci = 0; ci < channels.length; ci += 1) {
-          if (
-            program.channel.type === channels[ci].type &&
-            program.channel.sid === channels[ci].sid
-          ) {
-            channels[ci] = program.channel;
-            break;
-          }
-        }
-        if (ci === channels.length) {
-          channels.push(program.channel);
-        }
-      }
-      channels.sort(function (a, b) {
-        var types = ['EX', 'CS', 'BS', 'GR'];
-        if (a.type !== b.type) {
-          return types.indexOf(b.type) - types.indexOf(a.type);
-        }
-        return parseInt(a.sid, 10) - parseInt(b.sid, 10);
-      });
-      return channels;
-    }
-
-    function groupBy(list, key, reverse) {
-      var result = [];
-      var current = 0;
-      var index = 0;
-
-      list.sort(function (a, b) {
-        if (a[key] > b[key]) {
-          return 1;
-        } else if (a[key] < b[key]) {
-          return -1;
-        }
-        return 0;
-      });
-      if (reverse) {
-        list.reverse();
-      }
-      list.forEach(function (item) {
-        if (current !== item[key]) {
-          current = item[key];
-          index = result.length;
-          result.push({
-            key: current,
-            data: []
-          });
-        }
-        result[index].data.push(item);
-      });
-      return result;
     }
 
     function channelFromLegacy(legacy) {
@@ -446,64 +295,6 @@ limitations under the License.
       return channelFromLegacy(legacy).services.filter(function (a) {
         return a.serviceId === parseInt(legacy.sid, 10);
       })[0];
-    }
-
-    function generateFilterPattern(string) {
-      var query = {
-        channel: {},
-        categoryName: {}
-      };
-      var options = angular.isString(string) ? string.replace('　', ' ') : '';
-      var optionPettern = /([a-z]+): ?("[^"]*"|[^ ]+)?/g;
-      var option;
-      var key;
-      var value;
-
-      option = optionPettern.exec(options);
-      while (option !== null) {
-        key = option[1];
-        value = angular.isString(option[2]) ? option[2].replace(/^"([^"]+)"$/, '$1') : '';
-        switch (key) {
-          case 'ch':
-          case 'channel':
-            query.channel.$ = value;
-            break;
-          case 'chtype':
-          case 'channeltype':
-            query.channel.type = value;
-            break;
-          case 'chnum':
-          case 'channelnum':
-            query.channel.channel = value;
-            break;
-          case 'sid':
-          case 'serviceid':
-            query.channel.sid = value;
-            break;
-          case 'chname':
-          case 'channelname':
-          case 'service':
-          case 'servicename':
-            query.channel.name = value;
-            break;
-          case 'cat':
-          case 'category':
-          case 'genre':
-            query.categoryName.$ = value;
-            break;
-          case 'start':
-            query.start = new Date(value).getTime();
-            break;
-          case 'end':
-            query.end = new Date(value).getTime();
-            break;
-          default:
-            query[key] = value;
-        }
-        option = optionPettern.exec(options);
-      }
-      query.$ = angular.isString(string) ? string.replace(optionPettern, '').trim() : '';
-      return query;
     }
   }
 }());
