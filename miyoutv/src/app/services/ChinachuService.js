@@ -265,14 +265,14 @@ limitations under the License.
       return matchedCategory;
     }
 
-    function channelFromLegacy(legacy) {
+    function channelFromLegacy(legacy, channels) {
       var channel;
 
       if (!angular.isObject(legacy)) {
         return {};
       }
-      if (service.data.archive.channels) {
-        channel = service.data.archive.channels.filter(function (a) {
+      if (angular.isArray(channels)) {
+        channel = channels.filter(function (a) {
           return a.type === legacy.type && a.channel === legacy.channel;
         })[0];
       }
@@ -288,11 +288,11 @@ limitations under the License.
       };
     }
 
-    function serviceFromLegacy(legacy) {
+    function serviceFromLegacy(legacy, channels) {
       if (!angular.isObject(legacy)) {
         return {};
       }
-      return channelFromLegacy(legacy).services.filter(function (a) {
+      return channelFromLegacy(legacy, channels).services.filter(function (a) {
         return a.serviceId === parseInt(legacy.sid, 10);
       })[0];
     }

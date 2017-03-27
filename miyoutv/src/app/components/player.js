@@ -432,7 +432,10 @@ limitations under the License.
               angular.isObject(archiveResponse.data) &&
               angular.isArray(archiveResponse.data.programs)
             ) {
-              programService = ChinachuService.serviceFromLegacy($ctrl.program.channel);
+              programService = ChinachuService.serviceFromLegacy(
+                $ctrl.program.channel,
+                archiveResponse.data.channels
+              );
               $ctrl.programList = archiveResponse.data.programs.filter(function (a) {
                 return (
                   a.networkId === programService.networkId &&

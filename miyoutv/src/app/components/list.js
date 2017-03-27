@@ -253,7 +253,7 @@ limitations under the License.
       );
       for (ci = 0; ci < channels.length; ci += 1) {
         channel = channels[ci];
-        service = ChinachuService.serviceFromLegacy(channel);
+        service = ChinachuService.serviceFromLegacy(channel, archive.channels);
         for (pi = 0; pi < archive.programs.length; pi += 1) {
           item = archive.programs[pi];
           item.start = item.startAt;

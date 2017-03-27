@@ -421,7 +421,7 @@ limitations under the License.
 
       for (ci = 0; ci < channels.length; ci += 1) {
         channel = channels[ci];
-        column = ChinachuService.serviceFromLegacy(channel);
+        column = ChinachuService.serviceFromLegacy(channel, archive.channels);
         column.channel = channel;
         column.style = calcColumnStyle(column);
         column.commentQuery = resolveQuery(channel);
