@@ -31,7 +31,6 @@ limitations under the License.
     ChinachuService
   ) {
     var $ctrl = this;
-    var timer = null;
 
     $ctrl.classes = {};
     $ctrl.hotkeys = {
@@ -63,26 +62,6 @@ limitations under the License.
       return CommonService.isFullscreen();
     }, function (value) {
       $ctrl.classes.fullscreen = value;
-    });
-
-    $scope.$watch(function () {
-      return ChinachuService.getUrl();
-    }, function () {
-      var progressModal = CommonService.progressModal('Chinachuに接続中', 'Chinachuからデータを取得しています。');
-      ChinachuService.load(true).then(function () {
-        progressModal.close();
-      }, function (response) {
-        progressModal.close();
-        if (response.status === 404 && /archive\.json$/.test(response.config.url)) {
-          toaster.pop(
-            'info',
-            'MiyouTV Agent',
-            'データを取得できませんでした。録画情報を使用します。'
-          );
-        } else {
-          chinachuErrorHandler();
-        }
-      });
     });
 
     $scope.$watch(function () {
@@ -131,31 +110,5 @@ limitations under the License.
         );
       });
     });
-
-    $scope.$watch(function () {
-      return CommonService.loadLocalStorage('backendReloadInterval');
-    }, function (value) {
-      var time = angular.isNumber(value) ? value : 300000;
-      if (time > 0) {
-        if (timer) {
-          $interval.cancel(timer);
-        }
-        timer = $interval(function () {
-          ChinachuService.load().catch(chinachuErrorHandler);
-        }, time);
-      }
-    });
-
-    function chinachuErrorHandler() {
-      if (Object.keys(ChinachuService.status).length === 0) {
-        CommonService.errorModal(
-          'Chinachu request error',
-          'Chinachuに接続できませんでした。設定を確認してください。',
-          function () {
-            CommonService.openChinachuSetting();
-          }
-        );
-      }
-    }
   }
 }());
