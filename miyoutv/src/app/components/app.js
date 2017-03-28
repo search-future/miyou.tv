@@ -94,7 +94,7 @@ limitations under the License.
             'Chinachu request error',
             'Chinachuのステータスを確認できませんでした。設定を確認してください。',
             function () {
-              CommonService.openChinachuSetting();
+              CommonService.openBackendSetting();
             }
           );
         }
@@ -103,7 +103,7 @@ limitations under the License.
           'Chinachu request error',
           'Chinachuに接続できませんでした。設定を確認してください。',
           function () {
-            CommonService.openChinachuSetting();
+            CommonService.openBackendSetting();
           }
         );
       });

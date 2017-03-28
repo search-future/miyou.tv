@@ -31,7 +31,7 @@ limitations under the License.
     var $ctrl = this;
     $ctrl.close = CommonService.close;
     $ctrl.openViewSetting = CommonService.openViewSetting;
-    $ctrl.openChinachuSetting = CommonService.openChinachuSetting;
+    $ctrl.openBackendSetting = CommonService.openBackendSetting;
     $ctrl.openMoritapoSetting = CommonService.openMoritapoSetting;
     $ctrl.isCollapsed = true;
     $ctrl.searchText = '';

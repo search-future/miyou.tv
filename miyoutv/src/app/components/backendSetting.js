@@ -17,16 +17,16 @@ limitations under the License.
   'use strict';
 
   angular.module('app')
-    .component('chinachuSetting', {
-      templateUrl: 'templates/chinachuSetting.html',
-      controller: ChinachuSettingCtrl,
+    .component('backendSetting', {
+      templateUrl: 'templates/backendSetting.html',
+      controller: BackendSettingCtrl,
       bindings: {
         close: '&',
         dismiss: '&'
       }
     });
 
-  function ChinachuSettingCtrl(
+  function BackendSettingCtrl(
     $scope,
     ChinachuService
   ) {

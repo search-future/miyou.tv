@@ -48,7 +48,7 @@ limitations under the License.
       errorModal: errorModal,
       progressModal: progressModal,
       openViewSetting: openViewSetting,
-      openChinachuSetting: openChinachuSetting,
+      openBackendSetting: openBackendSetting,
       openMoritapoSetting: openMoritapoSetting
     };
     var props = {
@@ -343,9 +343,9 @@ limitations under the License.
       });
     }
 
-    function openChinachuSetting() {
+    function openBackendSetting() {
       return $uibModal.open({
-        component: 'chinachuSetting',
+        component: 'backendSetting',
         windowClass: 'modal-container'
       });
     }
