@@ -16,6 +16,7 @@
     "angular-bootstrap": "^2.4.0",
     "angular-hotkeys": "chieffancypants/angular-hotkeys#^1.7.0",
     "angular-loading-bar": "^0.9.0",
+    "angular-md5": "^0.1.10",
     "angular-route": "~1.6.1",
     "bootstrap": "^3.3.7",
     "roboto-fontface": "^0.6.1"
