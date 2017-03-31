@@ -129,12 +129,14 @@ limitations under the License.
     }, function () {
       archive = {};
       recorded = [];
+      $ctrl.archiveEnabled = false;
       ChinachuService.request('/archive.json').then(function (archiveResponse) {
         if (
           angular.isObject(archiveResponse) &&
           angular.isObject(archiveResponse.data)
         ) {
           archive = archiveResponse.data;
+          $ctrl.archiveEnabled = true;
         }
         ChinachuService.request('/api/recorded.json').then(function (recordedResponse) {
           if (
@@ -163,10 +165,6 @@ limitations under the License.
     $scope.$watchGroup([function () {
       return $ctrl.source;
     }, function () {
-      return CommonService.loadLocalStorage('hourFirst');
-    }, function () {
-      return CommonService.loadLocalStorage('hourFormat');
-    }, function () {
       return archive;
     }, function () {
       return recorded;
@@ -177,13 +175,8 @@ limitations under the License.
       $ctrl.dates = [];
       $ctrl.hours = [];
 
-      if (archive.programs) {
-        $ctrl.archiveEnabled = true;
-      } else {
-        $ctrl.archiveEnabled = false;
-        if (source === 'archive') {
-          source = 'recorded';
-        }
+      if (!$ctrl.archiveEnabled) {
+        source = 'recorded';
       }
       switch (source) {
         case 'archive':
@@ -223,33 +216,67 @@ limitations under the License.
         ].join(''));
       }
     });
-    $scope.$watchGroup([function () {
+    $scope.$watch(function () {
       return CommonService.loadLocalStorage('countMode');
     }, function () {
-      return CommonService.loadLocalStorage('previewEnabled');
-    }], function (newValues, oldValues) {
-      var countChanged = newValues[0] !== oldValues[0];
-      var ci;
       var column;
-      var ii;
       var item;
-      countMode = newValues[0];
-      previewEnabled = typeof newValues[1] === 'boolean' ? newValues[1] : true;
+      var ci;
+      var ii;
+      for (ci = 0; ci < $ctrl.programs.length; ci += 1) {
+        column = $ctrl.programs[ci];
+        for (ii = 0; ii < column.programs.length; ii += 1) {
+          item = column.programs[ii];
+          delete item.count;
+          item.enabled = false;
+        }
+      }
+      $timeout.cancel(timer);
+      timer = $timeout(updateView, 200);
+    });
+    $scope.$watch(function () {
+      return CommonService.loadLocalStorage('previewEnabled');
+    }, function (value) {
+      var column;
+      var item;
+      var ci;
+      var ii;
+
+      previewEnabled = typeof value === 'boolean' ? value : true;
+      for (ci = 0; ci < $ctrl.programs.length; ci += 1) {
+        column = $ctrl.programs[ci];
+        for (ii = 0; ii < column.programs.length; ii += 1) {
+          item = column.programs[ii];
+          if (!previewEnabled) {
+            delete item.preview;
+          }
+          item.enabled = false;
+        }
+      }
+      $timeout.cancel(timer);
+      timer = $timeout(updateView, 200);
+    });
+    $scope.$watchGroup([function () {
+      return CommonService.loadLocalStorage('hourFirst');
+    }, function () {
+      return CommonService.loadLocalStorage('hourFormat');
+    }], function () {
+      var column;
+      var item;
+      var ci;
+      var ii;
 
       for (ci = 0; ci < $ctrl.programs.length; ci += 1) {
         column = $ctrl.programs[ci];
         for (ii = 0; ii < column.programs.length; ii += 1) {
           item = column.programs[ii];
-          item.enabled = false;
-          if (countChanged) {
-            delete item.count;
-          }
-          if (!previewEnabled) {
-            delete item.preview;
-          }
+          item.displayTime = CommonService.formatDate(item.start, 'A HHHH:mm');
         }
       }
-
+      $ctrl.hours.forEach(function (a) {
+        var hour = a;
+        hour.hour = CommonService.convertHour(hour.time);
+      });
       $timeout.cancel(timer);
       timer = $timeout(updateView, 200);
     });
