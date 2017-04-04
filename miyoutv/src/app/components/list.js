@@ -91,30 +91,23 @@ limitations under the License.
     }, function () {
       archive = {};
       recorded = [];
-      ChinachuService.request('/archive.json').then(function (archiveResponse) {
+      ChinachuService.request('/archive.json').then(function (response) {
         if (
-          angular.isObject(archiveResponse) &&
-          angular.isObject(archiveResponse.data)
+          angular.isObject(response) &&
+          angular.isObject(response.data)
         ) {
-          archive = archiveResponse.data;
+          archive = response.data;
         }
-        ChinachuService.request('/api/recorded.json').then(function (recordedResponse) {
-          if (
-            angular.isObject(recordedResponse) &&
-            angular.isArray(recordedResponse.data)
-          ) {
-            recorded = recordedResponse.data;
-          }
-        });
+        return ChinachuService.request('/api/recorded.json');
       }, function () {
-        ChinachuService.request('/api/recorded.json').then(function (recordedResponse) {
-          if (
-            angular.isObject(recordedResponse) &&
-            angular.isArray(recordedResponse.data)
-          ) {
-            recorded = recordedResponse.data;
-          }
-        });
+        return ChinachuService.request('/api/recorded.json');
+      }).then(function (response) {
+        if (
+          angular.isObject(response) &&
+          angular.isArray(response.data)
+        ) {
+          recorded = response.data;
+        }
       });
     });
     $scope.$watch(function () {
