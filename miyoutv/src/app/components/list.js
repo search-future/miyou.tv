@@ -141,29 +141,46 @@ limitations under the License.
     }, function (value) {
       $ctrl.source = value || 'archive';
     });
-    $scope.$watchGroup([function () {
+    $scope.$watch(function () {
       return CommonService.loadLocalStorage('countMode');
     }, function () {
-      return CommonService.loadLocalStorage('previewEnabled');
-    }], function (newValues, oldValues) {
-      var countChanged = newValues[0] !== oldValues[0];
-      countMode = newValues[0];
-      previewEnabled = typeof newValues[1] === 'boolean' ? newValues[1] : true;
-
       $ctrl.programs.forEach(function (a) {
         var program = a;
+        delete program.count;
         program.enabled = false;
-        if (countChanged) {
-          delete program.count;
-        }
-        if (!previewEnabled) {
-          delete program.preview;
-        }
       });
-
       $timeout.cancel(timer);
       timer = $timeout(updateView, 200);
     });
+    $scope.$watch(function () {
+      return CommonService.loadLocalStorage('previewEnabled');
+    }, function (value) {
+      previewEnabled = typeof value === 'boolean' ? value : true;
+
+      $ctrl.programs.forEach(function (a) {
+        var program = a;
+        if (!previewEnabled) {
+          delete program.preview;
+        }
+        program.enabled = false;
+      });
+      $timeout.cancel(timer);
+      timer = $timeout(updateView, 200);
+    });
+    $scope.$watchGroup([function () {
+      return CommonService.loadLocalStorage('hourFirst');
+    }, function () {
+      return CommonService.loadLocalStorage('hourFormat');
+    }], function () {
+      $ctrl.programs.forEach(function (a) {
+        var program = a;
+        program.displayTime = CommonService.formatDate(program.start, 'A HHHH:mm');
+        program.enabled = false;
+      });
+      $timeout.cancel(timer);
+      timer = $timeout(updateView, 200);
+    });
+
     $scope.$watchGroup([function () {
       return $location.search().order;
     }, function () {
