@@ -52,13 +52,14 @@ limitations under the License.
     }
 
     function resolveChannel(channel) {
-      return channel.name
+      var name = angular.isObject(channel) ? channel.name : String(channel);
+      return name
         .replace(/[０-９Ａ-Ｚａ-ｚ：-？￥＄％-＊]/g, function (s) {
           return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
         })
         .replace('　', ' ')
         .replace('!', '')
-        .replace(/^(NHK[^0-9]+[0-9]).*$/, '$1')
+        .replace(/^(NHK[^0-9 ]+[0-9 ]).*$/, '$1')
         .replace(/^([^0-9]+)[0-9]$/, '$1')
         .replace(/(◆.+|・[0-9]+)$/, '')
         .replace(/HD$/, '')
