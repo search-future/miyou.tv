@@ -420,6 +420,7 @@ limitations under the License.
           angular.isObject(recordedResponse.data)
         ) {
           $ctrl.program = recordedResponse.data;
+          $ctrl.program.categoryName = ChinachuService.convertCategory($ctrl.program.category);
           $ctrl.title = $ctrl.program.fullTitle;
           $ctrl.channel = $ctrl.program.channel.name;
           $ctrl.commentOptions.offset = $ctrl.program.start - $ctrl.options.commentDelay;

@@ -29,8 +29,7 @@ limitations under the License.
 
   function PlayerInfoCtrl(
     $scope,
-    CommonService,
-    ChinachuService
+    CommonService
   ) {
     var $ctrl = this;
 
@@ -47,7 +46,7 @@ limitations under the License.
         $ctrl.program.channel = value.channel.name;
         $ctrl.program.start = value.start;
         $ctrl.program.end = value.end;
-        $ctrl.program.category = ChinachuService.convertCategory(value.category).localeName;
+        $ctrl.program.category = value.categoryName.localeName;
         $ctrl.program.title = value.fullTitle;
         $ctrl.program.episode = value.episode;
         $ctrl.program.detail = value.detail;
