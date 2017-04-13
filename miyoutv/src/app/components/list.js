@@ -41,6 +41,7 @@ limitations under the License.
     var timer;
     var countMode = 'speed';
     var previewEnabled = true;
+    var reloader;
 
     $ctrl.programs = [];
     $ctrl.source = 'archive';
@@ -48,6 +49,10 @@ limitations under the License.
     $ctrl.archiveEnabled = false;
     $ctrl.filterEnabled = false;
     $ctrl.baseHeight = 125;
+
+    $ctrl.$onDestroy = function () {
+      $timeout.cancel(reloader);
+    };
 
     $ctrl.search = function (value) {
       $location.search('search', value);
@@ -223,6 +228,8 @@ limitations under the License.
       }
     });
 
+    reloader = $timeout(reload, 300000);
+
     angular.element(viewport).on('scroll', function (e) {
       $location.search('y', e.target.scrollTop);
       $timeout.cancel(timer);
@@ -232,6 +239,21 @@ limitations under the License.
       $timeout.cancel(timer);
       timer = $timeout(updateView, 200);
     });
+
+    function reload() {
+      ChinachuService.request('/api/recorded.json', {
+        cache: false
+      }).then(function (response) {
+        if (
+          angular.isObject(response) &&
+          angular.isArray(response.data)
+        ) {
+          recorded = response.data;
+        }
+      });
+      $timeout.cancel(reloader);
+      reloader = $timeout(reload, 300000);
+    }
 
     function miyoutvFilter(a) {
       return a.isMiyoutvReserved;
