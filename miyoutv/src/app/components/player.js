@@ -25,6 +25,7 @@ limitations under the License.
   function PlayerCtrl(
     $scope,
     $location,
+    $timeout,
     toaster,
     CommonService,
     PlayerService,
@@ -34,6 +35,7 @@ limitations under the License.
     var $ctrl = this;
     var recorded = [];
     var channelOrder = ['gr', 'bs', 'cs'];
+    var reloader;
 
     $ctrl.mode = 'recorded';
     $ctrl.title = '';
@@ -128,6 +130,9 @@ limitations under the License.
           $ctrl.commentChannels = response.data.data.channels;
         }
       });
+    };
+    $ctrl.$onDestroy = function () {
+      $timeout.cancel(reloader);
     };
 
     $scope.$watch(function () {
@@ -524,6 +529,22 @@ limitations under the License.
       }, function () {
         CommonService.errorModal('Chinachu Error', 'Chinachuとの通信に失敗しました。');
       });
+      reloader = $timeout(reload, 300000);
+    }
+
+    function reload() {
+      ChinachuService.request('/api/recorded.json', {
+        cache: false
+      }).then(function (response) {
+        if (
+          angular.isObject(response) &&
+          angular.isArray(response.data)
+        ) {
+          recorded = response.data;
+        }
+      });
+      $timeout.cancel(reloader);
+      reloader = $timeout(reload, 300000);
     }
 
     function next() {
