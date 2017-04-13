@@ -361,9 +361,10 @@ limitations under the License.
       var start;
       var end;
       var currentTime;
+      var hourFirst = angular.isNumber(CommonService.loadLocalStorage('hourFirst')) ? CommonService.loadLocalStorage('hourFirst') : 4;
 
       date = new Date(time);
-      date.setHours(CommonService.loadLocalStorage('hourFirst'));
+      date.setHours(hourFirst);
       date.setMinutes(0);
       date.setSeconds(0);
       date.setMilliseconds(0);
