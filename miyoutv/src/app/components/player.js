@@ -336,16 +336,16 @@ limitations under the License.
             interval: '1m',
             fill: 1
           }
-        }).then(function (result) {
+        }).then(function (response) {
           if (
-            angular.isObject(result) &&
-            angular.isObject(result.data) &&
-            angular.isObject(result.data.data) &&
-            angular.isArray(result.data.data.intervals)
+            angular.isObject(response) &&
+            angular.isObject(response.data) &&
+            angular.isObject(response.data.data) &&
+            angular.isArray(response.data.data.intervals)
 
           ) {
-            $ctrl.commentIntervals = result.data.data.intervals;
-            $ctrl.commentInfo.count = result.data.data.n_hits;
+            $ctrl.commentIntervals = response.data.data.intervals;
+            $ctrl.commentInfo.count = response.data.data.n_hits;
           }
         });
       }
