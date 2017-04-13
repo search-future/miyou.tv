@@ -24,8 +24,6 @@ limitations under the License.
 
   function AppCtrl(
     $scope,
-    $location,
-    $interval,
     toaster,
     CommonService,
     ChinachuService
