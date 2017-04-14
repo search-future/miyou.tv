@@ -576,6 +576,12 @@ Components
   top: 100px;
 }
 
+/* Loading bar */
+
+#loading-bar-spinner {
+  left: 50%;
+  top: 50%;
+}
 
 /* Quick search */
 

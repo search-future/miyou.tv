@@ -166,7 +166,8 @@ limitations under the License.
               start: requestTargets[0].start,
               end: requestTargets[requestTargets.length - 1].start + 60000,
               channel: $ctrl.commentInfo.query
-            }
+            },
+            ignoreLoadingBar: true
           }).then(function (response) {
             if (
               angular.isObject(response) &&
