@@ -157,7 +157,7 @@ global.module.paths.push(modulePath);
       $window.resizeTo(windowState.width, windowState.height);
     }
   }
-  angular.module('app', ['ngAnimate', 'ngRoute', 'ui.bootstrap', 'agGrid', 'cfp.hotkeys', 'toaster'])
+  angular.module('app', ['ngAnimate', 'ngRoute', 'ui.bootstrap', 'agGrid', 'cfp.hotkeys', 'toaster', 'angular-loading-bar'])
     .constant('commentUrl', commentUrl)
     .constant('commentTokenUrl', commentTokenUrl)
     .constant('categoryTable', categoryTable)
