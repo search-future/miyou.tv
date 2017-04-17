@@ -36,6 +36,14 @@ limitations under the License.
     $ctrl.chinachuPassword = '';
     $ctrl.chinachuAuth = false;
 
+    $ctrl.$onInit = function () {
+      $ctrl.chinachuUrl = ChinachuService.url();
+      $ctrl.chinachuUser = ChinachuService.user();
+      $ctrl.chinachuPassword = ChinachuService.password();
+      if ($ctrl.chinachuUser || $ctrl.chinachuPassword) {
+        $ctrl.chinachuAuth = true;
+      }
+    };
     $ctrl.ok = function () {
       ChinachuService.url($ctrl.chinachuUrl);
       ChinachuService.user($ctrl.chinachuAuth ? $ctrl.chinachuUser : '');
@@ -45,27 +53,5 @@ limitations under the License.
     $ctrl.cancel = function () {
       $ctrl.dismiss();
     };
-
-    $scope.$watch(function () {
-      return ChinachuService.url();
-    }, function (value) {
-      $ctrl.chinachuUrl = value;
-    });
-    $scope.$watch(function () {
-      return ChinachuService.user();
-    }, function (value) {
-      if (value) {
-        $ctrl.chinachuAuth = true;
-      }
-      $ctrl.chinachuUser = value;
-    });
-    $scope.$watch(function () {
-      return ChinachuService.password();
-    }, function (value) {
-      if (value) {
-        $ctrl.chinachuAuth = true;
-      }
-      $ctrl.chinachuPassword = value;
-    });
   }
 }());
