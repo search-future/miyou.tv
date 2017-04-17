@@ -26,7 +26,8 @@ limitations under the License.
     $scope,
     toaster,
     CommonService,
-    ChinachuService
+    ChinachuService,
+    garaponDevId
   ) {
     var $ctrl = this;
 
@@ -55,6 +56,14 @@ limitations under the License.
       limit: 5,
       'position-class': 'toast-top-right'
     };
+
+    $scope.$watch(function () {
+      return garaponDevId;
+    }, function (value) {
+      if (!value) {
+        CommonService.saveLocalStorage('backendType', 'chinachu');
+      }
+    });
 
     $scope.$watch(function () {
       return CommonService.isFullscreen();

@@ -28,26 +28,53 @@ limitations under the License.
 
   function BackendSettingCtrl(
     $scope,
-    ChinachuService
+    CommonService,
+    ChinachuService,
+    garaponDevId
   ) {
     var $ctrl = this;
+    $ctrl.backendType = 'chinachu';
+    $ctrl.garaponEnabled = false;
     $ctrl.chinachuUrl = '';
     $ctrl.chinachuUser = '';
     $ctrl.chinachuPassword = '';
     $ctrl.chinachuAuth = false;
+    $ctrl.garaponAuth = true;
+    $ctrl.garaponUrl = '';
+    $ctrl.garaponUser = '';
+    $ctrl.garaponPassword = '';
 
     $ctrl.$onInit = function () {
+      $ctrl.garaponEnabled = !!garaponDevId;
+      $ctrl.backendType = CommonService.loadLocalStorage('backendType') || 'chinachu';
       $ctrl.chinachuUrl = ChinachuService.url();
       $ctrl.chinachuUser = ChinachuService.user();
       $ctrl.chinachuPassword = ChinachuService.password();
       if ($ctrl.chinachuUser || $ctrl.chinachuPassword) {
         $ctrl.chinachuAuth = true;
       }
+
+      $ctrl.garaponAuth = CommonService.loadLocalStorage('garaponAuth');
+      $ctrl.garaponUrl = CommonService.loadLocalStorage('garaponUrl') || '';
+      $ctrl.garaponUser = CommonService.loadLocalStorage('garaponUser') || '';
+      $ctrl.garaponPassword = CommonService.loadLocalStorage('garaponPassword') || '';
+      if (typeof $ctrl.garaponAuth !== 'boolean') {
+        $ctrl.garaponAuth = true;
+      }
     };
     $ctrl.ok = function () {
-      ChinachuService.url($ctrl.chinachuUrl);
-      ChinachuService.user($ctrl.chinachuAuth ? $ctrl.chinachuUser : '');
-      ChinachuService.password($ctrl.chinachuAuth ? $ctrl.chinachuPassword : '');
+      CommonService.saveLocalStorage('backendType', $ctrl.backendType);
+      if ($ctrl.backendType === 'chinachu') {
+        ChinachuService.url($ctrl.chinachuUrl);
+        ChinachuService.user($ctrl.chinachuAuth ? $ctrl.chinachuUser : '');
+        ChinachuService.password($ctrl.chinachuAuth ? $ctrl.chinachuPassword : '');
+      }
+      if ($ctrl.backendType === 'garapon') {
+        CommonService.saveLocalStorage('garaponAuth', $ctrl.garaponAuth);
+        CommonService.saveLocalStorage('garaponUrl', $ctrl.garaponAuth ? '' : $ctrl.garaponUrl);
+        CommonService.saveLocalStorage('garaponUser', $ctrl.garaponUser);
+        CommonService.saveLocalStorage('garaponPassword', $ctrl.garaponPassword);
+      }
       $ctrl.close();
     };
     $ctrl.cancel = function () {
