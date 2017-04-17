@@ -31,15 +31,15 @@ limitations under the License.
     ChinachuService
   ) {
     var $ctrl = this;
-    $ctrl.url = '';
-    $ctrl.user = '';
-    $ctrl.password = '';
-    $ctrl.auth = false;
+    $ctrl.chinachuUrl = '';
+    $ctrl.chinachuUser = '';
+    $ctrl.chinachuPassword = '';
+    $ctrl.chinachuAuth = false;
 
     $ctrl.ok = function () {
-      ChinachuService.url($ctrl.url);
-      ChinachuService.user($ctrl.auth ? $ctrl.user : '');
-      ChinachuService.password($ctrl.auth ? $ctrl.password : '');
+      ChinachuService.url($ctrl.chinachuUrl);
+      ChinachuService.user($ctrl.chinachuAuth ? $ctrl.chinachuUser : '');
+      ChinachuService.password($ctrl.chinachuAuth ? $ctrl.chinachuPassword : '');
       $ctrl.close();
     };
     $ctrl.cancel = function () {
@@ -49,23 +49,23 @@ limitations under the License.
     $scope.$watch(function () {
       return ChinachuService.url();
     }, function (value) {
-      $ctrl.url = value;
+      $ctrl.chinachuUrl = value;
     });
     $scope.$watch(function () {
       return ChinachuService.user();
     }, function (value) {
       if (value) {
-        $ctrl.auth = true;
+        $ctrl.chinachuAuth = true;
       }
-      $ctrl.user = value;
+      $ctrl.chinachuUser = value;
     });
     $scope.$watch(function () {
       return ChinachuService.password();
     }, function (value) {
       if (value) {
-        $ctrl.auth = true;
+        $ctrl.chinachuAuth = true;
       }
-      $ctrl.password = value;
+      $ctrl.chinachuPassword = value;
     });
   }
 }());

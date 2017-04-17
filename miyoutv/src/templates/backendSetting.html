@@ -15,17 +15,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <meta charset="UTF-8">
-<form class="backend-setting modal-component" name="chinachu">
+<form class="backend-setting modal-component" name="backend">
     <div class="modal-header">
         <div class="modal-title">Chinachu 接続設定</div>
     </div>
     <div class="modal-body">
         <div class="form-horizontal">
-            <div class="form-group has-feedback" ng-class="{'has-success': chinachu.url.$valid, 'has-warning': chinachu.url.$invalid}">
+            <div class="form-group has-feedback" ng-class="{'has-success': backend.chinachu_url.$valid, 'has-warning': backend.chinachu_url.$invalid}">
                 <label class="col-sm-3 control-label" for="chinachu-url">URL</label>
                 <div class="col-sm-9">
-                    <input id="chinachu-url" class="form-control" name="url" type="url" placeholder="http://127.0.0.1:10772" required ng-model="$ctrl.url">
-                    <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok': chinachu.url.$valid, 'glyphicon-warning-sign': chinachu.url.$invalid}"></span>
+                    <input id="chinachu-url" class="form-control" name="chinachu_url" type="url" placeholder="http://127.0.0.1:10772" required ng-model="$ctrl.chinachuUrl">
+                    <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok': backend.chinachu_url.$valid, 'glyphicon-warning-sign': backend.chinachu_url.$invalid}"></span>
                 </div>
             </div>
             <div class="form-group">
@@ -33,23 +33,23 @@ limitations under the License.
                 <div class="col-sm-9">
                     <div class="checkbox">
                         <label>
-                        <input id="chinachu-auth" name="auth" type="checkbox" ng-model="$ctrl.auth"> ユーザー名とパスワードを使用する
+                        <input id="chinachu-auth" name="chinachu_auth" type="checkbox" ng-model="$ctrl.chinachuAuth"> ユーザー名とパスワードを使用する
                     </label>
                     </div>
                 </div>
             </div>
-            <div class="form-group has-feedback" ng-class="{'has-success': chinachu.user.$valid, 'has-warning': chinachu.user.$invalid}" ng-show="$ctrl.auth">
+            <div class="form-group has-feedback" ng-class="{'has-success': backend.chinachu_user.$valid, 'has-warning': backend.chinachu_user.$invalid}" ng-show="$ctrl.chinachuAuth">
                 <label class="col-sm-3 control-label" for="chinachu-user">ユーザー</label>
                 <div class="col-sm-9">
-                    <input id="chinachu-user" class="form-control" name="user" type="text" ng-model="$ctrl.user" ng-required="$ctrl.auth" ng-disabled="!$ctrl.auth">
-                    <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok': chinachu.user.$valid, 'glyphicon-warning-sign': chinachu.user.$invalid}"></span>
+                    <input id="chinachu-user" class="form-control" name="chinachu_user" type="text" ng-model="$ctrl.chinachuUser" ng-required="$ctrl.chinachuAuth" ng-disabled="!$ctrl.chinachuAuth">
+                    <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok': backend.chinachu_user.$valid, 'glyphicon-warning-sign': backend.chinachu_user.$invalid}"></span>
                 </div>
             </div>
-            <div class="form-group has-feedback" ng-class="{'has-success': chinachu.password.$valid, 'has-warning': chinachu.password.$invalid}" ng-show="$ctrl.auth">
+            <div class="form-group has-feedback" ng-class="{'has-success': backend.chinachu_password.$valid, 'has-warning': backend.chinachu_password.$invalid}" ng-show="$ctrl.chinachuAuth">
                 <label class="col-sm-3 control-label" for="chinachu-password">パスワード</label>
                 <div class="col-sm-9">
-                    <input id="chinachu-password" class="form-control" name="password" type="password" ng-model="$ctrl.password" ng-required="$ctrl.auth" ng-disabled="!$ctrl.auth">
-                    <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok': chinachu.password.$valid, 'glyphicon-warning-sign': chinachu.password.$invalid}"></span>
+                    <input id="chinachu-password" class="form-control" name="chinachu_password" type="password" ng-model="$ctrl.chinachuPassword" ng-required="$ctrl.chinachuAuth" ng-disabled="!$ctrl.chinachuAuth">
+                    <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok': backend.chinachu_password.$valid, 'glyphicon-warning-sign': backend.chinachu_password.$invalid}"></span>
                 </div>
             </div>
         </div>
