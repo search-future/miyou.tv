@@ -30,12 +30,14 @@ limitations under the License.
     CommonService,
     PlayerService,
     ChinachuService,
+    GaraponService,
     CommentService
   ) {
     var $ctrl = this;
+    var backendType;
     var recorded = [];
     var channelOrder = ['gr', 'bs', 'cs'];
-    var reloader;
+    var updater;
 
     $ctrl.mode = 'recorded';
     $ctrl.title = '';
@@ -96,43 +98,20 @@ limitations under the License.
     $ctrl.previous = previous;
 
     $ctrl.$onInit = function () {
-      var params = $location.search();
+      backendType = CommonService.loadLocalStorage('backendType');
       loadSetting();
-      $ctrl.mode = params.mode;
-      switch (params.mode) {
-        case 'recorded':
-          playRecorded(params.id);
+      switch (backendType) {
+        case 'garapon':
+          initGarapon();
           break;
-        case 'channel':
-          playChannel(
-            params.type,
-            parseInt(params.sid, 10),
-            parseInt(params.start, 10) + $ctrl.options.commentDelay,
-            parseInt(params.end, 10)
-          );
-          break;
+        case 'chinachu':
         default:
+          initChinachu();
       }
-      CommentService.request('channels').then(function (response) {
-        if (
-          angular.isObject(response) &&
-          angular.isObject(response.data) &&
-          angular.isObject(response.data.data) &&
-          angular.isArray(response.data.data.channels)
-        ) {
-          response.data.data.channels.sort(function (a, b) {
-            var aType = channelOrder.indexOf(a.type.slice(0, 2));
-            var aNum = parseInt(a.type.slice(2), 10);
-            var bType = channelOrder.indexOf(b.type.slice(0, 2));
-            var bNum = parseInt(b.type.slice(2), 10);
-            return ((aType - bType) * 100) + (aNum - bNum);
-          });
-          $ctrl.commentChannels = response.data.data.channels;
-        }
-      });
     };
     $ctrl.$onDestroy = function () {
-      $timeout.cancel(reloader);
+      GaraponService.cancelRequests();
+      $timeout.cancel(updater);
     };
 
     $scope.$watch(function () {
@@ -416,8 +395,114 @@ limitations under the License.
       CommonService.back();
     });
 
+    function initChinachu() {
+      ChinachuService.request('/api/recorded.json').then(function (response) {
+        if (
+          angular.isObject(response) &&
+          angular.isArray(response.data)
+        ) {
+          response.data.sort(function (a, b) {
+            return a.end - b.end;
+          });
+          recorded = response.data;
+        } else {
+          CommonService.errorModal('Chinachu Error', '録画データが取得できませんでした。');
+        }
+      }).then(init, function () {
+        CommonService.errorModal('Chinachu Error', 'Chinachuとの通信に失敗しました。');
+      });
+      updater = $timeout(updateChinachu, 300000);
+    }
+
+    function updateChinachu() {
+      ChinachuService.request('/api/recorded.json', {
+        cache: false
+      }).then(function (response) {
+        if (
+          angular.isObject(response) &&
+          angular.isArray(response.data)
+        ) {
+          response.data.sort(function (a, b) {
+            return a.end - b.end;
+          });
+          recorded = response.data;
+        } else {
+          CommonService.errorModal('Chinachu Error', '録画データが取得できませんでした。');
+        }
+      });
+      $timeout.cancel(updater);
+      updater = $timeout(updateChinachu, 300000);
+    }
+
+    function initGarapon() {
+      var auth = CommonService.loadLocalStorage('garaponAuth');
+      var backend = CommonService.loadLocalStorage('garaponUrl');
+      var user = CommonService.loadLocalStorage('garaponUser');
+      var password = CommonService.loadLocalStorage('garaponPassword');
+      var promise;
+      if (user && password) {
+        GaraponService.user(user);
+        GaraponService.password(password);
+        if (auth || !backend) {
+          promise = GaraponService.loadBackend().then(function () {
+            return GaraponService.login();
+          });
+        } else {
+          GaraponService.backend(backend);
+          promise = GaraponService.login();
+        }
+        promise.then(init);
+      }
+    }
+
+    function init() {
+      var params = $location.search();
+      $ctrl.mode = params.mode;
+      switch (params.mode) {
+        case 'recorded':
+          playRecorded(params.id);
+          break;
+        case 'channel':
+          playChannel(
+            params.type,
+            parseInt(params.sid, 10),
+            parseInt(params.start, 10) + $ctrl.options.commentDelay,
+            parseInt(params.end, 10)
+          );
+          break;
+        default:
+      }
+      CommentService.request('channels').then(function (response) {
+        if (
+          angular.isObject(response) &&
+          angular.isObject(response.data) &&
+          angular.isObject(response.data.data) &&
+          angular.isArray(response.data.data.channels)
+        ) {
+          response.data.data.channels.sort(function (a, b) {
+            var aType = channelOrder.indexOf(a.type.slice(0, 2));
+            var aNum = parseInt(a.type.slice(2), 10);
+            var bType = channelOrder.indexOf(b.type.slice(0, 2));
+            var bNum = parseInt(b.type.slice(2), 10);
+            return ((aType - bType) * 100) + (aNum - bNum);
+          });
+          $ctrl.commentChannels = response.data.data.channels;
+        }
+      });
+    }
 
     function playRecorded(id) {
+      switch (backendType) {
+        case 'garapon':
+          playGarapon(id);
+          break;
+        case 'chinachu':
+        default:
+          playChinachu(id);
+      }
+    }
+
+    function playChinachu(id) {
       var mrl = ChinachuService.getUrl(['/api/recorded', id, 'watch.m2ts?c:v=copy&c:a=copy'].join('/'));
       $ctrl.program = null;
       ChinachuService.request(['/api/recorded/', id, '.json'].join('')).then(function (recordedResponse) {
@@ -489,27 +574,76 @@ limitations under the License.
       });
     }
 
+    function playGarapon(id) {
+      GaraponService.request('search', {
+        data: {
+          gtvid: id
+        }
+      }, false).then(function (response) {
+        var mrl = GaraponService.getStreamUrl(id);
+        var program;
+        if (
+          angular.isObject(response) &&
+          angular.isObject(response.data) &&
+          angular.isArray(response.data.program) &&
+          angular.isObject(response.data.program[0])
+        ) {
+          program = response.data.program[0];
+          $ctrl.program = program;
+          $ctrl.program.channel = {
+            type: program.gtvid.slice(0, 2),
+            sid: program.ch,
+            name: program.bc
+          };
+          $ctrl.program.start = GaraponService.convertDate(program.startdate);
+          $ctrl.program.end = program.start + GaraponService.convertDuration(program.duration);
+          $ctrl.program.seconds = GaraponService.convertDuration(program.duration) / 1000;
+          $ctrl.program.categoryName = GaraponService.convertCategory(program.genre[0]);
+          $ctrl.title = program.title;
+          $ctrl.channel = program.bc;
+          $ctrl.commentOptions.offset = $ctrl.program.start - $ctrl.options.commentDelay;
+          PlayerService.overwriteLength(GaraponService.convertDuration(program.duration));
+          playWithInfo(mrl);
+        }
+        PlayerService.play(mrl);
+      });
+    }
+
     function playWithInfo(mrl) {
       PlayerService.play(mrl);
       PlayerService.setScreenText([
         $ctrl.program.id,
-        $ctrl.program.fullTitle,
-        $ctrl.program.channel.name,
+        $ctrl.title,
+        $ctrl.channel,
         CommonService.formatDate($ctrl.program.start, 'yyyy/MM/dd(EEE) A HHHH:mm:ss')
       ].join('\n'), true);
     }
 
     function playChannel(type, sid, start, end) {
-      ChinachuService.request('/api/recorded.json').then(function (response) {
-        var program;
-        if (
-          angular.isObject(response) &&
-          angular.isArray(response.data)
-        ) {
-          response.data.sort(function (a, b) {
-            return a.end - b.end;
+      var program;
+      switch (backendType) {
+        case 'garapon':
+          GaraponService.request('search', {
+            data: {
+              n: 1,
+              ch: sid,
+              dt: 'e',
+              sdate: CommonService.formatDate(start, 'yyyy-MM-dd HH:mm:ss'),
+              sort: 'sta'
+            }
+          }).then(function (response) {
+            if (
+              angular.isObject(response) &&
+              angular.isObject(response.data) &&
+              angular.isArray(response.data.program) &&
+              angular.isObject(response.data.program[0])
+            ) {
+              playRecorded(response.data.program[0].gtvid);
+            }
           });
-          recorded = response.data;
+          break;
+        case 'chinachu':
+        default:
           program = recorded.filter(function (a) {
             return (
               a.channel.type === type &&
@@ -524,53 +658,82 @@ limitations under the License.
           } else {
             CommonService.errorModal('Player Error', '録画データが見つかりません。');
           }
-        } else {
-          CommonService.errorModal('Chinachu Error', '録画データが取得できませんでした。');
-        }
-      }, function () {
-        CommonService.errorModal('Chinachu Error', 'Chinachuとの通信に失敗しました。');
-      });
-      reloader = $timeout(reload, 300000);
-    }
-
-    function reload() {
-      ChinachuService.request('/api/recorded.json', {
-        cache: false
-      }).then(function (response) {
-        if (
-          angular.isObject(response) &&
-          angular.isArray(response.data)
-        ) {
-          recorded = response.data;
-        }
-      });
-      $timeout.cancel(reloader);
-      reloader = $timeout(reload, 300000);
+      }
     }
 
     function next() {
-      var program = recorded.filter(function (a) {
-        return (
-          a.channel.type === $ctrl.program.channel.type &&
-          a.channel.sid === $ctrl.program.channel.sid &&
-          a.start >= $ctrl.program.end
-        );
-      })[0];
-      if (program) {
-        playRecorded(program.id);
+      var program;
+      switch (backendType) {
+        case 'garapon':
+          GaraponService.request('search', {
+            data: {
+              n: 1,
+              ch: $ctrl.program.ch,
+              dt: 's',
+              sdate: CommonService.formatDate($ctrl.program.end, 'yyyy-MM-dd HH:mm:ss'),
+              sort: 'sta'
+            }
+          }, false).then(function (response) {
+            if (
+              angular.isObject(response) &&
+              angular.isObject(response.data) &&
+              angular.isArray(response.data.program) &&
+              angular.isObject(response.data.program[0])
+            ) {
+              playRecorded(response.data.program[0].gtvid);
+            }
+          });
+          break;
+        case 'chinachu':
+        default:
+          program = recorded.filter(function (a) {
+            return (
+              a.channel.type === $ctrl.program.channel.type &&
+              a.channel.sid === $ctrl.program.channel.sid &&
+              a.start >= $ctrl.program.end
+            );
+          })[0];
+          if (program) {
+            playRecorded(program.id);
+          }
       }
     }
 
     function previous() {
-      var program = recorded.filter(function (a) {
-        return (
-          a.channel.type === $ctrl.program.channel.type &&
-          a.channel.sid === $ctrl.program.channel.sid &&
-          a.end <= $ctrl.program.start
-        );
-      })[0];
-      if (program) {
-        playRecorded(program.id);
+      var program;
+      switch (backendType) {
+        case 'garapon':
+          GaraponService.request('search', {
+            data: {
+              n: 1,
+              ch: $ctrl.program.ch,
+              dt: 'e',
+              edate: CommonService.formatDate($ctrl.program.start, 'yyyy-MM-dd HH:mm:ss'),
+              sort: 'std'
+            }
+          }, false).then(function (response) {
+            if (
+              angular.isObject(response) &&
+              angular.isObject(response.data) &&
+              angular.isArray(response.data.program) &&
+              angular.isObject(response.data.program[0])
+            ) {
+              playRecorded(response.data.program[0].gtvid);
+            }
+          });
+          break;
+        case 'chinachu':
+        default:
+          program = recorded.filter(function (a) {
+            return (
+              a.channel.type === $ctrl.program.channel.type &&
+              a.channel.sid === $ctrl.program.channel.sid &&
+              a.end <= $ctrl.program.start
+            );
+          })[0];
+          if (program) {
+            playRecorded(program.id);
+          }
       }
     }
 
@@ -610,10 +773,11 @@ limitations under the License.
     }
 
     function resolveQuery(channel) {
+      var name = angular.isObject(channel) ? channel.name : channel;
       var queries = CommonService.loadLocalStorage('commentQueries') || {};
-      var query = queries[channel.name];
+      var query = queries[name];
       if (angular.isUndefined(query)) {
-        query = CommentService.resolveChannel(channel);
+        query = CommentService.resolveChannel(name);
       }
       return query;
     }

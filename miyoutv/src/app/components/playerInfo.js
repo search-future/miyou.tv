@@ -42,14 +42,14 @@ limitations under the License.
     }, function (value) {
       $ctrl.program = {};
       if (value) {
-        $ctrl.program.id = value.id;
+        $ctrl.program.id = value.id || value.gtvid;
         $ctrl.program.channel = value.channel.name;
         $ctrl.program.start = value.start;
         $ctrl.program.end = value.end;
         $ctrl.program.category = value.categoryName.localeName;
-        $ctrl.program.title = value.fullTitle;
+        $ctrl.program.title = value.fullTitle || value.title;
         $ctrl.program.episode = value.episode;
-        $ctrl.program.detail = value.detail;
+        $ctrl.program.detail = value.detail || value.description;
         $ctrl.program.displayStartTime = CommonService.formatDate(value.start, 'yyyy/MM/dd(EEE) A HHHH:mm');
         $ctrl.program.displayEndTime = CommonService.formatDate(value.end, 'yyyy/MM/dd(EEE) A HHHH:mm');
       }
