@@ -30,6 +30,7 @@ limitations under the License.
     $timeout,
     CommonService,
     ChinachuService,
+    GaraponService,
     CommentService,
     categoryTable
   ) {
@@ -39,12 +40,18 @@ limitations under the License.
     var viewport = $element[0].getElementsByClassName('scrollable')[0];
     var selectItem;
     var timer;
+    var backendType = 'chinachu';
+    var startHour = 0;
+    var endHour = 0;
+    var hourFirst;
     var countMode = 'speed';
     var previewEnabled = true;
     var reloader;
+    var reloadInterval;
 
     $ctrl.baseWidth = 200;
     $ctrl.baseHeight = 60;
+    $ctrl.archiveEnabled = true;
     $ctrl.programs = [];
     $ctrl.dates = [];
     $ctrl.hours = [];
@@ -70,7 +77,9 @@ limitations under the License.
     })[0]);
 
     $ctrl.$onDestroy = function () {
+      $timeout.cancel(timer);
       $timeout.cancel(reloader);
+      GaraponService.cancelRequests();
     };
 
     $ctrl.selectItem = function (item) {
@@ -109,7 +118,7 @@ limitations under the License.
           a.start <= start
         );
       });
-      if (isRecorded) {
+      if (isRecorded || recorded.length <= 0) {
         $location.url([
           '/player',
           '?mode=channel',
@@ -130,78 +139,9 @@ limitations under the License.
     };
 
     $scope.$watch(function () {
-      return ChinachuService.getUrl();
-    }, function () {
-      archive = {};
-      recorded = [];
-      $ctrl.archiveEnabled = false;
-      ChinachuService.request('/archive.json').then(function (response) {
-        if (
-          angular.isObject(response) &&
-          angular.isObject(response.data)
-        ) {
-          archive = response.data;
-          $ctrl.archiveEnabled = true;
-        }
-        return ChinachuService.request('/api/recorded.json');
-      }, function () {
-        return ChinachuService.request('/api/recorded.json');
-      }).then(function (response) {
-        if (
-          angular.isObject(response) &&
-          angular.isArray(response.data)
-        ) {
-          recorded = response.data;
-        }
-      });
-    });
-    $scope.$watch(function () {
       return $location.search().src;
     }, function (value) {
       $ctrl.source = value || 'archive';
-    });
-    $scope.$watchGroup([function () {
-      return $ctrl.source;
-    }, function () {
-      return archive;
-    }, function () {
-      return recorded;
-    }], function (values) {
-      var source = values[0];
-
-      $location.search('src', source);
-      $ctrl.dates = [];
-      $ctrl.hours = [];
-
-      if (!$ctrl.archiveEnabled) {
-        source = 'recorded';
-      }
-      switch (source) {
-        case 'archive':
-          initDatepicker(miyoutvFilter);
-          initDateHeader(miyoutvFilter);
-          initHourHeader(miyoutvFilter);
-          $ctrl.programs = programsFromArchive();
-          break;
-        case 'recorded':
-        default:
-          initDatepicker();
-          initDateHeader();
-          initHourHeader();
-          $ctrl.programs = programsFromRecorded();
-      }
-
-      $timeout.cancel(timer);
-      timer = $timeout(updateView, 200);
-    });
-    $scope.$watch(function () {
-      return selectItem;
-    }, function (newValue, oldValue) {
-      var newItem = newValue || {};
-      var oldItem = oldValue || {};
-
-      newItem.style = calcItemStyle(newItem);
-      oldItem.style = calcItemStyle(oldItem);
     });
     $scope.$watch(function () {
       return $location.search().search;
@@ -213,6 +153,66 @@ limitations under the License.
           '&search=' + value
         ].join(''));
       }
+    });
+    $scope.$watchGroup([function () {
+      return CommonService.loadLocalStorage('backendType');
+    }, function () {
+      return CommonService.loadLocalStorage('garaponAuth');
+    }, function () {
+      return CommonService.loadLocalStorage('garaponUrl');
+    }, function () {
+      return CommonService.loadLocalStorage('garaponUser');
+    }, function () {
+      return CommonService.loadLocalStorage('garaponPassword');
+    }, function () {
+      return ChinachuService.getUrl();
+    }], function (values) {
+      var garaponAuth = typeof values[1] === 'boolean' ? values[1] : true;
+      var garaponUrl = values[2];
+      var garaponUser = values[3];
+      var garaponPassword = values[4];
+      backendType = values[0];
+
+      $timeout.cancel(timer);
+      $timeout.cancel(reloader);
+      GaraponService.cancelRequests();
+      archive = {};
+      recorded = [];
+      $ctrl.programs = [];
+      switch (backendType) {
+        case 'garapon':
+          $ctrl.archiveEnabled = false;
+          connectGarapon(garaponAuth, garaponUrl, garaponUser, garaponPassword);
+          break;
+        case 'chinachu':
+        default:
+          $ctrl.archiveEnabled = true;
+          connectChinachu();
+      }
+    });
+    $scope.$watch(function () {
+      return $ctrl.source;
+    }, function () {
+      $location.search('src', $ctrl.source);
+      updateModel();
+      $timeout.cancel(timer);
+      timer = $timeout(updateView, 200);
+    });
+    $scope.$watchCollection(function () {
+      return recorded;
+    }, function () {
+      updateModel();
+      $timeout.cancel(timer);
+      timer = $timeout(updateView, 200);
+    });
+    $scope.$watch(function () {
+      return selectItem;
+    }, function (newValue, oldValue) {
+      var newItem = newValue || {};
+      var oldItem = oldValue || {};
+
+      newItem.style = calcItemStyle(newItem);
+      oldItem.style = calcItemStyle(oldItem);
     });
     $scope.$watch(function () {
       return CommonService.loadLocalStorage('countMode');
@@ -258,12 +258,13 @@ limitations under the License.
       return CommonService.loadLocalStorage('hourFirst');
     }, function () {
       return CommonService.loadLocalStorage('hourFormat');
-    }], function () {
+    }], function (values) {
       var column;
       var item;
       var ci;
       var ii;
 
+      hourFirst = angular.isNumber(values[0]) ? values[0] : 4;
       for (ci = 0; ci < $ctrl.programs.length; ci += 1) {
         column = $ctrl.programs[ci];
         for (ii = 0; ii < column.programs.length; ii += 1) {
@@ -278,6 +279,7 @@ limitations under the License.
       $timeout.cancel(timer);
       timer = $timeout(updateView, 200);
     });
+
     $scope.$watchGroup([function () {
       return viewport.scrollWidth;
     }, function () {
@@ -292,8 +294,15 @@ limitations under the License.
         viewport.scrollTop = height;
       }
     });
-
-    reloader = $timeout(reload, 300000);
+    $scope.$watch(function () {
+      return CommonService.loadLocalStorage('reloadInterval');
+    }, function (value) {
+      reloadInterval = angular.isNumber(value) ? value : 300000;
+      $timeout.cancel(reloader);
+      if (reloadInterval > 0) {
+        reloader = $timeout(reload, reloadInterval);
+      }
+    });
 
     angular.element(viewport).on('scroll', function (e) {
       $ctrl.vHeaderStyle.left = e.target.scrollLeft + 'px';
@@ -309,33 +318,8 @@ limitations under the License.
       timer = $timeout(updateView, 200);
     });
 
-    function reload() {
-      ChinachuService.request('/api/recorded.json', {
-        cache: false
-      }).then(function (response) {
-        if (
-          angular.isObject(response) &&
-          angular.isArray(response.data)
-        ) {
-          recorded = response.data;
-        }
-      });
-      $timeout.cancel(reloader);
-      reloader = $timeout(reload, 300000);
-    }
-
-    function miyoutvFilter(a) {
-      return a.isMiyoutvReserved;
-    }
-
-    function calcTime(pos) {
-      var baseTime = new Date($ctrl.hours[0] ? $ctrl.hours[0].time : 0).getTime();
-      return ((pos * 3600000) / $ctrl.baseHeight) + baseTime;
-    }
-
     function calcPos(time) {
-      var baseTime = new Date($ctrl.hours[0] ? $ctrl.hours[0].time : 0).getTime();
-      var pos = ((time - baseTime) * $ctrl.baseHeight) / 3600000;
+      var pos = ((time - startHour) * $ctrl.baseHeight) / 3600000;
       if (pos < 0) {
         pos = 0;
       }
@@ -343,10 +327,9 @@ limitations under the License.
     }
 
     function calcHeight(start, end) {
-      var baseTime = new Date($ctrl.hours[0] ? $ctrl.hours[0].time : 0).getTime();
-      var pos = ((start - baseTime) * $ctrl.baseHeight) / 3600000;
+      var pos = ((start - startHour) * $ctrl.baseHeight) / 3600000;
       var height = ((end - start) * $ctrl.baseHeight) / 3600000;
-      var overHeight = (pos + height) - ($ctrl.hours.length * $ctrl.baseHeight);
+      var overHeight = (pos + height) - calcPos(endHour);
       if (pos < 0) {
         height += pos;
       }
@@ -356,249 +339,377 @@ limitations under the License.
       return height;
     }
 
-    function isCurrentDate(time) {
-      var date;
+    function calcTime(pos) {
+      return ((pos * 3600000) / $ctrl.baseHeight) + startHour;
+    }
+
+    function connectChinachu() {
+      ChinachuService.request('/archive.json').then(function (response) {
+        if (
+          angular.isObject(response) &&
+          angular.isObject(response.data)
+        ) {
+          archive = response.data;
+          $ctrl.archiveEnabled = true;
+        } else {
+          $ctrl.archiveEnabled = false;
+        }
+        updateChinachu();
+      }, function () {
+        $ctrl.archiveEnabled = false;
+        updateChinachu();
+      });
+    }
+
+    function updateChinachu(noCache) {
+      var useCache = !noCache;
+      ChinachuService.request('/api/recorded.json', {
+        cache: useCache
+      }).then(function (response) {
+        if (
+          angular.isObject(response) &&
+          angular.isArray(response.data)
+        ) {
+          response.data.sort(function (a, b) {
+            return a.start - b.start;
+          });
+          recorded = response.data;
+        }
+      });
+    }
+
+    function connectGarapon(auth, url, user, password) {
+      var promise;
+      if (user && password) {
+        GaraponService.user(user);
+        GaraponService.password(password);
+        if (auth || !url) {
+          promise = GaraponService.loadBackend().then(function () {
+            return GaraponService.login();
+          });
+        } else {
+          GaraponService.backend(url);
+          promise = GaraponService.login();
+        }
+        promise.then(function (response) {
+          if (response) {
+            updateGarapon();
+          }
+        });
+      }
+    }
+
+    function updateGarapon(noCache) {
       var start;
       var end;
-      var currentTime;
-      var hourFirst = angular.isNumber(CommonService.loadLocalStorage('hourFirst')) ? CommonService.loadLocalStorage('hourFirst') : 4;
-
-      date = new Date(time);
-      date.setHours(hourFirst);
-      date.setMinutes(0);
-      date.setSeconds(0);
-      date.setMilliseconds(0);
-      start = date.getTime();
-      date.setDate(date.getDate() + 1);
-      end = date.getTime();
-      currentTime = calcTime(viewport.scrollTop);
-
-      return currentTime >= start && currentTime < end;
-    }
-
-    function initDateHeader(filter) {
-      var dates = [];
-      var start = new Date(Math.min.apply(
-        null,
-        recorded.filter(filter || Boolean).map(function (a) {
-          return a.start;
-        })
-      ));
-      var end = new Date(Math.max.apply(
-        null,
-        recorded.filter(filter || Boolean).map(function (a) {
-          return a.end;
-        })
-      ));
-      var date = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-
-      while (date.getTime() < end.getTime()) {
-        $ctrl.dates.push({
-          time: new Date(date),
-          isCurrent: false
-        });
-        date.setDate(date.getDate() + 1);
+      if (noCache) {
+        GaraponService.clearRequestCache();
       }
-      return dates;
-    }
-
-    function initHourHeader(filter) {
-      var start = new Date(Math.min.apply(
-        null,
-        recorded.filter(filter || Boolean).map(function (a) {
-          return a.start;
-        })
-      ));
-      var end = new Date(Math.max.apply(
-        null,
-        recorded.filter(filter || Boolean).map(function (a) {
-          return a.end;
-        })
-      ));
-      var hour = new Date(start.getFullYear(), start.getMonth(), start.getDate(), start.getHours());
-
-      while (hour.getTime() < end.getTime()) {
-        $ctrl.hours.push({
-          time: new Date(hour),
-          hour: CommonService.convertHour(hour)
-        });
-        hour.setHours(hour.getHours() + 1);
-      }
-    }
-
-    function initDatepicker(filter) {
-      $ctrl.datepickerOptions.minDate = new Date(Math.min.apply(
-        null,
-        recorded.filter(filter || Boolean).map(function (a) {
-          return a.start;
-        })
-      ));
-      $ctrl.datepickerOptions.maxDate = new Date(Math.max.apply(
-        null,
-        recorded.filter(filter || Boolean).map(function (a) {
-          return a.end;
-        })
-      ));
-    }
-
-    function programsFromArchive() {
-      var programs = [];
-      var channels = recordedChannels(miyoutvFilter);
-      var start = Math.min.apply(
-        null,
-        recorded.filter(miyoutvFilter).map(function (a) {
-          return a.start;
-        })
-      );
-      var end = Math.max.apply(
-        null,
-        recorded.filter(miyoutvFilter).map(function (a) {
-          return a.end;
-        })
-      );
-      var ci;
-      var pi;
-      var channel;
-      var column;
-      var item;
-
-      for (ci = 0; ci < channels.length; ci += 1) {
-        channel = channels[ci];
-        column = ChinachuService.serviceFromLegacy(channel, archive.channels);
-        column.channel = channel;
-        column.style = calcColumnStyle(column);
-        column.commentQuery = resolveQuery(channel);
-        column.programs = [];
-        for (pi = 0; pi < archive.programs.length; pi += 1) {
-          item = archive.programs[pi];
-          item.start = item.startAt;
-          item.end = item.startAt + item.duration;
-          if (
-            item.networkId === column.networkId &&
-            item.serviceId === column.serviceId &&
-            item.start < end &&
-            item.end > start
-          ) {
-            item.seconds = item.duration / 1000;
-            item.title = item.name;
-            item.detail = item.description;
-            item.channel = channel;
-            item.displayTime = CommonService.formatDate(item.start, 'A HHHH:mm');
-            item.isArchive = true;
-            item.isRecorded = false;
-            if (angular.isArray(item.genres)) {
-              item.categoryName = ChinachuService.convertCategory(item.genres[0].lv1);
-            } else {
-              item.categoryName = ChinachuService.convertCategory();
+      GaraponService.request('search', {
+        data: {
+          n: 1
+        }
+      }).then(function (response) {
+        if (
+          angular.isObject(response) &&
+          angular.isObject(response.data) &&
+          angular.isArray(response.data.program) &&
+          angular.isObject(response.data.program[0])
+        ) {
+          end = (
+            GaraponService.convertDate(response.data.program[0].startdate) +
+            GaraponService.convertDuration(response.data.program[0].duration)
+          );
+          return GaraponService.request('search', {
+            data: {
+              n: 1,
+              p: response.data.hit
             }
-            item.style = calcItemStyle(item);
-            delete item.count;
-            column.programs.push(item);
+          });
+        }
+        return null;
+      }).then(function (response) {
+        var i;
+        var pageCount;
+        if (
+          angular.isObject(response) &&
+          angular.isObject(response.data) &&
+          angular.isArray(response.data.program) &&
+          angular.isObject(response.data.program[0])
+        ) {
+          pageCount = parseInt(response.data.hit, 10) / 100;
+          start = GaraponService.convertDate(response.data.program[0].startdate);
+          initView(start, end);
+          for (i = 0; i < pageCount; i += 1) {
+            GaraponService.request('search', {
+              data: {
+                n: 100,
+                p: i + 1
+              }
+            }).then(getGaraponLoader(start, end));
           }
         }
-        if (column.programs.length > 0) {
-          programs.push(column);
-        }
-      }
-      return programs;
+      });
     }
 
-    function programsFromRecorded() {
+    function getGaraponLoader(start, end) {
+      return function (response) {
+        var program;
+        var column;
+        var ri;
+        var pi;
+        if (
+          angular.isObject(response) &&
+          angular.isObject(response.data) &&
+          angular.isArray(response.data.program)
+        ) {
+          for (ri = 0; ri < response.data.program.length; ri += 1) {
+            program = response.data.program[ri];
+            for (pi = 0; pi < $ctrl.programs.length; pi += 1) {
+              column = $ctrl.programs[pi];
+              if (
+                column.sid === program.ch
+              ) {
+                break;
+              }
+              column = null;
+            }
+            if (!column) {
+              column = {};
+              column.type = program.gtvid.slice(0, 2);
+              column.sid = program.ch;
+              column.name = program.bc;
+              column.commentQuery = resolveQuery(column.name);
+              column.style = {
+                height: calcHeight(start, end)
+              };
+              column.programs = [];
+              $ctrl.programs.push(column);
+            }
+            program.channel = {
+              type: program.gtvid.slice(0, 2),
+              sid: program.ch,
+              name: program.bc
+            };
+            program.detail = program.description;
+            program.start = GaraponService.convertDate(program.startdate);
+            program.end = program.start + GaraponService.convertDuration(program.duration);
+            program.seconds = GaraponService.convertDuration(program.duration) / 1000;
+            program.categoryName = GaraponService.convertCategory(program.genre[0]);
+            program.style = calcItemStyle(program);
+            program.displayTime = CommonService.formatDate(program.start, 'A HHHH:mm');
+            program.isArchive = false;
+            program.isRecorded = true;
+            delete program.count;
+            column.programs.push(program);
+          }
+          $ctrl.programs.sort(function (a, b) {
+            var types = ['1S', 'GR', 'BS', 'CS', 'US', 'YU'];
+            if (a.type !== b.type) {
+              return types.indexOf(a.type) - types.indexOf(b.type);
+            }
+            return parseInt(a.sid, 10) - parseInt(b.sid, 10);
+          });
+          $timeout.cancel(timer);
+          timer = $timeout(updateView, 200);
+        }
+      };
+    }
+
+    function reload() {
+      $timeout.cancel(reloader);
+      GaraponService.cancelRequests();
+      recorded = [];
+      $ctrl.programs = [];
+      switch (backendType) {
+        case 'garapon':
+          updateGarapon(true);
+          break;
+        case 'chinachu':
+        default:
+          updateChinachu(true);
+      }
+      reloader = $timeout(reload, reloadInterval);
+    }
+
+    function updateModel() {
+      if (backendType === 'garapon') {
+        $ctrl.source = 'garapon';
+      } else if ($ctrl.source === 'garapon') {
+        $ctrl.source = 'archive';
+      }
+      if (backendType === 'chinachu' && !$ctrl.archiveEnabled) {
+        $ctrl.source = 'recorded';
+      }
+      switch ($ctrl.source) {
+        case 'archive':
+          loadChinachuArchive();
+          break;
+        case 'recorded':
+          loadChinachuRecorded();
+          break;
+        default:
+      }
+    }
+
+    function loadChinachuArchive() {
+      var start;
+      var end;
       var programs = [];
-      var channels = recordedChannels();
-      var start = Math.min.apply(
+      var program;
+      var service;
+      var column;
+      var item;
+      var ri;
+      var pi;
+
+      start = Math.min.apply(
         null,
-        recorded.map(function (a) {
+        recorded.filter(function (a) {
+          return a.isMiyoutvReserved;
+        }).map(function (a) {
           return a.start;
         })
       );
-      var end = Math.max.apply(
+      end = Math.max.apply(
         null,
-        recorded.map(function (a) {
+        recorded.filter(function (a) {
+          return a.isMiyoutvReserved;
+        }).map(function (a) {
           return a.end;
         })
       );
-      var ci;
-      var pi;
-      var channel;
-      var column;
-      var item;
+      initView(start, end);
 
-      for (ci = 0; ci < channels.length; ci += 1) {
-        channel = channels[ci];
-        column = ChinachuService.serviceFromLegacy(channel);
-        column.channel = channel;
-        column.style = calcColumnStyle(column);
-        column.commentQuery = resolveQuery(channel);
-        column.programs = [];
-        for (pi = 0; pi < recorded.length; pi += 1) {
-          item = recorded[pi];
+      for (ri = 0; ri < recorded.length; ri += 1) {
+        program = recorded[ri];
+        for (pi = 0; pi < programs.length; pi += 1) {
+          column = programs[pi];
           if (
-            item.channel.type === column.channel.type &&
-            item.channel.sid === column.channel.sid &&
-            item.start < end &&
-            item.end > start
+            column.type === program.channel.type &&
+            column.sid === program.channel.sid
           ) {
-            item.categoryName = ChinachuService.convertCategory(item.category);
-            item.style = calcItemStyle(item);
-            item.displayTime = CommonService.formatDate(item.start, 'A HHHH:mm');
-            item.isArchive = false;
-            item.isRecorded = true;
-            delete item.count;
-            column.programs.push(item);
-          }
-        }
-        if (column.programs.length > 0) {
-          programs.push(column);
-        }
-      }
-      return programs;
-    }
-
-    function recordedChannels(filter) {
-      var data = recorded.filter(filter || Boolean);
-      var channels = [];
-      var program;
-      var ri;
-      var ci;
-
-      for (ri = 0; ri < data.length; ri += 1) {
-        program = data[ri];
-        for (ci = 0; ci < channels.length; ci += 1) {
-          if (
-            program.channel.type === channels[ci].type &&
-            program.channel.sid === channels[ci].sid
-          ) {
-            channels[ci] = program.channel;
             break;
           }
+          column = null;
         }
-        if (ci === channels.length) {
-          channels.push(program.channel);
+        if (!column) {
+          column = {};
+          column.type = program.channel.type;
+          column.sid = program.channel.sid;
+          column.style = {
+            height: calcHeight(start, end)
+          };
+          column.programs = [];
+          programs.push(column);
+          service = ChinachuService.serviceFromLegacy(program.channel, archive.channels);
+          for (pi = 0; pi < archive.programs.length; pi += 1) {
+            item = archive.programs[pi];
+            item.start = item.startAt;
+            item.end = item.startAt + item.duration;
+            if (
+              item.networkId === service.networkId &&
+              item.serviceId === service.serviceId &&
+              item.start < end &&
+              item.end > start
+            ) {
+              item.seconds = item.duration / 1000;
+              item.title = item.name;
+              item.detail = item.description;
+              item.channel = program.channel;
+              item.displayTime = CommonService.formatDate(item.start, 'A HHHH:mm');
+              item.isArchive = true;
+              item.isRecorded = false;
+              if (angular.isArray(item.genres)) {
+                item.categoryName = ChinachuService.convertCategory(item.genres[0].lv1);
+              } else {
+                item.categoryName = ChinachuService.convertCategory();
+              }
+              item.style = calcItemStyle(item);
+              delete item.count;
+              column.programs.push(item);
+            }
+          }
         }
+        column.name = program.channel.name;
+        column.commentQuery = resolveQuery(program.channel);
       }
-      channels.sort(function (a, b) {
+      programs.sort(function (a, b) {
         var types = ['GR', 'BS', 'CS', 'EX'];
         if (a.type !== b.type) {
           return types.indexOf(a.type) - types.indexOf(b.type);
         }
         return parseInt(a.sid, 10) - parseInt(b.sid, 10);
       });
-      return channels;
+      $ctrl.programs = programs;
     }
 
-    function calcColumnStyle() {
-      var start = $ctrl.hours[0] ? $ctrl.hours[0].time : 0;
-      var last = new Date($ctrl.hours[$ctrl.hours.length - 1].time);
+    function loadChinachuRecorded() {
+      var start;
       var end;
+      var programs = [];
+      var program;
+      var column;
+      var ri;
+      var pi;
 
-      last.setHours(last.getHours() + 1);
-      end = last.getTime();
-      return {
-        top: calcPos(start) + 'px',
-        height: calcHeight(start, end) + 'px'
-      };
+      start = Math.min.apply(
+        null,
+        recorded.map(function (a) {
+          return a.start;
+        })
+      );
+      end = Math.max.apply(
+        null,
+        recorded.map(function (a) {
+          return a.end;
+        })
+      );
+      initView(start, end);
+
+      for (ri = 0; ri < recorded.length; ri += 1) {
+        program = recorded[ri];
+        for (pi = 0; pi < programs.length; pi += 1) {
+          column = programs[pi];
+          if (
+            column.type === program.channel.type &&
+            column.sid === parseInt(program.channel.sid, 10)
+          ) {
+            break;
+          }
+          column = null;
+        }
+        if (!column) {
+          column = {};
+          column.type = program.channel.type;
+          column.sid = parseInt(program.channel.sid, 10);
+          column.style = {
+            height: calcHeight(start, end)
+          };
+          column.programs = [];
+          programs.push(column);
+        }
+        column.name = program.channel.name;
+        column.commentQuery = resolveQuery(program.channel);
+        program.detail = program.description;
+        program.categoryName = ChinachuService.convertCategory(program.category);
+        program.style = calcItemStyle(program);
+        program.displayTime = CommonService.formatDate(program.start, 'A HHHH:mm');
+        program.isArchive = false;
+        program.isRecorded = true;
+        delete program.count;
+        column.programs.push(program);
+      }
+      programs.sort(function (a, b) {
+        var types = ['GR', 'BS', 'CS', 'EX'];
+        if (a.type !== b.type) {
+          return types.indexOf(a.type) - types.indexOf(b.type);
+        }
+        return parseInt(a.sid, 10) - parseInt(b.sid, 10);
+      });
+      $ctrl.programs = programs;
     }
+
 
     function calcItemStyle(item) {
       if ($ctrl.selectItem() === item) {
@@ -614,12 +725,82 @@ limitations under the License.
     }
 
     function resolveQuery(channel) {
+      var name = angular.isObject(channel) ? channel.name : channel;
       var queries = CommonService.loadLocalStorage('commentQueries') || {};
-      var query = queries[channel.name];
+      var query = queries[name];
       if (angular.isUndefined(query)) {
-        query = CommentService.resolveChannel(channel);
+        query = CommentService.resolveChannel(name);
       }
       return query;
+    }
+
+
+    function initView(start, end) {
+      if (isFinite(start) && isFinite(end)) {
+        initBaseTime(start, end);
+        initDateHeader(start, end);
+        initDatepicker(start, end);
+        initHourHeader(start, end);
+      }
+    }
+
+    function initBaseTime(start, end) {
+      var startDate = new Date(start);
+      var endDate = new Date(end);
+      startHour = new Date(
+        startDate.getFullYear(),
+        startDate.getMonth(),
+        startDate.getDate(),
+        startDate.getHours()
+      ).getTime();
+      endHour = new Date(
+        endDate.getFullYear(),
+        endDate.getMonth(),
+        endDate.getDate(),
+        endDate.getHours()
+      ).getTime();
+    }
+
+    function initDateHeader(start, end) {
+      var dates = [];
+      var startDate = new Date(start);
+      var endDate = new Date(end);
+      var date = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+
+      while (date.getTime() < endDate.getTime()) {
+        dates.push({
+          time: new Date(date),
+          isCurrent: false
+        });
+        date.setDate(date.getDate() + 1);
+      }
+      $ctrl.dates = dates;
+    }
+
+    function initHourHeader(start, end) {
+      var hours = [];
+      var startDate = new Date(start);
+      var endDate = new Date(end);
+      var hour = new Date(
+        startDate.getFullYear(),
+        startDate.getMonth(),
+        startDate.getDate(),
+        startDate.getHours()
+      );
+
+      while (hour.getTime() < endDate.getTime()) {
+        hours.push({
+          time: new Date(hour),
+          hour: CommonService.convertHour(hour)
+        });
+        hour.setHours(hour.getHours() + 1);
+      }
+      $ctrl.hours = hours;
+    }
+
+    function initDatepicker(start, end) {
+      $ctrl.datepickerOptions.minDate = new Date(start);
+      $ctrl.datepickerOptions.maxDate = new Date(end);
     }
 
     function updateView() {
@@ -696,6 +877,25 @@ limitations under the License.
       }
     }
 
+    function isCurrentDate(time) {
+      var date;
+      var start;
+      var end;
+      var currentTime;
+
+      date = new Date(time);
+      date.setHours(hourFirst);
+      date.setMinutes(0);
+      date.setSeconds(0);
+      date.setMilliseconds(0);
+      start = date.getTime();
+      date.setDate(date.getDate() + 1);
+      end = date.getTime();
+      currentTime = calcTime(viewport.scrollTop);
+
+      return currentTime >= start && currentTime < end;
+    }
+
     function initItem(item) {
       var program = item;
       var recordedProgram;
@@ -722,12 +922,12 @@ limitations under the License.
       } else {
         recordedProgram = program;
       }
-      if (previewEnabled && angular.isUndefined(program.preview) && recordedProgram) {
-        if (recordedProgram.seconds < previewPos) {
-          previewPos = 10;
-        }
-        ChinachuService
-          .requestPreview(recordedProgram.id, 'png', {
+      if (previewEnabled && angular.isUndefined(program.preview)) {
+        if (backendType === 'chinachu' && recordedProgram) {
+          if (recordedProgram.seconds < previewPos) {
+            previewPos = 10;
+          }
+          ChinachuService.requestPreview(recordedProgram.id, 'png', {
             pos: previewPos,
             size: '160x90'
           }).then(function (value) {
@@ -735,6 +935,13 @@ limitations under the License.
               program.preview = value;
             }
           });
+        } else if (backendType === 'garapon') {
+          GaraponService.requestPreview(recordedProgram.gtvid).then(function (value) {
+            if (previewEnabled) {
+              program.preview = value;
+            }
+          });
+        }
       }
     }
 
