@@ -308,6 +308,7 @@ limitations under the License.
 
     angular.element(viewport).on('scroll', function (e) {
       $ctrl.vHeaderStyle.left = e.target.scrollLeft + 'px';
+      $ctrl.vHeaderStyle.paddingTop = (Math.floor(e.target.scrollTop / $ctrl.baseHeight / 24) * $ctrl.baseHeight * 24) + 'px';
       $ctrl.hHeaderStyle.top = e.target.scrollTop + 'px';
       $location.search('x', e.target.scrollLeft);
       $location.search('y', e.target.scrollTop);
@@ -781,16 +782,10 @@ limitations under the License.
 
     function initHourHeader(start, end) {
       var hours = [];
-      var startDate = new Date(start);
-      var endDate = new Date(end);
-      var hour = new Date(
-        startDate.getFullYear(),
-        startDate.getMonth(),
-        startDate.getDate(),
-        startDate.getHours()
-      );
+      var hour = new Date(start);
+      var i;
 
-      while (hour.getTime() < endDate.getTime()) {
+      for (i = 0; i < 48; i += 1) {
         hours.push({
           time: new Date(hour),
           hour: CommonService.convertHour(hour)
@@ -798,6 +793,7 @@ limitations under the License.
         hour.setHours(hour.getHours() + 1);
       }
       $ctrl.hours = hours;
+      $ctrl.vHeaderStyle.height = calcHeight(start, end);
     }
 
     function initDatepicker(start, end) {
