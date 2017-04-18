@@ -661,6 +661,7 @@ Components
 .program-header {
   background-color: #fff;
   display: flex;
+  overflow: hidden;
   position: absolute;
   z-index: 1;
 }
@@ -681,9 +682,9 @@ Components
   flex-direction: row;
   flex-wrap: nowrap;
   height: 32px;
+  min-width: 100%;
   padding-left: 25px;
-  width: 100%;
-  z-index: 13;
+  z-index: 14;
 }
 
 .program-header-horizontal .program-header-cell {
@@ -700,15 +701,16 @@ Components
   border-right: none;
 }
 
+.program-header-vertical {
+  flex-direction: column;
+  margin-top: 25px;
+  width: 25px;
+  z-index: 13;
+}
+
 .program-header-vertical .program-header-cell {
   background-color: #4c4c4c;
   color: #fff;
-}
-
-.program-header-vertical {
-  flex-direction: column;
-  padding-top: 25px;
-  width: 25px;
 }
 
 .program-header-vertical .program-header-content {

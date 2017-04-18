@@ -57,10 +57,12 @@ limitations under the License.
     $ctrl.hours = [];
     $ctrl.hHeaderStyle = {
       position: 'absolute',
-      left: 0
+      left: 0,
+      top: 0
     };
     $ctrl.vHeaderStyle = {
       position: 'absolute',
+      left: 0,
       top: 0
     };
     $ctrl.datepickerOptions = {
