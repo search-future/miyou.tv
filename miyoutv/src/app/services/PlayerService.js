@@ -119,6 +119,7 @@ limitations under the License.
           frame.uOffset,
           frame.vOffset
         );
+        props.active = true;
       })
     );
     $rootScope.$on('$destroy',
@@ -128,9 +129,10 @@ limitations under the License.
         deregister = $rootScope.$on('Player.Playing',
           function () {
             loadSetting();
-            time(preseekTime());
+            if (preseekTime() !== 0) {
+              time(preseekTime());
+            }
             preseekTime(0);
-            props.active = true;
             deregister();
           });
       })
