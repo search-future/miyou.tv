@@ -123,10 +123,12 @@ limitations under the License.
       return PlayerService.time();
     }, function (value) {
       var requestTargets;
-      var start = (value + $ctrl.commentOptions.offset) - 60000;
-      var end = (value + $ctrl.commentOptions.offset) + 30000;
+      var start;
+      var end;
       $ctrl.time = value;
-      if (PlayerService.preseekTime() === 0) {
+      if (value > 0 && PlayerService.preseekTime() === 0) {
+        start = (value + $ctrl.commentOptions.offset) - 60000;
+        end = (value + $ctrl.commentOptions.offset) + 30000;
         requestTargets = $ctrl.commentIntervals.filter(function (a) {
           return (
             a.isLoaded !== true &&
