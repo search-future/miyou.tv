@@ -226,9 +226,9 @@ limitations under the License.
     });
     $scope.$watch(function () {
       return viewport.scrollHeight;
-    }, function () {
+    }, function (value) {
       var search = $location.search();
-      if (search.y) {
+      if (search.y < value) {
         viewport.scrollTop = search.y;
       }
     });
