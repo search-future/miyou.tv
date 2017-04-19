@@ -287,12 +287,15 @@ limitations under the License.
     }, function () {
       return viewport.scrollHeight;
     }], function (values) {
+      var width = values[0];
       var height = values[1];
       var search = $location.search();
-      if (search.x && search.y) {
+      if (search.x < width) {
         viewport.scrollLeft = search.x;
+      }
+      if (search.y < height) {
         viewport.scrollTop = search.y;
-      } else {
+      } else if (angular.isUndefined(search.y)) {
         viewport.scrollTop = height;
       }
     });
