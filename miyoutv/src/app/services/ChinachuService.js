@@ -169,17 +169,24 @@ limitations under the License.
       } else {
         request(['/api/recorded/' + id + '/preview' + ext].join(''), config).then(function (response) {
           var reader = new FileReader();
-
-          reader.onload = function () {
-            deferred.resolve(reader.result);
-            savePreviewCache(id, format, params, reader.result);
-            reader = null;
-          };
-          reader.onerror = function () {
-            deferred.reject(reader.error);
-            reader = null;
-          };
-          reader.readAsDataURL(response.data);
+          if (
+            angular.isObject(response) &&
+            angular.isObject(response.data) &&
+            response.data.size > 0
+          ) {
+            reader.onload = function () {
+              deferred.resolve(reader.result);
+              savePreviewCache(id, format, params, reader.result);
+              reader = null;
+            };
+            reader.onerror = function () {
+              deferred.reject(reader.error);
+              reader = null;
+            };
+            reader.readAsDataURL(response.data);
+          } else {
+            deferred.reject(response);
+          }
         }, deferred.reject, deferred.notify);
       }
       return deferred.promise;
