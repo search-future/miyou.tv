@@ -148,7 +148,8 @@ limitations under the License.
       var ext = /jpe?g$/.test(format) ? '.jpg' : '.png';
       var config = {
         params: params,
-        responseType: 'blob'
+        responseType: 'blob',
+        timeout: 10000
       };
       var cache = loadPreviewCache(id, format, params);
       if (cache) {
