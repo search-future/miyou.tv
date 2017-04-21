@@ -81,6 +81,7 @@ limitations under the License.
       active = false;
       $timeout.cancel(timer);
       $timeout.cancel(reloader);
+      ChinachuService.cancelRequests();
       GaraponService.cancelRequests();
     };
 
@@ -186,6 +187,7 @@ limitations under the License.
 
       $timeout.cancel(timer);
       $timeout.cancel(reloader);
+      ChinachuService.cancelRequests();
       GaraponService.cancelRequests();
       archive = {};
       recorded = [];
@@ -470,6 +472,7 @@ limitations under the License.
 
     function reload() {
       $timeout.cancel(reloader);
+      ChinachuService.cancelRequests();
       GaraponService.cancelRequests();
       recorded = [];
       $ctrl.programs = [];

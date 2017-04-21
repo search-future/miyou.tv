@@ -131,8 +131,9 @@ limitations under the License.
     };
     $ctrl.$onDestroy = function () {
       active = false;
-      GaraponService.cancelRequests();
       $timeout.cancel(updater);
+      ChinachuService.cancelRequests();
+      GaraponService.cancelRequests();
     };
 
     $scope.$watch(function () {
