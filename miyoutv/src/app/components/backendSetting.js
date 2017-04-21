@@ -47,9 +47,9 @@ limitations under the License.
     $ctrl.$onInit = function () {
       $ctrl.garaponEnabled = !!garaponDevId;
       $ctrl.backendType = CommonService.loadLocalStorage('backendType') || 'chinachu';
-      $ctrl.chinachuUrl = ChinachuService.url();
-      $ctrl.chinachuUser = ChinachuService.user();
-      $ctrl.chinachuPassword = ChinachuService.password();
+      $ctrl.chinachuUrl = CommonService.loadLocalStorage('chinachuUrl');
+      $ctrl.chinachuUser = CommonService.loadLocalStorage('chinachuUser');
+      $ctrl.chinachuPassword = CommonService.loadLocalStorage('chinachuPassword');
       if ($ctrl.chinachuUser || $ctrl.chinachuPassword) {
         $ctrl.chinachuAuth = true;
       }
@@ -65,9 +65,9 @@ limitations under the License.
     $ctrl.ok = function () {
       CommonService.saveLocalStorage('backendType', $ctrl.backendType);
       if ($ctrl.backendType === 'chinachu') {
-        ChinachuService.url($ctrl.chinachuUrl);
-        ChinachuService.user($ctrl.chinachuAuth ? $ctrl.chinachuUser : '');
-        ChinachuService.password($ctrl.chinachuAuth ? $ctrl.chinachuPassword : '');
+        CommonService.saveLocalStorage('chinachuUrl', $ctrl.chinachuUrl);
+        CommonService.saveLocalStorage('chinachuUser', $ctrl.chinachuAuth ? $ctrl.chinachuUser : '');
+        CommonService.saveLocalStorage('chinachuPassword', $ctrl.chinachuAuth ? $ctrl.chinachuPassword : '');
       }
       if ($ctrl.backendType === 'garapon') {
         CommonService.saveLocalStorage('garaponAuth', $ctrl.garaponAuth);

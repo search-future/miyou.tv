@@ -435,6 +435,12 @@ limitations under the License.
     }
 
     function initChinachu() {
+      var backend = CommonService.loadLocalStorage('chinachuUrl');
+      var user = CommonService.loadLocalStorage('chinachuUser');
+      var password = CommonService.loadLocalStorage('chinachuPassword');
+      ChinachuService.url(backend);
+      ChinachuService.user(user);
+      ChinachuService.password(password);
       ChinachuService.request('/api/recorded.json').then(function (response) {
         if (
           angular.isObject(response) &&

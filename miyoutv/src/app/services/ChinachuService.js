@@ -59,17 +59,8 @@ limitations under the License.
       previewCache: CommonService.loadLocalStorage('chinachu/previewCache') || []
     };
 
-    loadSetting();
     initPreviewCache();
     return service;
-
-    function saveSetting() {
-      CommonService.saveLocalStorage('chinachu', props.setting);
-    }
-
-    function loadSetting() {
-      angular.extend(props.setting, CommonService.loadLocalStorage('chinachu'));
-    }
 
     function initPreviewCache() {
       var time = Date.now();
@@ -89,7 +80,6 @@ limitations under the License.
     function url(value) {
       if (angular.isDefined(value)) {
         props.setting.url = value;
-        saveSetting();
       }
       return props.setting.url;
     }
@@ -97,7 +87,6 @@ limitations under the License.
     function user(value) {
       if (angular.isDefined(value)) {
         props.setting.user = value;
-        saveSetting();
       }
       return props.setting.user;
     }
@@ -105,7 +94,6 @@ limitations under the License.
     function password(value) {
       if (angular.isDefined(value)) {
         props.setting.password = value;
-        saveSetting();
       }
       return props.setting.password;
     }
@@ -113,7 +101,6 @@ limitations under the License.
     function previewCacheLifetime(value) {
       if (!isNaN(value)) {
         props.setting.previewCacheLifetime = parseInt(value, 10);
-        saveSetting();
       }
       return props.setting.previewCacheLifetime;
     }

@@ -161,6 +161,12 @@ limitations under the License.
     $scope.$watchGroup([function () {
       return CommonService.loadLocalStorage('backendType');
     }, function () {
+      return CommonService.loadLocalStorage('chinachuUrl');
+    }, function () {
+      return CommonService.loadLocalStorage('chinachuUser');
+    }, function () {
+      return CommonService.loadLocalStorage('chinachuPassword');
+    }, function () {
       return CommonService.loadLocalStorage('garaponAuth');
     }, function () {
       return CommonService.loadLocalStorage('garaponUrl');
@@ -168,13 +174,14 @@ limitations under the License.
       return CommonService.loadLocalStorage('garaponUser');
     }, function () {
       return CommonService.loadLocalStorage('garaponPassword');
-    }, function () {
-      return ChinachuService.getUrl();
     }], function (values) {
-      var garaponAuth = typeof values[1] === 'boolean' ? values[1] : true;
-      var garaponUrl = values[2];
-      var garaponUser = values[3];
-      var garaponPassword = values[4];
+      var chinachuUrl = values[1];
+      var chinachuUser = values[2];
+      var chinachuPassword = values[3];
+      var garaponAuth = typeof values[4] === 'boolean' ? values[4] : true;
+      var garaponUrl = values[5];
+      var garaponUser = values[6];
+      var garaponPassword = values[7];
       backendType = values[0];
 
       $timeout.cancel(timer);
@@ -191,7 +198,7 @@ limitations under the License.
         case 'chinachu':
         default:
           $ctrl.archiveEnabled = true;
-          connectChinachu();
+          connectChinachu(chinachuUrl, chinachuUser, chinachuPassword);
       }
     });
     $scope.$watch(function () {
@@ -292,7 +299,10 @@ limitations under the License.
       }
     }
 
-    function connectChinachu() {
+    function connectChinachu(url, user, password) {
+      ChinachuService.url(url);
+      ChinachuService.user(user);
+      ChinachuService.password(password);
       ChinachuService.request('/archive.json').then(function (response) {
         if (
           angular.isObject(response) &&

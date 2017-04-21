@@ -71,51 +71,66 @@ limitations under the License.
       $ctrl.classes.fullscreen = value;
     });
 
-    $scope.$watch(function () {
-      return ChinachuService.getUrl();
+    $scope.$watchGroup([function () {
+      return CommonService.loadLocalStorage('backendType');
     }, function () {
-      ChinachuService.request('/api/status.json').then(function (response) {
-        var status;
-        if (
-          angular.isObject(response) &&
-          angular.isObject(response.data) &&
-          angular.isObject(response.data.feature)
-        ) {
-          status = response.data;
-          if (angular.isObject(status) && angular.isObject(status.feature)) {
-            if (!status.feature.previewer) {
-              toaster.pop({
-                type: 'warning',
-                title: 'Chinachu config error',
-                body: 'Chinachuのプレビューが無効です。プレビューを表示できません。'
-              });
+      return CommonService.loadLocalStorage('chinachuUrl');
+    }, function () {
+      return CommonService.loadLocalStorage('chinachuUser');
+    }, function () {
+      return CommonService.loadLocalStorage('chinachuPassword');
+    }], function (values) {
+      var backendType = values[0];
+      var url = values[1];
+      var user = values[2];
+      var password = values[3];
+      if (backendType === 'chinachu') {
+        ChinachuService.url(url);
+        ChinachuService.user(user);
+        ChinachuService.password(password);
+        ChinachuService.request('/api/status.json').then(function (response) {
+          var status;
+          if (
+            angular.isObject(response) &&
+            angular.isObject(response.data) &&
+            angular.isObject(response.data.feature)
+          ) {
+            status = response.data;
+            if (angular.isObject(status) && angular.isObject(status.feature)) {
+              if (!status.feature.previewer) {
+                toaster.pop({
+                  type: 'warning',
+                  title: 'Chinachu config error',
+                  body: 'Chinachuのプレビューが無効です。プレビューを表示できません。'
+                });
+              }
+              if (!status.feature.streamer) {
+                toaster.pop({
+                  type: 'error',
+                  title: 'Chinachu config error',
+                  body: 'Chinachuのストリーム再生が無効です。録画を再生できません。'
+                });
+              }
             }
-            if (!status.feature.streamer) {
-              toaster.pop({
-                type: 'error',
-                title: 'Chinachu config error',
-                body: 'Chinachuのストリーム再生が無効です。録画を再生できません。'
-              });
-            }
+          } else {
+            CommonService.errorModal(
+              'Chinachu request error',
+              'Chinachuのステータスを確認できませんでした。設定を確認してください。',
+              function () {
+                CommonService.openBackendSetting();
+              }
+            );
           }
-        } else {
+        }, function () {
           CommonService.errorModal(
             'Chinachu request error',
-            'Chinachuのステータスを確認できませんでした。設定を確認してください。',
+            'バックエンドに接続できませんでした。設定を確認してください。',
             function () {
               CommonService.openBackendSetting();
             }
           );
-        }
-      }, function () {
-        CommonService.errorModal(
-          'Chinachu request error',
-          'Chinachuに接続できませんでした。設定を確認してください。',
-          function () {
-            CommonService.openBackendSetting();
-          }
-        );
-      });
+        });
+      }
     });
   }
 }());
