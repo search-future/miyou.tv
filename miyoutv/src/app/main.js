@@ -124,6 +124,16 @@ global.module.paths.push(modulePath);
 
   function run($window, $timeout, CommonService) {
     var win = CommonService.window();
+    var chinachuSetting = CommonService.loadLocalStorage('chinachu');
+    if (angular.isObject(chinachuSetting)) {
+      CommonService.saveLocalStorage('chinachuUrl', chinachuSetting.url);
+      CommonService.saveLocalStorage('chinachuUser', chinachuSetting.user);
+      CommonService.saveLocalStorage('chinachuPassword', chinachuSetting.password);
+      CommonService.removeLocalStorage('chinachu');
+    }
+    CommonService.removeLocalStorage('commentCache');
+    CommonService.removeLocalStorage('commentCountCache');
+    CommonService.removeFile('comments', 'commentCache.json');
 
     angular.element($window).on('move', saveWindowState);
     angular.element($window).on('resize', saveWindowState);
