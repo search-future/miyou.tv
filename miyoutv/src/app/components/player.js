@@ -34,10 +34,29 @@ limitations under the License.
     CommentService
   ) {
     var $ctrl = this;
+    var active = false;
     var backendType;
     var recorded = [];
     var channelOrder = ['gr', 'bs', 'cs'];
     var updater;
+    var garaponLoginStatusMessages = {
+      1: null,
+      100: 'Parameter error',
+      200: 'ガラポン端末のインターネット接続を確認してください。'
+    };
+    var garaponLoginMessages = {
+      1: null,
+      0: 'ガラポン端末へのログインに失敗しました。',
+      100: 'ログインIDが間違っています。',
+      200: 'ログインパスワードが間違っています。',
+      400: 'Unknown developer'
+    };
+    var garaponSearchMessages = {
+      1: null,
+      0: 'Invalid session',
+      100: 'Parameter error',
+      200: 'Database error'
+    };
 
     $ctrl.mode = 'recorded';
     $ctrl.title = '';
@@ -98,6 +117,7 @@ limitations under the License.
     $ctrl.previous = previous;
 
     $ctrl.$onInit = function () {
+      active = true;
       backendType = CommonService.loadLocalStorage('backendType');
       loadSetting();
       switch (backendType) {
@@ -110,6 +130,7 @@ limitations under the License.
       }
     };
     $ctrl.$onDestroy = function () {
+      active = false;
       GaraponService.cancelRequests();
       $timeout.cancel(updater);
     };
@@ -165,7 +186,7 @@ limitations under the License.
                 return a.time - b.time;
               });
             }
-          });
+          }, requestError);
         }
       }
     });
@@ -334,7 +355,7 @@ limitations under the License.
             $ctrl.commentIntervals = response.data.data.intervals;
             $ctrl.commentInfo.count = response.data.data.n_hits;
           }
-        });
+        }, requestError);
       }
     });
     $scope.$watchCollection(function () {
@@ -397,6 +418,22 @@ limitations under the License.
       CommonService.back();
     });
 
+    function requestError(response) {
+      if (response.status >= 400) {
+        toaster.pop({
+          type: 'error',
+          title: 'HTTP error',
+          body: [response.config.url, ' ', response.statusText, '(', response.status, ')'].join('')
+        });
+      } else if (active && response.status < 0) {
+        toaster.pop({
+          type: 'error',
+          title: 'Connection error',
+          body: [response.config.url, ' ', 'Connection failure'].join('')
+        });
+      }
+    }
+
     function initChinachu() {
       ChinachuService.request('/api/recorded.json').then(function (response) {
         if (
@@ -410,9 +447,10 @@ limitations under the License.
         } else {
           CommonService.errorModal('Chinachu Error', '録画データが取得できませんでした。');
         }
-      }).then(init, function () {
+      }).then(init, function (response) {
         CommonService.errorModal('Chinachu Error', 'Chinachuとの通信に失敗しました。');
-      });
+        requestError(response);
+      }, requestError);
       updater = $timeout(updateChinachu, 300000);
     }
 
@@ -448,12 +486,44 @@ limitations under the License.
         if (auth || !backend) {
           promise = GaraponService.loadBackend().then(function () {
             return GaraponService.login();
+          }, function (result) {
+            if (result.status) {
+              requestError(result);
+            } else if (result[1]) {
+              toaster.pop({
+                type: 'error',
+                title: 'Garapon Web Authentication error',
+                body: result[1]
+              });
+            }
           });
         } else {
           GaraponService.backend(backend);
           promise = GaraponService.login();
         }
-        promise.then(init);
+        promise.then(init, function (response) {
+          var message;
+          if (
+            angular.isObject(response) &&
+            response.status === 200 &&
+            angular.isObject(response.data)
+          ) {
+            if (garaponLoginStatusMessages[response.data.status]) {
+              message = garaponLoginStatusMessages[response.data.status];
+            } else if (garaponLoginMessages[response.data.login]) {
+              message = garaponLoginMessages[response.data.login];
+            } else {
+              message = 'Unknown Error';
+            }
+            toaster.pop({
+              type: 'error',
+              title: 'Garapon TV login error',
+              body: message
+            });
+          } else {
+            requestError(response);
+          }
+        });
       }
     }
 
@@ -490,7 +560,7 @@ limitations under the License.
           });
           $ctrl.commentChannels = response.data.data.channels;
         }
-      });
+      }, requestError);
     }
 
     function playRecorded(id) {
@@ -573,7 +643,25 @@ limitations under the License.
             playWithInfo(mrl);
           });
         }
-      });
+      }, requestError);
+    }
+
+    function checkGaraponSearch(response) {
+      if (
+        angular.isObject(response) &&
+        angular.isObject(response.data)
+      ) {
+        if (garaponSearchMessages[response.data.status]) {
+          toaster.pop({
+            type: 'error',
+            title: 'GArapon TV Error',
+            body: garaponSearchMessages[response.data.status]
+          });
+          return false;
+        }
+        return true;
+      }
+      return false;
     }
 
     function playGarapon(id) {
@@ -585,8 +673,7 @@ limitations under the License.
         var mrl = GaraponService.getStreamUrl(id);
         var program;
         if (
-          angular.isObject(response) &&
-          angular.isObject(response.data) &&
+          checkGaraponSearch(response) &&
           angular.isArray(response.data.program) &&
           angular.isObject(response.data.program[0])
         ) {
@@ -608,7 +695,7 @@ limitations under the License.
           playWithInfo(mrl);
         }
         PlayerService.play(mrl);
-      });
+      }, requestError);
     }
 
     function playWithInfo(mrl) {
@@ -635,14 +722,13 @@ limitations under the License.
             }
           }).then(function (response) {
             if (
-              angular.isObject(response) &&
-              angular.isObject(response.data) &&
+              checkGaraponSearch(response) &&
               angular.isArray(response.data.program) &&
               angular.isObject(response.data.program[0])
             ) {
               playRecorded(response.data.program[0].gtvid);
             }
-          });
+          }, requestError);
           break;
         case 'chinachu':
         default:
@@ -677,14 +763,13 @@ limitations under the License.
             }
           }, false).then(function (response) {
             if (
-              angular.isObject(response) &&
-              angular.isObject(response.data) &&
+              checkGaraponSearch(response) &&
               angular.isArray(response.data.program) &&
               angular.isObject(response.data.program[0])
             ) {
               playRecorded(response.data.program[0].gtvid);
             }
-          });
+          }, requestError);
           break;
         case 'chinachu':
         default:
@@ -715,14 +800,13 @@ limitations under the License.
             }
           }, false).then(function (response) {
             if (
-              angular.isObject(response) &&
-              angular.isObject(response.data) &&
+              checkGaraponSearch(response) &&
               angular.isArray(response.data.program) &&
               angular.isObject(response.data.program[0])
             ) {
               playRecorded(response.data.program[0].gtvid);
             }
-          });
+          }, requestError);
           break;
         case 'chinachu':
         default:
