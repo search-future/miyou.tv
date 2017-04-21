@@ -43,6 +43,7 @@ limitations under the License.
       requestAll: requestAll,
       requestPreview: requestPreview,
       requestPreviewNow: requestPreviewNow,
+      cancelRequests: cancelRequests,
       convertCategory: convertCategory,
       channelFromLegacy: channelFromLegacy,
       serviceFromLegacy: serviceFromLegacy
@@ -54,6 +55,7 @@ limitations under the License.
         password: '',
         previewCacheLifetime: 604800000
       },
+      canceller: $q.defer(),
       previewStack: [],
       previewProcessing: false,
       previewCache: CommonService.loadLocalStorage('chinachu/previewCache') || []
@@ -127,10 +129,11 @@ limitations under the License.
     }
 
     function request(path, config) {
-      var conf = angular.extend({}, config);
-
-      conf.url = getUrl(path);
-      conf.cache = angular.isDefined(conf.cache) ? conf.cache : true;
+      var conf = angular.extend({
+        url: getUrl(path),
+        cache: true,
+        timeout: props.canceller.promise
+      }, config);
       return $http(conf);
     }
 
@@ -217,6 +220,16 @@ limitations under the License.
         deferred: deferred
       });
       processPreviewStack();
+    }
+
+    function clearPreviewStack() {
+      props.previewStack = [];
+    }
+
+    function cancelRequests() {
+      clearPreviewStack();
+      props.canceller.reject();
+      props.canceller = $q.defer();
     }
 
     function savePreviewCache(id, format, params, dataUrl) {
