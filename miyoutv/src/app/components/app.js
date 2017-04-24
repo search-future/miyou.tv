@@ -27,6 +27,7 @@ limitations under the License.
     toaster,
     CommonService,
     ChinachuService,
+    CommentService,
     garaponDevId
   ) {
     var $ctrl = this;
@@ -71,6 +72,50 @@ limitations under the License.
       $ctrl.classes.fullscreen = value;
     });
 
+    $scope.$watchGroup([function () {
+      return CommonService.loadLocalStorage('moritapoEmail');
+    }, function () {
+      return CommonService.loadLocalStorage('moritapoPassword');
+    }], function (values) {
+      var email = values[0] || '';
+      var password = values[1] || '';
+      if (email && password) {
+        CommentService.requestToken(email, password).catch(function (response) {
+          if (response.status === 200) {
+            switch (response.data.EC) {
+              case 401:
+                CommonService.errorModal(
+                  'Moritapo Auth error',
+                  'モリタポアカウントの認証に失敗しました。設定を確認してください。',
+                  function () {
+                    CommonService.openMoritapoSetting();
+                  }
+                );
+                break;
+              default:
+            }
+          } else if (response.status >= 400) {
+            toaster.pop({
+              type: 'error',
+              title: 'HTTP error',
+              body: [response.config.url, ' ', response.statusText, '(', response.status, ')'].join('')
+            });
+          } else if (response.status < 0) {
+            toaster.pop({
+              type: 'error',
+              title: 'Connection error',
+              body: [response.config.url, ' ', 'Connection failure'].join('')
+            });
+          }
+        });
+      } else {
+        toaster.pop({
+          type: 'warning',
+          title: 'Comment error',
+          body: 'コメントを表示するにはモリタポアカウントが必要です。モリタポアカウントを設定してください。'
+        });
+      }
+    });
     $scope.$watchGroup([function () {
       return CommonService.loadLocalStorage('backendType');
     }, function () {

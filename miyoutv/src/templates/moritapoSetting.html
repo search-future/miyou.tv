@@ -20,16 +20,15 @@ limitations under the License.
         <div class="modal-title">モリタポアカウント</div>
     </div>
     <div class="modal-body">
-        <div class="form-group" ng-hide="$ctrl.hasToken">
+        <div class="form-group">
             <div class="form-group">
                 <div uib-alert class="alert-info">コメントを表示するにはモリタポアカウントが必要です。</div>
-                <div uib-alert class="alert-warning" ng-show="$ctrl.hasAuthError">認証に失敗しました。メールアドレスとパスワードを確認してください。</div>
             </div>
             <div class="form-horizontal">
                 <div class="form-group has-feedback" ng-class="{'has-success': moritapo.email.$valid, 'has-warning': moritapo.email.$invalid}">
                     <label class="col-sm-3 control-label" for="moritapo-email">メールアドレス</label>
                     <div class="col-sm-9">
-                        <input id="moritapo-email" class="form-control" name="email" type="email" required ng-disabled="$ctrl.hasToken" ng-model="$ctrl.email">
+                        <input id="moritapo-email" class="form-control" name="email" type="email" required ng-model="$ctrl.email">
                         <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok': moritapo.email.$valid, 'glyphicon-warning-sign': moritapo.email.$invalid}"></span>
                     </div>
                 </div>
@@ -41,23 +40,10 @@ limitations under the License.
                     </div>
                 </div>
             </div>
-            <div class="col-sm-offset-3 col-sm-9 form-group">
-                <button class="btn btn-default" type="button" ng-disabled="$ctrl.hasToken" ng-click="$ctrl.requestToken()">認証</button>
-            </div>
-        </div>
-        <div class="row" ng-show="$ctrl.hasToken">
-            <div class="col-sm-3 form-group">
-                <div class="form-control-static">モリタポアカウント</div>
-            </div>
-            <div class="col-sm-9 form-group">
-                <div class="form-control-static text-success">認証済み<span class="glyphicon glyphicon-ok"></span></div>
-            </div>
-            <div class=" col-sm-offset-3 col-sm-9 form-group">
-                <button class="btn btn-danger" type="button" ng-disabled="!$ctrl.hasToken" ng-click="$ctrl.deleteToken()">認証解除</button>
-            </div>
         </div>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-save" ng-click="$ctrl.ok()">閉じる</button>
+        <button type="button" class="btn btn-save" ng-click="$ctrl.ok()">OK</button>
+        <button type="button" class="btn btn-cancel" ng-click="$ctrl.cancel()">キャンセル</button>
     </div>
 </form>

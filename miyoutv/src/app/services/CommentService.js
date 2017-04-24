@@ -23,7 +23,6 @@ limitations under the License.
     $q,
     $http,
     $httpParamSerializer,
-    CommonService,
     commentUrl,
     commentTokenUrl
   ) {
@@ -42,8 +41,6 @@ limitations under the License.
       canceller: null,
       filter: null
     };
-
-    props.token = CommonService.loadLocalStorage('comment_token') || '';
 
     return service;
 
@@ -83,7 +80,6 @@ limitations under the License.
       $http(conf).then(function (response) {
         if (response.data.token) {
           props.token = response.data.token;
-          CommonService.saveLocalStorage('comment_token', props.token);
           deferred.resolve(response);
         } else {
           deferred.reject(response);
@@ -94,7 +90,6 @@ limitations under the License.
 
     function deleteToken() {
       props.token = '';
-      CommonService.saveLocalStorage('comment_token', props.token);
     }
 
     function request(path, config) {

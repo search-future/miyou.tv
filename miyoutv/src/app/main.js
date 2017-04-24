@@ -133,6 +133,7 @@ global.module.paths.push(modulePath);
     }
     CommonService.removeLocalStorage('commentCache');
     CommonService.removeLocalStorage('commentCountCache');
+    CommonService.removeLocalStorage('comment_token');
     CommonService.removeFile('comments', 'commentCache.json');
 
     angular.element($window).on('move', saveWindowState);

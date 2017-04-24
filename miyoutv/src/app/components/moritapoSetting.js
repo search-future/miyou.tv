@@ -22,13 +22,12 @@ limitations under the License.
       controller: moritapoSettingCtrl,
       bindings: {
         close: '&',
-        reject: '&'
+        dismiss: '&'
       }
     });
 
   function moritapoSettingCtrl(
-    $scope,
-    CommentService
+    CommonService
   ) {
     var $ctrl = this;
     $ctrl.hasToken = false;
@@ -36,32 +35,18 @@ limitations under the License.
     $ctrl.password = '';
     $ctrl.hasAuthError = false;
 
-    $ctrl.requestToken = function () {
-      CommentService.requestToken($ctrl.email, $ctrl.password).then(function () {
-        $ctrl.hasAuthError = false;
-      }, function (response) {
-        switch (response.data.EC) {
-          case 401:
-            $ctrl.hasAuthError = true;
-            break;
-          default:
-        }
-      });
+    $ctrl.$onInit = function () {
+      $ctrl.email = CommonService.loadLocalStorage('moritapoEmail');
+      $ctrl.password = CommonService.loadLocalStorage('moritapoPassword');
     };
-    $ctrl.deleteToken = function () {
-      CommentService.deleteToken();
-    };
+
     $ctrl.ok = function () {
+      CommonService.saveLocalStorage('moritapoEmail', $ctrl.email || '');
+      CommonService.saveLocalStorage('moritapoPassword', $ctrl.password || '');
       $ctrl.close();
     };
     $ctrl.cancel = function () {
-      $ctrl.reject();
+      $ctrl.dismiss();
     };
-
-    $scope.$watch(function () {
-      return CommentService.token();
-    }, function (value) {
-      $ctrl.hasToken = Boolean(value);
-    });
   }
 }());
