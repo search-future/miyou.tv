@@ -27,9 +27,7 @@ limitations under the License.
     });
 
   function BackendSettingCtrl(
-    $scope,
     CommonService,
-    ChinachuService,
     garaponDevId
   ) {
     var $ctrl = this;
