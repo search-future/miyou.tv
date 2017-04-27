@@ -225,7 +225,8 @@ limitations under the License.
     });
     $scope.$watch(function () {
       return CommonService.loadLocalStorage('countMode');
-    }, function () {
+    }, function (value) {
+      countMode = value || 'speed';
       $ctrl.programs.forEach(function (a) {
         var program = a;
         delete program.count;

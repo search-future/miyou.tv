@@ -256,11 +256,12 @@ limitations under the License.
     });
     $scope.$watch(function () {
       return CommonService.loadLocalStorage('countMode');
-    }, function () {
+    }, function (value) {
       var column;
       var item;
       var ci;
       var ii;
+      countMode = value || 'speed';
       for (ci = 0; ci < $ctrl.programs.length; ci += 1) {
         column = $ctrl.programs[ci];
         for (ii = 0; ii < column.programs.length; ii += 1) {
