@@ -100,13 +100,18 @@ limitations under the License.
 
     $ctrl.$onInit = function () {
       active = true;
+      angular.element(viewport).on('scroll', onScroll);
+      angular.element($window).on('resize', onResize);
     };
+
     $ctrl.$onDestroy = function () {
       active = false;
       $timeout.cancel(timer);
       $timeout.cancel(reloader);
       ChinachuService.cancelRequests();
       GaraponService.cancelRequests();
+      angular.element(viewport).off('scroll', onScroll);
+      angular.element($window).off('resize', onResize);
     };
 
     $ctrl.selectItem = function (item) {
@@ -342,7 +347,7 @@ limitations under the License.
       }
     });
 
-    angular.element(viewport).on('scroll', function (e) {
+    function onScroll(e) {
       $ctrl.vHeaderStyle.left = e.target.scrollLeft + 'px';
       $ctrl.vHeaderStyle.paddingTop = (Math.floor(e.target.scrollTop / $ctrl.baseHeight / 24) * $ctrl.baseHeight * 24) + 'px';
       $ctrl.hHeaderStyle.top = e.target.scrollTop + 'px';
@@ -351,11 +356,12 @@ limitations under the License.
       $timeout.cancel(timer);
       timer = $timeout(updateView, 200);
       $scope.$digest();
-    });
-    angular.element($window).on('resize', function () {
+    }
+
+    function onResize() {
       $timeout.cancel(timer);
       timer = $timeout(updateView, 200);
-    });
+    }
 
     function calcPos(time) {
       var pos = ((time - startHour) * $ctrl.baseHeight) / 3600000;

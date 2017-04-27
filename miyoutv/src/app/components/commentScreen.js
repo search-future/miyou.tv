@@ -53,6 +53,14 @@ limitations under the License.
     $ctrl.options = {};
     $ctrl.comments = [];
 
+    $ctrl.$onInit = function () {
+      angular.element($window).on('resize', onResize);
+    };
+
+    $ctrl.$onDestroy = function () {
+      angular.element($window).off('resize', onResize);
+    };
+
     $scope.$watch(function () {
       return $ctrl.enabled;
     }, function (value) {
@@ -150,14 +158,14 @@ limitations under the License.
       }
     });
 
-    angular.element($window).on('resize', function () {
+    function onResize() {
       adjustLines();
       $ctrl.comments.forEach(function (a) {
         var comment = a;
 
         comment.visible = false;
       });
-    });
+    }
 
     function selectLine(comment) {
       var screenWidth = $element[0].clientWidth;

@@ -76,13 +76,18 @@ limitations under the License.
 
     $ctrl.$onInit = function () {
       active = true;
+      angular.element(viewport).on('scroll', onScroll);
+      angular.element($window).on('resize', onResize);
     };
+
     $ctrl.$onDestroy = function () {
       active = false;
       $timeout.cancel(timer);
       $timeout.cancel(reloader);
       ChinachuService.cancelRequests();
       GaraponService.cancelRequests();
+      angular.element(viewport).off('scroll', onScroll);
+      angular.element($window).off('resize', onResize);
     };
 
     $ctrl.search = function (value) {
@@ -275,15 +280,17 @@ limitations under the License.
       }
     });
 
-    angular.element(viewport).on('scroll', function (e) {
+    function onScroll(e) {
       $location.search('y', e.target.scrollTop);
       $timeout.cancel(timer);
       timer = $timeout(updateView, 200);
-    });
-    angular.element($window).on('resize', function () {
+    }
+
+    function onResize() {
       $timeout.cancel(timer);
       timer = $timeout(updateView, 200);
-    });
+    }
+
 
     function requestError(response) {
       if (response.status >= 400) {
