@@ -39,6 +39,7 @@ limitations under the License.
   function CommentScreenCtrl(
     $scope,
     $element,
+    $window,
     $timeout,
     PlayerService
   ) {
@@ -148,10 +149,14 @@ limitations under the License.
         dp += 1;
       }
     });
-    $scope.$watch(function () {
-      return $element[0].clientHeight;
-    }, function () {
+
+    angular.element($window).on('resize', function () {
       adjustLines();
+      $ctrl.comments.forEach(function (a) {
+        var comment = a;
+
+        comment.visible = false;
+      });
     });
 
     function selectLine(comment) {
