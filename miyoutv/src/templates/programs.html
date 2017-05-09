@@ -31,12 +31,12 @@ limitations under the License.
         <div class="col-lg-8 col-sm-6 col-xs-12">
             <ul class="nav nav-mtvblack nav-mtvblack-line flex flex-row flex-center" ng-class="{'hidden-lg': $ctrl.dates.length > 8, 'hidden-md': $ctrl.dates.length > 5, 'hidden-sm': $ctrl.dates.length > 3, 'hidden-xs': $ctrl.dates.length > 2 }">
                 <li class="flex-item trim" ng-repeat="date in $ctrl.dates" ng-class="{active: date.isCurrent}">
-                    <a href="" ng-bind="date.time | date:'M/d EEE'" ng-click="$ctrl.scrollToTime(date.time)"></a>
+                    <a href="" ng-bind="date.time | date:'M/d EEE'" ng-click="$ctrl.scrollToDate(date.time)"></a>
                 </li>
             </ul>
             <div ng-class="{'hidden-lg': $ctrl.dates.length <= 8, 'hidden-md': $ctrl.dates.length <= 5, 'hidden-sm': $ctrl.dates.length <= 3, 'hidden-xs': $ctrl.dates.length <= 2 }">
                 <div class="input-group input-group-dark input-sm">
-                    <input class="form-control text-center" type="text" uib-datepicker-popup="y/M/d EEE" datepicker-options="$ctrl.datepickerOptions" show-button-bar="false" popup-placement="bottom-right" is-open="$ctrl.datepickerOpened" ng-model="$ctrl.currentDate" ng-change="$ctrl.scrollToTime($ctrl.currentDate)">
+                    <input class="form-control text-center" type="text" uib-datepicker-popup="y/M/d EEE" datepicker-options="$ctrl.datepickerOptions" show-button-bar="false" popup-placement="bottom-right" is-open="$ctrl.datepickerOpened" ng-model="$ctrl.currentDate" ng-change="$ctrl.scrollToDate($ctrl.currentDate)">
                     <div class="input-group-btn" title="日付を選択">
                         <button class="btn btn-dark" type="button" ng-click="$ctrl.datepickerOpened = !$ctrl.datepickerOpened">
                             <span class="glyphicon glyphicon-calendar"></span>

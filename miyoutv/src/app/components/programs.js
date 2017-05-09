@@ -45,7 +45,7 @@ limitations under the License.
     var backendType = 'chinachu';
     var startHour = 0;
     var endHour = 0;
-    var hourFirst;
+    var hourFirst = 4;
     var countMode = 'speed';
     var previewEnabled = true;
     var reloader;
@@ -120,8 +120,10 @@ limitations under the License.
       }
       return selectItem;
     };
-    $ctrl.scrollToTime = function (time) {
-      viewport.scrollTop = calcPos(new Date(time).getTime());
+    $ctrl.scrollToDate = function (time) {
+      var date = new Date(time);
+      date.setHours(hourFirst);
+      viewport.scrollTop = calcPos(date.getTime());
     };
     $ctrl.play = function (item) {
       if (item) {
