@@ -823,7 +823,7 @@ limitations under the License.
               a.channel.sid === $ctrl.program.channel.sid &&
               a.end <= $ctrl.program.start
             );
-          })[0];
+          }).slice(-1)[0];
           if (program) {
             playRecorded(program.id);
           }
