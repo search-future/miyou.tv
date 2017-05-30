@@ -26,6 +26,7 @@ limitations under the License.
     md5,
     CommonService,
     garaponAuthUrl,
+    garaponAuthUrlV4,
     garaponDevId,
     categoryTable
   ) {
@@ -41,9 +42,11 @@ limitations under the License.
       clearRequestCache: clearRequestCache,
       login: login,
       logout: logout,
+      loginV4: loginV4,
       requestPreview: requestPreview,
       previewCacheLifetime: previewCacheLifetime,
       getStreamUrl: getStreamUrl,
+      getV4Url: getV4Url,
       convertDate: convertDate,
       convertDuration: convertDuration,
       convertCategory: convertCategory
@@ -81,7 +84,9 @@ limitations under the License.
     function backend(value) {
       if (angular.isString(value)) {
         props.backend = value.trim();
-        logout(true);
+        if (apiVersion < 4) {
+          logout(true);
+        }
       }
       return props.backend;
     }
@@ -216,13 +221,20 @@ limitations under the License.
         },
         transformRequest: $httpParamSerializer,
         url: [backend(), '/gapi/v', apiVersion(), '/', path].join(''),
-        cache: true,
-        params: {
-          dev_id: garaponDevId,
-          gtvsession: props.gtvsession
-        },
+        params: {},
+        data: {},
         timeout: props.canceller.promise
       }, config);
+      if (apiVersion() >= 4) {
+        if (conf.method === 'POST') {
+          conf.data.gtvsession = props.gtvsession;
+        } else {
+          conf.params.gtvsession = props.gtvsession;
+        }
+      } else {
+        conf.params.dev_id = garaponDevId;
+        conf.params.gtvsession = props.gtvsession;
+      }
       if (angular.isUndefined(useCache) || useCache) {
         key = conf.url + angular.toJson(conf.params) + angular.toJson(conf.data);
         if (angular.isUndefined(props.requestCache[key])) {
@@ -308,6 +320,91 @@ limitations under the License.
       return md5.createHash(password());
     }
 
+    function loginV4() {
+      var deferred = $q.defer();
+      var promise;
+      if (props.gtvsession) {
+        promise = checkV4Session().then(function (result) {
+          if (result.status === 'success') {
+            return result;
+          }
+          return getV4Session();
+        }, getV4Session);
+      } else {
+        promise = getV4Session();
+      }
+      promise.then(function (result) {
+        var url;
+        if (result.status === 'success') {
+          if (result.data.gtvsession) {
+            props.gtvsession = result.data.gtvsession;
+          }
+          url = ['http://', result.data.ipaddr];
+          if (
+            result.data.ipaddr === result.data.gipaddr &&
+            angular.isString(result.data.port)
+          ) {
+            url.push(':');
+            url.push(result.data.port);
+          }
+          backend(url.join(''));
+          apiVersion(4);
+          deferred.resolve(result);
+        } else {
+          deferred.reject(result);
+        }
+      });
+      return deferred.promise;
+    }
+
+    function getV4Session() {
+      var deferred = $q.defer();
+      $http({
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        transformRequest: $httpParamSerializer,
+        url: [garaponAuthUrlV4, 'service/Auth/Gtvsession/get'].join('/'),
+        data: {
+          dev_id: garaponDevId,
+          gid: user(),
+          passwd: password()
+        }
+      }).then(function (response) {
+        if (angular.isObject(response.data)) {
+          deferred.resolve(response.data);
+        } else {
+          deferred.reject(response);
+        }
+      }, deferred.reject);
+      return deferred.promise;
+    }
+
+    function checkV4Session() {
+      var deferred = $q.defer();
+      $http({
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        transformRequest: $httpParamSerializer,
+        url: [garaponAuthUrlV4, 'service/Auth/Gtvsession/checkWithGid'].join('/'),
+        data: {
+          dev_id: garaponDevId,
+          gid: user(),
+          gtvsession: props.gtvsession
+        }
+      }).then(function (response) {
+        if (angular.isObject(response.data)) {
+          deferred.resolve(response.data);
+        } else {
+          deferred.reject(response);
+        }
+      }, deferred.reject);
+      return deferred.promise;
+    }
+
     function requestPreview(id) {
       var deferred = $q.defer();
       var config = {
@@ -369,6 +466,17 @@ limitations under the License.
         })].join('');
       }
       return null;
+    }
+
+    function getV4Url(path) {
+      var sessionParam;
+      if (/\?/.test(path)) {
+        sessionParam = '&';
+      } else {
+        sessionParam = '?';
+      }
+      sessionParam += ['gtvsession=' + props.gtvsession];
+      return [backend(), path, sessionParam].join('');
     }
 
     function convertDate(value) {

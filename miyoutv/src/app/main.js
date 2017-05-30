@@ -22,6 +22,7 @@ global.module.paths.push(modulePath);
   'use strict';
 
   var garaponAuthUrl = 'http://garagw.garapon.info';
+  var garaponAuthUrlV4 = process.env.GARAPON_AUTHV4;
   var garaponSiteUrl = process.env.GARAPON_SITE;
   var garaponDevId = '';
   var commentUrl = 'https://miteru.digitiminimi.com/a2sc.php/miyou';
@@ -174,6 +175,7 @@ global.module.paths.push(modulePath);
   angular.module('app', ['ngAnimate', 'ngRoute', 'ui.bootstrap', 'agGrid', 'cfp.hotkeys', 'toaster', 'angular-loading-bar', 'angular-md5'])
     .constant('garaponAuthUrl', garaponAuthUrl)
     .constant('garaponSiteUrl', garaponSiteUrl)
+    .constant('garaponAuthUrlV4', garaponAuthUrlV4)
     .constant('garaponDevId', garaponDevId)
     .constant('commentUrl', commentUrl)
     .constant('commentTokenUrl', commentTokenUrl)
