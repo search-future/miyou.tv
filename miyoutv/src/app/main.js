@@ -22,6 +22,7 @@ global.module.paths.push(modulePath);
   'use strict';
 
   var garaponAuthUrl = 'http://garagw.garapon.info';
+  var garaponSiteUrl = process.env.GARAPON_SITE;
   var garaponDevId = '';
   var commentUrl = 'https://miteru.digitiminimi.com/a2sc.php/miyou';
   var commentTokenUrl = 'https://miteru.digitiminimi.com/a2sc.php/auth/moritapo';
@@ -172,6 +173,7 @@ global.module.paths.push(modulePath);
   }
   angular.module('app', ['ngAnimate', 'ngRoute', 'ui.bootstrap', 'agGrid', 'cfp.hotkeys', 'toaster', 'angular-loading-bar', 'angular-md5'])
     .constant('garaponAuthUrl', garaponAuthUrl)
+    .constant('garaponSiteUrl', garaponSiteUrl)
     .constant('garaponDevId', garaponDevId)
     .constant('commentUrl', commentUrl)
     .constant('commentTokenUrl', commentTokenUrl)
