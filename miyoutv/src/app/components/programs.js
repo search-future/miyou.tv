@@ -32,6 +32,7 @@ limitations under the License.
     CommonService,
     ChinachuService,
     GaraponService,
+    GaraponSiteService,
     CommentService,
     categoryTable
   ) {
@@ -66,7 +67,13 @@ limitations under the License.
       1: null,
       0: 'Invalid session',
       100: 'Parameter error',
-      200: 'Database error'
+      200: 'Database error',
+      success: null,
+      unknown_developer: 'Unknown developer',
+      invalid_params: 'Invalid params',
+      internal_error: 'Internal error',
+      unauthorized: 'Unauthorized',
+      no_program: 'No program'
     };
 
     $ctrl.baseWidth = 200;
@@ -110,6 +117,7 @@ limitations under the License.
       $timeout.cancel(reloader);
       ChinachuService.cancelRequests();
       GaraponService.cancelRequests();
+      GaraponSiteService.cancelRequests();
       angular.element(viewport).off('scroll', onScroll);
       angular.element($window).off('resize', onResize);
     };
@@ -133,6 +141,7 @@ limitations under the License.
             '?mode=channel',
             '&type=', item.channel.type,
             '&sid=', item.channel.sid,
+            '&stype=', item.channel.service_type || '',
             '&start=', item.start,
             '&end=', item.end
           ].join(''));
@@ -225,6 +234,10 @@ limitations under the License.
         case 'garapon':
           $ctrl.archiveEnabled = false;
           connectGarapon(garaponAuth, garaponUrl, garaponUser, garaponPassword);
+          break;
+        case 'garaponv4':
+          $ctrl.archiveEnabled = false;
+          connectGaraponV4(garaponUser, garaponPassword);
           break;
         case 'chinachu':
         default:
@@ -628,15 +641,161 @@ limitations under the License.
       return false;
     }
 
+    function connectGaraponV4(user, password) {
+      GaraponSiteService.user(user);
+      GaraponSiteService.password(password);
+      GaraponService.user(user);
+      GaraponService.password(password);
+      GaraponSiteService.login().then(function () {
+        return GaraponService.loginV4();
+      }).then(function () {
+        updateGaraponV4();
+      }, requestError);
+    }
+
+    function updateGaraponV4(noCache) {
+      var start;
+      var end;
+      if (noCache) {
+        GaraponService.clearRequestCache();
+      }
+      GaraponService.request('Tuner/', {
+        data: {
+          action: 'getrecdate'
+        }
+      }, requestError).then(function (response) {
+        var startDate;
+        var endDate;
+        if (
+          checkGaraponSearch(response) &&
+          angular.isArray(response.data.data)
+        ) {
+          startDate = new Date(response.data.data[0]);
+          endDate = new Date(response.data.data.slice(-1)[0]);
+          startDate.setHours(0);
+          endDate.setHours(0);
+          endDate.setDate(endDate.getDate() + 1);
+          start = startDate.getTime();
+          end = endDate.getTime();
+
+          return GaraponService.request('Tuner/', {
+            data: {
+              action: 'getrecch'
+            }
+          });
+        }
+        return null;
+      }, requestError).then(function (response) {
+        var tsids = [];
+        var i;
+        if (
+          checkGaraponSearch(response) &&
+          angular.isArray(response.data.data)
+        ) {
+          for (i = 0; i < response.data.data.length; i += 1) {
+            tsids.push(response.data.data[i].tsid10);
+          }
+          initView(start, end);
+          loadGaraponV4(tsids.join(','), start, end, 1);
+        }
+        return null;
+      }, requestError);
+    }
+
+    function loadGaraponV4(tsids, start, end, page) {
+      GaraponSiteService.request('Program/Search/search', {
+        data: {
+          tsids: tsids,
+          starttime: start / 1000,
+          endtime: end / 1000,
+          num: 100,
+          page: page
+        }
+      }).then(function (response) {
+        var column;
+        var program;
+        var ri;
+        var pi;
+        var bottomTime = endHour / 1000;
+        if (
+          checkGaraponSearch(response) &&
+          angular.isArray(response.data.programs)
+        ) {
+          if (response.data.hit > page * 100) {
+            loadGaraponV4(tsids, start, end, page + 1);
+          }
+          for (ri = 0; ri < response.data.programs.length; ri += 1) {
+            program = response.data.programs[ri];
+            if (program.endtime <= bottomTime) {
+              for (pi = 0; pi < $ctrl.programs.length; pi += 1) {
+                column = $ctrl.programs[pi];
+                if (
+                  column.sid === program.tsid10 &&
+                  column.service_type === program.service_type
+                ) {
+                  break;
+                }
+                column = null;
+              }
+              if (!column) {
+                column = {};
+                column.type = program.gtvid.slice(0, 2);
+                column.sid = program.tsid10;
+                column.name = program.bcname;
+                column.service_type = program.service_type;
+                column.commentQuery = resolveQuery(column.name);
+                column.style = {
+                  height: calcHeight(start, end)
+                };
+                column.programs = [];
+                $ctrl.programs.push(column);
+              }
+              program.channel = {
+                type: program.gtvid.slice(0, 2),
+                sid: program.tsid10,
+                service_type: program.service_type,
+                name: program.bcname
+              };
+              program.detail = program.description;
+              program.start = program.starttime * 1000;
+              program.end = program.endtime * 1000;
+              program.seconds = program.durationtime;
+              program.categoryName = GaraponSiteService.convertCategory(program.genre[0]);
+              program.style = calcItemStyle(program);
+              program.displayTime = CommonService.formatDate(program.start, 'A HHHH:mm');
+              program.isArchive = false;
+              program.isRecorded = true;
+              program.v4Unverified = true;
+              delete program.count;
+              column.programs.push(program);
+            }
+          }
+          $ctrl.programs.sort(function (a, b) {
+            var types = ['1S', 'GR', 'BS', 'CS', 'US', 'YU'];
+            if (a.type !== b.type) {
+              return types.indexOf(a.type) - types.indexOf(b.type);
+            }
+            return parseInt(a.sid, 10) - parseInt(b.sid, 10);
+          });
+          $timeout.cancel(timer);
+          timer = $timeout(updateView, 200);
+        }
+      }, requestError);
+    }
+
     function reload() {
       $timeout.cancel(reloader);
       ChinachuService.cancelRequests();
       GaraponService.cancelRequests();
+      GaraponSiteService.cancelRequests();
       recorded = [];
       $ctrl.programs = [];
       switch (backendType) {
         case 'garapon':
           updateGarapon(true);
+          break;
+        case 'garaponv4':
+          updateGaraponV4(true);
           break;
         case 'chinachu':
         default:
@@ -646,12 +805,12 @@ limitations under the License.
     }
 
     function updateModel() {
-      if (backendType === 'garapon') {
+      if (backendType === 'garapon' || backendType === 'garaponv4') {
         $ctrl.source = 'garapon';
       } else if ($ctrl.source === 'garapon') {
         $ctrl.source = 'archive';
       }
-      if (backendType === 'chinachu' && !$ctrl.archiveEnabled) {
+      if (backendType === 'chinachu' && recorded.length > 0 && !$ctrl.archiveEnabled) {
         $ctrl.source = 'recorded';
       }
       switch ($ctrl.source) {
@@ -850,10 +1009,14 @@ limitations under the License.
 
     function initView(start, end) {
       if (isFinite(start) && isFinite(end)) {
-        initBaseTime(start, end);
-        initDateHeader(start, end);
-        initDatepicker(start, end);
-        initHourHeader(start, end);
+        if (end > Date.now()) {
+          initView(start, Date.now());
+        } else {
+          initBaseTime(start, end);
+          initDateHeader(start, end);
+          initDatepicker(start, end);
+          initHourHeader(start, end);
+        }
       }
     }
 
@@ -926,6 +1089,8 @@ limitations under the License.
       var ii;
       var countStart;
       var countEnd;
+      var garaponV4VerifyItems = [];
+      var garaponV4VerifyParams = [];
 
       $ctrl.categories.forEach(function (a) {
         if (a.checked) {
@@ -957,7 +1122,8 @@ limitations under the License.
             item.enabled = (
               item.start < end &&
               item.end > start &&
-              (!categoryFilterEnabled || checkedCategories.indexOf(item.categoryName.name) >= 0)
+              (!categoryFilterEnabled || checkedCategories.indexOf(item.categoryName.name) >= 0) &&
+              (backendType !== 'garaponv4' || item.isRecorded)
             );
             if (item.enabled) {
               if (countMode !== 'none' && angular.isUndefined(item.count)) {
@@ -967,6 +1133,16 @@ limitations under the License.
                 if (!countEnd || countEnd < item.end) {
                   countEnd = item.end;
                 }
+              }
+              if (item.v4Unverified) {
+                item.v4Unverified = false;
+                garaponV4VerifyItems.push(item);
+                garaponV4VerifyParams.push([
+                  item.starttime,
+                  item.endtime,
+                  item.tsid16,
+                  item.service_type
+                ].join(','));
               }
               initItem(item);
             }
@@ -982,6 +1158,30 @@ limitations under the License.
             }).then(getCounter(ci), requestError);
           }
         }
+      }
+      if (garaponV4VerifyParams.length > 0) {
+        GaraponService.request('Program/', {
+          data: {
+            action: 'check',
+            'programs[]': garaponV4VerifyParams
+          }
+        }).then(function (response) {
+          var i;
+          if (checkGaraponSearch(response)) {
+            for (i = 0; i < response.data.data.length; i += 1) {
+              if (response.data.data[i].result) {
+                garaponV4VerifyItems[i].isRecorded = true;
+                if (previewEnabled) {
+                  garaponV4VerifyItems[i].preview = garaponV4VerifyItems[i].thumbnail_url;
+                }
+              } else {
+                garaponV4VerifyItems[i].isRecorded = false;
+                garaponV4VerifyItems[i].enabled = false;
+              }
+            }
+          }
+          garaponV4VerifyItems = null;
+        }, requestError);
       }
     }
 
@@ -1049,6 +1249,10 @@ limitations under the License.
               program.preview = value;
             }
           });
+        } else if (backendType === 'garaponv4' && program.isRecorded) {
+          if (previewEnabled) {
+            program.preview = program.thumbnail_url;
+          }
         }
       }
     }
