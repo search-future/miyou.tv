@@ -73,6 +73,10 @@ limitations under the License.
         CommonService.saveLocalStorage('garaponUser', $ctrl.garaponUser);
         CommonService.saveLocalStorage('garaponPassword', $ctrl.garaponPassword);
       }
+      if ($ctrl.backendType === 'garaponv4') {
+        CommonService.saveLocalStorage('garaponUser', $ctrl.garaponUser);
+        CommonService.saveLocalStorage('garaponPassword', $ctrl.garaponPassword);
+      }
       $ctrl.close();
     };
     $ctrl.cancel = function () {

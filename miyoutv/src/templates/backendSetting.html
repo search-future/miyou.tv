@@ -28,7 +28,8 @@ limitations under the License.
                     <div class="col-sm-9">
                         <select id="backend-type" class="form-control" ng-model="$ctrl.backendType">
                             <option value="chinachu">Chinachu</option>
-                            <option value="garapon">ガラポンTV</option>
+                            <option value="garaponv4">ガラポンTV API Ver.4 (六号機～)</option>
+                            <option value="garapon">ガラポンTV API Ver.3 (～伍号機)</option>
                         </select>
                     </div>
                 </div>
@@ -67,9 +68,9 @@ limitations under the License.
                     </div>
                 </div>
             </fieldset>
-            <fieldset ng-show="$ctrl.backendType === 'garapon'">
+            <fieldset ng-show="$ctrl.backendType === 'garapon' || $ctrl.backendType === 'garaponv4'">
                 <legend>ガラポンTV設定</legend>
-                <div class="form-group">
+                <div class="form-group" ng-hide="$ctrl.backendType === 'garaponv4'">
                     <label class="col-sm-3 control-label" for="garapon-auth">URL自動取得</label>
                     <div class="col-sm-9">
                         <label>
@@ -77,7 +78,7 @@ limitations under the License.
                         </label>
                     </div>
                 </div>
-                <div class="form-group has-feedback" ng-class="{'has-success': backend.garapon_url.$valid, 'has-warning': backend.garapon_url.$invalid}" ng-show="!$ctrl.garaponAuth">
+                <div class="form-group has-feedback" ng-hide="$ctrl.backendType === 'garaponv4'" ng-class="{'has-success': backend.garapon_url.$valid, 'has-warning': backend.garapon_url.$invalid}" ng-show="!$ctrl.garaponAuth">
                     <label class="col-sm-3 control-label" for="garapon-url">URL</label>
                     <div class="col-sm-9">
                         <input id="garapon-url" class="form-control" name="garapon_url" type="url" placeholder="http://192.168.11.11" ng-model="$ctrl.garaponUrl" ng-requied="!$ctrl.garaponAuth" ng-disabled="$ctrl.garaponAuth">
@@ -85,7 +86,7 @@ limitations under the License.
                     </div>
                 </div>
                 <div class="form-group has-feedback" ng-class="{'has-success': backend.garapon_user.$valid, 'has-warning': backend.garapon_user.$invalid}">
-                    <label class="col-sm-3 control-label" for="garapon-user">ユーザーID</label>
+                    <label class="col-sm-3 control-label" for="garapon-user">ログインID</label>
                     <div class="col-sm-9">
                         <input id="garapon-user" class="form-control" name="garapon_user" type="text" required ng-model="$ctrl.garaponUser">
                         <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok': backend.garapon_user.$valid, 'glyphicon-warning-sign': backend.garapon_user.$invalid}"></span>
