@@ -33,6 +33,7 @@ limitations under the License.
     CommonService,
     ChinachuService,
     GaraponService,
+    GaraponSiteService,
     CommentService
   ) {
     var $ctrl = this;
@@ -63,7 +64,13 @@ limitations under the License.
       1: null,
       0: 'Invalid session',
       100: 'Parameter error',
-      200: 'Database error'
+      200: 'Database error',
+      success: null,
+      unknown_developer: 'Unknown developer',
+      invalid_params: 'Invalid params',
+      internal_error: 'Internal error',
+      unauthorized: 'Unauthorized',
+      no_program: 'No program'
     };
 
     $ctrl.archiveEnabled = true;
@@ -86,6 +93,7 @@ limitations under the License.
       $timeout.cancel(reloader);
       ChinachuService.cancelRequests();
       GaraponService.cancelRequests();
+      GaraponSiteService.cancelRequests();
       angular.element(viewport).off('scroll', onScroll);
       angular.element($window).off('resize', onResize);
     };
@@ -189,11 +197,12 @@ limitations under the License.
       var garaponUser = values[6];
       var garaponPassword = values[7];
       backendType = values[0];
-
+      $ctrl.preFilterPattern = {};
       $timeout.cancel(timer);
       $timeout.cancel(reloader);
       ChinachuService.cancelRequests();
       GaraponService.cancelRequests();
+      GaraponSiteService.cancelRequests();
       archive = {};
       recorded = [];
       $ctrl.programs = [];
@@ -201,6 +210,11 @@ limitations under the License.
         case 'garapon':
           $ctrl.archiveEnabled = false;
           connectGarapon(garaponAuth, garaponUrl, garaponUser, garaponPassword);
+          break;
+        case 'garaponv4':
+          $ctrl.archiveEnabled = false;
+          $ctrl.preFilterPattern.isRecorded = true;
+          connectGaraponV4(garaponUser, garaponPassword);
           break;
         case 'chinachu':
         default:
@@ -465,15 +479,121 @@ limitations under the License.
       return false;
     }
 
+    function connectGaraponV4(user, password) {
+      GaraponSiteService.user(user);
+      GaraponSiteService.password(password);
+      GaraponService.user(user);
+      GaraponService.password(password);
+      GaraponSiteService.login().then(function () {
+        return GaraponService.loginV4();
+      }).then(function () {
+        updateGaraponV4();
+      }, requestError);
+    }
+
+    function updateGaraponV4(noCache) {
+      var start;
+      var end;
+      if (noCache) {
+        GaraponService.clearRequestCache();
+      }
+      GaraponService.request('Tuner/', {
+        data: {
+          action: 'getrecdate'
+        }
+      }, requestError).then(function (response) {
+        var startDate;
+        var endDate;
+        if (
+          checkGaraponSearch(response) &&
+          angular.isArray(response.data.data)
+        ) {
+          startDate = new Date(response.data.data[0]);
+          endDate = new Date(response.data.data.slice(-1)[0]);
+          startDate.setHours(0);
+          endDate.setHours(0);
+          endDate.setDate(endDate.getDate() + 1);
+          start = startDate.getTime();
+          end = endDate.getTime();
+          return GaraponService.request('Tuner/', {
+            data: {
+              action: 'getrecch'
+            }
+          });
+        }
+        return null;
+      }, requestError).then(function (response) {
+        var tsids = [];
+        var i;
+        if (
+          checkGaraponSearch(response) &&
+          angular.isArray(response.data.data)
+        ) {
+          for (i = 0; i < response.data.data.length; i += 1) {
+            tsids.push(response.data.data[i].tsid10);
+          }
+          loadGaraponV4(tsids.join(','), start, end, 1);
+        }
+      }, requestError);
+    }
+
+    function loadGaraponV4(tsids, start, end, page) {
+      GaraponSiteService.request('Program/Search/search', {
+        data: {
+          tsids: tsids,
+          starttime: start / 1000,
+          endtime: end / 1000,
+          num: 100,
+          page: page
+        }
+      }).then(function (response) {
+        var i;
+        var program;
+        if (
+          checkGaraponSearch(response) &&
+          angular.isArray(response.data.programs)
+        ) {
+          if (response.data.hit > page * 100) {
+            loadGaraponV4(tsids, start, end, page + 1);
+          }
+          for (i = 0; i < response.data.programs.length; i += 1) {
+            program = response.data.programs[i];
+            program.channel = {
+              type: program.gtvid.slice(0, 2),
+              sid: program.tsid10,
+              name: program.bcname
+            };
+            program.detail = program.description;
+            program.start = program.starttime * 1000;
+            program.end = program.endtime * 1000;
+            program.seconds = program.durationtime;
+            program.categoryName = GaraponSiteService.convertCategory(program.genre[0]);
+            program.displayTime = CommonService.formatDate(program.start, 'M/d EEE A HHHH:mm');
+            program.isArchive = false;
+            program.isRecorded = true;
+            program.v4Unverified = true;
+            delete program.count;
+            $ctrl.programs.push(program);
+          }
+          $timeout.cancel(timer);
+          timer = $timeout(updateView, 200);
+        }
+      }, requestError);
+    }
+
     function reload() {
       $timeout.cancel(reloader);
       ChinachuService.cancelRequests();
       GaraponService.cancelRequests();
+      GaraponSiteService.cancelRequests();
       recorded = [];
       $ctrl.programs = [];
       switch (backendType) {
         case 'garapon':
           updateGarapon(true);
+          break;
+        case 'garaponv4':
+          updateGaraponV4(true);
           break;
         case 'chinachu':
         default:
@@ -483,12 +603,12 @@ limitations under the License.
     }
 
     function updateModel() {
-      if (backendType === 'garapon') {
+      if (backendType === 'garapon' || backendType === 'garaponv4') {
         $ctrl.source = 'garapon';
       } else if ($ctrl.source === 'garapon') {
         $ctrl.source = 'archive';
       }
-      if (backendType === 'chinachu' && !$ctrl.archiveEnabled) {
+      if (backendType === 'chinachu' && recorded.length && !$ctrl.archiveEnabled) {
         $ctrl.source = 'recorded';
       }
       switch ($ctrl.source) {
@@ -593,23 +713,60 @@ limitations under the License.
     function updateView() {
       var top = viewport.scrollTop;
       var bottom = viewport.scrollTop + viewport.clientHeight;
-      var i;
+      var ii;
       var item;
       var preload = 5;
+      var garaponV4VerifyItems = [];
+      var garaponV4VerifyParams = [];
 
       $ctrl.viewStyle = {
         height: ($ctrl.baseHeight * $ctrl.filteredPrograms.length) + 'px',
         paddingTop: ((Math.floor(top / $ctrl.baseHeight) - preload) * $ctrl.baseHeight) + 'px'
       };
-      for (i = 0; i < $ctrl.filteredPrograms.length; i += 1) {
-        item = $ctrl.filteredPrograms[i];
+      for (ii = 0; ii < $ctrl.filteredPrograms.length; ii += 1) {
+        item = $ctrl.filteredPrograms[ii];
         item.enabled = (
-          (i - preload) * $ctrl.baseHeight < bottom &&
-          (i + preload + 1) * $ctrl.baseHeight > top
+          (ii - preload) * $ctrl.baseHeight < bottom &&
+          (ii + preload + 1) * $ctrl.baseHeight > top
         );
         if (item.enabled) {
+          if (item.v4Unverified) {
+            item.v4Unverified = false;
+            garaponV4VerifyItems.push(item);
+            garaponV4VerifyParams.push([
+              item.starttime,
+              item.endtime,
+              item.tsid16,
+              item.service_type
+            ].join(','));
+          }
           initItem(item);
         }
+      }
+      if (garaponV4VerifyParams.length > 0) {
+        GaraponService.request('Program/', {
+          data: {
+            action: 'check',
+            'programs[]': garaponV4VerifyParams
+          }
+        }).then(function (response) {
+          var i;
+          if (checkGaraponSearch(response)) {
+            for (i = 0; i < response.data.data.length; i += 1) {
+              if (response.data.data[i].result) {
+                garaponV4VerifyItems[i].isRecorded = true;
+                if (previewEnabled) {
+                  garaponV4VerifyItems[i].preview = garaponV4VerifyItems[i].thumbnail_url;
+                }
+              } else {
+                garaponV4VerifyItems[i].isRecorded = false;
+              }
+            }
+          }
+          garaponV4VerifyItems = null;
+          $timeout.cancel(timer);
+          timer = $timeout(updateView, 200);
+        }, requestError);
       }
     }
 
@@ -659,6 +816,10 @@ limitations under the License.
               program.preview = value;
             }
           });
+        } else if (backendType === 'garaponv4') {
+          if (previewEnabled) {
+            program.preview = program.thumbnail_url;
+          }
         }
       }
 
