@@ -31,6 +31,7 @@ limitations under the License.
     PlayerService,
     ChinachuService,
     GaraponService,
+    GaraponSiteService,
     CommentService
   ) {
     var $ctrl = this;
@@ -55,7 +56,13 @@ limitations under the License.
       1: null,
       0: 'Invalid session',
       100: 'Parameter error',
-      200: 'Database error'
+      200: 'Database error',
+      success: null,
+      unknown_developer: 'Unknown developer',
+      invalid_params: 'Invalid params',
+      internal_error: 'Internal error',
+      unauthorized: 'Unauthorized',
+      no_program: 'No program'
     };
 
     $ctrl.mode = 'recorded';
@@ -124,6 +131,9 @@ limitations under the License.
         case 'garapon':
           initGarapon();
           break;
+        case 'garaponv4':
+          initGaraponV4();
+          break;
         case 'chinachu':
         default:
           initChinachu();
@@ -134,6 +144,7 @@ limitations under the License.
       $timeout.cancel(updater);
       ChinachuService.cancelRequests();
       GaraponService.cancelRequests();
+      GaraponSiteService.cancelRequests();
     };
 
     $scope.$watch(function () {
@@ -534,6 +545,18 @@ limitations under the License.
       }
     }
 
+    function initGaraponV4() {
+      var user = CommonService.loadLocalStorage('garaponUser');
+      var password = CommonService.loadLocalStorage('garaponPassword');
+      GaraponSiteService.user(user);
+      GaraponSiteService.password(password);
+      GaraponService.user(user);
+      GaraponService.password(password);
+      GaraponSiteService.login().then(function () {
+        return GaraponService.loginV4();
+      }).then(init, requestError);
+    }
+
     function init() {
       var params = $location.search();
       $ctrl.mode = params.mode;
@@ -545,6 +568,7 @@ limitations under the License.
           playChannel(
             params.type,
             parseInt(params.sid, 10),
+            parseInt(params.stype || 0, 10),
             parseInt(params.start, 10) + $ctrl.options.commentDelay,
             parseInt(params.end, 10)
           );
@@ -574,6 +598,9 @@ limitations under the License.
       switch (backendType) {
         case 'garapon':
           playGarapon(id);
+          break;
+        case 'garaponv4':
+          playGaraponV4(id);
           break;
         case 'chinachu':
         default:
@@ -705,6 +732,56 @@ limitations under the License.
       }, requestError);
     }
 
+    function playGaraponV4(id) {
+      var program;
+      GaraponSiteService.request('Program/Search/programInfo', {
+        data: {
+          gtvid: id
+        }
+      }, false).then(function (response) {
+        if (
+          checkGaraponSearch(response) &&
+          angular.isObject(response.data.program)
+        ) {
+          program = response.data.program;
+          return GaraponService.request('Program/', {
+            data: {
+              action: 'check',
+              starttime: program.starttime,
+              endtime: program.endtime,
+              tsid10: program.tsid10,
+              service_type: program.service_type
+            }
+          });
+        }
+        return null;
+      }, requestError).then(function (response) {
+        if (
+          checkGaraponSearch(response)
+        ) {
+          if (response.data.data[0].result) {
+            $ctrl.program = program;
+            $ctrl.program.channel = {
+              type: program.gtvid.slice(0, 2),
+              sid: program.tsid10,
+              name: program.bcname
+            };
+            $ctrl.program.start = program.starttime * 1000;
+            $ctrl.program.end = program.endtime * 1000;
+            $ctrl.program.seconds = program.duration;
+            $ctrl.program.categoryName = GaraponSiteService.convertCategory(program.genre[0]);
+            $ctrl.title = program.title;
+            $ctrl.channel = program.bcname;
+            $ctrl.commentOptions.offset = $ctrl.program.start - $ctrl.options.commentDelay;
+            PlayerService.overwriteLength(program.durationtime * 1000);
+            playWithInfo(GaraponService.getV4Url(program.m3u8_url));
+          } else {
+            CommonService.errorModal('Player Error', '録画データが見つかりません。');
+          }
+        }
+      }, requestError);
+    }
+
     function playWithInfo(mrl) {
       PlayerService.play(mrl);
       PlayerService.setScreenText([
@@ -715,7 +792,7 @@ limitations under the License.
       ].join('\n'), true);
     }
 
-    function playChannel(type, sid, start, end) {
+    function playChannel(type, sid, stype, start, end) {
       var program;
       switch (backendType) {
         case 'garapon':
@@ -723,7 +800,7 @@ limitations under the License.
             data: {
               n: 1,
               ch: sid,
-              dt: 'e',
+              dt: 's',
               sdate: CommonService.formatDate(start, 'yyyy-MM-dd HH:mm:ss'),
               sort: 'sta'
             }
@@ -734,6 +811,28 @@ limitations under the License.
               angular.isObject(response.data.program[0])
             ) {
               playRecorded(response.data.program[0].gtvid);
+            }
+          }, requestError);
+          break;
+        case 'garaponv4':
+          GaraponSiteService.request('Program/Search/search', {
+            data: {
+              starttime: start / 1000,
+              endtime: end / 1000,
+              tsids: sid
+            }
+          }).then(function (response) {
+            var programs;
+            if (
+              checkGaraponSearch(response) &&
+              angular.isArray(response.data.programs)
+            ) {
+              programs = response.data.programs.filter(function (a) {
+                return String(a.service_type) === String(stype);
+              });
+              if (programs.length > 0) {
+                playRecorded(programs[0].gtvid);
+              }
             }
           }, requestError);
           break;
@@ -778,6 +877,28 @@ limitations under the License.
             }
           }, requestError);
           break;
+        case 'garaponv4':
+          GaraponSiteService.request('Program/Search/search', {
+            data: {
+              tsids: $ctrl.program.tsid10,
+              starttime: Math.floor(($ctrl.program.end) / 1000) - 1,
+              sort: 'sta'
+            }
+          }, false).then(function (response) {
+            var programs;
+            if (
+              checkGaraponSearch(response) &&
+              angular.isArray(response.data.programs)
+            ) {
+              programs = response.data.programs.filter(function (a) {
+                return a.service_type === $ctrl.program.service_type;
+              });
+              if (programs.length > 0) {
+                playRecorded(programs[0].gtvid);
+              }
+            }
+          }, requestError);
+          break;
         case 'chinachu':
         default:
           program = recorded.filter(function (a) {
@@ -812,6 +933,29 @@ limitations under the License.
               angular.isObject(response.data.program[0])
             ) {
               playRecorded(response.data.program[0].gtvid);
+            }
+          }, requestError);
+          break;
+        case 'garaponv4':
+          GaraponSiteService.request('Program/Search/search', {
+            data: {
+              tsids: $ctrl.program.tsid10,
+              starttime: Math.floor(($ctrl.program.start) / 1000) - 604800,
+              endtime: Math.floor(($ctrl.program.start) / 1000) - 10,
+              sort: 'std'
+            }
+          }, false).then(function (response) {
+            var programs;
+            if (
+              checkGaraponSearch(response) &&
+              angular.isArray(response.data.programs)
+            ) {
+              programs = response.data.programs.filter(function (a) {
+                return a.service_type === $ctrl.program.service_type;
+              });
+              if (programs.length > 0) {
+                playRecorded(programs[0].gtvid);
+              }
             }
           }, requestError);
           break;
