@@ -278,9 +278,6 @@ limitations under the License.
 
     function logout(force) {
       var deferred = $q.defer();
-      if (force) {
-        props.gtvsession = null;
-      }
       request('auth', {
         data: {
           type: 'logout'
@@ -292,12 +289,17 @@ limitations under the License.
           response.data.status === 1 &&
           response.data.logout === 1
         ) {
-          props.gtvsession = null;
+          if (!force) {
+            props.gtvsession = null;
+          }
           deferred.resolve(response);
         } else {
           deferred.reject(response);
         }
       }, deferred.reject, deferred.notify);
+      if (force) {
+        props.gtvsession = null;
+      }
       return deferred.promise;
     }
 
