@@ -404,60 +404,47 @@ limitations under the License.
       if (noCache) {
         GaraponService.clearRequestCache();
       }
-      GaraponService.request('search', {
-        data: {
-          n: 1
-        }
-      }).then(function (response) {
-        var i;
-        var pageCount;
-        if (
-          angular.isObject(response) &&
-          angular.isObject(response.data) &&
-          angular.isArray(response.data.program) &&
-          angular.isObject(response.data.program[0])
-        ) {
-          pageCount = parseInt(response.data.hit, 10) / 100;
-          for (i = 0; i < pageCount; i += 1) {
-            GaraponService.request('search', {
-              data: {
-                n: 100,
-                p: i + 1
-              }
-            }).then(garaponLoader, requestError);
-          }
-        }
-      }, requestError);
+      loadGarapon(1);
     }
 
-    function garaponLoader(response) {
-      var program;
-      var ri;
-      if (
-        checkGaraponSearch(response) &&
-        angular.isArray(response.data.program)
-      ) {
-        for (ri = 0; ri < response.data.program.length; ri += 1) {
-          program = response.data.program[ri];
-          program.channel = {
-            type: program.gtvid.slice(0, 2),
-            sid: program.ch,
-            name: program.bc
-          };
-          program.detail = program.description;
-          program.start = GaraponService.convertDate(program.startdate);
-          program.end = program.start + GaraponService.convertDuration(program.duration);
-          program.seconds = GaraponService.convertDuration(program.duration) / 1000;
-          program.categoryName = GaraponService.convertCategory(program.genre[0]);
-          program.displayTime = CommonService.formatDate(program.start, 'M/d EEE A HHHH:mm');
-          program.isArchive = false;
-          program.isRecorded = true;
-          delete program.count;
-          $ctrl.programs.push(program);
+    function loadGarapon(page) {
+      GaraponService.request('search', {
+        data: {
+          n: 100,
+          p: page
         }
-        $timeout.cancel(timer);
-        timer = $timeout(updateView, 200);
-      }
+      }).then(function (response) {
+        var program;
+        var ri;
+        if (
+          checkGaraponSearch(response) &&
+          angular.isArray(response.data.program)
+        ) {
+          if (response.data.hit > page * 100) {
+            loadGarapon(page + 1);
+          }
+          for (ri = 0; ri < response.data.program.length; ri += 1) {
+            program = response.data.program[ri];
+            program.channel = {
+              type: program.gtvid.slice(0, 2),
+              sid: program.ch,
+              name: program.bc
+            };
+            program.detail = program.description;
+            program.start = GaraponService.convertDate(program.startdate);
+            program.end = program.start + GaraponService.convertDuration(program.duration);
+            program.seconds = GaraponService.convertDuration(program.duration) / 1000;
+            program.categoryName = GaraponService.convertCategory(program.genre[0]);
+            program.displayTime = CommonService.formatDate(program.start, 'M/d EEE A HHHH:mm');
+            program.isArchive = false;
+            program.isRecorded = true;
+            delete program.count;
+            $ctrl.programs.push(program);
+          }
+          $timeout.cancel(timer);
+          timer = $timeout(updateView, 200);
+        }
+      }, requestError);
     }
 
     function checkGaraponSearch(response) {
