@@ -527,30 +527,25 @@ limitations under the License.
         }
         return null;
       }, requestError).then(function (response) {
-        var i;
-        var pageCount;
         if (
           checkGaraponSearch(response) &&
           angular.isArray(response.data.program) &&
           angular.isObject(response.data.program[0])
         ) {
-          pageCount = parseInt(response.data.hit, 10) / 100;
           start = GaraponService.convertDate(response.data.program[0].startdate);
           initView(start, end);
-          for (i = 0; i < pageCount; i += 1) {
-            GaraponService.request('search', {
-              data: {
-                n: 100,
-                p: i + 1
-              }
-            }).then(getGaraponLoader(start, end), requestError);
-          }
+          loadGarapon(start, end, 1);
         }
       }, requestError);
     }
 
-    function getGaraponLoader(start, end) {
-      return function (response) {
+    function loadGarapon(start, end, page) {
+      GaraponService.request('search', {
+        data: {
+          n: 100,
+          p: page
+        }
+      }).then(function (response) {
         var program;
         var column;
         var ri;
@@ -559,6 +554,9 @@ limitations under the License.
           checkGaraponSearch(response) &&
           angular.isArray(response.data.program)
         ) {
+          if (response.data.hit > page * 100) {
+            loadGarapon(start, end, page + 1);
+          }
           for (ri = 0; ri < response.data.program.length; ri += 1) {
             program = response.data.program[ri];
             for (pi = 0; pi < $ctrl.programs.length; pi += 1) {
@@ -609,7 +607,7 @@ limitations under the License.
           $timeout.cancel(timer);
           timer = $timeout(updateView, 200);
         }
-      };
+      }, requestError);
     }
 
     function checkGaraponSearch(response) {
