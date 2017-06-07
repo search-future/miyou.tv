@@ -81,6 +81,7 @@ limitations under the License.
     function backend(value) {
       if (angular.isString(value)) {
         props.backend = value.trim();
+        logout(true);
       }
       return props.backend;
     }
