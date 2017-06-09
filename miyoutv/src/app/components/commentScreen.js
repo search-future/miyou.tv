@@ -22,7 +22,6 @@ limitations under the License.
         '<div ng-show="$ctrl.enabled">',
         '<div',
         'ng-repeat="comment in $ctrl.comments"',
-        'ng-show="comment.visible"',
         'ng-style="comment.style"',
         'ng-bind="comment.text"',
         '></div>',
@@ -54,11 +53,11 @@ limitations under the License.
     $ctrl.comments = [];
 
     $ctrl.$onInit = function () {
-      angular.element($window).on('resize', onResize);
+      angular.element($window).on('resize', adjustLines);
     };
 
     $ctrl.$onDestroy = function () {
-      angular.element($window).off('resize', onResize);
+      angular.element($window).off('resize', adjustLines);
     };
 
     $scope.$watch(function () {
@@ -68,7 +67,7 @@ limitations under the License.
         $ctrl.comments.forEach(function (a) {
           var comment = a;
 
-          comment.visible = false;
+          comment.style.visibility = 'hidden';
         });
       }
     });
@@ -99,9 +98,9 @@ limitations under the License.
       $ctrl.comments = [];
       for (i = 0; i < max; i += 1) {
         $ctrl.comments.push({
-          visible: false,
           style: {
             position: 'absolute',
+            visibility: 'hidden',
             transitionProperty: 'left',
             transitionTimingFunction: 'linear'
           }
@@ -137,14 +136,14 @@ limitations under the License.
         $ctrl.comments.forEach(function (a) {
           var comment = a;
 
-          comment.visible = false;
+          comment.style.visibility = 'hidden';
         });
       } else if (newValue - oldValue > duration) {
         start = (newValue - duration) + offset;
         $ctrl.comments.forEach(function (a) {
           var comment = a;
 
-          comment.visible = false;
+          comment.style.visibility = 'hidden';
         });
       }
       while (dp < $ctrl.data.length) {
@@ -158,55 +157,46 @@ limitations under the License.
       }
     });
 
-    function onResize() {
-      adjustLines();
-      $ctrl.comments.forEach(function (a) {
-        var comment = a;
-
-        comment.visible = false;
-      });
-    }
-
     function selectLine(comment) {
       var screenWidth = $element[0].clientWidth;
       var commentWidth = comment.element[0].offsetWidth;
       var reachTime = (duration * screenWidth) / (screenWidth + commentWidth);
-      var minTime = Infinity;
-      var oldComments = [];
-      var index = 0;
+      var candidateLife = Infinity;
+      var candidateRight = Infinity;
+      var candidateIndex = 0;
 
       var i = 0;
-      var reminingTime = 0;
+      var remainingTime = 0;
       var lineElement = null;
       var right = 0;
 
       for (i = 0; i < lines.length; i += 1) {
-        if (!lines[i] || !lines[i].visible) {
+        if (!lines[i] || lines[i].style.visibility === 'hidden') {
           return i;
         }
-        reminingTime = (lines[i].time + duration) - comment.time;
+        remainingTime = (lines[i].time + duration) - comment.time;
         lineElement = lines[i].element[0];
         right = lineElement.offsetLeft + lineElement.offsetWidth;
-        if (reminingTime <= reachTime && right <= $element[0].clientWidth) {
+        if (remainingTime <= reachTime && right <= $element[0].clientWidth) {
           return i;
         }
-        if (reminingTime <= minTime) {
-          if (reminingTime !== minTime) {
-            minTime = reminingTime;
-            oldComments = [];
-          }
-          oldComments.push(lines[i]);
+        if (remainingTime <= candidateLife && right < candidateRight) {
+          candidateLife = remainingTime;
+          candidateRight = right;
+          candidateIndex = lines[i].index || i;
         }
       }
-      index = Math.floor(Math.random() * oldComments.length);
-      return oldComments[index].index;
+      if (Math.floor(candidateIndex + 0.25) >= Math.floor(candidateIndex)) {
+        candidateIndex -= 1;
+      }
+      return candidateIndex + 0.25;
     }
 
     function initComment(value) {
       var comment = value;
 
       comment.element.on('transitionend', function () {
-        comment.visible = false;
+        comment.style.visibility = 'hidden';
       });
     }
 
@@ -220,6 +210,7 @@ limitations under the License.
         comment.style.transitionDuration = duration + 'ms';
         comment.style.transitionDelay = (comment.time - $ctrl.time) + 'ms';
         comment.style.left = -comment.element[0].offsetWidth + 'px';
+        comment = null;
       });
     }
 
@@ -228,11 +219,6 @@ limitations under the License.
       var fontSize = (lineHeight * 2) / 3;
 
       $element.css('fontSize', fontSize + 'px');
-      $ctrl.comments.forEach(function (comment) {
-        if (comment.visible) {
-          initAnimation(comment);
-        }
-      });
     }
 
     function deployComment(data) {
@@ -241,15 +227,16 @@ limitations under the License.
       comment.time = data.time - offset;
       comment.text = data.text;
       comment.style.opacity = 0;
-      comment.visible = true;
+      comment.style.visibility = 'visible';
       $timeout(function () {
         var index = selectLine(comment);
 
         comment.index = index;
-        lines[index] = comment;
-        comment.style.top = ((100 * index) / lines.length) + '%';
+        lines[Math.floor(index)] = comment;
+        comment.style.top = ((100 * index) / (lines.length + 1)) + '%';
         comment.style.opacity = 1;
         initAnimation(comment);
+        comment = null;
       });
       cp += 1;
       if (cp >= $ctrl.comments.length) {
