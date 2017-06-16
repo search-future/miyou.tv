@@ -8,13 +8,9 @@
   },
   "bugs": "https://github.com/search-future/miyou.tv/issues",
   "dependencies": {
-    "electron": "^1.4.13",
-    "electron-prebuilt": "^0.36.0",
-    "nw": ">=0.12.3",
-    "wcjs-prebuilt": "^3.0.0",
-    "webchimera.js": "^0.2.7",
     "webgl-video-renderer": "^0.2.0"
   },
+  "devDependencies": {},
   "engines": {
     "node": ">=1.2.0"
   },
@@ -28,17 +24,10 @@
     "tv"
   ],
   "license": "Apache-2.0",
-  "main": "index.html",
-  "optionalDependencies": {},
+  "main": "index.js",
+  "productName": "MiyouTV",
   "repository": "https://github.com/search-future/miyou.tv",
   "scripts": {
-    "start": "electron index.js || nw"
-  },
-  "window": {
-    "frame": true,
-    "toolbar": false,
-    "show": false,
-    "min_width": 300,
-    "min_height": 500
+    "start": "electron"
   }
 }

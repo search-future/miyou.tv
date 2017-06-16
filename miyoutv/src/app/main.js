@@ -15,8 +15,11 @@ limitations under the License.
 */
 var path = require('path');
 var execDir = path.dirname(process.execPath);
-var modulePath = path.join(execDir, 'node_modules');
-global.module.paths.push(modulePath);
+if (process.platform === 'darwin') {
+  global.module.paths.push(path.join(execDir, '../../../../node_modules'));
+} else {
+  global.module.paths.push(path.join(execDir, 'node_modules'));
+}
 
 (function () {
   'use strict';

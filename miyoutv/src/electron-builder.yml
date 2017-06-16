@@ -1,0 +1,27 @@
+appId: "jp.razil.miyoutv"
+copyright: "Copyright © 2016 Brazil Ltd."
+directories:
+  output: "../"
+extraMetadata:
+  author:
+    name: "未来検索ブラジル"
+    url: "http://razil.jp/"
+extraFiles:
+  - "install.sh"
+  - "node_modules/"
+linux:
+  category: "AudioVideo"
+  icon: "miyoutv.iconset"
+  target:
+    - "AppImage"
+    - "tar.gz"
+mac:
+  icon: "miyoutv.icns"
+nsis:
+  artifactName: "${productName} Setup ${version} (${env.NSIS_ARCH}).${ext}"
+  deleteAppDataOnUninstall: true
+win:
+  icon: "miyoutv.ico"
+  target:
+    - "zip"
+    - "nsis"

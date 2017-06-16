@@ -6,15 +6,25 @@ var win;
 
 /* eslint-disable */
 if (/^0/.test(process.versions.electron)) {
+  if (process.env.npm_lifecycle_script) {
+    require('electron-reload')(__dirname, {
+      electron: require('electron-prebuilt')
+    });
+  }
   app = require('app');
   BrowserWindow = require('browser-window');
 } else {
+  if (process.env.npm_lifecycle_script) {
+    require('electron-reload')(__dirname, {
+      electron: process.execPath
+    });
+  }
   app = require('electron').app;
   BrowserWindow = require('electron').BrowserWindow;
 }
 /* eslint-enable */
 
-if (process.platform === 'win32') {
+if (process.platform === 'win32' && !process.env.VLC_PLUGIN_PATH) {
   process.env.VLC_PLUGIN_PATH = path.join(
     path.dirname(process.env.npm_lifecycle_script ? '.' : process.execPath), 'node_modules/wcjs-prebuilt/bin/plugins'
   );
