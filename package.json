@@ -21,7 +21,7 @@
     "bootstrap": "^3.3.7",
     "font-awesome": "^4.7.0",
     "jquery": "^3.2.1",
-    "typeface-roboto": "0.0.29",
+    "typeface-roboto": "0.0.35",
     "webgl-video-renderer": "^0.2.0"
   },
   "devDependencies": {
@@ -29,11 +29,11 @@
     "cpx": "^1.5.0",
     "cross-conf-env": "^1.1.2",
     "css-loader": "^0.28.4",
-    "electron-builder": "^19.7.1",
+    "electron-builder": "^19.19.1",
     "electron-reload": "^1.2.1",
     "env-cmd": "^5.1.0",
-    "eslint": "^3.14.1",
-    "eslint-config-airbnb-base": "^11.0.1",
+    "eslint": "^4.4.1",
+    "eslint-config-airbnb-base": "^11.3.1",
     "eslint-config-angular": "^0.5.0",
     "eslint-plugin-angular": "^1.6.1",
     "eslint-plugin-import": "^2.2.0",
@@ -51,9 +51,9 @@
     "stylelint-config-standard": "^16.0.0",
     "tar.gz": "^1.0.5",
     "typeface-notosans-jp": "^1.0.1",
-    "uglify-js": "^2.8.28",
-    "uglifyjs-webpack-plugin": "^0.4.3",
-    "webpack": "^3.0.0"
+    "uglify-js": "^3.0.27",
+    "uglifyjs-webpack-plugin": "^0.4.6",
+    "webpack": "^3.5.2"
   },
   "engines": {
     "node": ">=4"
