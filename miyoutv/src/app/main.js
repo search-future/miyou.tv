@@ -144,16 +144,6 @@ if (process.platform === 'darwin') {
     angular.element($window).on('move', saveWindowState);
     angular.element($window).on('resize', saveWindowState);
 
-    if (process.versions.nw || process.versions['node-webkit']) {
-      win.on('close', function () {
-        win.restore();
-        $timeout(function () {
-          saveWindowState();
-          win.close(true);
-        });
-      });
-    }
-
     win.show();
     loadWindowState();
 
@@ -164,7 +154,7 @@ if (process.platform === 'darwin') {
         width: $window.outerWidth,
         height: $window.outerHeight
       };
-      if (process.versions.nw || process.versions['node-webkit'] || !(win.isMinimized() || win.isMaximized() || win.isFullScreen())) {
+      if (!(win.isMinimized() || win.isMaximized() || win.isFullScreen())) {
         CommonService.saveLocalStorage('windowState', windowState);
       }
     }

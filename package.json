@@ -27,7 +27,6 @@
     "glob": "^7.1.2",
     "json": "^9.0.6",
     "ng-annotate-loader": "^0.6.1",
-    "nwjs-builder": "^1.14.0",
     "rimraf": "^2.6.1",
     "stylelint": "^7.8.0",
     "stylelint-config-standard": "^16.0.0",
@@ -53,7 +52,6 @@
   "optionalDependencies": {
     "electron": "^1.4.13",
     "electron-prebuilt": "^0.36.0",
-    "nw": ">=0.12.3",
     "wcjs-prebuilt": "^3.0.0",
     "webchimera.js": "^0.2.7"
   },
@@ -104,12 +102,5 @@
     "watch": "concurrently \"npm run watch:js\" \"npm run watch:resource\"",
     "watch:js": "npm run build:js -- -w",
     "watch:resource": "npm run build:resource -- -w"
-  },
-  "window": {
-    "frame": true,
-    "toolbar": true,
-    "show": false,
-    "min_width": 300,
-    "min_height": 500
   }
 }

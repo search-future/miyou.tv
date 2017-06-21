@@ -3,4 +3,4 @@ set WCJS_RUNTIME="electron"
 set WCJS_RUNTIME_VERSION="v1.4.13"
 
 npm install --no-optional
-npm install nw@1.4.13 wcjs-prebuilt
+npm install electron@1.4.13 wcjs-prebuilt

@@ -47,13 +47,6 @@ limitations under the License.
         var loader = document.createElement('script');
 
         loader.src = 'app.js';
-        loader.addEventListener('error', function() {
-            if (global.nw) {
-                nw.Window.get().evalNWBin(null, 'app.bin');
-            } else {
-                require('nw.gui').Window.get().evalNWBin(null, 'app.bin');
-            }
-        }, false);
         document.body.appendChild(loader);
 
         function bootstrap() {

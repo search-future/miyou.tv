@@ -38,10 +38,15 @@ limitations under the License.
       saveFile: saveFile,
       loadFile: loadFile,
       removeFile: removeFile,
+      isFullscreen: isFullscreen,
+      enterFullscreen: enterFullscreen,
+      leaveFullscreen: leaveFullscreen,
+      toggleFullscreen: toggleFullscreen,
       quitModal: quitModal,
       close: close,
       reload: reload,
       back: back,
+      quit: quit,
       formatTime: formatTime,
       convertHour: convertHour,
       formatDate: formatDate,
@@ -58,21 +63,7 @@ limitations under the License.
     };
 
     /* eslint-disable */
-    if (process.versions.nw || process.versions['node-webkit']) {
-      if (process.versions.nw) {
-        props.app = nw.App;
-        props.win = nw.Window.get();
-      } else {
-        props.app = require('nw.gui').App;
-        props.win = require('nw.gui').Window.get();
-      }
-      props.dataPath = props.app.dataPath;
-      service.isFullscreen = isFullscreen;
-      service.enterFullscreen = enterFullscreenNW;
-      service.leaveFullscreen = leaveFullscreenNW;
-      service.toggleFullscreen = toggleFullscreenNW;
-      service.quit = quitNW;
-    } else if (process.versions.electron) {
+    if (process.versions.electron) {
       var version = process.versions.electron.split('.');
       if (parseInt(version[0], 10) > 0) {
         props.app = require('electron').remote.app;
@@ -82,11 +73,6 @@ limitations under the License.
         props.win = require('remote').getCurrentWindow();
       }
       props.dataPath = props.app.getPath('userData');
-      service.isFullscreen = isFullscreen;
-      service.enterFullscreen = enterFullscreenElectron;
-      service.leaveFullscreen = leaveFullscreenElectron;
-      service.toggleFullscreen = toggleFullscreenElectron;
-      service.quit = quitElectron;
     }
     /* eslint-enable */
 
@@ -199,32 +185,17 @@ limitations under the License.
       return props.isFullscreen;
     }
 
-    function enterFullscreenNW() {
-      props.isFullscreen = true;
-      props.win.enterFullscreen();
-    }
-
-    function enterFullscreenElectron() {
+    function enterFullscreen() {
       props.isFullscreen = true;
       props.win.setFullScreen(props.isFullscreen);
     }
 
-    function leaveFullscreenNW() {
-      props.isFullscreen = false;
-      props.win.leaveFullscreen();
-    }
-
-    function leaveFullscreenElectron() {
+    function leaveFullscreen() {
       props.isFullscreen = false;
       props.win.setFullScreen(props.isFullscreen);
     }
 
-    function toggleFullscreenNW() {
-      props.isFullscreen = !props.win.isFullscreen;
-      props.win.toggleFullscreen();
-    }
-
-    function toggleFullscreenElectron() {
+    function toggleFullscreen() {
       props.isFullscreen = !props.win.isFullScreen();
       props.win.setFullScreen(props.isFullscreen);
     }
@@ -254,11 +225,7 @@ limitations under the License.
       $window.history.back();
     }
 
-    function quitNW() {
-      props.app.closeAllWindows();
-    }
-
-    function quitElectron() {
+    function quit() {
       props.app.quit();
     }
 
