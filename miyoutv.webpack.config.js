@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const glob = require('glob');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
@@ -23,8 +24,13 @@ module.exports = {
   },
   devtool: 'source-map',
   plugins: [
+    new webpack.DefinePlugin(
+      process.env.IS_PACK ? {
+        NODE_ENV: process.env.NODE_ENV,
+      } : {}
+    ),
     new UglifyJSPlugin({
-      sourceMap: true
+      sourceMap: process.env.NODE_ENV !== 'production'
     })
   ]
 };

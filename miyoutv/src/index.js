@@ -3,10 +3,11 @@ var app;
 var BrowserWindow;
 
 var win;
+var nodeEnv = process.env.NODE_ENV;
 
 /* eslint-disable */
 if (/^0/.test(process.versions.electron)) {
-  if (process.env.npm_lifecycle_script) {
+  if (nodeEnv !== 'production') {
     require('electron-reload')(__dirname, {
       electron: require('electron-prebuilt')
     });
@@ -14,7 +15,7 @@ if (/^0/.test(process.versions.electron)) {
   app = require('app');
   BrowserWindow = require('browser-window');
 } else {
-  if (process.env.npm_lifecycle_script) {
+  if (nodeEnv !== 'production') {
     require('electron-reload')(__dirname, {
       electron: process.execPath
     });
@@ -37,7 +38,7 @@ function createWindow() {
     show: false
   });
 
-  if (process.env.npm_lifecycle_script) {
+  if (nodeEnv !== 'production') {
     win.webContents.openDevTools();
   } else {
     win.setMenu(null);
