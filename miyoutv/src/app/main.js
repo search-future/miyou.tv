@@ -27,7 +27,7 @@ if (process.platform === 'darwin') {
   var garaponAuthUrl = 'http://garagw.garapon.info';
   var garaponAuthUrlV4 = process.env.GARAPON_AUTHV4;
   var garaponSiteUrl = process.env.GARAPON_SITE;
-  var garaponDevId = '';
+  var garaponDevId = process.env.GARAPON_DEVID;
   var commentUrl = 'https://miteru.digitiminimi.com/a2sc.php/miyou';
   var commentTokenUrl = 'https://miteru.digitiminimi.com/a2sc.php/auth/moritapo';
 
