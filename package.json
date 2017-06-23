@@ -58,8 +58,8 @@
   "productName": "MiyouTV",
   "repository": "https://github.com/search-future/miyou.tv",
   "scripts": {
-    "build": "concurrently \"npm run build:js\" \"npm run build:resource\" \"npm run build:bundle\"",
-    "build-agent": "concurrently \"npm run build-agent:js\" \"npm run build-agent:resource\"",
+    "build": "env-cmd .env.local concurrently \"npm run build:js\" \"npm run build:resource\" \"npm run build:bundle\"",
+    "build-agent": "env-cmd .env.local concurrently \"npm run build-agent:js\" \"npm run build-agent:resource\"",
     "build-agent:js": "webpack --config miyoutv-agent.webpack.config.js",
     "build-agent:resource": "cpx \"miyoutv-agent/**/!(src|*.js)\" build/miyoutv-agent/",
     "build:bundle": "cpx miyoutv/src/bower.json miyoutv/dist/ && bower install --config.cwd=miyoutv/dist/",
@@ -97,9 +97,9 @@
     "predist:win32": "npm run build && npm run dist:win32:copy && npm run dist:win32:config",
     "predist:win64": "npm run build && npm run dist:win64:copy && npm run dist:win64:config",
     "prestart": "npm run build",
-    "start": "concurrently -k -s first \"electron ./\" \"npm run watch\"",
+    "start": "env-cmd .env.local concurrently -k -s first \"electron ./\" \"npm run watch\"",
     "test": "eslint --ignore-path .gitignore ./",
-    "watch": "concurrently \"npm run watch:js\" \"npm run watch:resource\"",
+    "watch": "env-cmd .env.local concurrently \"npm run watch:js\" \"npm run watch:resource\"",
     "watch:js": "npm run build:js -- -w",
     "watch:resource": "npm run build:resource -- -w"
   }
