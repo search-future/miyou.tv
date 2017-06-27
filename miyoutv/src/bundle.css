@@ -13,10 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-/* eslint-disable node/no-missing-require*/
-(function (jquery) {
-  'use strict';
-
-  window.jQuery = jquery;
-  window.$ = jquery;
-}(require('./bower_components/jquery/dist/jquery.min.js')));
+@import "../../node_modules/typeface-roboto/index.css";
+@import "../../node_modules/bootstrap/dist/css/bootstrap.css";
+@import "../../node_modules/angularjs-toaster/toaster.css";
+@import "../../node_modules/angular-loading-bar/build/loading-bar.css";
