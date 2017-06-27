@@ -45,6 +45,7 @@
     "stylelint": "^7.8.0",
     "stylelint-config-standard": "^16.0.0",
     "tar.gz": "^1.0.5",
+    "typeface-notosans-jp": "^1.0.1",
     "uglify-js": "^2.8.28",
     "uglifyjs-webpack-plugin": "^0.4.3",
     "webpack": "^2.6.1"

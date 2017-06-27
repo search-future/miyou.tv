@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 @import "../../node_modules/typeface-roboto/index.css";
+@import "../../node_modules/typeface-notosans-jp/notosansjapanese.css";
 @import "../../node_modules/bootstrap/dist/css/bootstrap.css";
 @import "../../node_modules/angularjs-toaster/toaster.css";
 @import "../../node_modules/angular-loading-bar/build/loading-bar.css";

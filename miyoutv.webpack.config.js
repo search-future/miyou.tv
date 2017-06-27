@@ -38,7 +38,7 @@ module.exports = {
         })}`,
       }),
     }, {
-      test: /(typeface|fonts).+\.(eot|svg|ttf|woff2?)$/,
+      test: /(typeface|fonts).+\.(eot|otf|svg|ttf|woff2?)$/,
       use: 'file-loader?name=fonts/[name].[ext]',
     }]
   },
