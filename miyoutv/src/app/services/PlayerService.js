@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-(function (wcjs, renderer) {
+(function (wcjs) {
   'use strict';
 
   angular.module('app')
@@ -198,7 +198,7 @@ limitations under the License.
         service.player.onPausableChanged = createEmitter('Player.PausableChanged');
         service.player.onLengthChanged = createEmitter('Player.LengthChanged');
       }
-      service.renderContext = renderer.setupCanvas(screen);
+      service.renderContext = wcjsRenderer.setupCanvas(screen);
       service.renderContext.fillBlack();
       $rootScope.$broadcast('Player.Ready');
     }
@@ -552,6 +552,5 @@ limitations under the License.
     }
   }
 }(
-  require(process.platform === 'linux' ? 'webchimera.js' : 'wcjs-prebuilt'),
-  require('webgl-video-renderer')
+  require(process.platform === 'linux' ? 'webchimera.js' : 'wcjs-prebuilt')
 ));

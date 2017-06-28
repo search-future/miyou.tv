@@ -1,9 +1,8 @@
 {
   "root": true,
   "globals": {
-    "nw": true,
     "agGrid": true,
-    "serialLoad": true
+    "wcjsRenderer": true
   },
   "env": {
     "browser": true,

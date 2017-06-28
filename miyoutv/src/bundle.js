@@ -16,6 +16,7 @@ limitations under the License.
 /* eslint-disable node/no-unpublished-require*/
 window.jQuery = require('jquery');
 window.agGrid = require('ag-grid/dist/ag-grid.js');
+window.wcjsRenderer = require('webgl-video-renderer');
 require('bootstrap');
 require('angular');
 require('angular-animate');
