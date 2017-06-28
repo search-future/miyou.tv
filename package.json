@@ -73,11 +73,12 @@
   "productName": "MiyouTV",
   "repository": "https://github.com/search-future/miyou.tv",
   "scripts": {
-    "build": "env-cmd .env.local concurrently \"npm run build:webpack\" \"npm run build:resource\"",
-    "build-agent": "env-cmd .env.local concurrently \"npm run build-agent:webpack\" \"npm run build-agent:resource\"",
-    "build-agent:webpack": "webpack --config miyoutv-agent.webpack.config.js",
+    "build": "env-cmd .env.local concurrently \"npm run build:js\" \"npm run build:bundle\" \"npm run build:resource\"",
+    "build-agent": "env-cmd .env.local concurrently \"npm run build-agent:js\" \"npm run build-agent:resource\"",
+    "build-agent:js": "webpack --env.agent",
     "build-agent:resource": "cpx \"miyoutv-agent/**/!(src|*.js)\" build/miyoutv-agent/",
-    "build:webpack": "webpack --config miyoutv.webpack.config.js",
+    "build:js": "webpack --env.miyoutv --env.js",
+    "build:bundle": "webpack --env.miyoutv --env.bundle",
     "build:resource": "cpx \"miyoutv/src/**/!(*.js|package*.json|bundle.*)\" miyoutv/dist/",
     "clean": "rimraf miyoutv/dist/ \"build/miyoutv-*(agent|linux32|linux64|mac|win32|win64)\"",
     "dist": "env-cmd pack.env.js concurrently \"cross-conf-env npm run dist:$npm_config_pack_type\"",
@@ -110,12 +111,13 @@
     "predist:mac": "npm run build && npm run dist:mac:copy && npm run dist:mac:config && npm run dist:mac:install",
     "predist:win32": "npm run build && npm run dist:win32:copy && npm run dist:win32:config",
     "predist:win64": "npm run build && npm run dist:win64:copy && npm run dist:win64:config",
-    "prestart": "npm run build",
+    "prestart": "env-cmd .env.local npm run build:js",
     "source": "env-cmd .env.local electron miyoutv/src/",
     "start": "env-cmd .env.local concurrently -k -s first \"electron ./\" \"npm run watch\"",
     "test": "eslint --ignore-path .gitignore ./",
-    "watch": "env-cmd .env.local concurrently \"npm run watch:webpack\" \"npm run watch:resource\"",
-    "watch:webpack": "npm run build:webpack -- -w",
+    "watch": "env-cmd .env.local concurrently \"npm run watch:js\" \"npm run watch:resource\"",
+    "watch:js": "npm run build:js -- -w",
+    "watch:bundle": "npm run build:bundle -- -w",
     "watch:resource": "npm run build:resource -- -w"
   }
 }
