@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 var path = require('path');
+var fs = require('fs');
 var app;
 var BrowserWindow;
 
@@ -22,35 +23,38 @@ var nodeEnv = process.env.NODE_ENV;
 
 /* eslint-disable */
 if (/^0/.test(process.versions.electron)) {
-  if (nodeEnv !== 'production') {
+  try {
     require('electron-reload')(__dirname, {
       electron: require('electron-prebuilt')
     });
-  }
+  } catch(e) {}
   app = require('app');
   BrowserWindow = require('browser-window');
 } else {
-  if (nodeEnv !== 'production') {
+  try {
     require('electron-reload')(__dirname, {
       electron: process.execPath
     });
-  }
+  } catch(e) {}
   app = require('electron').app;
   BrowserWindow = require('electron').BrowserWindow;
 }
 /* eslint-enable */
 
 if (process.platform === 'win32' && !process.env.VLC_PLUGIN_PATH) {
-  process.env.VLC_PLUGIN_PATH = path.join(
-    path.dirname(process.env.npm_lifecycle_script ? '.' : process.execPath), 'node_modules/wcjs-prebuilt/bin/plugins'
-  );
+  process.env.VLC_PLUGIN_PATH = path.join(path.dirname(process.execPath), 'node_modules/wcjs-prebuilt/bin/plugins');
+  try {
+    fs.statSync(process.env.VLC_PLUGIN_PATH);
+  } catch (e) {
+    process.env.VLC_PLUGIN_PATH = path.resolve('node_modules/wcjs-prebuilt/bin/plugins');
+  }
 }
 
 function createWindow() {
   win = new BrowserWindow({
     minWidth: 300,
     minHeight: 500,
-    show: false
+    show: nodeEnv !== 'production'
   });
 
   if (nodeEnv !== 'production') {
