@@ -16,13 +16,19 @@ const miyoutvConfigJs = {
     filename: '[name].js',
   },
   module: {
-    noParse: /\.js$/,
     rules: [{
       test: /\.js$/,
       use: 'ng-annotate-loader',
     }],
   },
   devtool: 'source-map',
+  target: 'electron',
+  externals: [{
+    'electron-prebuilt': 'require("electron-prebuilt")',
+    'electron-reload': 'require("electron-reload")',
+    'webchimera.js': 'require("webchimera.js")',
+    'wcjs-prebuilt': 'require("wcjs-prebuilt")',
+  }],
   plugins: [
     new webpack.DefinePlugin(
       process.env.IS_PACK ? {
@@ -31,9 +37,15 @@ const miyoutvConfigJs = {
       } : {}
     ),
     new UglifyJSPlugin({
-      sourceMap: process.env.NODE_ENV !== 'production',
+      sourceMap: true,
     }),
-  ]
+  ],
+  node: {
+    global: false,
+    process: false,
+    __filename: false,
+    __dirname: false,
+  },
 };
 const miyoutvConfigBundle = {
   entry: {
@@ -52,7 +64,7 @@ const miyoutvConfigBundle = {
       use: ExtractTextPlugin.extract({
         use: `css-loader?${JSON.stringify({
           minimize: true,
-          sourceMap: process.env.NODE_ENV !== 'production',
+          sourceMap: true,
         })}`,
       }),
     }, {
@@ -63,7 +75,7 @@ const miyoutvConfigBundle = {
   devtool: 'source-map',
   plugins: [
     new UglifyJSPlugin({
-      sourceMap: process.env.NODE_ENV !== 'production',
+      sourceMap: true,
     }),
     new ExtractTextPlugin('[name].css'),
   ]
@@ -79,7 +91,6 @@ const agentConfig = {
   },
   target: 'node',
   node: {
-    console: false,
     global: false,
     process: false,
     Buffer: false,
