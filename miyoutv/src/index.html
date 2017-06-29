@@ -28,12 +28,8 @@ limitations under the License.
 <body>
     <app></app>
     <script src="bundle.js"></script>
+    <script src="app.js"></script>
     <script>
-        var loader = document.createElement('script');
-
-        loader.src = 'app.js';
-        document.body.appendChild(loader);
-
         function bootstrap() {
             if (this.readyState === 'complete') {
                 angular.bootstrap(this, ['app']);
