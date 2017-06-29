@@ -30,11 +30,11 @@ const miyoutvConfigJs = {
     'wcjs-prebuilt': 'require("wcjs-prebuilt")',
   }],
   plugins: [
-    new webpack.DefinePlugin(
+    new webpack.EnvironmentPlugin(
       process.env.IS_PACK ? {
-        NODE_ENV: process.env.NODE_ENV,
-        GARAPON_DEVID: process.env.GARAPON_DEVID,
-      } : {}
+        NODE_ENV: 'development',
+        GARAPON_DEVID: '',
+      } : []
     ),
     new UglifyJSPlugin({
       sourceMap: true,
