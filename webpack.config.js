@@ -4,12 +4,38 @@ const glob = require('glob');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-const miyoutvConfigJs = {
+const miyoutvConfigMain = {
+  entry: {
+    index: path.join(__dirname, 'miyoutv/src/index.js'),
+  },
+  output: {
+    path: path.join(__dirname, 'miyoutv/dist/'),
+    filename: '[name].js',
+  },
+  devtool: 'source-map',
+  target: 'electron-main',
+  externals: [{
+    'electron-prebuilt': 'require("electron-prebuilt")',
+    'electron-reload': 'require("electron-reload")',
+  }],
+  plugins: [
+    new webpack.EnvironmentPlugin(
+      process.env.IS_PACK ? {
+        NODE_ENV: 'development',
+      } : []
+    ),
+    new UglifyJSPlugin({
+      sourceMap: true,
+    }),
+  ],
+  node: false,
+};
+
+const miyoutvConfigRenderer = {
   entry: {
     app: glob.sync(path.join(__dirname, 'miyoutv/src/app/**/*.js'), {
       nosort: true,
     }),
-    index: path.join(__dirname, 'miyoutv/src/index.js'),
   },
   output: {
     path: path.join(__dirname, 'miyoutv/dist/'),
@@ -22,10 +48,8 @@ const miyoutvConfigJs = {
     }],
   },
   devtool: 'source-map',
-  target: 'electron',
+  target: 'electron-renderer',
   externals: [{
-    'electron-prebuilt': 'require("electron-prebuilt")',
-    'electron-reload': 'require("electron-reload")',
     'webchimera.js': 'require("webchimera.js")',
     'wcjs-prebuilt': 'require("wcjs-prebuilt")',
   }],
@@ -42,6 +66,7 @@ const miyoutvConfigJs = {
   ],
   node: false,
 };
+
 const miyoutvConfigBundle = {
   entry: {
     bundle: [
@@ -78,6 +103,7 @@ const miyoutvConfigBundle = {
     new ExtractTextPlugin('[name].css'),
   ]
 };
+
 const agentConfig = {
   entry: {
     'miyoutv-agent': path.join(__dirname, 'miyoutv-agent/src/miyoutv-agent.js'),
@@ -95,13 +121,15 @@ module.exports = (env) => {
   const config = [];
   if (env.miyoutv || !env.agent) {
     if (env.js) {
-      config.push(miyoutvConfigJs);
+      config.push(miyoutvConfigMain);
+      config.push(miyoutvConfigRenderer);
     }
     if (env.bundle) {
       config.push(miyoutvConfigBundle);
     }
     if (config.length < 1) {
-      config.push(miyoutvConfigJs);
+      config.push(miyoutvConfigMain);
+      config.push(miyoutvConfigRenderer);
       config.push(miyoutvConfigBundle);
     }
   }
