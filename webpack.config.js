@@ -40,12 +40,7 @@ const miyoutvConfigJs = {
       sourceMap: true,
     }),
   ],
-  node: {
-    global: false,
-    process: false,
-    __filename: false,
-    __dirname: false,
-  },
+  node: false,
 };
 const miyoutvConfigBundle = {
   entry: {
@@ -62,10 +57,13 @@ const miyoutvConfigBundle = {
     rules: [{
       test: /\.css$/,
       use: ExtractTextPlugin.extract({
-        use: `css-loader?${JSON.stringify({
-          minimize: true,
-          sourceMap: true,
-        })}`,
+        use: [{
+          loader: 'css-loader',
+          options: {
+            minimize: true,
+            sourceMap: true,
+          }
+        }],
       }),
     }, {
       test: /(typeface|fonts).+\.(eot|otf|svg|ttf|woff2?)$/,
@@ -90,13 +88,7 @@ const agentConfig = {
     filename: '[name].js',
   },
   target: 'node',
-  node: {
-    global: false,
-    process: false,
-    Buffer: false,
-    __filename: false,
-    __dirname: false,
-  },
+  node: false,
 };
 
 module.exports = (env) => {
