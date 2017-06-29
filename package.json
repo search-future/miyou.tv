@@ -48,7 +48,7 @@
     "typeface-notosans-jp": "^1.0.1",
     "uglify-js": "^2.8.28",
     "uglifyjs-webpack-plugin": "^0.4.3",
-    "webpack": "^2.6.1"
+    "webpack": "^3.0.0"
   },
   "engines": {
     "node": ">=4"
