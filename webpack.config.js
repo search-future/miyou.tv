@@ -3,6 +3,7 @@ const webpack = require('webpack');
 const glob = require('glob');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const discardFonts = require('postcss-discard-font-face');
 
 const miyoutvConfigMain = {
   entry: {
@@ -87,7 +88,15 @@ const miyoutvConfigBundle = {
           options: {
             minimize: true,
             sourceMap: true,
-          }
+            importLoaders: 1,
+          },
+        }, {
+          loader: 'postcss-loader',
+          options: {
+            ident: 'postcss',
+            plugins: [discardFonts(['woff2'])],
+            sourceMap: true,
+          },
         }],
       }),
     }, {
