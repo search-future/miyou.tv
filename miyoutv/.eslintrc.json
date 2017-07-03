@@ -16,6 +16,9 @@
     "plugin:node/recommended"
   ],
   "rules": {
-    "func-names": "off"
+    "func-names": "off",
+    "node/no-unpublished-require": ["error", {
+      "allowModules": ["electron"]
+    }]
   }
 }

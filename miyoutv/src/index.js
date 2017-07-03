@@ -13,32 +13,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+var app = require('electron').app;
+var BrowserWindow = require('electron').BrowserWindow;
+
 var path = require('path');
 var fs = require('fs');
-var app;
-var BrowserWindow;
 
 var win;
 var nodeEnv = process.env.NODE_ENV;
 
 /* eslint-disable */
-if (/^0/.test(process.versions.electron)) {
-  try {
-    require('electron-reload')(__dirname, {
-      electron: require('electron-prebuilt')
-    });
-  } catch(e) {}
-  app = require('app');
-  BrowserWindow = require('browser-window');
-} else {
-  try {
-    require('electron-reload')(__dirname, {
-      electron: process.execPath
-    });
-  } catch(e) {}
-  app = require('electron').app;
-  BrowserWindow = require('electron').BrowserWindow;
-}
+try {
+  require('electron-reload')(__dirname, {
+    electron: /^0/.test(process.versions.electron) ? require('electron-prebuilt') : process.execPath
+  });
+} catch (e) {}
 /* eslint-enable */
 
 if (process.platform === 'win32' && !process.env.VLC_PLUGIN_PATH) {
