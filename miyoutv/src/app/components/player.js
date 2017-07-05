@@ -96,16 +96,16 @@ limitations under the License.
       m: PlayerService.toggleMute,
       p: previous,
       n: next,
-      'ctrl+up': function () {
+      'mod+up': function () {
         PlayerService.increaseVolume(5);
       },
-      'ctrl+down': function () {
+      'mod+down': function () {
         PlayerService.decreaseVolume(5);
       },
-      'ctrl+left': function () {
+      'mod+left': function () {
         PlayerService.jumpBackward('11s');
       },
-      'ctrl+right': function () {
+      'mod+right': function () {
         PlayerService.jumpForward('29s');
       },
       'shift+left': function () {
@@ -114,7 +114,7 @@ limitations under the License.
       'shift+right': function () {
         $ctrl.options.commentDelay += 500;
       },
-      'ctrl+s': function () {
+      'mod+s': function () {
         $ctrl.sidebarCollapsed = !$ctrl.sidebarCollapsed;
       }
     };
