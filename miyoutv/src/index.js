@@ -243,11 +243,6 @@ function createWindow() {
     autoHideMenuBar: true,
     show: nodeEnv !== 'production'
   });
-
-  if (nodeEnv !== 'production') {
-    win.webContents.openDevTools();
-  }
-
   win.loadURL('file://' + path.join(__dirname, '/index.html'));
 
   win.on('closed', function () {
@@ -260,6 +255,10 @@ function createWindow() {
   Menu.setApplicationMenu(buildAppMenu());
   if (/^0/.test(process.versions.electron)) {
     global.contextMenu = buildContextMenu();
+  }
+
+  if (nodeEnv !== 'production') {
+    win.webContents.openDevTools();
   }
 }
 
