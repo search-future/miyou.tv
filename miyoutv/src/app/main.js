@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+var remote = require('electron').remote;
 var path = require('path');
 var execDir = path.dirname(process.execPath);
 if (process.platform === 'darwin') {
@@ -143,6 +144,13 @@ if (process.platform === 'darwin') {
 
     angular.element($window).on('move', saveWindowState);
     angular.element($window).on('resize', saveWindowState);
+
+    if (/^0/.test(process.versions.electron)) {
+      angular.element($window).on('contextmenu', function (e) {
+        e.preventDefault();
+        remote.getGlobal('contextMenu').popup();
+      });
+    }
 
     win.show();
     loadWindowState();

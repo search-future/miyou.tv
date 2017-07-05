@@ -155,6 +155,87 @@ function buildAppMenu() {
   return Menu.buildFromTemplate(template);
 }
 
+function buildContextMenu(params) {
+  var noParams = typeof params !== 'object';
+  var template = [{
+    label: '戻る',
+    click: function () {
+      win.webContents.goBack();
+    },
+    visible: noParams || win.webContents.canGoBack()
+  }, {
+    label: '進む',
+    click: function () {
+      win.webContents.goForward();
+    },
+    visible: noParams || win.webContents.canGoForward()
+  }, {
+    label: 'MiyouTVを再読み込み',
+    role: 'reload',
+    click: function () {
+      win.webContents.reload();
+    }
+  }, {
+    type: 'separator'
+  }, {
+    label: '元に戻す',
+    role: 'undo',
+    visible: noParams || params.editFlags.canUndo
+  }, {
+    label: 'やり直す',
+    role: 'redo',
+    visible: noParams || params.editFlags.canRedo
+  }, {
+    type: 'separator',
+    visible: noParams || params.editFlags.canUndo || params.editFlags.canRedo
+  }, {
+    label: '切り取り',
+    role: 'cut',
+    visible: noParams || params.editFlags.canCut
+  }, {
+    label: 'コピー',
+    role: 'copy',
+    visible: noParams || params.editFlags.canCopy
+  }, {
+    label: '貼り付け',
+    role: 'paste',
+    visible: noParams || params.editFlags.canPaste
+  }, {
+    label: '削除',
+    role: 'delete',
+    visible: noParams || params.editFlags.canDelete,
+    click: function () {
+      win.webContents.delete();
+    }
+  }, {
+    type: 'separator',
+    visible: noParams || params.isEditable || params.editFlags.canCopy
+  }, {
+    label: 'すべて選択',
+    role: 'selectall',
+    visible: noParams || params.editFlags.canSelectAll
+  }, {
+    type: 'separator',
+    visible: noParams || params.editFlags.canSelectAll
+  }, {
+    label: 'MiyouTVを終了',
+    role: 'quit',
+    click: function () {
+      app.quit();
+    }
+  }];
+  template.forEach(function (a) {
+    var item = a;
+
+    if (item.visible === false) {
+      item.type = null;
+      item.role = null;
+    }
+  });
+
+  return Menu.buildFromTemplate(template);
+}
+
 function createWindow() {
   win = new BrowserWindow({
     minWidth: 300,
@@ -172,8 +253,14 @@ function createWindow() {
   win.on('closed', function () {
     win = null;
   });
+  win.webContents.on('context-menu', function (e, params) {
+    buildContextMenu(params).popup();
+  });
 
   Menu.setApplicationMenu(buildAppMenu());
+  if (/^0/.test(process.versions.electron)) {
+    global.contextMenu = buildContextMenu();
+  }
 }
 
 app.on('ready', createWindow);
