@@ -173,7 +173,7 @@ if (process.platform === 'darwin') {
       $window.resizeTo(windowState.width, windowState.height);
     }
   }
-  angular.module('app', ['ngAnimate', 'ngRoute', 'ui.bootstrap', 'agGrid', 'cfp.hotkeys', 'toaster', 'angular-loading-bar', 'angular-md5'])
+  angular.module('app', ['ngAnimate', 'ngRoute', 'ui.bootstrap', 'ui.bootstrap.contextMenu', 'agGrid', 'cfp.hotkeys', 'toaster', 'angular-loading-bar', 'angular-md5'])
     .constant('garaponAuthUrl', garaponAuthUrl)
     .constant('garaponSiteUrl', garaponSiteUrl)
     .constant('garaponAuthUrlV4', garaponAuthUrlV4)

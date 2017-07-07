@@ -11,6 +11,7 @@
     "ag-grid": "^10.1.0",
     "angular": "^1.6.4",
     "angular-animate": "^1.6.4",
+    "angular-bootstrap-contextmenu": "^0.9.9",
     "angular-hotkeys": "^1.7.0",
     "angular-loading-bar": "^0.9.0",
     "angular-md5": "^0.1.10",

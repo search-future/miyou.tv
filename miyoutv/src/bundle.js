@@ -22,6 +22,7 @@ require('angular');
 require('angular-animate');
 require('angular-route');
 require('angular-ui-bootstrap');
+require('angular-bootstrap-contextmenu');
 require('angular-hotkeys');
 require('angularjs-toaster');
 require('angular-loading-bar');
