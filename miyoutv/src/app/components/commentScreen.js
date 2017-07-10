@@ -60,10 +60,17 @@ limitations under the License.
       angular.element($window).off('resize', adjustLines);
     };
 
-    $scope.$watch(function () {
+    $scope.$watchGroup([function () {
       return $ctrl.enabled;
-    }, function (value) {
-      if (!value) {
+    }, function () {
+      return $element[0].clientWidth;
+    }, function () {
+      return $element[0].clientHeight;
+    }], function (values) {
+      var enabled = values[0];
+      var width = values[1];
+      var heifht = values[2];
+      if (!enabled || width <= 0 || heifht <= 0) {
         $ctrl.comments.forEach(function (a) {
           var comment = a;
 
@@ -126,7 +133,7 @@ limitations under the License.
       var start = 0;
       var end = 0;
 
-      if (!$ctrl.enabled) {
+      if (!$ctrl.enabled || $element[0].clientWidth <= 0 || $element[0].clientHeight <= 0) {
         return;
       }
       start = oldValue + offset;
