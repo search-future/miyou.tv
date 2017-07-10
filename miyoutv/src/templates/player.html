@@ -16,13 +16,13 @@ limitations under the License.
 -->
 <meta charset="UTF-8">
 <div class="player view-content">
-    <div class="view-content-header row trim bg-inverse">
-        <div class="col-xs-2 text-left">
+    <div class="view-content-header row trim bg-inverse text-nowrap">
+        <div class="col-sm-2 col-xs-4 text-left pick">
             <button class="btn btn-media" title="再生を終了" ng-click="$ctrl.stop()">
                 <img class="img-icon-md" src="assets/back.svg">
             </button>
         </div>
-        <div class="col-xs-8 text-center">
+        <div class="col-sm-8 col-xs-4 text-center pick">
             <span class="channel" ng-bind="$ctrl.channel"></span>
             <span class="title" ng-bind="$ctrl.title"></span>
         </div>

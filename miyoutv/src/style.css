@@ -120,6 +120,13 @@ Components
 ---------- */
 
 
+/* Text */
+
+.text-nowrap {
+  white-space: nowrap;
+}
+
+
 /* Label */
 
 .label-news {
@@ -794,6 +801,25 @@ Components
 
 .player .view-content-header {
   line-height: 44px;
+  overflow: hidden;
+}
+
+.fullscreen .player .view-content-header {
+  height: 1px;
+  left: 0;
+  margin: 0;
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transition-duration: 1s;
+  transition-property: opacity, height;
+  z-index: 3;
+}
+
+.fullscreen .player .view-content-header:hover {
+  height: auto;
+  opacity: 0.8;
 }
 
 
@@ -849,26 +875,6 @@ Components
   fill: none;
   stroke: #7f75ff;
   stroke-width: 3px;
-}
-
-.fullscreen .player-header {
-  background-color: rgba(51, 51, 51, 0.8);
-  height: 1px;
-  left: 0;
-  margin: 0;
-  opacity: 0;
-  overflow: hidden;
-  position: absolute;
-  right: 0;
-  top: 0;
-  transition-duration: 1s;
-  transition-property: opacity, height;
-  z-index: 3;
-}
-
-.fullscreen .player-header:hover {
-  height: auto;
-  opacity: 1;
 }
 
 .fullscreen .player-control {
