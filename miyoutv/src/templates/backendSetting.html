@@ -40,7 +40,7 @@ limitations under the License.
                     <label class="col-sm-3 control-label" for="chinachu-url">URL</label>
                     <div class="col-sm-9">
                         <input id="chinachu-url" class="form-control" name="chinachu_url" type="url" placeholder="http://127.0.0.1:10772" required ng-model="$ctrl.chinachuUrl">
-                        <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok': backend.chinachu_url.$valid, 'glyphicon-warning-sign': backend.chinachu_url.$invalid}"></span>
+                        <span class="fa form-control-feedback" ng-class="{'fa-check': backend.chinachu_url.$valid, 'fa-warning': backend.chinachu_url.$invalid}"></span>
                     </div>
                 </div>
                 <div class="form-group">
@@ -57,14 +57,14 @@ limitations under the License.
                     <label class="col-sm-3 control-label" for="chinachu-user">ユーザー</label>
                     <div class="col-sm-9">
                         <input id="chinachu-user" class="form-control" name="chinachu_user" type="text" ng-model="$ctrl.chinachuUser" ng-required="$ctrl.chinachuAuth" ng-disabled="!$ctrl.chinachuAuth">
-                        <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok': backend.chinachu_user.$valid, 'glyphicon-warning-sign': backend.chinachu_user.$invalid}"></span>
+                        <span class="fa form-control-feedback" ng-class="{'fa-check': backend.chinachu_user.$valid, 'fa-warning': backend.chinachu_user.$invalid}"></span>
                     </div>
                 </div>
                 <div class="form-group has-feedback" ng-class="{'has-success': backend.chinachu_password.$valid, 'has-warning': backend.chinachu_password.$invalid}" ng-show="$ctrl.chinachuAuth">
                     <label class="col-sm-3 control-label" for="chinachu-password">パスワード</label>
                     <div class="col-sm-9">
                         <input id="chinachu-password" class="form-control" name="chinachu_password" type="password" ng-model="$ctrl.chinachuPassword" ng-required="$ctrl.chinachuAuth" ng-disabled="!$ctrl.chinachuAuth">
-                        <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok': backend.chinachu_password.$valid, 'glyphicon-warning-sign': backend.chinachu_password.$invalid}"></span>
+                        <span class="fa form-control-feedback" ng-class="{'fa-check': backend.chinachu_password.$valid, 'fa-warning': backend.chinachu_password.$invalid}"></span>
                     </div>
                 </div>
             </fieldset>
@@ -82,21 +82,21 @@ limitations under the License.
                     <label class="col-sm-3 control-label" for="garapon-url">URL</label>
                     <div class="col-sm-9">
                         <input id="garapon-url" class="form-control" name="garapon_url" type="url" placeholder="http://192.168.11.11" ng-model="$ctrl.garaponUrl" ng-requied="!$ctrl.garaponAuth" ng-disabled="$ctrl.garaponAuth">
-                        <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok': backend.garapon_url.$valid, 'glyphicon-warning-sign': backend.garapon_url.$invalid}"></span>
+                        <span class="fa form-control-feedback" ng-class="{'fa-check': backend.garapon_url.$valid, 'fa-warning': backend.garapon_url.$invalid}"></span>
                     </div>
                 </div>
                 <div class="form-group has-feedback" ng-class="{'has-success': backend.garapon_user.$valid, 'has-warning': backend.garapon_user.$invalid}">
                     <label class="col-sm-3 control-label" for="garapon-user">ログインID</label>
                     <div class="col-sm-9">
                         <input id="garapon-user" class="form-control" name="garapon_user" type="text" required ng-model="$ctrl.garaponUser">
-                        <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok': backend.garapon_user.$valid, 'glyphicon-warning-sign': backend.garapon_user.$invalid}"></span>
+                        <span class="fa form-control-feedback" ng-class="{'fa-check': backend.garapon_user.$valid, 'fa-warning': backend.garapon_user.$invalid}"></span>
                     </div>
                 </div>
                 <div class="form-group has-feedback" ng-class="{'has-success': backend.garapon_password.$valid, 'has-warning': backend.garapon_password.$invalid}">
                     <label class="col-sm-3 control-label" for="garapon-password">パスワード</label>
                     <div class="col-sm-9">
                         <input id="garapon-password" class="form-control" name="garapon_password" type="password" required ng-model="$ctrl.garaponPassword">
-                        <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok': backend.garapon_password.$valid, 'glyphicon-warning-sign': backend.garapon_password.$invalid}"></span>
+                        <span class="fa form-control-feedback" ng-class="{'fa-check': backend.garapon_password.$valid, 'fa-warning': backend.garapon_password.$invalid}"></span>
                     </div>
                 </div>
             </fieldset>

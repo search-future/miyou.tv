@@ -28,17 +28,17 @@ limitations under the License.
             <ul class="nav nav-mtvblack navbar-nav col-sm-4">
                 <li ng-class="{active: $ctrl.current === 'programs'}">
                     <a href="#!/programs" ng-click="$ctrl.isCollapsed = true">
-                        <span class="glyphicon glyphicon-th"></span> 番組表
+                        <span class="fa fa-th"></span> 番組表
                     </a>
                 </li>
                 <li ng-class="{active: $ctrl.current === 'list'}">
                     <a href="#!/list" ng-click="$ctrl.isCollapsed = true">
-                        <span class="glyphicon glyphicon-th-list"></span> 番組一覧
+                        <span class="fa fa-list"></span> 番組一覧
                     </a>
                 </li>
                 <!--<li>
                     <a href="#!/ranking" ng-click="$ctrl.isCollapsed = true">
-                        <span class="glyphicon glyphicon-star"></span> ランキング
+                        <span class="fa fa-star"></span> ランキング
                     </a>
                 </li>-->
             </ul>
@@ -46,7 +46,7 @@ limitations under the License.
                 <form class="navbar-form text-center" ng-submit="$ctrl.search()">
                     <div class="form-group input-group input-group-search">
                         <span class="input-group-addon">
-                            <span class="glyphicon glyphicon-search"></span>
+                            <span class="fa fa-search"></span>
                         </span>
                         <input type="text" class="form-control" placeholder="Search" ng-model="$ctrl.searchText">
                     </div>
@@ -55,7 +55,7 @@ limitations under the License.
             <ul class="nav nav-mtvblack navbar-nav navbar-right">
                 <li class="dropdown dropdown-inverse" uib-dropdown>
                     <a class="dropdown-toggle clickable" uib-dropdown-toggle>
-                        設定 <span class="glyphicon glyphicon-cog"></span>
+                        設定 <span class="fa fa-cog"></span>
                     </a>
                     <ul class="dropdown-menu" uib-dropdown-menu>
                         <li><a href="" ng-click="$ctrl.openViewSetting()">表示設定</a></li>

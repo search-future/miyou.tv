@@ -20,7 +20,7 @@ limitations under the License.
         <div class="col-lg-2 col-sm-3 col-xs-12">
             <form class="form-horizontal" ng-if="$ctrl.archiveEnabled">
                 <div class="input-group input-group-dark input-sm" title="表示データ">
-                    <label class="input-group-addon control-label" for="source"><span class="glyphicon glyphicon-list-alt"></span></label>
+                    <label class="input-group-addon control-label" for="source"><span class="fa fa-database"></span></label>
                     <select id="source" class="form-control" name="source" ng-model="$ctrl.source" ng-change="$ctrl.scrollTo(0)">
                         <option value="archive">番組表</option>
                         <option value="recorded">録画情報</option>
@@ -39,7 +39,7 @@ limitations under the License.
                     <input class="form-control text-center" type="text" uib-datepicker-popup="y/M/d EEE" datepicker-options="$ctrl.datepickerOptions" show-button-bar="false" popup-placement="bottom-right" is-open="$ctrl.datepickerOpened" ng-model="$ctrl.currentDate" ng-change="$ctrl.scrollToDate($ctrl.currentDate)">
                     <div class="input-group-btn" title="日付を選択">
                         <button class="btn btn-dark" type="button" ng-click="$ctrl.datepickerOpened = !$ctrl.datepickerOpened">
-                            <span class="glyphicon glyphicon-calendar"></span>
+                            <span class="fa fa-calendar"></span>
                         </button>
                     </div>
                 </div>
@@ -83,10 +83,10 @@ limitations under the License.
                         <span class="badge" title="{{item.countDetail}}" ng-bind="item.count"></span>
                         <span class="time text-primary" ng-bind="item.displayTime"></span>
                         <span class="title text-primary quick-search quick-search-hidden">
-                            <span ng-bind="item.title"></span> <span class="glyphicon glyphicon-search quick-search-btn" title="番組名で検索" ng-click="$ctrl.search(item.title)"></span>
+                            <span ng-bind="item.title"></span> <span class="fa fa-search quick-search-btn" title="番組名で検索" ng-click="$ctrl.search(item.title)"></span>
                         </span>
                         <span class="label quick-search" ng-class="'label-' + item.categoryName.name">
-                            <span ng-bind="item.categoryName.localeName"></span> <span class="glyphicon glyphicon-search quick-search-btn" title="カテゴリで検索" ng-click="$ctrl.search('cat:' + item.categoryName.name)"></span>
+                            <span ng-bind="item.categoryName.localeName"></span> <span class="fa fa-search quick-search-btn" title="カテゴリで検索" ng-click="$ctrl.search('cat:' + item.categoryName.name)"></span>
                         </span>
                         <div class="detail" ng-bind="item.detail"></div>
                         <div class="preview text-center" ng-if="item.preview" ng-click="$ctrl.play(item)">
