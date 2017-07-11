@@ -42,6 +42,11 @@ limitations under the License.
       enterFullscreen: enterFullscreen,
       leaveFullscreen: leaveFullscreen,
       toggleFullscreen: toggleFullscreen,
+      isMaximized: isMaximized,
+      maximize: maximize,
+      isMinimized: isMinimized,
+      minimize: minimize,
+      restore: restore,
       quitModal: quitModal,
       close: close,
       reload: reload,
@@ -198,6 +203,26 @@ limitations under the License.
     function toggleFullscreen() {
       props.isFullscreen = !props.win.isFullScreen();
       props.win.setFullScreen(props.isFullscreen);
+    }
+
+    function isMaximized() {
+      return props.win.isMaximized();
+    }
+
+    function maximize() {
+      props.win.maximize();
+    }
+
+    function isMinimized() {
+      return props.win.isMinimized();
+    }
+
+    function minimize() {
+      props.win.minimize();
+    }
+
+    function restore() {
+      props.win.restore();
     }
 
     function quitModal() {
