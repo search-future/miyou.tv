@@ -87,52 +87,57 @@ limitations under the License.
     $ctrl.mainMenu = [
       [function () {
         if (PlayerService.playing()) {
-          return '<span class="glyphicon glyphicon-pause"></span> 一時停止';
+          return '<span class="fa fa-fw fa-pause"></span> 一時停止';
         }
-        return '<span class="glyphicon glyphicon-play"></span> 再生';
+        return '<span class="fa fa-fw fa-play"></span> 再生';
       }, function () {
         PlayerService.togglePause();
       }],
       null,
-      ['<span class="glyphicon glyphicon-step-forward"></span> 30秒進める', function () {
+      ['<span class="fa fa-fw fa-step-forward"></span> 30秒進める', function () {
         PlayerService.jumpForward('29s');
       }],
-      ['<span class="glyphicon glyphicon-step-backward"></span> 10秒戻す', function () {
+      ['<span class="fa fa-fw fa-step-backward"></span> 10秒戻す', function () {
         PlayerService.jumpBackward('11s');
       }],
       null,
       ['再生速度', [
-        ['<span class="glyphicon glyphicon-forward"></span> 速くする', function () {
+        ['<span class="fa fa-fw fa-forward"></span> 速くする', function () {
           PlayerService.speedUp();
         }],
-        ['<span class="glyphicon glyphicon-play"></span> 通常再生', function () {
+        ['<span class="fa fa-fw fa-play"></span> 通常再生', function () {
           PlayerService.normalSpeed();
         }],
-        ['<span class="glyphicon glyphicon-backward"></span> 遅くする', function () {
+        ['<span class="fa fa-fw fa-backward"></span> 遅くする', function () {
           PlayerService.speedDown();
         }]
       ]],
       ['オーディオ', [
-        ['<span class="glyphicon glyphicon-repeat"></span> 音声切替', function () {
+        ['<span class="fa fa-fw fa-rotate-right"></span> 音声切替', function () {
           PlayerService.toggleAudioTrack();
         }],
         null,
-        ['<span class="glyphicon glyphicon-volume-up"></span> 音量を上げる', function () {
+        ['<span class="fa fa-fw fa-volume-up"></span> 音量を上げる', function () {
           PlayerService.increaseVolume(5);
         }],
-        ['<span class="glyphicon glyphicon-volume-down"></span> 音量を下げる', function () {
+        ['<span class="fa fa-fw fa-volume-down"></span> 音量を下げる', function () {
           PlayerService.decreaseVolume(5);
         }],
-        ['<span class="glyphicon glyphicon-volume-off"></span> ミュート', function () {
+        [function () {
+          if (PlayerService.mute()) {
+            return '<span class="fa fa-fw fa-volume-off text-danger"></span> ミュート';
+          }
+          return '<span class="fa fa-fw fa-volume-off text-muted"></span> ミュート';
+        }, function () {
           PlayerService.toggleMute();
         }]
       ]],
       ['ビデオ', [
         [function () {
           if (CommonService.isFullscreen()) {
-            return '<span class="glyphicon glyphicon-check"></span> 全画面表示';
+            return '<span class="fa fa-fw fa-arrows-alt text-primary"></span> 全画面表示';
           }
-          return '<span class="glyphicon glyphicon-unchecked"></span> 全画面表示';
+          return '<span class="fa fa-fw fa-arrows-alt text-muted"></span> 全画面表示';
         }, function () {
           CommonService.toggleFullscreen();
         }]
@@ -140,32 +145,37 @@ limitations under the License.
       ['コメント', [
         [function () {
           if ($ctrl.commentEnabled) {
-            return '<span class="glyphicon glyphicon-check"></span> コメントを表示';
+            return '<span class="fa fa-fw fa-comment text-primary"></span> コメントを表示';
           }
-          return '<span class="glyphicon glyphicon-unchecked"></span> コメントを表示';
+          return '<span class="fa fa-fw fa-comment text-muted"></span> コメントを表示';
         }, function () {
           $ctrl.commentEnabled = !$ctrl.commentEnabled;
         }],
-        null, // -----
-        ['<span class="glyphicon glyphicon-chevron-left"></span> 早める', function () {
+        null,
+        ['<span class="fa fa-fw fa-chevron-left"></span> 早める', function () {
           $ctrl.options.commentDelay -= 500;
         }],
-        ['<span class="glyphicon glyphicon-chevron-right"></span> 遅らせる', function () {
+        ['<span class="fa fa-fw fa-chevron-right"></span> 遅らせる', function () {
           $ctrl.options.commentDelay += 500;
         }]
       ]],
       null,
-      ['<span class="glyphicon glyphicon-fast-backward"></span> 前の番組へ', function () {
+      ['<span class="fa fa-fw fa-fast-backward"></span> 前の番組へ', function () {
         previous();
       }],
-      ['<span class="glyphicon glyphicon-fast-forward"></span> 次の番組へ', function () {
+      ['<span class="fa fa-fw fa-fast-forward"></span> 次の番組へ', function () {
         next();
       }],
       null,
-      ['<span class="glyphicon glyphicon-list-alt"></span> サイドバー切替', function () {
+      [function () {
+        if ($ctrl.sidebarCollapsed) {
+          return '<span class="fa fa-fw fa-list-alt text-muted"></span> サイドバー切替';
+        }
+        return '<span class="fa fa-fw fa-list-alt text-primary"></span> サイドバー切替';
+      }, function () {
         $ctrl.sidebarCollapsed = !$ctrl.sidebarCollapsed;
       }],
-      ['<span class="glyphicon glyphicon-log-out"></span> 再生を終了', function () {
+      ['<span class="fa fa-fw fa-stop"></span> 再生を終了', function () {
         CommonService.back();
       }]
     ];
