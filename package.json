@@ -19,6 +19,7 @@
     "angular-ui-bootstrap": "^2.5.0",
     "angularjs-toaster": "^2.1.0",
     "bootstrap": "^3.3.7",
+    "font-awesome": "^4.7.0",
     "jquery": "^3.2.1",
     "typeface-roboto": "0.0.29",
     "webgl-video-renderer": "^0.2.0"
