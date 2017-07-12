@@ -39,9 +39,7 @@ limitations under the License.
       loadFile: loadFile,
       removeFile: removeFile,
       isFullscreen: isFullscreen,
-      enterFullscreen: enterFullscreen,
-      leaveFullscreen: leaveFullscreen,
-      toggleFullscreen: toggleFullscreen,
+      setFullscreen: setFullscreen,
       isMaximized: isMaximized,
       maximize: maximize,
       isMinimized: isMinimized,
@@ -63,7 +61,6 @@ limitations under the License.
     };
     var props = {
       win: null,
-      isFullscreen: false,
       quitModal: null
     };
 
@@ -81,7 +78,6 @@ limitations under the License.
     }
     /* eslint-enable */
 
-    props.isFullscreen = props.win.isFullscreen;
     return service;
 
     function window() {
@@ -187,22 +183,11 @@ limitations under the License.
     }
 
     function isFullscreen() {
-      return props.isFullscreen;
+      return props.win.isFullScreen();
     }
 
-    function enterFullscreen() {
-      props.isFullscreen = true;
-      props.win.setFullScreen(props.isFullscreen);
-    }
-
-    function leaveFullscreen() {
-      props.isFullscreen = false;
-      props.win.setFullScreen(props.isFullscreen);
-    }
-
-    function toggleFullscreen() {
-      props.isFullscreen = !props.win.isFullScreen();
-      props.win.setFullScreen(props.isFullscreen);
+    function setFullscreen(flag) {
+      props.win.setFullScreen(flag);
     }
 
     function isMaximized() {
