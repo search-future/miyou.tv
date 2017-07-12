@@ -1,4 +1,3 @@
-
 /*
 Copyright 2016 Brazil Ltd.
 
@@ -16,6 +15,7 @@ limitations under the License.
 */
 
 body {
+  -webkit-app-region: drag;
   font-family: 'Roboto', 'Noto Sans Japanese', '游ゴシック体', 'Yu Gothic', 'YuGothic', 'ヒラギノ角ゴ ProN W3', 'Hiragino Kaku Gothic ProN', 'メイリオ', 'Meiryo', 'ＭＳ Ｐゴシック', 'MS PGothic', sans-serif;
   font-size: 11pt;
   height: 0;
@@ -194,6 +194,29 @@ Components
 .form-thread,
 .form-autoscroll {
   padding: 10px;
+}
+
+.btn-win,
+.btn-win:focus {
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  color: #ccc;
+  outline: none;
+}
+
+.btn-win:hover,
+.btn-win:active:focus {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #ccc;
+  outline: none;
+}
+
+.btn-win-close:hover,
+.btn-win-close:active:focus {
+  background-color: rgba(255, 0, 0, 0.5);
+  color: #ccc;
+  outline: none;
 }
 
 .btn-save {
@@ -458,6 +481,15 @@ Components
   border-bottom: 2px solid #9991ff;
 }
 
+.app .navbar-fixed-top {
+  margin: 2px;
+  margin-top: 30px;
+}
+
+.fullscreen .navbar-fixed-top {
+  margin: 0;
+}
+
 
 /* Modal */
 
@@ -583,12 +615,14 @@ Components
   top: 100px;
 }
 
+
 /* Loading bar */
 
 #loading-bar-spinner {
   left: 50%;
   top: 50%;
 }
+
 
 /* Quick search */
 
@@ -624,10 +658,35 @@ Components
 ---------- */
 
 .app {
+  -webkit-app-region: no-drag;
+  border: 2px solid #333;
   display: flex;
   flex-direction: column;
   height: 100vh;
   width: 100vw;
+}
+
+.fullscreen {
+  border: none;
+}
+
+.titlebar {
+  -webkit-app-region: drag;
+  background-color: #1a1a1a;
+  color: #999;
+  line-height: 28px;
+  text-align: center;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.fullscreen .titlebar {
+  display: none;
+}
+
+.titlebar a,
+.titlebar button {
+  -webkit-app-region: no-drag;
 }
 
 .view {

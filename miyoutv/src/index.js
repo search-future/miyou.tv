@@ -241,6 +241,7 @@ function createWindow() {
     minWidth: 300,
     minHeight: 500,
     autoHideMenuBar: true,
+    frame: false,
     show: nodeEnv !== 'production'
   });
   win.loadURL('file://' + path.join(__dirname, '/index.html'));
