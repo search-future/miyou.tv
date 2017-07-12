@@ -40,6 +40,8 @@ limitations under the License.
       removeFile: removeFile,
       isFullscreen: isFullscreen,
       setFullscreen: setFullscreen,
+      isAlwaysOnTop: isAlwaysOnTop,
+      setAlwaysOnTop: setAlwaysOnTop,
       isMaximized: isMaximized,
       maximize: maximize,
       isMinimized: isMinimized,
@@ -187,7 +189,15 @@ limitations under the License.
     }
 
     function setFullscreen(flag) {
-      props.win.setFullScreen(flag);
+      props.win.setFullScreen(Boolean(flag));
+    }
+
+    function isAlwaysOnTop() {
+      return props.win.isAlwaysOnTop();
+    }
+
+    function setAlwaysOnTop(flag) {
+      props.win.setAlwaysOnTop(Boolean(flag));
     }
 
     function isMaximized() {
