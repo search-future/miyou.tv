@@ -37,7 +37,7 @@ limitations under the License.
       'mod+w': CommonService.quitModal,
       esc: function () {
         if (CommonService.isFullscreen()) {
-          CommonService.leaveFullscreen();
+          CommonService.setFullscreen(false);
         } else {
           CommonService.quitModal();
         }
