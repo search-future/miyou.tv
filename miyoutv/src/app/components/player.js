@@ -139,7 +139,7 @@ limitations under the License.
           }
           return '<span class="fa fa-fw fa-arrows-alt text-muted"></span> 全画面表示';
         }, function () {
-          CommonService.toggleFullscreen();
+          CommonService.setFullscreen(!CommonService.isFullscreen());
         }]
       ]],
       ['コメント', [
@@ -186,12 +186,14 @@ limitations under the License.
       '=': PlayerService.normalSpeed,
       '-': PlayerService.speedDown,
       '+': PlayerService.speedUp,
-      f: CommonService.toggleFullscreen,
       b: PlayerService.toggleAudioTrack,
       v: PlayerService.toggleSubtitlesTrack,
       m: PlayerService.toggleMute,
       p: previous,
       n: next,
+      f: function () {
+        $ctrl.toggleFullscreen();
+      },
       'mod+up': function () {
         PlayerService.increaseVolume(5);
       },
@@ -214,10 +216,13 @@ limitations under the License.
         $ctrl.sidebarCollapsed = !$ctrl.sidebarCollapsed;
       }
     };
-    $ctrl.toggleFullscreen = CommonService.toggleFullscreen;
     $ctrl.stop = PlayerService.stop;
     $ctrl.next = next;
     $ctrl.previous = previous;
+
+    $ctrl.toggleFullscreen = function () {
+      CommonService.setFullscreen(!CommonService.isFullscreen());
+    };
 
     $ctrl.$onInit = function () {
       active = true;

@@ -45,7 +45,10 @@ limitations under the License.
     $ctrl.jumpBackward = PlayerService.jumpBackward;
     $ctrl.toggleMute = PlayerService.toggleMute;
     $ctrl.setVolume = PlayerService.volume;
-    $ctrl.toggleFullscreen = CommonService.toggleFullscreen;
+
+    $ctrl.toggleFullscreen = function () {
+      CommonService.setFullscreen(!CommonService.isFullscreen());
+    };
 
     $ctrl.toggleComment = function () {
       $ctrl.commentEnabled = !$ctrl.commentEnabled;
