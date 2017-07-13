@@ -70,6 +70,12 @@ limitations under the License.
       $ctrl.classes.fullscreen = value;
     });
 
+    $scope.$watch(function () {
+      return CommonService.isAlwaysOnTop();
+    }, function (value) {
+      CommonService.saveLocalStorage('alwaysOnTop', value);
+    });
+
     $scope.$watchGroup([function () {
       return CommonService.loadLocalStorage('moritapoEmail');
     }, function () {

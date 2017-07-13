@@ -171,6 +171,7 @@ if (process.platform === 'darwin') {
       var windowState = CommonService.loadLocalStorage('windowState') || {};
       $window.moveTo(windowState.x, windowState.y);
       $window.resizeTo(windowState.width, windowState.height);
+      CommonService.setAlwaysOnTop(CommonService.loadLocalStorage('alwaysOnTop'));
     }
   }
   angular.module('app', ['ngAnimate', 'ngRoute', 'ui.bootstrap', 'ui.bootstrap.contextMenu', 'agGrid', 'cfp.hotkeys', 'toaster', 'angular-loading-bar', 'angular-md5'])
