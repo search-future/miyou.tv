@@ -94,11 +94,11 @@ limitations under the License.
         PlayerService.togglePause();
       }],
       null,
-      ['<span class="fa fa-fw fa-step-forward"></span> 30秒進める', function () {
-        PlayerService.jumpForward('29s');
-      }],
       ['<span class="fa fa-fw fa-step-backward"></span> 10秒戻す', function () {
         PlayerService.jumpBackward('11s');
+      }],
+      ['<span class="fa fa-fw fa-step-forward"></span> 30秒進める', function () {
+        PlayerService.jumpForward('29s');
       }],
       null,
       ['再生速度', [
@@ -125,9 +125,9 @@ limitations under the License.
         }],
         [function () {
           if (PlayerService.mute()) {
-            return '<span class="fa fa-fw fa-volume-off text-danger"></span> ミュート';
+            return '<span class="fa fa-fw fa-check text-primary"></span> ミュート';
           }
-          return '<span class="fa fa-fw fa-volume-off text-muted"></span> ミュート';
+          return '<span class="fa fa-fw"></span> ミュート';
         }, function () {
           PlayerService.toggleMute();
         }]
@@ -135,9 +135,9 @@ limitations under the License.
       ['ビデオ', [
         [function () {
           if (CommonService.isFullscreen()) {
-            return '<span class="fa fa-fw fa-arrows-alt text-primary"></span> 全画面表示';
+            return '<span class="fa fa-fw fa-check text-primary"></span> 全画面表示';
           }
-          return '<span class="fa fa-fw fa-arrows-alt text-muted"></span> 全画面表示';
+          return '<span class="fa fa-fw"></span> 全画面表示';
         }, function () {
           CommonService.setFullscreen(!CommonService.isFullscreen());
         }]
@@ -145,9 +145,9 @@ limitations under the License.
       ['コメント', [
         [function () {
           if ($ctrl.commentEnabled) {
-            return '<span class="fa fa-fw fa-comment text-primary"></span> コメントを表示';
+            return '<span class="fa fa-fw fa-check text-primary"></span> コメントを表示';
           }
-          return '<span class="fa fa-fw fa-comment text-muted"></span> コメントを表示';
+          return '<span class="fa fa-fw"></span> コメントを表示';
         }, function () {
           $ctrl.commentEnabled = !$ctrl.commentEnabled;
         }],
@@ -169,9 +169,9 @@ limitations under the License.
       null,
       [function () {
         if ($ctrl.sidebarCollapsed) {
-          return '<span class="fa fa-fw fa-list-alt text-muted"></span> サイドバー切替';
+          return '<span class="fa fa-fw"></span> サイドバーを表示';
         }
-        return '<span class="fa fa-fw fa-list-alt text-primary"></span> サイドバー切替';
+        return '<span class="fa fa-fw fa-check text-primary"></span> サイドバーを表示';
       }, function () {
         $ctrl.sidebarCollapsed = !$ctrl.sidebarCollapsed;
       }],
