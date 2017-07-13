@@ -27,18 +27,28 @@ limitations under the License.
 
 <body>
     <app></app>
-    <script src="bundle.js"></script>
-    <script src="app.js"></script>
+    <img id="splash" src="assets/splash_screen.png" width="1440" height="789">
     <script>
+        var splash = document.getElementById('splash');
+        if (window.sessionStorage.getItem('isLoaded')) {
+            splash.remove();
+        } else {
+            splash.width = window.outerWidth;
+            splash.height = window.outerHeight;
+        }
+
         function bootstrap() {
             if (this.readyState === 'complete') {
                 angular.bootstrap(this, ['app']);
                 this.removeEventListener('readystatechange', bootstrap);
+                splash.remove();
             }
         }
         document.addEventListener('readystatechange', bootstrap);
 
     </script>
+    <script src="bundle.js"></script>
+    <script src="app.js"></script>
 </body>
 
 </html>

@@ -129,7 +129,6 @@ if (process.platform === 'darwin') {
   }
 
   function run($window, $timeout, CommonService) {
-    var win = CommonService.window();
     var chinachuSetting = CommonService.loadLocalStorage('chinachu');
     if (angular.isObject(chinachuSetting)) {
       CommonService.saveLocalStorage('chinachuUrl', chinachuSetting.url);
@@ -153,7 +152,6 @@ if (process.platform === 'darwin') {
     }
 
     if (!CommonService.loadSessionStorage('isLoaded')) {
-      win.show();
       loadWindowState();
     }
     CommonService.saveSessionStorage('isLoaded', true);

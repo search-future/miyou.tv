@@ -238,11 +238,13 @@ function buildContextMenu(params) {
 
 function createWindow() {
   win = new BrowserWindow({
+    width: 1440,
+    height: 789,
+    center: true,
     minWidth: 300,
     minHeight: 500,
-    autoHideMenuBar: true,
     frame: false,
-    show: nodeEnv !== 'production'
+    autoHideMenuBar: true
   });
   win.loadURL('file://' + path.join(__dirname, '/index.html'));
 
