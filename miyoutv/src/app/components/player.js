@@ -140,6 +140,14 @@ limitations under the License.
           return '<span class="fa fa-fw"></span> 全画面表示';
         }, function () {
           CommonService.setFullscreen(!CommonService.isFullscreen());
+        }],
+        [function () {
+          if (CommonService.isAlwaysOnTop()) {
+            return '<span class="fa fa-fw fa-check text-primary"></span> 常に前面に表示';
+          }
+          return '<span class="fa fa-fw"></span> 常に前面に表示';
+        }, function () {
+          CommonService.setAlwaysOnTop(!CommonService.isAlwaysOnTop());
         }]
       ]],
       ['コメント', [
