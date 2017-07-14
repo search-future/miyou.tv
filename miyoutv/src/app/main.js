@@ -152,8 +152,11 @@ if (process.platform === 'darwin') {
       });
     }
 
-    win.show();
-    loadWindowState();
+    if (!CommonService.loadSessionStorage('isLoaded')) {
+      win.show();
+      loadWindowState();
+    }
+    CommonService.saveSessionStorage('isLoaded', true);
 
     function saveWindowState() {
       var windowState = {
@@ -162,7 +165,11 @@ if (process.platform === 'darwin') {
         width: $window.outerWidth,
         height: $window.outerHeight
       };
-      if (!(win.isMinimized() || win.isMaximized() || win.isFullScreen())) {
+      if (!(
+          CommonService.isMinimized() ||
+          CommonService.isMaximized() ||
+          CommonService.isFullscreen()
+        )) {
         CommonService.saveLocalStorage('windowState', windowState);
       }
     }
