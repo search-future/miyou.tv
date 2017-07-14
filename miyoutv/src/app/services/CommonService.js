@@ -68,14 +68,8 @@ limitations under the License.
 
     /* eslint-disable */
     if (process.versions.electron) {
-      var version = process.versions.electron.split('.');
-      if (parseInt(version[0], 10) > 0) {
-        props.app = require('electron').remote.app;
-        props.win = require('electron').remote.getCurrentWindow();
-      } else {
-        props.app = require('remote').app;
-        props.win = require('remote').getCurrentWindow();
-      }
+      props.app = require('electron').remote.app;
+      props.win = require('electron').remote.getCurrentWindow();
       props.dataPath = props.app.getPath('userData');
     }
     /* eslint-enable */
