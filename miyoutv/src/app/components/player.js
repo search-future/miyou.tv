@@ -247,6 +247,7 @@ limitations under the License.
         default:
           initChinachu();
       }
+      CommonService.setPowerSave(false);
     };
     $ctrl.$onDestroy = function () {
       active = false;
@@ -254,6 +255,7 @@ limitations under the License.
       ChinachuService.cancelRequests();
       GaraponService.cancelRequests();
       GaraponSiteService.cancelRequests();
+      CommonService.setPowerSave(true);
     };
 
     $scope.$watch(function () {
