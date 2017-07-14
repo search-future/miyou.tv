@@ -47,6 +47,8 @@ limitations under the License.
       isMinimized: isMinimized,
       minimize: minimize,
       restore: restore,
+      isPowerSave: isPowerSave,
+      setPowerSave: setPowerSave,
       quitModal: quitModal,
       close: close,
       reload: reload,
@@ -70,6 +72,7 @@ limitations under the License.
     if (process.versions.electron) {
       props.app = require('electron').remote.app;
       props.win = require('electron').remote.getCurrentWindow();
+      props.powerSaveBlocker = require('electron').remote.powerSaveBlocker;
       props.dataPath = props.app.getPath('userData');
     }
     /* eslint-enable */
@@ -212,6 +215,26 @@ limitations under the License.
 
     function restore() {
       props.win.restore();
+    }
+
+    function isPowerSave() {
+      return !(
+        angular.isDefined(props.powerSaveBlockerId) &&
+        props.powerSaveBlocker.isStarted(props.powerSaveBlockerId)
+      );
+    }
+
+    function setPowerSave(flag) {
+      if (
+        angular.isDefined(flag) &&
+        flag !== isPowerSave()
+      ) {
+        if (flag) {
+          props.powerSaveBlocker.stop(props.powerSaveBlockerId);
+        } else {
+          props.powerSaveBlockerId = props.powerSaveBlocker.start('prevent-display-sleep');
+        }
+      }
     }
 
     function quitModal() {
