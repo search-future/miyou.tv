@@ -69,13 +69,15 @@ limitations under the License.
     }], function (values) {
       var enabled = values[0];
       var width = values[1];
-      var heifht = values[2];
-      if (!enabled || width <= 0 || heifht <= 0) {
+      var height = values[2];
+      if (!enabled || width <= 0 || height <= 0) {
         $ctrl.comments.forEach(function (a) {
           var comment = a;
 
           comment.style.visibility = 'hidden';
         });
+      } else {
+        adjustLines();
       }
     });
     $scope.$watch(function () {
