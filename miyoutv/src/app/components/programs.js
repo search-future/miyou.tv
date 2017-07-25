@@ -588,7 +588,7 @@ limitations under the License.
               column.name = program.bc;
               column.commentQuery = resolveQuery(column.name);
               column.style = {
-                height: calcHeight(start, end)
+                height: calcHeight(startHour, endHour)
               };
               column.programs = [];
               $ctrl.programs.push(column);
@@ -745,7 +745,7 @@ limitations under the License.
                 column.service_type = program.service_type;
                 column.commentQuery = resolveQuery(column.name);
                 column.style = {
-                  height: calcHeight(start, end)
+                  height: calcHeight(startHour, endHour)
                 };
                 column.programs = [];
                 $ctrl.programs.push(column);
@@ -870,7 +870,7 @@ limitations under the License.
           column.type = program.channel.type;
           column.sid = program.channel.sid;
           column.style = {
-            height: calcHeight(start, end)
+            height: calcHeight(startHour, endHour)
           };
           column.programs = [];
           programs.push(column);
@@ -956,7 +956,7 @@ limitations under the License.
           column.type = program.channel.type;
           column.sid = parseInt(program.channel.sid, 10);
           column.style = {
-            height: calcHeight(start, end)
+            height: calcHeight(startHour, endHour)
           };
           column.programs = [];
           programs.push(column);
@@ -987,7 +987,8 @@ limitations under the License.
       if ($ctrl.selectItem() === item) {
         return {
           top: calcPos(item.start) + 'px',
-          minHeight: calcHeight(item.start, item.end) + 'px'
+          minHeight: calcHeight(item.start, item.end) + 'px',
+          maxHeight: calcHeight(item.start, endHour) + 'px'
         };
       }
       return {
@@ -1013,9 +1014,9 @@ limitations under the License.
           initView(start, Date.now());
         } else {
           initBaseTime(start, end);
+          initHourHeader(startHour, endHour);
           initDateHeader(start, end);
           initDatepicker(start, end);
-          initHourHeader(start, end);
         }
       }
     }
@@ -1033,15 +1034,18 @@ limitations under the License.
         endDate.getFullYear(),
         endDate.getMonth(),
         endDate.getDate(),
-        endDate.getHours()
+        endDate.getHours() + 1
       ).getTime();
     }
 
     function initDateHeader(start, end) {
       var dates = [];
+      var date;
       var startDate = new Date(start);
       var endDate = new Date(end);
-      var date = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+      startDate.setHours(startDate.getHours() - hourFirst);
+      endDate.setHours(endDate.getHours() - hourFirst);
+      date = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
 
       while (date.getTime() < endDate.getTime()) {
         dates.push({
@@ -1070,8 +1074,12 @@ limitations under the License.
     }
 
     function initDatepicker(start, end) {
-      $ctrl.datepickerOptions.minDate = new Date(start);
-      $ctrl.datepickerOptions.maxDate = new Date(end);
+      var startDate = new Date(start);
+      var endDate = new Date(end);
+      startDate.setHours(startDate.getHours() - hourFirst);
+      endDate.setHours(endDate.getHours() - hourFirst);
+      $ctrl.datepickerOptions.minDate = startDate;
+      $ctrl.datepickerOptions.maxDate = endDate;
     }
 
     function updateView() {
