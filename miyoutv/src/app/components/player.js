@@ -801,7 +801,7 @@ limitations under the License.
         if (garaponSearchMessages[response.data.status]) {
           toaster.pop({
             type: 'error',
-            title: 'GArapon TV Error',
+            title: 'Garapon TV Error',
             body: garaponSearchMessages[response.data.status]
           });
           return false;
