@@ -776,7 +776,9 @@ limitations under the License.
               }, function (watchResponse) {
                 var streamSize = watchResponse.headers['content-length'];
                 var ms = (fileSize * 10000) / streamSize;
-                PlayerService.overwriteLength(ms);
+                if (streamSize > 1000000) {
+                  PlayerService.overwriteLength(ms);
+                }
                 playWithInfo(mrl);
               });
               request.on('error', function () {
