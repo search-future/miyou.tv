@@ -237,10 +237,14 @@ limitations under the License.
       $timeout.cancel(timer);
       timer = $timeout(updateView, 200);
     });
-    $scope.$watch(function () {
+    $scope.$watchGroup([function () {
       return CommonService.loadLocalStorage('countMode');
-    }, function (value) {
-      countMode = value || 'speed';
+    }, function () {
+      return CommonService.loadLocalStorage('moritapoEmail');
+    }, function () {
+      return CommonService.loadLocalStorage('moritapoPassword');
+    }], function (values) {
+      countMode = values[0] || 'speed';
       $ctrl.programs.forEach(function (a) {
         var program = a;
         delete program.count;
