@@ -269,14 +269,18 @@ limitations under the License.
       newItem.style = calcItemStyle(newItem);
       oldItem.style = calcItemStyle(oldItem);
     });
-    $scope.$watch(function () {
+    $scope.$watchGroup([function () {
       return CommonService.loadLocalStorage('countMode');
-    }, function (value) {
+    }, function () {
+      return CommonService.loadLocalStorage('moritapoEmail');
+    }, function () {
+      return CommonService.loadLocalStorage('moritapoPassword');
+    }], function (values) {
       var column;
       var item;
       var ci;
       var ii;
-      countMode = value || 'speed';
+      countMode = values[0] || 'speed';
       for (ci = 0; ci < $ctrl.programs.length; ci += 1) {
         column = $ctrl.programs[ci];
         for (ii = 0; ii < column.programs.length; ii += 1) {
