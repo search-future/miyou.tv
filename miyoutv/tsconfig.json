@@ -10,5 +10,6 @@
     "sourceMap": true
   },
   "include": [
+    "src/bundle.ts"
   ]
 }

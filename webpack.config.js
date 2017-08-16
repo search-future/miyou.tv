@@ -20,11 +20,9 @@ const miyoutvConfigMain = {
     'electron-reload': 'require("electron-reload")',
   }],
   plugins: [
-    new webpack.EnvironmentPlugin(
-      process.env.IS_PACK ? {
-        NODE_ENV: 'development',
-      } : []
-    ),
+    new webpack.EnvironmentPlugin(process.env.IS_PACK ? {
+      NODE_ENV: 'development',
+    } : []),
     new UglifyJSPlugin({
       sourceMap: true,
     }),
@@ -55,12 +53,10 @@ const miyoutvConfigRenderer = {
     'wcjs-prebuilt': 'require("wcjs-prebuilt")',
   }],
   plugins: [
-    new webpack.EnvironmentPlugin(
-      process.env.IS_PACK ? {
-        NODE_ENV: 'development',
-        GARAPON_DEVID: '',
-      } : []
-    ),
+    new webpack.EnvironmentPlugin(process.env.IS_PACK ? {
+      NODE_ENV: 'development',
+      GARAPON_DEVID: '',
+    } : []),
     new UglifyJSPlugin({
       sourceMap: true,
     }),
@@ -71,7 +67,7 @@ const miyoutvConfigRenderer = {
 const miyoutvConfigBundle = {
   entry: {
     bundle: [
-      path.join(__dirname, 'miyoutv/src/bundle.js'),
+      path.join(__dirname, 'miyoutv/src/bundle.ts'),
       path.join(__dirname, 'miyoutv/src/bundle.css'),
     ],
   },
@@ -81,6 +77,14 @@ const miyoutvConfigBundle = {
   },
   module: {
     rules: [{
+      test: /\.ts$/,
+      use: {
+        loader: 'awesome-typescript-loader',
+        options: {
+          configFileName: 'miyoutv/tsconfig.json',
+        },
+      },
+    }, {
       test: /\.css$/,
       use: ExtractTextPlugin.extract({
         use: [{

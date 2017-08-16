@@ -13,17 +13,27 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-/* eslint-disable node/no-unpublished-require*/
+import * as angular from 'angular';
+import 'angular-animate';
+import 'angular-route';
+import 'angular-ui-bootstrap';
+import 'angular-bootstrap-contextmenu';
+import 'angular-hotkeys';
+import 'angularjs-toaster';
+import 'angular-loading-bar';
+import 'angular-md5';
+import * as agGrid from 'ag-grid/main';
+agGrid.initialiseAgGridWithAngular1(angular);
+
+interface Window {
+  jQuery: JQuery;
+  wcjsRenderer: any;
+  angular: ng.IAngularStatic;
+  agGrid: any;
+}
+declare const window: Window;
+
+window.angular = angular;
 window.jQuery = require('jquery');
-window.agGrid = require('ag-grid/dist/ag-grid.js');
 window.wcjsRenderer = require('webgl-video-renderer');
 require('bootstrap');
-require('angular');
-require('angular-animate');
-require('angular-route');
-require('angular-ui-bootstrap');
-require('angular-bootstrap-contextmenu');
-require('angular-hotkeys');
-require('angularjs-toaster');
-require('angular-loading-bar');
-require('angular-md5');
