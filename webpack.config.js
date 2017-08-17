@@ -7,11 +7,22 @@ const discardFonts = require('postcss-discard-font-face');
 
 const miyoutvConfigMain = {
   entry: {
-    index: path.join(__dirname, 'miyoutv/src/index.js'),
+    index: path.join(__dirname, 'miyoutv/src/index.ts'),
   },
   output: {
     path: path.join(__dirname, 'miyoutv/dist/'),
     filename: '[name].js',
+  },
+  module: {
+    rules: [{
+      test: /\.ts$/,
+      use: {
+        loader: 'awesome-typescript-loader',
+        options: {
+          configFileName: 'miyoutv/tsconfig.json',
+        },
+      },
+    }]
   },
   devtool: 'source-map',
   target: 'electron-main',

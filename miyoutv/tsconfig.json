@@ -10,6 +10,7 @@
     "sourceMap": true
   },
   "include": [
+    "src/index.ts",
     "src/bundle.ts"
   ]
 }

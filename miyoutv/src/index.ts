@@ -13,27 +13,34 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-var app = require('electron').app;
-var shell = require('electron').shell;
-var BrowserWindow = require('electron').BrowserWindow;
-var Menu = require('electron').Menu;
+import { app, shell, BrowserWindow, Menu } from 'electron';
+import * as path from 'path';
+import * as fs from 'fs';
 
-var path = require('path');
-var fs = require('fs');
+declare namespace NodeJS {
+  interface Global {
+    contextMenu: Electron.Menu;
+  }
+}
+declare const global: NodeJS.Global;
 
-var win;
-var nodeEnv = process.env.NODE_ENV;
+let win: Electron.BrowserWindow = null;
+const nodeEnv: string = process.env.NODE_ENV;
 
-/* eslint-disable */
 try {
   require('electron-reload')(__dirname, {
-    electron: /^0/.test(process.versions.electron) ? require('electron-prebuilt') : process.execPath
+    electron: (
+      /^0/.test(process.versions.electron) ?
+        require('electron-prebuilt') : process.execPath
+    ),
   });
-} catch (e) {}
-/* eslint-enable */
+} catch (e) { }
 
 if (process.platform === 'win32' && !process.env.VLC_PLUGIN_PATH) {
-  process.env.VLC_PLUGIN_PATH = path.join(path.dirname(process.execPath), 'node_modules/wcjs-prebuilt/bin/plugins');
+  process.env.VLC_PLUGIN_PATH = path.join(
+    path.dirname(process.execPath),
+    'node_modules/wcjs-prebuilt/bin/plugins',
+  );
   try {
     fs.statSync(process.env.VLC_PLUGIN_PATH);
   } catch (e) {
@@ -41,35 +48,33 @@ if (process.platform === 'win32' && !process.env.VLC_PLUGIN_PATH) {
   }
 }
 
-function buildAppMenu() {
-  var template = [];
+function buildAppMenu(): Electron.Menu {
+  const template: Electron.MenuItemOptions[] = [];
 
   if (process.platform === 'darwin') {
     template.unshift({
       label: app.getName(),
       submenu: [{
-        label: app.getName() + 'について',
-        role: 'about'
+        label: `${app.getName()}について`,
+        role: 'about',
       }, {
-        type: 'separator'
+        type: 'separator',
       }, {
-        label: app.getName() + 'を隠す',
-        role: 'hide'
+        label: `${app.getName()}を隠す`,
+        role: 'hide',
       }, {
         label: 'ほかを隠す',
-        role: 'hideothers'
+        role: 'hideothers',
       }, {
         label: 'すべてを表示',
-        role: 'unhide'
+        role: 'unhide',
       }, {
-        type: 'separator'
+        type: 'separator',
       }, {
         label: 'MiyouTVを終了',
         role: 'quit',
-        click: function () {
-          app.quit();
-        }
-      }]
+        click: (): void => app.quit(),
+      }],
     });
   } else {
     template.push({
@@ -77,166 +82,144 @@ function buildAppMenu() {
       submenu: [{
         label: 'MiyouTVを終了',
         role: 'quit',
-        click: function () {
-          app.quit();
-        }
-      }]
+        click: (): void => app.quit(),
+      }],
     });
   }
   template.push({
     label: '編集',
     submenu: [{
       label: '元に戻す',
-      role: 'undo'
+      role: 'undo',
     }, {
       label: 'やり直す',
-      role: 'redo'
+      role: 'redo',
     }, {
-      type: 'separator'
+      type: 'separator',
     }, {
       label: '切り取り',
-      role: 'cut'
+      role: 'cut',
     }, {
       label: 'コピー',
-      role: 'copy'
+      role: 'copy',
     }, {
       label: '貼り付け',
-      role: 'paste'
+      role: 'paste',
     }, {
       label: '削除',
       role: 'delete',
-      click: function () {
-        win.webContents.delete();
-      }
+      click: (): void => win.webContents.delete(),
     }, {
-      type: 'separator'
+      type: 'separator',
     }, {
       label: 'すべて選択',
-      role: 'selectall'
-    }]
+      role: 'selectall',
+    }],
   });
   template.push({
     label: '表示',
     submenu: [{
       label: 'MiyouTVを再読み込み',
       role: 'reload',
-      key: 'CmdOrCtrl+R',
-      click: function () {
-        win.webContents.reload();
-      }
+      accelerator: 'CmdOrCtrl+R',
+      click: (): void => win.webContents.reload(),
     }, {
       label: '開発者ツール',
       role: 'toggledevtools',
-      key: 'CmdOrCtrl+Shift+I',
-      click: function () {
-        win.webContents.toggleDevTools();
-      }
+      accelerator: 'CmdOrCtrl+Shift+I',
+      click: (): void => win.webContents.toggleDevTools(),
     }, {
-      type: 'separator'
+      type: 'separator',
     }, {
       label: '全画面表示',
       role: 'togglefullscreen',
-      key: 'F11',
-      click: function () {
-        win.setFullScreen(!win.isFullScreen());
-      }
-    }]
+      accelerator: 'F11',
+      click: (): void => win.setFullScreen(!win.isFullScreen()),
+    }],
   });
   template.push({
     label: 'ヘルプ',
     submenu: [{
       label: app.getName() + 'について',
-      click: function () {
+      click: (): void => {
         shell.openExternal('http://miyou.tv');
-      }
-    }]
+      },
+    }],
   });
 
   return Menu.buildFromTemplate(template);
 }
 
-function buildContextMenu(params) {
-  var noParams = typeof params !== 'object';
-  var template = [{
+function buildContextMenu(params?: Electron.ContextMenuParams): Electron.Menu {
+  const noParams: boolean = typeof params !== 'object';
+  const template: Electron.MenuItemOptions[] = [{
     label: '戻る',
-    click: function () {
-      win.webContents.goBack();
-    },
-    visible: noParams || win.webContents.canGoBack()
+    click: (): void => win.webContents.goBack(),
+    visible: noParams || win.webContents.canGoBack(),
   }, {
     label: '進む',
-    click: function () {
-      win.webContents.goForward();
-    },
-    visible: noParams || win.webContents.canGoForward()
+    click: (): void => win.webContents.goForward(),
+    visible: noParams || win.webContents.canGoForward(),
   }, {
     label: 'MiyouTVを再読み込み',
     role: 'reload',
-    click: function () {
-      win.webContents.reload();
-    }
+    click: (): void => win.webContents.reload(),
   }, {
-    type: 'separator'
+    type: 'separator',
   }, {
     label: '元に戻す',
     role: 'undo',
-    visible: noParams || params.editFlags.canUndo
+    visible: noParams || params.editFlags.canUndo,
   }, {
     label: 'やり直す',
     role: 'redo',
-    visible: noParams || params.editFlags.canRedo
+    visible: noParams || params.editFlags.canRedo,
   }, {
     type: 'separator',
-    visible: noParams || params.editFlags.canUndo || params.editFlags.canRedo
+    visible: noParams || params.editFlags.canUndo || params.editFlags.canRedo,
   }, {
     label: '切り取り',
     role: 'cut',
-    visible: noParams || params.editFlags.canCut
+    visible: noParams || params.editFlags.canCut,
   }, {
     label: 'コピー',
     role: 'copy',
-    visible: noParams || params.editFlags.canCopy
+    visible: noParams || params.editFlags.canCopy,
   }, {
     label: '貼り付け',
     role: 'paste',
-    visible: noParams || params.editFlags.canPaste
+    visible: noParams || params.editFlags.canPaste,
   }, {
     label: '削除',
     role: 'delete',
     visible: noParams || params.editFlags.canDelete,
-    click: function () {
-      win.webContents.delete();
-    }
+    click: (): void => win.webContents.delete(),
   }, {
     type: 'separator',
-    visible: noParams || params.isEditable || params.editFlags.canCopy
+    visible: noParams || params.isEditable || params.editFlags.canCopy,
   }, {
     label: 'すべて選択',
     role: 'selectall',
-    visible: noParams || params.editFlags.canSelectAll
+    visible: noParams || params.editFlags.canSelectAll,
   }, {
     type: 'separator',
-    visible: noParams || params.editFlags.canSelectAll
+    visible: noParams || params.editFlags.canSelectAll,
   }, {
     label: 'MiyouTVを終了',
     role: 'quit',
-    click: function () {
-      app.quit();
-    }
+    click: (): void => app.quit(),
   }];
-  template.forEach(function (a) {
-    var item = a;
-
-    if (item.visible === false) {
-      item.type = null;
-      item.role = null;
+  template.forEach((a: Electron.MenuItemOptions): void => {
+    if (a.visible === false) {
+      a.type = null;
+      a.role = null;
     }
   });
 
   return Menu.buildFromTemplate(template);
 }
 
-function createWindow() {
+function createWindow(): void {
   win = new BrowserWindow({
     width: 1440,
     height: 789,
@@ -244,16 +227,19 @@ function createWindow() {
     minWidth: 300,
     minHeight: 500,
     frame: false,
-    autoHideMenuBar: true
+    autoHideMenuBar: true,
   });
   win.loadURL('file://' + path.join(__dirname, '/index.html'));
 
-  win.on('closed', function () {
+  win.on('closed', (): void => {
     win = null;
   });
-  win.webContents.on('context-menu', function (e, params) {
-    buildContextMenu(params).popup();
-  });
+  win.webContents.on(
+    'context-menu',
+    (e: Electron.Event, params: Electron.ContextMenuParams): void => {
+      buildContextMenu(params).popup();
+    },
+  );
 
   Menu.setApplicationMenu(buildAppMenu());
   if (/^0/.test(process.versions.electron)) {
@@ -267,13 +253,13 @@ function createWindow() {
 
 app.on('ready', createWindow);
 
-app.on('window-all-closed', function () {
+app.on('window-all-closed', (): void => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
-app.on('activate', function () {
+app.on('activate', (): void => {
   if (win === null) {
     createWindow();
   }
