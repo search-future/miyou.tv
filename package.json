@@ -63,6 +63,7 @@
     "stylelint-config-standard": "^16.0.0",
     "tar.gz": "^1.0.5",
     "tslint": "^5.6.0",
+    "tslint-config-airbnb": "^5.2.1",
     "typeface-notosans-jp": "^1.0.1",
     "typescript": "^2.4.2",
     "uglify-js": "^3.0.27",

@@ -1,0 +1,14 @@
+{
+  "extends": "tslint-config-airbnb",
+  "rules": {
+    "variable-name": [
+      "allow-pascal-case"
+    ],
+    "function-name": [
+      true,
+      {
+        "method-regex": "^\\$?[a-z][\\w\\d]+$"
+      }
+    ]
+  }
+}
