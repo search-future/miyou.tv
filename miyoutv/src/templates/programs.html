@@ -57,7 +57,7 @@ limitations under the License.
                     <li ng-repeat="category in $ctrl.categories">
                         <div class="checkbox text-nowrap" title="{{category.localeName}}">
                             <label>
-                            <input type="checkbox" name="category" ng-model="category.checked" ng-change="$ctrl.updateView()">{{category.localeName}}
+                            <input type="checkbox" name="category" ng-model="category.checked" ng-change="$ctrl.update()">{{category.localeName}}
                         </label>
                         </div>
                     </li>

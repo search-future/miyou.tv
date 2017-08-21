@@ -13,29 +13,31 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-(function () {
-  'use strict';
+declare module angular { }
 
-  angular.module('app')
-    .component('quitModal', {
-      bindings: {
-        close: '&',
-        dismiss: '&'
-      },
-      templateUrl: 'templates/quitModal.html',
-      controller: QuitModalCtrl
-    });
+class ProgressModalController {
+  static componentName: string = 'progressModal';
+  static $inject: string[] = [];
 
-  function QuitModalCtrl(CommonService) {
-    var $ctrl = this;
+  public resolve: {
+    title: string;
+    message: string;
+  };
 
-    $ctrl.yes = function () {
-      $ctrl.close();
-      CommonService.quit();
-    };
-
-    $ctrl.no = function () {
-      $ctrl.dismiss();
-    };
+  get title(): string {
+    return this.resolve.title;
   }
-}());
+
+  get message(): string {
+    return this.resolve.message;
+  }
+}
+
+angular.module('app')
+  .component('progressModal', {
+    templateUrl: 'templates/progressModal.html',
+    controller: ProgressModalController,
+    bindings: {
+      resolve: '<',
+    },
+  });

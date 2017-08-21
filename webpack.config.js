@@ -43,7 +43,7 @@ const miyoutvConfigMain = {
 
 const miyoutvConfigRenderer = {
   entry: {
-    app: glob.sync(path.join(__dirname, 'miyoutv/src/app/**/*.js'), {
+    app: glob.sync(path.join(__dirname, 'miyoutv/src/app/**/*.ts'), {
       nosort: true,
     }),
   },
@@ -53,6 +53,14 @@ const miyoutvConfigRenderer = {
   },
   module: {
     rules: [{
+      test: /\.ts$/,
+      use: {
+        loader: 'awesome-typescript-loader',
+        options: {
+          configFileName: 'miyoutv/tsconfig.json',
+        },
+      },
+    }, {
       test: /\.js$/,
       use: 'ng-annotate-loader',
     }],

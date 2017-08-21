@@ -99,7 +99,7 @@
     "build-agent:resource": "cpx \"miyoutv-agent/**/!(src|*.js)\" build/miyoutv-agent/",
     "build:js": "webpack --env.miyoutv --env.js",
     "build:bundle": "webpack --env.miyoutv --env.bundle",
-    "build:resource": "cpx \"miyoutv/src/**/!(app|*.js|package*.json|bundle.*)\" miyoutv/dist/",
+    "build:resource": "cpx \"miyoutv/src/**/!(app|*.js|*.ts|package*.json|bundle.*)\" miyoutv/dist/",
     "clean": "rimraf miyoutv/dist/ \"build/miyoutv-*(agent|linux32|linux64|mac|win32|win64)\"",
     "dist": "env-cmd pack.env.js cross-conf-env npm run dist:%npm_config_pack_type%",
     "dist-agent": "cross-conf-env targz c build/miyoutv-agent/ build/miyoutv-agent-%npm_package_version%.tar.gz",
