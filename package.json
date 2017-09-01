@@ -132,7 +132,6 @@
     "predist:win32": "env-cmd pack-win32.env npm run build && npm run dist:win32:copy && npm run dist:win32:config",
     "predist:win64": "env-cmd pack-win64.env npm run build && npm run dist:win64:copy && npm run dist:win64:config",
     "prestart": "env-cmd .env.local npm run build:js",
-    "source": "env-cmd .env.local electron miyoutv/src/",
     "start": "env-cmd .env.local concurrently -k -s first \"electron ./\" \"npm run watch\"",
     "test": "eslint --ignore-path .gitignore ./",
     "watch": "env-cmd .env.local concurrently \"npm run watch:js\" \"npm run watch:bundle\" \"npm run watch:resource\"",
