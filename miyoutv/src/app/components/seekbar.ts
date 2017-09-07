@@ -58,7 +58,7 @@ class SeekbarController {
     private PlayerService: PlayerService.PlayerService,
   ) {
     $scope.$watch(
-      (): number => PlayerService.position(),
+      (): number => PlayerService.position,
       (value: number): void => {
         if (!this.isSeeking) {
           this.position = value;
@@ -69,11 +69,11 @@ class SeekbarController {
         this.endTime = this.length;
         if (this.offset) {
           this.clockTime = CommonService.formatDate(
-            PlayerService.time() + this.offset,
+            PlayerService.time + this.offset,
             'A HHHH:mm:ss',
           );
           this.endTime = CommonService.formatDate(
-            PlayerService.length() + this.offset,
+            PlayerService.length + this.offset,
             'A HHHH:mm:ss',
           );
         }
@@ -84,7 +84,7 @@ class SeekbarController {
       [
         (): Program[] => this.programList,
         (): number => this.offset,
-        (): number => PlayerService.length(),
+        (): number => PlayerService.length,
       ],
       (values: [Program[], number, number]): void => {
         const [list, offset, length]: [Program[], number, number] = values;
@@ -105,7 +105,7 @@ class SeekbarController {
       [
         (): ChartData[] => this.chartData,
         (): number => this.offset,
-        (): number => PlayerService.length(),
+        (): number => PlayerService.length,
       ],
       (values: [ChartData[], number, number]): void => {
         const data: ChartData[] = values[0];
@@ -145,7 +145,7 @@ class SeekbarController {
 
   public seek(position: number): void {
     if (this.isSeeking) {
-      this.PlayerService.position(position);
+      this.PlayerService.position = position;
     }
   }
 }

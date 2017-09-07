@@ -39,25 +39,25 @@ class ControlbarController {
     private PlayerService: PlayerService.PlayerService,
   ) {
     $scope.$watch(
-      (): boolean => CommonService.isFullscreen(),
+      (): boolean => CommonService.fullscreen,
       (value: boolean): void => {
         this.isFullscreen = value;
       },
     );
     $scope.$watch(
-      (): boolean => PlayerService.playing(),
+      (): boolean => PlayerService.playing,
       (value: boolean): void => {
         this.playing = value;
       },
     );
     $scope.$watch(
-      (): boolean => PlayerService.mute(),
+      (): boolean => PlayerService.mute,
       (value: boolean): void => {
         this.mute = value;
       },
     );
     $scope.$watch(
-      (): number => PlayerService.volume(),
+      (): number => PlayerService.volume,
       (value: number): void => {
         this.volume = value;
       },
@@ -93,11 +93,11 @@ class ControlbarController {
   }
 
   public setVolume(volume: number): void {
-    this.PlayerService.volume(volume);
+    this.PlayerService.volume = volume;
   }
 
   public toggleFullscreen(): void {
-    this.CommonService.setFullscreen(!this.CommonService.isFullscreen());
+    this.CommonService.fullscreen = !this.CommonService.fullscreen;
   }
 
   public toggleComment(): void {

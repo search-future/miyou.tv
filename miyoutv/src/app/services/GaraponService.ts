@@ -28,11 +28,6 @@ interface PreviewCache {
 }
 
 export interface GaraponService {
-  backend(value?: string): string;
-  apiVersion(value?: number): number;
-  user(value?: string): string;
-  password(value?: string): string;
-  previewCacheLifetime(value?: number): number;
   requestBackendInfo(useCache?: boolean): ng.IPromise<{}>;
   loadBackend(useCache?: boolean): ng.IPromise<{}>;
   request(
@@ -94,41 +89,37 @@ export class GaraponService implements GaraponService {
     this.initPreviewCache();
   }
 
-  public backend(value?: string): string {
-    if (angular.isString(value)) {
-      this._backend = value.trim();
-      if (this.apiVersion() < 4) {
-        this.logout(true);
-      }
+  set backend(url: string) {
+    this._backend = url.trim();
+    if (this.apiVersion < 4) {
+      this.logout(true);
     }
+  }
+  get backend() {
     return this._backend;
   }
-
-  public apiVersion(value?: number): number {
-    if (angular.isNumber(value)) {
-      this._apiVersion = value;
-    }
+  set apiVersion(version: number) {
+    this._apiVersion = version;
+  }
+  get apiVersion(): number {
     return this._apiVersion;
   }
-
-  public user(value?: string): string {
-    if (angular.isString(value)) {
-      this._user = value.trim();
-    }
+  set user(user: string) {
+    this._user = user.trim();
+  }
+  get user(): string {
     return this._user;
   }
-
-  public password(value?: string): string {
-    if (angular.isString(value)) {
-      this._password = value.trim();
-    }
+  set password(password: string) {
+    this._password = password.trim();
+  }
+  get password(): string {
     return this._password;
   }
-
-  public previewCacheLifetime(value: number): number {
-    if (!isNaN(value)) {
-      this._previewCacheLifetime = parseInt(value as any, 10);
-    }
+  set previewCacheLifetime(time: number) {
+    this._previewCacheLifetime = time;
+  }
+  get previewCacheLifetime() {
     return this._previewCacheLifetime;
   }
 
@@ -143,7 +134,7 @@ export class GaraponService implements GaraponService {
       },
       transformRequest: this.$httpParamSerializer,
       data: {
-        user: this.user(),
+        user: this.user,
         md5passwd: this.md5password(),
         dev_id: this.garaponDevId,
       },
@@ -213,12 +204,12 @@ export class GaraponService implements GaraponService {
             url.push(':');
             url.push(result.port);
           }
-          this.backend(url.join(''));
+          this.backend = url.join('');
           const version: string = (/^GTV([0-9]+)/.exec(result.gtvver) || [])[1];
           if (parseInt(version, 10) < 3) {
-            this.apiVersion(2);
+            this.apiVersion = 2;
           } else {
-            this.apiVersion(3);
+            this.apiVersion = 3;
           }
           deferred.resolve(result);
         } else {
@@ -230,6 +221,7 @@ export class GaraponService implements GaraponService {
     );
     return deferred.promise;
   }
+
   public request(
     path?: string,
     config?: ng.IRequestShortcutConfig,
@@ -242,14 +234,14 @@ export class GaraponService implements GaraponService {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         transformRequest: this.$httpParamSerializer,
-        url: `${this.backend()}/gapi/v${this.apiVersion()}/${path}`,
+        url: `${this.backend}/gapi/v${this.apiVersion}/${path}`,
         params: {},
         data: {},
         timeout: this.canceller.promise,
       },
       config,
     );
-    if (this.apiVersion() >= 4) {
+    if (this.apiVersion >= 4) {
       if (conf.method === 'POST') {
         conf.data.gtvsession = this.gtvsession;
       } else {
@@ -291,7 +283,7 @@ export class GaraponService implements GaraponService {
         {
           data: {
             type: 'login',
-            loginid: this.user(),
+            loginid: this.user,
             md5pswd: this.md5password(),
           },
         },
@@ -362,7 +354,7 @@ export class GaraponService implements GaraponService {
   }
 
   protected md5password(): void {
-    return this.md5.createHash(this.password());
+    return this.md5.createHash(this.password);
   }
 
   public loginV4(): ng.IPromise<{}> {
@@ -401,8 +393,8 @@ export class GaraponService implements GaraponService {
           url.push(':');
           url.push(result.data.port);
         }
-        this.apiVersion(4);
-        this.backend(url.join(''));
+        this.apiVersion = 4;
+        this.backend = url.join('');
         deferred.resolve(result);
       } else {
         deferred.reject(result);
@@ -422,8 +414,8 @@ export class GaraponService implements GaraponService {
       url: `${this.garaponAuthUrlV4}/service/Auth/Gtvsession/get`,
       data: {
         dev_id: this.garaponDevId,
-        gid: this.user(),
-        passwd: this.password(),
+        gid: this.user,
+        passwd: this.password,
       },
     }).then(
       (response: ng.IHttpPromiseCallbackArg<{}>): void => {
@@ -449,7 +441,7 @@ export class GaraponService implements GaraponService {
       url: `${this.garaponAuthUrlV4}/service/Auth/Gtvsession/checkWithGid`,
       data: {
         dev_id: this.garaponDevId,
-        gid: this.user(),
+        gid: this.user,
         gtvsession: this.gtvsession,
       },
     }).then(
@@ -471,7 +463,7 @@ export class GaraponService implements GaraponService {
     if (angular.isArray(previewCache) && previewCache.length > 0) {
       this.previewCache = [];
       previewCache.forEach((a: PreviewCache): void => {
-        if (time - a.time < this.previewCacheLifetime()) {
+        if (time - a.time < this.previewCacheLifetime) {
           this.previewCache.push(a);
         } else if (angular.isString(a.id)) {
           this.CommonService.removeFile('previews', a.id);
@@ -483,7 +475,7 @@ export class GaraponService implements GaraponService {
     const deferred: ng.IDeferred<any> = this.$q.defer();
     const config: ng.IRequestConfig = {
       method: 'GET',
-      url: `${this.backend()}/thumbs/${id}`,
+      url: `${this.backend}/thumbs/${id}`,
       cache: true,
       responseType: 'blob',
       timeout: this.canceller.promise,
@@ -534,10 +526,10 @@ export class GaraponService implements GaraponService {
 
   public getStreamUrl(id: string): string {
     if (angular.isString(id)) {
-      if (this.apiVersion() < 3) {
-        return `${this.backend()}/cgi-bin/play/m3u8.cgi?${id}-${this.gtvsession}`;
+      if (this.apiVersion < 3) {
+        return `${this.backend}/cgi-bin/play/m3u8.cgi?${id}-${this.gtvsession}`;
       }
-      return `${this.backend()}/${id}.m3u8?${this.$httpParamSerializer({
+      return `${this.backend}/${id}.m3u8?${this.$httpParamSerializer({
         gtvsession: this.gtvsession,
         dev_id: this.garaponDevId,
       })}`;
@@ -553,7 +545,7 @@ export class GaraponService implements GaraponService {
       sessionParam = '?';
     }
     sessionParam += `gtvsession=${this.gtvsession}`;
-    return `${this.backend()}${path}${sessionParam}`;
+    return `${this.backend}${path}${sessionParam}`;
   }
 
   public convertDate(value: number | Date): number {

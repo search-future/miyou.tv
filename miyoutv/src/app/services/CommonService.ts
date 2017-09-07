@@ -20,7 +20,6 @@ import { remote } from 'electron';
 declare module angular { }
 
 export interface CommonService {
-  window(): Electron.BrowserWindow;
   saveLocalStorage(key: string, value: any): void;
   loadLocalStorage(key: string): any;
   removeLocalStorage(key: string): void;
@@ -30,17 +29,9 @@ export interface CommonService {
   saveFile(dirname: string, filename: string, value: any): boolean;
   loadFile(dirname: string, filename: string): any;
   removeFile(dirname: string, filename: string): boolean;
-  isFullscreen(): boolean;
-  setFullscreen(flag: boolean): void;
-  isAlwaysOnTop(): boolean;
-  setAlwaysOnTop(flag: boolean): void;
-  isMaximized(): boolean;
   maximize(): void;
-  isMinimized(): boolean;
   minimize(): void;
   restore(): void;
-  isPowerSave(): boolean;
-  setPowerSave(flag: boolean): void;
   quitModal(): void;
   close(): void;
   reload(): void;
@@ -94,8 +85,39 @@ export class CommonService implements CommonService {
     }
   }
 
-  public window(): Electron.BrowserWindow {
+  get window(): Electron.BrowserWindow {
     return this.win;
+  }
+  get isMaximized(): boolean {
+    return this.win.isMaximized();
+  }
+  get isMinimized(): boolean {
+    return this.win.isMinimized();
+  }
+  set fullscreen(flag: boolean) {
+    this.win.setFullScreen(flag);
+  }
+  get fullscreen(): boolean {
+    return this.win.isFullScreen();
+  }
+  set alwaysOnTop(flag: boolean) {
+    this.win.setAlwaysOnTop(flag);
+  }
+  get alwaysOnTop(): boolean {
+    return this.win.isAlwaysOnTop();
+  }
+  set powerSave(flag: boolean) {
+    if (flag) {
+      this.powerSaveBlocker.stop(this.powerSaveBlockerId);
+    } else {
+      this.powerSaveBlockerId = this.powerSaveBlocker.start('prevent-display-sleep');
+    }
+  }
+  get powerSave(): boolean {
+    return !(
+      angular.isDefined(this.powerSaveBlockerId) &&
+      this.powerSaveBlocker.isStarted(this.powerSaveBlockerId)
+    );
   }
 
   public saveLocalStorage(key: string, value: any): void {
@@ -195,34 +217,9 @@ export class CommonService implements CommonService {
     }
   }
 
-  public isFullscreen(): boolean {
-    return this.win.isFullScreen();
-
-  }
-
-  public setFullscreen(flag: boolean): void {
-    this.win.setFullScreen(Boolean(flag));
-  }
-
-  public isAlwaysOnTop(): boolean {
-    return this.win.isAlwaysOnTop();
-  }
-
-  public setAlwaysOnTop(flag: boolean): void {
-    this.win.setAlwaysOnTop(Boolean(flag));
-  }
-
-  public isMaximized(): boolean {
-    return this.win.isMaximized();
-
-  }
   public maximize(): void {
     this.win.maximize();
 
-  }
-
-  public isMinimized(): boolean {
-    return this.win.isMinimized();
   }
 
   public minimize(): void {
@@ -232,26 +229,6 @@ export class CommonService implements CommonService {
 
   public restore(): void {
     this.win.restore();
-  }
-
-  public isPowerSave(): boolean {
-    return !(
-      angular.isDefined(this.powerSaveBlockerId) &&
-      this.powerSaveBlocker.isStarted(this.powerSaveBlockerId)
-    );
-  }
-
-  public setPowerSave(flag: boolean): void {
-    if (
-      angular.isDefined(flag) &&
-      flag !== this.isPowerSave()
-    ) {
-      if (flag) {
-        this.powerSaveBlocker.stop(this.powerSaveBlockerId);
-      } else {
-        this.powerSaveBlockerId = this.powerSaveBlocker.start('prevent-display-sleep');
-      }
-    }
   }
 
   public quitModal(): void {

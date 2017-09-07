@@ -21,8 +21,6 @@ export interface CategoryName {
 }
 
 export interface GaraponSiteService {
-  user(value?: string): string;
-  password(value?: string): string;
   login(): ng.IPromise<{}>;
   request(
     path: string,
@@ -64,16 +62,16 @@ export class GaraponSiteService implements GaraponSiteService {
     this.canceller = $q.defer();
   }
 
-  public user(value?: string): string {
-    if (angular.isString(value)) {
-      this._user = value.trim();
-    }
+  set user(user: string) {
+    this._user = user.trim();
+  }
+  get user(): string {
     return this._user;
   }
-  public password(value?: string): string {
-    if (angular.isString(value)) {
-      this._password = value.trim();
-    }
+  set password(password: string) {
+    this._password = password.trim();
+  }
+  get password(): string {
     return this._password;
   }
 
@@ -119,8 +117,8 @@ export class GaraponSiteService implements GaraponSiteService {
       transformRequest: this.$httpParamSerializer,
       data: {
         dev_id: this.garaponDevId,
-        gid: this.user(),
-        passwd: this.password(),
+        gid: this.user,
+        passwd: this.password,
         response_type: 'json',
       },
       timeout: this.canceller.promise,

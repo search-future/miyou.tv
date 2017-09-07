@@ -17,7 +17,7 @@ import * as CommonService from '../services/CommonService';
 
 const wcjs: any = require(process.platform === 'linux' ? 'webchimera.js' : 'wcjs-prebuilt');
 declare module angular { }
-declare const wcjsRenderer : any;
+declare const wcjsRenderer: any;
 
 export interface PlayerSetting {
   mute: boolean;
@@ -28,16 +28,6 @@ export interface PlayerSetting {
 
 export interface PlayerService {
   deinterlaceList: string[];
-  playing(): boolean;
-  state(): number;
-  length(): number;
-  position(value?: number): number;
-  time(value?: number): number;
-  volume(value?: number): number;
-  mute(value?: boolean): boolean;
-  rate(value?: number): number;
-  overwriteLength(value?: number): number;
-  preseekTime(value?: number): number;
   init(screen: Element): void;
   suspend(): void;
   play(mrl?: string): void;
@@ -46,25 +36,15 @@ export interface PlayerService {
   stop(): void;
   toggleMute(): void;
   close(): void;
-  audioTrackCount(): number;
-  audioTrack(value?: number): number;
   toggleAudioTrack(): void;
-  audioChannel(value?: number): number;
-  audioDelay(value?: number): number;
-  videoTrackCount(): number;
-  videoTrack(value?: number): number;
   toggleVideoTrack(): void;
-  deinterlace(value?: string): string;
-  aspectRatio(value?: string): string;
-  subtitlesCount(): number;
-  subtitlesTrack(value?: number): number;
   toggleSubtitlesTrack(): void;
   subtitlesDelay(value?: number): number;
   normalSpeed(): void;
   speedUp(): void;
   speedDown(): void;
-  jumpForward(value: number | string): void;
-  jumpBackward(value: number | string): void;
+  jumpForward(value: string): void;
+  jumpBackward(value: string): void;
   increaseVolume(value: number): void;
   decreaseVolume(value: number): void;
   setScreenText(text: string, force?: boolean): void;
@@ -130,10 +110,10 @@ export class PlayerService implements PlayerService {
 
     $rootScope.$watchGroup(
       [
-        (): boolean => this.mute(),
-        (): number => this.volume(),
-        (): string => this.deinterlace(),
-        (): string => this.aspectRatio(),
+        (): boolean => this.mute,
+        (): number => this.volume,
+        (): string => this.deinterlace,
+        (): string => this.aspectRatio,
       ],
       (): void => {
         if (this.active) {
@@ -161,10 +141,10 @@ export class PlayerService implements PlayerService {
         this.active = false;
         deregister = $rootScope.$on('Player.Playing', (): void => {
           this.loadSetting();
-          if (this.preseekTime() !== 0) {
-            this.time(this.preseekTime());
+          if (this.preseekTime !== 0) {
+            this.time = this.preseekTime;
           }
-          this.preseekTime(0);
+          this.preseekTime = 0;
           deregister();
         });
       }),
@@ -188,131 +168,208 @@ export class PlayerService implements PlayerService {
 
   protected saveSetting(): void {
     const setting: PlayerSetting = {
-      mute: this.mute(),
-      volume: this.volume(),
-      deinterlace: this.deinterlace(),
-      aspectRatio: this.aspectRatio(),
+      mute: this.mute,
+      volume: this.volume,
+      deinterlace: this.deinterlace,
+      aspectRatio: this.aspectRatio,
     };
     this.CommonService.saveLocalStorage('player', setting);
   }
 
   protected loadSetting(): void {
     const setting: PlayerSetting = this.CommonService.loadLocalStorage('player') || {};
-    this.mute(setting.mute);
-    this.volume(setting.volume);
+    this.mute = setting.mute;
+    this.volume = setting.volume;
     if (angular.isDefined(setting.deinterlace)) {
-      this.deinterlace(setting.deinterlace);
-    } else {
-      this.deinterlace(this._deinterlace);
+      this.deinterlace = setting.deinterlace;
     }
     if (angular.isDefined(setting.aspectRatio)) {
-      this.aspectRatio(setting.aspectRatio);
-    } else {
-      this.aspectRatio(this._aspectRatio);
+      this.aspectRatio = setting.aspectRatio;
     }
   }
 
-  public playing(): boolean {
+  get playing(): boolean {
     return this.player.playing;
   }
 
-  public state(): number {
+  get state(): number {
     return this.player.state;
   }
 
-  public length(): number {
-    if (this.player.length === 0 && this.overwriteLength() > 0) {
-      return this.overwriteLength();
+  get length(): number {
+    if (this.player.length === 0 && this.overwriteLength > 0) {
+      return this.overwriteLength;
     }
     return this.player.length;
   }
 
-  public position(value?: number): number {
-    let message: string;
-
-    if (!isNaN(value)) {
-      this.player.position = parseFloat(value as any);
-      message = this.formattedTime();
-      this.setScreenText(message);
-    }
+  set position(position: number) {
+    this.player.position = position;
+    this.setScreenText(this.formattedTime());
+  }
+  get position(): number {
     return this.player.position;
   }
 
-  public time(value?: number): number {
-    let newTime: number;
-
-    if (!isNaN(value)) {
-      newTime = parseInt(value as any, 10);
-      if (this.player.time === 0 && this.overwriteLength() > 0) {
-        this.position(newTime / this.overwriteLength());
-      } else {
-        this.player.time = newTime;
-      }
+  set time(time: number) {
+    const newTime: number = time;
+    if (this.player.time === 0 && this.overwriteLength > 0) {
+      this.position = newTime / this.overwriteLength;
+    } else {
+      this.player.time = newTime;
     }
-    if (this.player.time === 0 && this.overwriteLength() > 0) {
-      return this.position() * this.overwriteLength();
+  }
+
+  get time(): number {
+    if (this.player.time === 0 && this.overwriteLength > 0) {
+      return this.position * this.overwriteLength;
     }
     return this.player.time;
   }
 
-  public volume(value?: number): number {
-    let message: string;
-
-    if (!isNaN(value)) {
-      if (value > 200) {
-        this.player.volume = 200;
-      } else if (value < 0) {
-        this.player.volume = 0;
-      } else {
-        this.player.volume = parseInt(value as any, 10);
-      }
-      message = `音量 ${this.volume()}%`;
-      this.setScreenText(message);
+  set volume(volume: number) {
+    if (volume > 200) {
+      this.player.volume = 200;
+    } else if (volume < 0) {
+      this.player.volume = 0;
+    } else {
+      this.player.volume = volume;
     }
+    const message = `音量 ${this.volume}%`;
+    this.setScreenText(message);
+  }
+  get volume(): number {
     return this.player.volume;
   }
 
-  public mute(value?: boolean): boolean {
-    if (angular.isDefined(value)) {
-      this.player.mute = Boolean(value);
-    }
+  set mute(value: boolean) {
+    this.player.mute = value;
+  }
+  get mute(): boolean {
     return this.player.mute;
   }
 
-  public rate(value?: number): number {
-    let newRate: number;
-    let message: string;
-
-    if (!isNaN(value)) {
-      newRate = parseFloat(value as any);
-      if (newRate >= this.playerRateLimit) {
-        this.player.input.rate = this.playerRateLimit;
-      } else if (newRate > 64) {
-        this.player.input.rate = 64;
-      } else if (newRate < 1 / 32) {
-        this.player.input.rate = 1 / 32;
-      } else {
-        this.player.input.rate = newRate;
-      }
-      message = `再生速度 x${(Math.round(this.rate() * 100) / 100)}`;
-      this.setScreenText(message);
+  set rate(rate: number) {
+    const newRate = rate;
+    if (newRate >= this.playerRateLimit) {
+      this.player.input.rate = this.playerRateLimit;
+    } else if (newRate > 64) {
+      this.player.input.rate = 64;
+    } else if (newRate < 1 / 32) {
+      this.player.input.rate = 1 / 32;
+    } else {
+      this.player.input.rate = newRate;
     }
+    const message = `再生速度 x${(Math.round(this.rate * 100) / 100)}`;
+    this.setScreenText(message);
+  }
+  get rate(): number {
     return this.player.input.rate;
   }
 
-
-  public overwriteLength(value?: number): number {
-    if (!isNaN(value)) {
-      this._overwriteLength = parseInt(value as any, 10);
-    }
+  set overwriteLength(length: number) {
+    this._overwriteLength = length;
+  }
+  get overwriteLength(): number {
     return this._overwriteLength;
   }
 
-  public preseekTime(value?: number): number {
-    if (!isNaN(value)) {
-      this._preseekTime = parseInt(value as any, 10);
-    }
+  set preseekTime(time: number) {
+    this._preseekTime = time;
+  }
+  get preseekTime(): number {
     return this._preseekTime;
+  }
+
+  get audioTrackCount(): number {
+    return this.player.audio.count;
+  }
+
+  set audioTrack(track: number) {
+    this.player.audio.track = track;
+    let message: string;
+    if (this.audioTrack > 0) {
+      message = `音声${this.audioTrack}`;
+    } else {
+      message = '音声無効';
+    }
+    this.setScreenText(message);
+  }
+  get audioTrack(): number {
+    return this.player.audio.track;
+  }
+
+  set audioChannel(channel: number) {
+    this.player.audio.channel = channel;
+  }
+  get audioChannel(): number {
+    return this.player.audio.channel;
+  }
+
+  set audioDelay(delay: number) {
+    this.player.audio.delay = delay;
+  }
+  get audioDelay(): number {
+    return this.player.audio.delay;
+  }
+
+  get videoTrackCount(): number {
+    return this.player.video.count;
+  }
+
+  set videoTrack(track: number) {
+    this.player.video.track = track;
+    let message: string;
+    if (this.videoTrack > 0) {
+      message = `映像${this.videoTrack}`;
+    } else {
+      message = '映像無効';
+    }
+    this.setScreenText(message);
+  }
+  get videoTrack(): number {
+    return this.player.video.track;
+  }
+
+  set deinterlace(mode: string) {
+    const isEnabled: boolean = PlayerService.deinterlaceList.filter(
+      (a: string): boolean => a === mode,
+    ).length > 0;
+    if (isEnabled) {
+      this.player.video.deinterlace.enable(mode);
+      this._deinterlace = mode;
+    } else {
+      this.player.video.deinterlace.disable();
+      this._deinterlace = '';
+    }
+  }
+  get deinterlace(): string {
+    return this._deinterlace;
+  }
+
+  set aspectRatio(ratio: string) {
+    this._aspectRatio = ratio;
+  }
+  get aspectRatio(): string {
+    return this._aspectRatio;
+  }
+
+  get subtitlesCount(): number {
+    return this.player.subtitles.count;
+  }
+
+  set subtitlesTrack(track: number) {
+    this.player.subtitles.track = track;
+    let message: string;
+    if (this.subtitlesTrack > 0) {
+      message = `字幕${this.subtitlesTrack}`;
+    } else {
+      message = '字幕無効';
+    }
+    this.setScreenText(message);
+  }
+  get subtitlesTrack(): number {
+    return this.player.subtitles.track;
   }
 
   public init(screen: HTMLCanvasElement): void {
@@ -354,139 +411,36 @@ export class PlayerService implements PlayerService {
     this.player.close();
   }
 
-  public audioTrackCount(): number {
-    return this.player.audio.count;
-  }
-
-  public audioTrack(value?: number): number {
-    let message: string;
-
-    if (!isNaN(value)) {
-      this.player.audio.track = parseInt(value as any, 10);
-      if (this.audioTrack() > 0) {
-        message = `音声${this.audioTrack()}`;
-      } else {
-        message = '音声無効';
-      }
-      this.setScreenText(message);
-    }
-    return this.player.audio.track;
-  }
-
   public toggleAudioTrack(): void {
-    let track: number = this.audioTrack() + 1;
+    let track: number = this.audioTrack + 1;
     if (track <= 0) {
       track = 1;
     }
-    this.audioTrack(track);
-  }
-
-  public audioChannel(value?: number): number {
-    if (!isNaN(value)) {
-      this.player.audio.channel = parseInt(value as any, 10);
-    }
-    return this.player.audio.channel;
-  }
-
-  public audioDelay(value?: number): number {
-    if (!isNaN(value)) {
-      this.player.audio.delay = parseInt(value as any, 10);
-    }
-    return this.player.audio.delay;
-  }
-
-  public videoTrackCount(): number {
-    return this.player.video.count;
-  }
-
-  public videoTrack(value?: number): number {
-    let message: string;
-
-    if (!isNaN(value)) {
-      this.player.video.track = parseInt(value as any, 10);
-
-      if (this.videoTrack() > 0) {
-        message = `映像${this.videoTrack()}`;
-      } else {
-        message = '映像無効';
-      }
-      this.setScreenText(message);
-    }
-    return this.player.video.track;
+    this.audioTrack = track;
   }
 
   public toggleVideoTrack(): void {
-    let track: number = this.videoTrack() + 1;
+    let track: number = this.videoTrack + 1;
     if (track <= 0) {
       track = 1;
     }
-    this.videoTrack(track);
-  }
-  public deinterlace(value?: string): string {
-    let isEnabled: boolean;
-
-    if (angular.isDefined(value)) {
-      isEnabled = PlayerService.deinterlaceList.filter(
-        (a: string): boolean => a === value,
-      ).length > 0;
-      if (isEnabled) {
-        this.player.video.deinterlace.enable(value);
-        this._deinterlace = value;
-      } else {
-        this.player.video.deinterlace.disable();
-        this._deinterlace = '';
-      }
-    }
-    return this._deinterlace;
-  }
-
-  public aspectRatio(value?: string): string {
-    if (angular.isDefined(value)) {
-      this._aspectRatio = value;
-    }
-    return this._aspectRatio;
-  }
-
-  public subtitlesCount(): number {
-    return this.player.subtitles.count;
-  }
-
-  public subtitlesTrack(value?: number): number {
-    let message: string;
-
-    if (!isNaN(value)) {
-      this.player.subtitles.track = parseInt(value as any, 10);
-      if (this.subtitlesTrack() > 0) {
-        message = `字幕${this.subtitlesTrack()}`;
-      } else {
-        message = '字幕無効';
-      }
-      this.setScreenText(message);
-    }
-    return this.player.subtitles.track;
+    this.videoTrack = track;
   }
 
   public toggleSubtitlesTrack(): void {
-    let track: number = this.subtitlesTrack() + 1;
+    let track: number = this.subtitlesTrack + 1;
     if (track <= 0) {
       track = 1;
     }
-    this.subtitlesTrack(track);
-  }
-
-  public subtitlesDelay(value?: number): number {
-    if (!isNaN(value)) {
-      this.player.subtitles.delay = parseInt(value as any, 10);
-    }
-    return this.player.subtitles.delay;
+    this.subtitlesTrack = track;
   }
 
   public normalSpeed(): void {
-    this.rate(1);
+    this.rate = 1;
   }
 
   public speedUp(): void {
-    let newRate: number = this.rate();
+    let newRate: number = this.rate;
     switch (Math.floor(parseFloat(newRate.toFixed(1)))) {
       case 3:
       case 2:
@@ -498,11 +452,11 @@ export class PlayerService implements PlayerService {
       default:
         newRate *= 2;
     }
-    this.rate(newRate);
+    this.rate = newRate;
   }
 
   public speedDown(): void {
-    let newRate: number = this.rate();
+    let newRate: number = this.rate;
     switch (Math.ceil(parseFloat(newRate.toFixed(1)))) {
       case 4:
       case 3:
@@ -514,35 +468,35 @@ export class PlayerService implements PlayerService {
       default:
         newRate /= 2;
     }
-    this.rate(newRate);
+    this.rate = newRate;
   }
 
-  public jumpForward(value: number | string): void {
-    if (/^-?[0-9.]+ms/.test(value as string)) {
-      this.time(this.time() + parseFloat(value as string));
-    } else if (/^-?[0-9.]+s/.test(value as string)) {
-      this.time(this.time() + (parseFloat(value as string) * 1000));
+  public jumpForward(time: string): void {
+    if (/^-?[0 - 9.] + ms /.test(time as string)) {
+      this.time = this.time + parseFloat(time as string);
+    } else if (/^-?[0-9.]+s/.test(time as string)) {
+      this.time = this.time + (parseFloat(time as string) * 1000);
     } else {
-      this.position(this.position() + parseFloat(value as string));
+      this.position = this.position + parseFloat(time as string);
     }
   }
 
-  public jumpBackward(value: number | string): void {
-    if (/^-?[0-9.]+ms/.test(value as string)) {
-      this.time(this.time() - parseFloat(value as string));
-    } else if (/^-?[0-9.]+s/.test(value as string)) {
-      this.time(this.time() - (parseFloat(value as string) * 1000));
+  public jumpBackward(time: string): void {
+    if (/^-?[0 - 9.] + ms /.test(time as string)) {
+      this.time = this.time - parseFloat(time);
+    } else if (/^-?[0-9.]+s/.test(time as string)) {
+      this.time = this.time - (parseFloat(time) * 1000);
     } else {
-      this.position(this.position() - parseFloat(value as string));
+      this.position = this.position - parseFloat(time);
     }
   }
 
   public increaseVolume(value: number): void {
-    this.volume(this.volume() + value);
+    this.volume = this.volume + value;
   }
 
   public decreaseVolume(value: number): void {
-    this.volume(this.volume() - value);
+    this.volume = this.volume - value;
   }
 
   public setScreenText(text: string, force?: boolean): void {
@@ -558,13 +512,12 @@ export class PlayerService implements PlayerService {
   }
 
   public formattedTime(): string {
-    return this.CommonService.formatTime(this.time());
+    return this.CommonService.formatTime(this.time);
   }
 
   public formattedLength(): string {
-    return this.CommonService.formatTime(this.length());
+    return this.CommonService.formatTime(this.length);
   }
-
 }
 
 angular.module('app')

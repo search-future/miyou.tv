@@ -134,7 +134,7 @@ class CommentScreenController {
       },
     );
     $scope.$watch(
-      (): number => PlayerService.time(),
+      (): number => PlayerService.time,
       (newValue: number, oldValue: number): void => {
         if (!this.enabled || $element[0].clientWidth <= 0 || $element[0].clientHeight <= 0) {
           return;

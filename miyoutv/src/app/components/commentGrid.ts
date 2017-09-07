@@ -143,7 +143,7 @@ class CommentGridController {
       this.gridOptions.api.addEventListener('rowDoubleClicked', (): void => {
         const selectedtRows: any[] = this.gridOptions.api.getSelectedRows();
         if (selectedtRows.length > 0) {
-          this.PlayerService.time(selectedtRows[0].playTime);
+          this.PlayerService.time = selectedtRows[0].playTime;
         }
       });
     },
@@ -182,7 +182,7 @@ class CommentGridController {
       },
     );
     $scope.$watch(
-      (): number => PlayerService.time(),
+      (): number => PlayerService.time,
       (newValue: number, oldValue: number): void => {
         if (this.autoScroll) {
           this.gridOptions.api.ensureNodeVisible((a: any): boolean => a.data.playTime >= oldValue);

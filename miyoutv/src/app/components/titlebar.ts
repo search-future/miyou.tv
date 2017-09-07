@@ -33,19 +33,19 @@ class TitlebarController {
     private CommonService: CommonService.CommonService,
   ) {
     $scope.$watch(
-      (): boolean => CommonService.isFullscreen(),
+      (): boolean => CommonService.fullscreen,
       (value: boolean): void => {
         this.isFullscreen = value;
       },
     );
     $scope.$watch(
-      (): boolean => CommonService.isMaximized(),
+      (): boolean => CommonService.isMaximized,
       (value: boolean): void => {
         this.isMaximized = value;
       },
     );
     $scope.$watch(
-      (): boolean => CommonService.isAlwaysOnTop(),
+      (): boolean => CommonService.alwaysOnTop,
       (value: boolean): void => {
         this.isAlwaysOnTop = value;
       },
@@ -53,7 +53,7 @@ class TitlebarController {
   }
 
   public toggleAlwaysOnTop(): void {
-    this.CommonService.setAlwaysOnTop(!this.CommonService.isAlwaysOnTop());
+    this.CommonService.alwaysOnTop = !this.CommonService.alwaysOnTop;
   }
 
   public minimize(): void {
@@ -69,7 +69,7 @@ class TitlebarController {
   }
 
   public fullscreen(): void {
-    this.CommonService.setFullscreen(true);
+    this.CommonService.fullscreen = true;
   }
 
   public close(): void {

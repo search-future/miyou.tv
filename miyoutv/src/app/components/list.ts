@@ -397,9 +397,9 @@ class ListController {
   }
 
   protected connectChinachu(url: string, user: string, password: string): void {
-    this.ChinachuService.url(url);
-    this.ChinachuService.user(user);
-    this.ChinachuService.password(password);
+    this.ChinachuService.url = url;
+    this.ChinachuService.user = user;
+    this.ChinachuService.password = password;
     this.ChinachuService.request('/archive.json').then(
       (response: ng.IHttpPromiseCallbackArg<Archive>): void => {
         if (
@@ -441,8 +441,8 @@ class ListController {
   protected connectGarapon(auth: boolean, url: string, user: string, password: string): void {
     let promise: ng.IPromise<any>;
     if (user && password) {
-      this.GaraponService.user(user);
-      this.GaraponService.password(password);
+      this.GaraponService.user = user;
+      this.GaraponService.password = password;
       if (auth || !url) {
         promise = this.GaraponService.loadBackend().then(
           (): ng.IPromise<{}> => this.GaraponService.login(),
@@ -460,7 +460,7 @@ class ListController {
           this.requestError,
         );
       } else {
-        this.GaraponService.backend(url);
+        this.GaraponService.backend = url;
         promise = this.GaraponService.login();
       }
       promise.then(
@@ -563,10 +563,10 @@ class ListController {
   }
 
   protected connectGaraponV4(user: string, password: string): void {
-    this.GaraponSiteService.user(user);
-    this.GaraponSiteService.password(password);
-    this.GaraponService.user(user);
-    this.GaraponService.password(password);
+    this.GaraponSiteService.user = user;
+    this.GaraponSiteService.password = password;
+    this.GaraponService.user = user;
+    this.GaraponService.password = password;
     this.GaraponSiteService.login().then(
       (): ng.IPromise<{}> => this.GaraponService.loginV4(),
     ).then(

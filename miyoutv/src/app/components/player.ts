@@ -150,7 +150,7 @@ class PlayerController {
   public sidebarCollapsed: boolean = false;
   public mainMenu: any = [
     [(): string => {
-      if (this.PlayerService.playing()) {
+      if (this.PlayerService.playing) {
         return '<span class="fa fa-fw fa-pause"></span> 一時停止';
       }
       return '<span class="fa fa-fw fa-play"></span> 再生';
@@ -188,7 +188,7 @@ class PlayerController {
         this.PlayerService.decreaseVolume(5);
       }],
       [(): string => {
-        if (this.PlayerService.mute()) {
+        if (this.PlayerService.mute) {
           return '<span class="fa fa-fw fa-check text-primary"></span> ミュート';
         }
         return '<span class="fa fa-fw"></span> ミュート';
@@ -198,20 +198,20 @@ class PlayerController {
     ]],
     ['ビデオ', [
       [(): string => {
-        if (this.CommonService.isFullscreen()) {
+        if (this.CommonService.fullscreen) {
           return '<span class="fa fa-fw fa-check text-primary"></span> 全画面表示';
         }
         return '<span class="fa fa-fw"></span> 全画面表示';
       }, (): void => {
-        this.CommonService.setFullscreen(!this.CommonService.isFullscreen());
+        this.CommonService.fullscreen = !this.CommonService.fullscreen;
       }],
       [(): string => {
-        if (this.CommonService.isAlwaysOnTop()) {
+        if (this.CommonService.alwaysOnTop) {
           return '<span class="fa fa-fw fa-check text-primary"></span> 常に前面に表示';
         }
         return '<span class="fa fa-fw"></span> 常に前面に表示';
       }, (): void => {
-        this.CommonService.setAlwaysOnTop(!this.CommonService.isAlwaysOnTop());
+        this.CommonService.alwaysOnTop = !this.CommonService.alwaysOnTop;
       }],
     ]],
     ['コメント', [
@@ -299,10 +299,10 @@ class PlayerController {
       },
     );
     $scope.$watch(
-      (): number => PlayerService.time(),
+      (): number => PlayerService.time,
       (value: number): void => {
         this.time = value;
-        if (value > 0 && PlayerService.preseekTime() === 0) {
+        if (value > 0 && PlayerService.preseekTime === 0) {
           const start: number = (value + this.commentOptions.offset) - 60000;
           const end: number = (value + this.commentOptions.offset) + 30000;
           const requestTargets: CommentInterval[] = this.commentIntervals.filter(a => (
@@ -344,60 +344,61 @@ class PlayerController {
       },
     );
     $scope.$watch(
-      (): number => PlayerService.audioTrackCount(),
+      (): number => PlayerService.audioTrackCount,
       (value: number): void => {
         this.audioTrackCount = value;
       });
     $scope.$watch(
-      (): number => PlayerService.rate(),
+      (): number => PlayerService.rate,
       (value: number): void => {
         this.options.playerRate = value;
       });
     $scope.$watch(
       (): number => this.options.playerRate,
       (value: number): void => {
-        PlayerService.rate(value);
+        PlayerService.rate = value;
       });
     $scope.$watch(
-      (): string => PlayerService.deinterlace(),
+      (): string => PlayerService.deinterlace,
       (value: string): void => {
         this.options.playerDeinterlace = value;
       });
     $scope.$watch(
       (): string => this.options.playerDeinterlace,
       (value: string): void => {
-        PlayerService.deinterlace(value);
+        PlayerService.deinterlace = value;
       });
     $scope.$watch(
-      (): string => PlayerService.aspectRatio(),
+      (): string => PlayerService.aspectRatio,
       (value: string): void => {
         this.options.playerAspectRatio = value;
       });
     $scope.$watch(
       (): string => this.options.playerAspectRatio,
       (value: string): void => {
-        PlayerService.aspectRatio(value);
+        PlayerService.aspectRatio = value;
       });
     $scope.$watch(
-      (): number => PlayerService.audioTrack(),
+      (): number => PlayerService.audioTrack,
       (value: number): void => {
         this.options.playerAudioTrack = value;
-        this.hasSurround = PlayerService.audioChannel(5) === 5;
+        PlayerService.audioChannel = 5;
+        this.hasSurround = PlayerService.audioChannel === 5;
       });
     $scope.$watch(
       (): number => this.options.playerAudioTrack,
       (value: number): void => {
-        PlayerService.audioTrack(value);
+        PlayerService.audioTrack = value;
       });
     $scope.$watch(
-      (): number => PlayerService.audioChannel(),
+      (): number => PlayerService.audioChannel,
       (value: number): void => {
         this.options.playerAudioChannel = value;
       });
     $scope.$watch(
       (): number => this.options.playerAudioChannel,
       (value: number): void => {
-        PlayerService.audioChannel(value);
+        PlayerService.audioChannel = value;
       });
 
     $scope.$watch(
@@ -580,7 +581,7 @@ class PlayerController {
     this.PlayerService.stop();
   }
   public toggleFullscreen(): void {
-    this.CommonService.setFullscreen(!this.CommonService.isFullscreen());
+    this.CommonService.fullscreen = !this.CommonService.fullscreen;
   }
 
   public $onInit(): void {
@@ -598,7 +599,7 @@ class PlayerController {
       default:
         this.initChinachu();
     }
-    this.CommonService.setPowerSave(false);
+    this.CommonService.powerSave = false;
   }
 
   public $onDestroy(): void {
@@ -607,7 +608,7 @@ class PlayerController {
     this.ChinachuService.cancelRequests();
     this.GaraponService.cancelRequests();
     this.GaraponSiteService.cancelRequests();
-    this.CommonService.setPowerSave(true);
+    this.CommonService.powerSave = true;
   }
 
   protected requestError(response: ng.IHttpPromiseCallbackArg<any>): void {
@@ -630,9 +631,9 @@ class PlayerController {
     const backend: string = this.CommonService.loadLocalStorage('chinachuUrl');
     const user: string = this.CommonService.loadLocalStorage('chinachuUser');
     const password: string = this.CommonService.loadLocalStorage('chinachuPassword');
-    this.ChinachuService.url(backend);
-    this.ChinachuService.user(user);
-    this.ChinachuService.password(password);
+    this.ChinachuService.url = backend;
+    this.ChinachuService.user = user;
+    this.ChinachuService.password = password;
     this.ChinachuService.request('/api/recorded.json').then(
       (response: ng.IHttpPromiseCallbackArg<{}>): void => {
         if (
@@ -680,8 +681,8 @@ class PlayerController {
     const password: string = this.CommonService.loadLocalStorage('garaponPassword');
     let promise: ng.IPromise<any>;
     if (user && password) {
-      this.GaraponService.user(user);
-      this.GaraponService.password(password);
+      this.GaraponService.user = user;
+      this.GaraponService.password = password;
       if (auth || !backend) {
         promise = this.GaraponService.loadBackend().then(
           (): ng.IPromise<{}> => this.GaraponService.login(),
@@ -698,7 +699,7 @@ class PlayerController {
           },
         );
       } else {
-        this.GaraponService.backend(backend);
+        this.GaraponService.backend = backend;
         promise = this.GaraponService.login();
       }
       promise.then(
@@ -732,10 +733,10 @@ class PlayerController {
   protected initGaraponV4(): void {
     const user: string = this.CommonService.loadLocalStorage('garaponUser');
     const password: string = this.CommonService.loadLocalStorage('garaponPassword');
-    this.GaraponSiteService.user(user);
-    this.GaraponSiteService.password(password);
-    this.GaraponService.user(user);
-    this.GaraponService.password(password);
+    this.GaraponSiteService.user = user;
+    this.GaraponSiteService.password = password;
+    this.GaraponService.user = user;
+    this.GaraponService.password = password;
     this.GaraponSiteService
       .login()
       .then((): ng.IPromise<{}> => this.GaraponService.loginV4())
@@ -814,7 +815,7 @@ class PlayerController {
           this.title = this.program.fullTitle;
           this.channel = this.program.channel.name;
           this.commentOptions.offset = this.program.start - this.options.commentDelay;
-          this.PlayerService.overwriteLength(this.program.seconds * 1000);
+          this.PlayerService.overwriteLength = this.program.seconds * 1000;
 
           this.ChinachuService.request('/archive.json').then(
             (archiveResponse: ng.IHttpPromiseCallbackArg<Archive>): void => {
@@ -851,7 +852,7 @@ class PlayerController {
                     method: 'GET',
                     protocol: chinachuUrl.protocol,
                     hostname: chinachuUrl.hostname,
-                    port: chinachuUrl.port,
+                    port: parseInt(chinachuUrl.port, 10),
                     path: `/api/recorded/${id}/watch.m2ts?c:v=copy&c:a=copy&ss=10&t=10`,
                     auth: chinachuUrl.auth,
                     timeout: 10000,
@@ -862,7 +863,7 @@ class PlayerController {
                     );
                     const ms: number = (fileSize * 10000) / streamSize;
                     if (streamSize > 1000000) {
-                      this.PlayerService.overwriteLength(ms);
+                      this.PlayerService.overwriteLength = ms;
                     }
                     this.playWithInfo(mrl);
                   });
@@ -931,7 +932,9 @@ class PlayerController {
           this.title = program.title;
           this.channel = program.bc;
           this.commentOptions.offset = this.program.start - this.options.commentDelay;
-          this.PlayerService.overwriteLength(this.GaraponService.convertDuration(program.duration));
+          this.PlayerService.overwriteLength = (
+            this.GaraponService.convertDuration(program.duration)
+          );
           this.playWithInfo(mrl);
         }
         this.PlayerService.play(mrl);
@@ -993,7 +996,7 @@ class PlayerController {
             this.title = program.title;
             this.channel = program.bcname;
             this.commentOptions.offset = this.program.start - this.options.commentDelay;
-            this.PlayerService.overwriteLength(program.durationtime * 1000);
+            this.PlayerService.overwriteLength = program.durationtime * 1000;
             this.playWithInfo(this.GaraponService.getV4Url(program.m3u8_url));
           } else {
             this.CommonService.errorModal('Player Error', '録画データが見つかりません。');
@@ -1089,7 +1092,7 @@ class PlayerController {
           (!end || a.start < end)
         ))[0];
         if (program) {
-          this.PlayerService.preseekTime(start - program.start);
+          this.PlayerService.preseekTime = start - program.start;
           this.playRecorded(program.id);
         } else {
           this.CommonService.errorModal('Player Error', '録画データが見つかりません。');

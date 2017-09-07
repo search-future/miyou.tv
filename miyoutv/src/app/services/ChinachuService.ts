@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import * as CommonService  from 'CommonService';
+import * as CommonService from 'CommonService';
 
 declare module angular { }
 
@@ -60,10 +60,6 @@ interface PreviewOption {
 }
 
 export interface ChinachuService {
-  url(value?: string): string;
-  user(value?: string): string;
-  password(value?: string): string;
-  previewCacheLifetime(value?: number): number;
   getUrl(path?: string): string;
   request(path: string, config?: ng.IRequestShortcutConfig): ng.IHttpPromise<{}>;
   requestAll(paths: string[], config?: ng.IRequestShortcutConfig): ng.IPromise<{}>;
@@ -107,53 +103,42 @@ export class ChinachuService implements ChinachuService {
     this.initPreviewCache();
   }
 
-  get status(): Object {
-    return this._status;
+  set url(url: string) {
+    this._url = url;
   }
-
-  get data(): Object {
-    return this._data;
-  }
-
-  public url(value?: string): string {
-    if (angular.isDefined(value)) {
-      this._url = value;
-    }
+  get url(): string {
     return this._url;
   }
-
-  public user(value?: string): string {
-    if (angular.isDefined(value)) {
-      this._user = value;
-    }
+  set user(user: string) {
+    this._user = user;
+  }
+  get user(): string {
     return this._user;
   }
-
-  public password(value?: string): string {
-    if (angular.isDefined(value)) {
-      this._password = value;
-    }
+  set password(password: string) {
+    this._password = password;
+  }
+  get password(): string {
     return this._password;
   }
-
-  public previewCacheLifetime(value?: number): number {
-    if (!isNaN(value)) {
-      this._previewCacheLifetime = value;
-    }
+  set previewCacheLifetime(time: number) {
+    this._previewCacheLifetime = time;
+  }
+  get previewCacheLifetime(): number {
     return this._previewCacheLifetime;
   }
 
   public getUrl(path?: string): string {
-    let wuiUrl: string = this.url() || 'http://127.0.0.1:20772';
+    let wuiUrl: string = this.url || 'http://127.0.0.1:20772';
     const auth: string[] = [];
 
     if (!/^https?:\/\//.test(wuiUrl)) {
       wuiUrl = 'http://${wuiUrl}';
     }
-    if (this.user()) {
-      auth.push(this.user());
-      if (this.password()) {
-        auth.push(this.password());
+    if (this.user) {
+      auth.push(this.user);
+      if (this.password) {
+        auth.push(this.password);
       }
       wuiUrl = wuiUrl.replace(
         /^(https?:\/\/)(.*)$/,
@@ -287,7 +272,7 @@ export class ChinachuService implements ChinachuService {
     if (angular.isArray(previewCache) && previewCache.length > 0) {
       this.previewCache = [];
       previewCache.forEach((a: PreviewCache): void => {
-        if (time - a.time < this.previewCacheLifetime()) {
+        if (time - a.time < this.previewCacheLifetime) {
           this.previewCache.push(a);
         } else if (angular.isString(a.key)) {
           this.CommonService.removeFile('previews', a.key);

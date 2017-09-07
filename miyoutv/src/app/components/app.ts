@@ -47,8 +47,8 @@ class AppController {
         CommonService.quitModal();
       },
       esc: (): void => {
-        if (CommonService.isFullscreen()) {
-          CommonService.setFullscreen(false);
+        if (CommonService.fullscreen) {
+          CommonService.fullscreen = false;
         } else {
           CommonService.quitModal();
         }
@@ -77,13 +77,13 @@ class AppController {
       },
     );
     $scope.$watch(
-      (): boolean => CommonService.isFullscreen(),
+      (): boolean => CommonService.fullscreen,
       (value: boolean): void => {
         this.classes.fullscreen = value;
       },
     );
     $scope.$watch(
-      (): boolean => CommonService.isAlwaysOnTop(),
+      (): boolean => CommonService.alwaysOnTop,
       (value: boolean): void => {
         CommonService.saveLocalStorage('alwaysOnTop', value);
       },
@@ -144,9 +144,9 @@ class AppController {
       (values: string[]): void => {
         const [backendType, url, user, password]: string[] = values;
         if (backendType === 'chinachu') {
-          ChinachuService.url(url);
-          ChinachuService.user(user);
-          ChinachuService.password(password);
+          ChinachuService.url = url;
+          ChinachuService.user = user;
+          ChinachuService.password = password;
           ChinachuService.request('/api/status.json').then(
             (response: ng.IHttpPromiseCallbackArg<{
               feature: { [key: string]: boolean };

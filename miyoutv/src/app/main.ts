@@ -195,9 +195,9 @@ function run(
       height: $window.outerHeight,
     };
     if (!(
-      CommonService.isMinimized() ||
-      CommonService.isMaximized() ||
-      CommonService.isFullscreen()
+      CommonService.isMinimized ||
+      CommonService.isMaximized ||
+      CommonService.fullscreen
     )) {
       CommonService.saveLocalStorage('windowState', windowState);
     }
@@ -207,7 +207,7 @@ function run(
     const windowState: WindowState = CommonService.loadLocalStorage('windowState') || {};
     $window.moveTo(windowState.x, windowState.y);
     $window.resizeTo(windowState.width, windowState.height);
-    CommonService.setAlwaysOnTop(CommonService.loadLocalStorage('alwaysOnTop'));
+    CommonService.alwaysOnTop = CommonService.loadLocalStorage('alwaysOnTop');
   }
 }
 angular.module('app', [

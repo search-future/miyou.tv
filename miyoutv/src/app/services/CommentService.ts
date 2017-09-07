@@ -41,7 +41,6 @@ export interface CommentInterval {
 }
 
 export interface CommentService {
-  token(): string;
   resolveChannel(channel: string | Channel): string;
   requestToken(email: string, password: string): ng.IHttpPromise<{ token: string }>;
   deleteToken(): void;
@@ -68,7 +67,7 @@ export class CommentService implements CommentService {
     private commentTokenUrl: string,
   ) { }
 
-  public token(): string {
+  get token(): string {
     return this._token;
   }
 
@@ -130,7 +129,7 @@ export class CommentService implements CommentService {
         method: 'GET',
         url: `${this.commentUrl}/${path}`,
         headers: {
-          'X-MITEYOU-AUTH-TOKEN': this.token(),
+          'X-MITEYOU-AUTH-TOKEN': this.token,
         },
       },
       config,

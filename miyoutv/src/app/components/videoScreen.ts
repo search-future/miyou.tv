@@ -82,7 +82,7 @@ class VideoScreenController {
   }
 
   protected adjustSize(): void {
-    const aspectRatioString: string = this.PlayerService.aspectRatio();
+    const aspectRatioString: string = this.PlayerService.aspectRatio;
     const aspectRatio: string[] = aspectRatioString.split(':');
     let width: number = 0;
     let height: number = 0;
