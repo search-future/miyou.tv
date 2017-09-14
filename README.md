@@ -64,7 +64,7 @@ $ mv miyoutv-v*.*.* miyoutv
 インストーラーをダウンロードして実行してください。
 
 ### miyoutv(Mac)
-アーカイブを展開して実行してください。
+パッケージを展開して実行してください。
 
 ### miyoutv-agent(Linux)
 **miyoutv-agentはChinachu beta専用です。Chinachu gammaで全録するにはルールを作成してください。**
