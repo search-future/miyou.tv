@@ -60,9 +60,6 @@ const miyoutvConfigRenderer = {
           configFileName: 'miyoutv/tsconfig.json',
         },
       },
-    }, {
-      test: /\.js$/,
-      use: 'ng-annotate-loader',
     }],
   },
   devtool: 'source-map',
