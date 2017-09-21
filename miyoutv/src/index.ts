@@ -40,8 +40,8 @@ try {
 
 if (process.platform === 'win32' && !process.env.VLC_PLUGIN_PATH) {
   process.env.VLC_PLUGIN_PATH = path.join(
-    path.dirname(process.execPath),
-    'node_modules/wcjs-prebuilt/bin/plugins',
+    app.getPath('exe'),
+    '../node_modules/wcjs-prebuilt/bin/plugins',
   );
   try {
     fs.statSync(process.env.VLC_PLUGIN_PATH);

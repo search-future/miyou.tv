@@ -40,11 +40,10 @@ interface WindowState {
   height: number;
 }
 
-const execDir: string = path.dirname(process.execPath);
 if (process.platform === 'darwin') {
-  global.module.paths.push(path.join(execDir, '../../../../node_modules'));
+  global.module.paths.push(path.join(remote.app.getPath('exe'), '../../node_modules'));
 } else {
-  global.module.paths.push(path.join(execDir, 'node_modules'));
+  global.module.paths.push(path.join(remote.app.getPath('exe'), '../node_modules'));
 }
 
 const garaponAuthUrl: string = 'http://garagw.garapon.info';
