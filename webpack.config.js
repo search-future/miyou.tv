@@ -67,6 +67,7 @@ const miyoutvConfigRenderer = {
   externals: [{
     'webchimera.js': 'require("webchimera.js")',
     'wcjs-prebuilt': 'require("wcjs-prebuilt")',
+    'fs-extra': 'require("fs-extra")',
   }],
   plugins: [
     new webpack.EnvironmentPlugin(process.env.IS_PACK ? {

@@ -6,15 +6,15 @@ extraMetadata:
   author:
     name: "未来検索ブラジル"
     url: "http://razil.jp/"
-extraFiles:
-  - "install.sh"
-  - "node_modules/"
 linux:
   category: "AudioVideo"
   icon: "miyoutv.iconset"
   target:
     - "AppImage"
     - "tar.gz"
+  extraFiles:
+    - "install.sh"
+    - "node_modules/"
 mac:
   icon: "miyoutv.icns"
 nsis:
@@ -25,3 +25,5 @@ win:
   target:
     - "zip"
     - "nsis"
+  extraFiles:
+    - "node_modules/"

@@ -40,11 +40,7 @@ interface WindowState {
   height: number;
 }
 
-if (process.platform === 'darwin') {
-  global.module.paths.push(path.join(remote.app.getPath('exe'), '../../node_modules'));
-} else {
-  global.module.paths.push(path.join(remote.app.getPath('exe'), '../node_modules'));
-}
+global.module.paths.push(path.join(remote.app.getPath('exe'), '../node_modules'));
 
 const garaponAuthUrl: string = 'http://garagw.garapon.info';
 const garaponAuthUrlV4: string = process.env.GARAPON_AUTHV4;

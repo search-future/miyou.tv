@@ -13,11 +13,46 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+import * as path from 'path';
+import * as fs from 'fs-extra';
+import { remote } from 'electron';
 import * as CommonService from '../services/CommonService';
 
-const wcjs: any = require(process.platform === 'linux' ? 'webchimera.js' : 'wcjs-prebuilt');
 declare module angular { }
 declare const wcjsRenderer: any;
+
+declare module NodeJS {
+  interface Global {
+    require: {
+      resolve: (name: string) => string;
+    };
+  }
+}
+declare const global: NodeJS.Global;
+
+let wcjs: any;
+if (process.platform === 'darwin' && !process.env.WCJS_TARGET) {
+  const wcjsPath: string = path.join(
+    global.require.resolve('wcjs-prebuilt'),
+    '../bin',
+  );
+  const wcjsTarget: string = path.join(
+    remote.app.getPath('temp'),
+    remote.app.getName(),
+    'webchimera.js',
+  );
+  try {
+    fs.copySync(wcjsPath, wcjsTarget, {
+      filter: (src: string): boolean => fs.statSync(src).isFile(),
+    });
+    process.env.WCJS_TARGET = wcjsTarget;
+  } catch (e) { }
+}
+try {
+  wcjs = require('wcjs-prebuilt');
+} catch (e) {
+  wcjs = require('webchimera.js');
+}
 
 export interface PlayerSetting {
   mute: boolean;
