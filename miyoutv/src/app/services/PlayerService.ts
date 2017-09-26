@@ -43,7 +43,21 @@ if (process.platform === 'darwin' && !process.env.WCJS_TARGET) {
   );
   try {
     fs.copySync(wcjsPath, wcjsTarget, {
-      filter: (src: string): boolean => fs.statSync(src).isFile(),
+      filter: (src: string, dest: string): boolean => {
+        if (fs.statSync(src).isSymbolicLink()) {
+          const basename: string = path.basename(src);
+          const targetName: string = fs.readdirSync(
+            path.join(wcjsPath, 'lib'),
+          ).filter((a: string) => (
+            a.indexOf(`${basename.split('.')[0]}.`) === 0 && a !== basename
+          ))[0];
+          try {
+            fs.symlinkSync(path.join(wcjsTarget, 'lib', targetName), dest);
+          } catch (e) { }
+          return false;
+        }
+        return true;
+      },
     });
     process.env.WCJS_TARGET = wcjsTarget;
   } catch (e) { }
