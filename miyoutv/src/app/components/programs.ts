@@ -208,6 +208,7 @@ class ProgramsController {
         $timeout.cancel(this.reloader);
         ChinachuService.cancelRequests();
         GaraponService.cancelRequests();
+        GaraponSiteService.cancelRequests();
         this.archive = {
           channels: [],
           programs: [],
