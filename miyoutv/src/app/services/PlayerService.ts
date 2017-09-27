@@ -68,6 +68,8 @@ try {
   wcjs = require('webchimera.js');
 }
 
+enum VlcLogLevel { Debug, Info, Warning, Error }
+
 export interface PlayerSetting {
   mute: boolean;
   volume: number;
@@ -156,6 +158,20 @@ export class PlayerService implements PlayerService {
     this.player.onSeekableChanged = this.createEmitter('Player.SeekableChanged');
     this.player.onPausableChanged = this.createEmitter('Player.PausableChanged');
     this.player.onLengthChanged = this.createEmitter('Player.LengthChanged');
+
+    this.player.onLogMessage = (level: number, message: string, format: string): void => {
+      switch (level) {
+        case VlcLogLevel.Error:
+          if (message.indexOf('Unexpected channel configuration change') >= 0) {
+            const track: number = this.audioTrack;
+            this.audioTrack = 0;
+            this.audioTrack = track;
+            this.position = this.position;
+          }
+          break;
+        default:
+      }
+    };
 
     $rootScope.$watchGroup(
       [
