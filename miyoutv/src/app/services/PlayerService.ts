@@ -452,8 +452,10 @@ export class PlayerService implements PlayerService {
   public play(mrl?: string): void {
     if (mrl) {
       this.active = false;
+      this.player.play(mrl);
+    } else {
+      this.player.play();
     }
-    this.player.play(mrl);
   }
   public pause(): void {
     this.player.pause();
