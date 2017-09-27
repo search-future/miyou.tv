@@ -214,6 +214,10 @@ class ProgramsController {
         };
         this.recorded = [];
         this.programs = [];
+        $location.search('x', null);
+        $location.replace();
+        $location.search('y', null);
+        $location.replace();
         switch (backendType) {
           case 'garapon':
             this.archiveEnabled = false;
