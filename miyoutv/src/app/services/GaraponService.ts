@@ -385,16 +385,7 @@ export class GaraponService implements GaraponService {
         if (result.data.gtvsession) {
           this.gtvsession = result.data.gtvsession;
         }
-        const url: string[] = ['http://', result.data.ipaddr];
-        if (
-          result.data.ipaddr === result.data.gipaddr &&
-          angular.isString(result.data.port)
-        ) {
-          url.push(':');
-          url.push(result.data.port);
-        }
         this.apiVersion = 4;
-        this.backend = url.join('');
         deferred.resolve(result);
       } else {
         deferred.reject(result);
