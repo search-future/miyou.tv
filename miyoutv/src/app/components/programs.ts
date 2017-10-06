@@ -737,7 +737,19 @@ class ProgramsController {
     this.GaraponService.user = user;
     this.GaraponService.password = password;
     this.GaraponSiteService.login().then(
-      (): ng.IPromise<{}> => this.GaraponService.loginV4(),
+      (result: any): ng.IPromise<any> => {
+        if (
+          angular.isObject(result) &&
+          angular.isObject(result.gtvinfo)
+        ) {
+          this.GaraponService.apiVersion = 4;
+          this.GaraponService.backend = `https://${result.gtvinfo.access_ip}`;
+          if (result.gtvinfo.is_global_access === 1) {
+            return this.GaraponService.loginV4();
+          }
+          return result;
+        }
+      },
     ).then(
       (): void => {
         this.updateGaraponV4();
