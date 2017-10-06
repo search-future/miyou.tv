@@ -43,8 +43,8 @@ interface WindowState {
 global.module.paths.push(path.join(remote.app.getPath('exe'), '../node_modules'));
 
 const garaponAuthUrl: string = 'http://garagw.garapon.info';
-const garaponAuthUrlV4: string = process.env.GARAPON_AUTHV4;
-const garaponSiteUrl: string = process.env.GARAPON_SITE;
+const garaponAuthUrlV4: string = 'https://gtvm.garapon.tv';
+const garaponSiteUrl: string = 'https://siteapi.garapon.tv';
 const garaponDevId: string = process.env.GARAPON_DEVID;
 const commentUrl: string = 'https://miteru.digitiminimi.com/a2sc.php/miyou';
 const commentTokenUrl: string = 'https://miteru.digitiminimi.com/a2sc.php/auth/moritapo';
