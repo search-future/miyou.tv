@@ -95,13 +95,21 @@ export class CommonService implements CommonService {
     return this.win.isMinimized();
   }
   set fullscreen(flag: boolean) {
-    this.win.setFullScreen(flag);
+    if (flag) {
+      this.win.setFullScreen(true);
+    } else {
+      this.win.setFullScreen(false);
+    }
   }
   get fullscreen(): boolean {
     return this.win.isFullScreen();
   }
   set alwaysOnTop(flag: boolean) {
-    this.win.setAlwaysOnTop(flag);
+    if (flag) {
+      this.win.setAlwaysOnTop(true);
+    } else {
+      this.win.setAlwaysOnTop(false);
+    }
   }
   get alwaysOnTop(): boolean {
     return this.win.isAlwaysOnTop();
