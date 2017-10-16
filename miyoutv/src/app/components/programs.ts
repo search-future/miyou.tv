@@ -832,10 +832,10 @@ class ProgramsController {
           if (response.data.hit > page * 100) {
             this.loadGaraponV4(tsids, start, end, page + 1);
           }
-          const bottomTime: number = this.endHour / 1000;
+          const now: number = Date.now() / 1000;
           for (let ri: number = 0; ri < response.data.programs.length; ri += 1) {
             const program: Program = response.data.programs[ri];
-            if (program.endtime <= bottomTime) {
+            if (program.endtime <= now) {
               let column: ProgramColumn;
               for (let pi: number = 0; pi < this.programs.length; pi += 1) {
                 column = this.programs[pi];

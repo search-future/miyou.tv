@@ -663,24 +663,30 @@ class ListController {
           if (response.data.hit > page * 100) {
             this.loadGaraponV4(tsids, start, end, page + 1);
           }
+          const now: number = Date.now() / 1000;
           for (let i: number = 0; i < response.data.programs.length; i += 1) {
             const program: Program = response.data.programs[i];
-            program.channel = {
-              type: program.gtvid.slice(0, 2),
-              sid: program.tsid10,
-              name: program.bcname,
-            };
-            program.detail = program.description;
-            program.start = program.starttime * 1000;
-            program.end = program.endtime * 1000;
-            program.seconds = program.durationtime;
-            program.categoryName = this.GaraponSiteService.convertCategory(program.genre[0]);
-            program.displayTime = this.CommonService.formatDate(program.start, 'M/d EEE A HHHH:mm');
-            program.isArchive = false;
-            program.isRecorded = true;
-            program.v4Unverified = true;
-            delete program.count;
-            this.programs.push(program);
+            if (program.endtime <= now) {
+              program.channel = {
+                type: program.gtvid.slice(0, 2),
+                sid: program.tsid10,
+                name: program.bcname,
+              };
+              program.detail = program.description;
+              program.start = program.starttime * 1000;
+              program.end = program.endtime * 1000;
+              program.seconds = program.durationtime;
+              program.categoryName = this.GaraponSiteService.convertCategory(program.genre[0]);
+              program.displayTime = this.CommonService.formatDate(
+                program.start,
+                'M/d EEE A HHHH:mm',
+              );
+              program.isArchive = false;
+              program.isRecorded = true;
+              program.v4Unverified = true;
+              delete program.count;
+              this.programs.push(program);
+            }
           }
           this.$timeout.cancel(this.timer);
           this.timer = this.$timeout((): void => this.updateView(), 200);
