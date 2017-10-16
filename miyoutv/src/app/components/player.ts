@@ -1157,8 +1157,10 @@ class PlayerController {
               this.checkGaraponSearch(response) &&
               angular.isArray(response.data.programs)
             ) {
+              const now: number = Date.now() / 1000;
               const programs: Program[] = response.data.programs.filter((a: Program): boolean => (
-                a.service_type === this.program.service_type
+                a.service_type === this.program.service_type &&
+                a.endtime < now
               ));
               if (programs.length > 0) {
                 this.playRecorded(programs[0].gtvid);
