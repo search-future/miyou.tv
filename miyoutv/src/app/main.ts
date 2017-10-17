@@ -46,6 +46,7 @@ const garaponAuthUrl: string = 'http://garagw.garapon.info';
 const garaponAuthUrlV4: string = 'https://gtvm.garapon.tv';
 const garaponSiteUrl: string = 'https://siteapi.garapon.tv';
 const garaponDevId: string = process.env.GARAPON_DEVID;
+const garaponEntryUrl: string = process.env.GARAPON_ENTRY_URL || 'http://garapon.tv/premium-plus/';
 const commentUrl: string = 'https://miteru.digitiminimi.com/a2sc.php/miyou';
 const commentTokenUrl: string = 'https://miteru.digitiminimi.com/a2sc.php/auth/moritapo';
 
@@ -219,6 +220,7 @@ angular.module('app', [
   .constant('garaponSiteUrl', garaponSiteUrl)
   .constant('garaponAuthUrlV4', garaponAuthUrlV4)
   .constant('garaponDevId', garaponDevId)
+  .constant('garaponEntryUrl', garaponEntryUrl)
   .constant('commentUrl', commentUrl)
   .constant('commentTokenUrl', commentTokenUrl)
   .constant('categoryTable', categoryTable)

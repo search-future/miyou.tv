@@ -33,9 +33,13 @@ limitations under the License.
                         </select>
                     </div>
                 </div>
+                <div class="alert-info" ng-show="$ctrl.backendType === 'chinachu'" uib-alert>Chinachu γ/βに対応しています。<a href="" ng-click="$ctrl.open('https://chinachu.moe/')">七森中録画研究会サイト</a></div>
+                <div class="alert-info" ng-show="$ctrl.backendType === 'garaponv4'" uib-alert>ガラポン六号機に対応しています。<a href="" ng-click="$ctrl.open($ctrl.garaponEntryUrl)">ガラポンTVレンタル申込ページ</a></div>
+                <div class="alert-info" ng-show="$ctrl.backendType === 'garapon'" uib-alert>ガラポン伍/四/参号機に対応しています。<a href="" ng-click="$ctrl.open($ctrl.garaponEntryUrl)">ガラポンTVレンタル申込ページ</a></div>
             </fieldset>
             <fieldset ng-show="$ctrl.backendType === 'chinachu'">
                 <legend>Chinachu設定</legend>
+                <div class="alert-info" ng-if="!$ctrl.garaponEnabled" uib-alert>Chinachu β/γに対応しています。<a href="" ng-click="$ctrl.open('https://chinachu.moe/')">七森中録画研究会サイト</a></div>
                 <div class="form-group has-feedback" ng-class="{'has-success': backend.chinachu_url.$valid, 'has-warning': backend.chinachu_url.$invalid}">
                     <label class="col-sm-3 control-label" for="chinachu-url">URL</label>
                     <div class="col-sm-9">

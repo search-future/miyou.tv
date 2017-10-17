@@ -22,6 +22,7 @@ class BackendSettingController {
   static $inject: string[] = [
     'CommonService',
     'garaponDevId',
+    'garaponEntryUrl',
   ];
 
   public backendType: string = 'chinachu';
@@ -40,6 +41,7 @@ class BackendSettingController {
   constructor(
     private CommonService: CommonService.CommonService,
     private garaponDevId: string,
+    public garaponEntryUrl: string,
   ) {
   }
 
@@ -60,6 +62,10 @@ class BackendSettingController {
     if (typeof this.garaponAuth !== 'boolean') {
       this.garaponAuth = true;
     }
+  }
+
+  public open(url: string): void {
+    this.CommonService.openExternal(url);
   }
 
   public ok(): void {

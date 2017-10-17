@@ -73,6 +73,7 @@ const miyoutvConfigRenderer = {
     new webpack.EnvironmentPlugin(process.env.IS_PACK ? {
       NODE_ENV: 'development',
       GARAPON_DEVID: '',
+      GARAPON_ENTRY_URL: '',
     } : []),
     new UglifyJSPlugin({
       sourceMap: true,
