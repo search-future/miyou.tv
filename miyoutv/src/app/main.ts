@@ -172,7 +172,7 @@ function run(
   angular.element($window).on('resize', saveWindowState);
 
   if (/^0/.test(process.versions.electron)) {
-    angular.element($window).on('contextmenu', (e: JQuery.Event<HTMLElement>): void => {
+    angular.element($window).on('contextmenu', (e: JQuery.Event<any>): void => {
       e.preventDefault();
       remote.getGlobal('contextMenu').popup();
     });
