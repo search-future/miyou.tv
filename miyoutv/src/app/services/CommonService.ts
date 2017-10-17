@@ -29,6 +29,7 @@ export interface CommonService {
   saveFile(dirname: string, filename: string, value: any): boolean;
   loadFile(dirname: string, filename: string): any;
   removeFile(dirname: string, filename: string): boolean;
+  openExternal(url: string, options: { activate: boolean }): void;
   maximize(): void;
   minimize(): void;
   restore(): void;
@@ -63,6 +64,7 @@ export class CommonService implements CommonService {
   ];
 
   private app: Electron.App;
+  private shell: Electron.Shell;
   private win: Electron.BrowserWindow;
   private powerSaveBlocker: Electron.PowerSaveBlocker;
   private dataPath: string;
@@ -79,6 +81,7 @@ export class CommonService implements CommonService {
   ) {
     if (process.versions.electron) {
       this.app = remote.app;
+      this.shell = remote.shell;
       this.win = remote.getCurrentWindow();
       this.powerSaveBlocker = remote.powerSaveBlocker;
       this.dataPath = this.app.getPath('userData');
@@ -223,6 +226,10 @@ export class CommonService implements CommonService {
     } catch (e) {
       return false;
     }
+  }
+
+  public openExternal(url: string, options?: { activate: boolean }): void {
+    this.shell.openExternal(url, options);
   }
 
   public maximize(): void {
