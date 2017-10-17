@@ -40,6 +40,10 @@ class moritapoSettingController {
     this.password = this.CommonService.loadLocalStorage('moritapoPassword');
   }
 
+  public open(url: string): void {
+    this.CommonService.openExternal(url);
+  }
+
   public ok(): void {
     this.CommonService.saveLocalStorage('moritapoEmail', this.email || '');
     this.CommonService.saveLocalStorage('moritapoPassword', this.password || '');
