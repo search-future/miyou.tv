@@ -214,8 +214,6 @@ class ListController {
         this.archive = { channels: [], programs: [] };
         this.recorded = [];
         this.programs = [];
-        $location.search('y', null);
-        $location.replace();
         switch (this.backendType) {
           case 'garapon':
             this.archiveEnabled = false;

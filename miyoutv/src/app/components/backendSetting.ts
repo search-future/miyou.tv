@@ -20,6 +20,7 @@ declare module angular { }
 class BackendSettingController {
   static componentName: string = 'backendSetting';
   static $inject: string[] = [
+    '$location',
     'CommonService',
     'garaponDevId',
     'garaponEntryUrl',
@@ -39,6 +40,7 @@ class BackendSettingController {
   public dismiss: () => void;
 
   constructor(
+    private $location: ng.ILocationService,
     private CommonService: CommonService.CommonService,
     private garaponDevId: string,
     public garaponEntryUrl: string,
@@ -91,6 +93,10 @@ class BackendSettingController {
       this.CommonService.saveLocalStorage('garaponUser', this.garaponUser);
       this.CommonService.saveLocalStorage('garaponPassword', this.garaponPassword);
     }
+    this.$location.search('x', null);
+    this.$location.replace();
+    this.$location.search('y', null);
+    this.$location.replace();
     this.close();
   }
 
