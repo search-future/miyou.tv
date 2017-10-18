@@ -3,15 +3,15 @@ MiyouTV
 MiyouTVは録画した地上波/BS/CSテレビ放送と２ちゃんねるの実況スレのコメントを同期して再生できるシステムです。
 
 ## Description
-MiyouTVのシステムは録画サーバーと番組データを取得して再生するアプリケーションから構成されます。
+MiyouTVのシステムは録画バックエンドと番組データを取得して再生するアプリケーションから構成されます。
 
-### 録画サーバー
-ChinachuとMirakurunが導入されているLinux環境が必須です。
+### 録画バックエンド
+ガラポンTV、またはChinachuとMirakurunが導入されているLinux環境が必須です。
 
 ### 再生アプリケーション miyoutv が動作するクライアントPC(以降「クライアントPC」)
-現在LinuxおよびWindowsで動作します。モリタポアカウントを設定することでコメントを再生することができます。
+Linux、Windows、Macに対応しています。モリタポアカウントを設定することでコメントを再生することができます。
 
-クライアントPCは全録サーバーと同一機で大丈夫です。また、全録サーバーをLANの何処かに置き、クライアントPCで再生するといった使い方もできます。
+クライアントPCはChinachuやMirakurunと同一機でも大丈夫です。また、全録サーバーをLANの何処かに置き、クライアントPCで再生するといった使い方ができます。
 
 ## Demo
 |![](https://search-future.github.io/miyou.tv/demo-player.png)|![](https://search-future.github.io/miyou.tv/demo-search.png)|![](https://search-future.github.io/miyou.tv/demo-programs.png)|![](https://search-future.github.io/miyou.tv/demo-recorded.png)|
@@ -20,7 +20,7 @@ ChinachuとMirakurunが導入されているLinux環境が必須です。
 ## Software which this repository includes
 ### miyoutv
 コメントを表示できるテレビ番組再生フロントエンドアプリケーションです。
-録画した番組情報、または、miyoutv-agentが収集した番組表を利用できます。
+バックエンドが録画した番組情報、または、miyoutv-agentが収集した番組表を利用できます。
 
 ### miyoutv-agent
 Chinachu betaでの全録を支援するプログラムです。以下の機能を持ちます。
@@ -32,6 +32,25 @@ Chinachu betaでの全録を支援するプログラムです。以下の機能�
 **Chinachu gammaでは使用できません。ルール作成で全録できるルールを設定してください。その場合、EPGベースの全録となります。**
 
 ## Requirement
+
+### miyoutv
+* [ガラポンTV](http://garapon.tv/)
+* [Chinachu](https://github.com/Chinachu/Chinachu)
+* [Mirakurun](https://github.com/Chinachu/Mirakurun)
+
+バックエンドとして、ガラポンTV、またはChinachuとMirakurunが導入されているLinux環境が必要です。
+
+### miyoutv(Linux, AppImage)
+* `$ sudo apt-get install vlc`
+
+vlcのインストールが必要です。
+
+### miyoutv(Linux, tar.gz)
+* [Node.js](http://nodejs.org/)
+* `$ sudo apt-get install build-essential cmake libvlc-dev`
+
+WebChimera.jsをビルドできる環境が必要です。
+
 ### miyoutv-agent
 * [Chinachu](https://github.com/Chinachu/Chinachu)
 * [Mirakurun](https://github.com/Chinachu/Mirakurun)
@@ -40,20 +59,16 @@ Chinachu betaでの全録を支援するプログラムです。以下の機能�
 
 Chinachu *beta*とMirakurunが導入されている環境で動作します。
 
-### miyoutv(Linux)
-* [Node.js](http://nodejs.org/)
-* `$ sudo apt-get install build-essential cmake libvlc-dev`
-
-ChinachuとMirakurunがインストールされたサーバーとWebChimera.jsをビルドできる環境が必要です。
-
 ## Installation
-MiyouTVのシステムは**番組再生アプリケーションのmiyoutv**と**録画サーバー**から構成されています。
-miyoutv単体でChinachuクライアントとして動作します。EPGに依存しない全録システムを構築するにはChinachu betaとmiyoutv-agentが必要です。
+MiyouTVのシステムは**番組再生アプリケーションのmiyoutv**と**録画バックエンド**から構成されています。
+miyoutvはガラポンTVとChinachuのクライアントとして動作します。EPGに依存しない全録システムを構築するにはChinachu betaとmiyoutv-agentが必要です。
 ### Download
 <https://github.com/search-future/miyou.tv/releases>
 
-### miyoutv(Linux)
-ダウンロードしたAppImageファイルを実行してください。libvlcのインストールが必要です。
+### miyoutv(Linux, AppImage)
+ダウンロードしたAppImageファイルを実行してください。vlcのインストールが必要です。
+
+### miyoutv(Linux, tar.gz)
 アーカイブファイルを使用する場合は展開されたディレクトリ内のinstall.shを実行してください。
 ```
 $ tar xzf miyoutv-v*.*.*.tar.gz
@@ -115,7 +130,7 @@ channel: 27
 ## Usage
 1. インストーラーを実行、またはアーカイブを展開します。
 2. 展開されたMiyouTVを実行します。
-3. 上部ナビゲーションの設定メニューからChinachuの接続情報を設定します。
+3. 上部ナビゲーションの設定メニューからバックエンドの設定をします。
 4. コメントを表示するには設定メニューからモリタポアカウントを設定します。
 モリタポアカウントは<http://moritapo.jp/>から取得できます。
 5. 番組表にコメントカウントが表示されます。上部ナビゲーションから番組一覧への切り替えができます。
