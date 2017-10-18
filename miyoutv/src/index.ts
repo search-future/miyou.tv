@@ -27,7 +27,7 @@ declare const global: NodeJS.Global;
 let win: Electron.BrowserWindow = null;
 const nodeEnv: string = process.env.NODE_ENV;
 
-app.commandLine.appendSwitch('js-flags', '--max-old-space-size=256 --gc_interval=100');
+app.commandLine.appendSwitch('js-flags', '--max-old-space-size=512 --gc_interval=100');
 
 try {
   require('electron-reload')(__dirname, {
