@@ -23,6 +23,7 @@ class AppController {
   static componentName: string = 'app';
   static $inject: string[] = [
     '$scope',
+    'hotkeys',
     'toaster',
     'CommonService',
     'ChinachuService',
@@ -31,29 +32,37 @@ class AppController {
   ];
 
   public classes: { [key: string]: boolean } = {};
-  public hotkeys: { [key: string]: () => void };
   public toasterOptions: toaster.IToasterConfig;
 
   constructor(
     private $scope: ng.IScope,
+    private hotkeys: ng.hotkeys.HotkeysProvider,
     private toaster: toaster.IToasterService,
     private CommonService: CommonService.CommonService,
     private ChinachuService: ChinachuService.ChinachuService,
     private CommentService: CommentService.CommentService,
     private garaponDevId: string,
   ) {
-    this.hotkeys = {
-      'mod+w': (): void => {
-        CommonService.quitModal();
+    hotkeys.bindTo($scope).add({
+      combo: 'mod+w',
+      description: 'MiyouTVを終了',
+      callback: (e: Event): void => {
+        this.CommonService.quitModal();
+        e.preventDefault();
       },
-      esc: (): void => {
-        if (CommonService.fullscreen) {
-          CommonService.fullscreen = false;
+    }).add({
+      combo: 'esc',
+      description: '全画面表示解除/MiyouTVを終了',
+      callback: (e: Event): void => {
+        if (this.CommonService.fullscreen) {
+          this.CommonService.fullscreen = false;
         } else {
-          CommonService.quitModal();
+          this.CommonService.quitModal();
         }
+        e.preventDefault();
       },
-    };
+    });
+    hotkeys.get('?').description = 'このヘルプの表示/非表示';
 
     this.toasterOptions = {
       'time-out': {
