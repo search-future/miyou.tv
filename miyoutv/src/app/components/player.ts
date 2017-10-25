@@ -280,11 +280,11 @@ class PlayerController {
       description: '再生速度を通常に戻す',
       callback: (): void => this.PlayerService.normalSpeed(),
     }).add({
-      combo: '-',
+      combo: ['-', 'pagedown'],
       description: '再生速度を下げる',
       callback: (): void => this.PlayerService.speedDown(),
     }).add({
-      combo: '+',
+      combo: ['+', 'pageup'],
       description: '再生速度を上げる',
       callback: (): void => this.PlayerService.speedUp(),
     }).add({
@@ -299,11 +299,11 @@ class PlayerController {
       description: 'ミュート',
       callback: (): void => this.PlayerService.toggleMute(),
     }).add({
-      combo: 'p',
+      combo: ['home', 'p'],
       description: '前の番組を再生',
       callback: (): void => this.previous(),
     }).add({
-      combo: 'n',
+      combo: ['end', 'n'],
       description: '次の番組を再生',
       callback: (): void => this.next(),
     }).add({
@@ -311,35 +311,35 @@ class PlayerController {
       description: '全画面表示/解除',
       callback: (): void => this.toggleFullscreen(),
     }).add({
-      combo: 'mod+up',
+      combo: ['up', 'mod+up'],
       description: '音量を上げる',
       callback: (): void => this.PlayerService.increaseVolume(5),
     }).add({
-      combo: 'mod+down',
+      combo: ['down', 'mod+down'],
       description: '音量を下げる',
       callback: (): void => this.PlayerService.decreaseVolume(5),
     }).add({
-      combo: 'mod+left',
+      combo: ['left', 'mod+left'],
       description: '10秒戻す',
       callback: (): void => this.PlayerService.jumpBackward('11s'),
     }).add({
-      combo: 'mod+right',
+      combo: ['right', 'mod+right'],
       description: '30秒進める',
       callback: (): void => this.PlayerService.jumpForward('29s'),
     }).add({
-      combo: 'shift+left',
+      combo: ['shift+left', '['],
       description: 'コメントを早める',
       callback: (): void => {
         this.options.commentDelay -= 500;
       },
     }).add({
-      combo: 'shift+right',
+      combo: ['shift+right', ']'],
       description: 'コメントを遅らせる',
       callback: (): void => {
         this.options.commentDelay += 500;
       },
     }).add({
-      combo: 'mod+s',
+      combo: ['o', 'mod+s'],
       description: 'サイドバーを表示/非表示',
       callback: (): void => {
         this.sidebarCollapsed = !this.sidebarCollapsed;
