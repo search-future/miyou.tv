@@ -609,6 +609,14 @@ Components
 }
 
 
+/* Hotkeys */
+
+.cfp-hotkeys {
+  overflow-y: auto;
+  display: block;
+}
+
+
 /* Toast */
 
 .toast-top-right {
