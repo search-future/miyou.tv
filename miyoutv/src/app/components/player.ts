@@ -65,6 +65,7 @@ class PlayerController {
     '$scope',
     '$location',
     '$timeout',
+    'hotkeys',
     'toaster',
     'CommonService',
     'PlayerService',
@@ -251,37 +252,11 @@ class PlayerController {
       this.CommonService.back();
     }],
   ];
-  public mainHotkeys: { [key: string]: () => void } = {
-    s: (): void => this.CommonService.back(),
-    space: (): void => this.PlayerService.togglePause(),
-    '=': (): void => this.PlayerService.normalSpeed(),
-    '-': (): void => this.PlayerService.speedDown(),
-    '+': (): void => this.PlayerService.speedUp(),
-    b: (): void => this.PlayerService.toggleAudioTrack(),
-    v: (): void => this.PlayerService.toggleSubtitlesTrack(),
-    m: (): void => this.PlayerService.toggleMute(),
-    p: (): void => this.previous(),
-    n: (): void => this.next(),
-    f: (): void => this.toggleFullscreen(),
-    'mod+up': (): void => this.PlayerService.increaseVolume(5),
-    'mod+down': (): void => this.PlayerService.decreaseVolume(5),
-    'mod+left': (): void => this.PlayerService.jumpBackward('11s'),
-    'mod+right': (): void => this.PlayerService.jumpForward('29s'),
-    'shift+left': (): void => {
-      this.options.commentDelay -= 500;
-    },
-    'shift+right': (): void => {
-      this.options.commentDelay += 500;
-    },
-    'mod+s': (): void => {
-      this.sidebarCollapsed = !this.sidebarCollapsed;
-    },
-  };
-
   constructor(
     private $scope: ng.IScope,
     private $location: ng.ILocationService,
     private $timeout: ng.ITimeoutService,
+    private hotkeys: ng.hotkeys.HotkeysProvider,
     private toaster: toaster.IToasterService,
     private CommonService: CommonService.CommonService,
     private PlayerService: PlayerService.PlayerService,
@@ -291,6 +266,85 @@ class PlayerController {
     private CommentService: CommentService.CommentService,
   ) {
     this.sidebarCollapsed = Boolean(this.CommonService.loadLocalStorage('sidebarCollapsed'));
+
+    hotkeys.bindTo($scope).add({
+      combo: 's',
+      description: '再生を終了',
+      callback: (): void => this.CommonService.back(),
+    }).add({
+      combo: 'space',
+      description: '再生/一時停止',
+      callback: (): void => this.PlayerService.togglePause(),
+    }).add({
+      combo: '=',
+      description: '再生速度を通常に戻す',
+      callback: (): void => this.PlayerService.normalSpeed(),
+    }).add({
+      combo: '-',
+      description: '再生速度を下げる',
+      callback: (): void => this.PlayerService.speedDown(),
+    }).add({
+      combo: '+',
+      description: '再生速度を上げる',
+      callback: (): void => this.PlayerService.speedUp(),
+    }).add({
+      combo: 'b',
+      description: '音声切り替え',
+      callback: (): void => this.PlayerService.toggleAudioTrack(),
+    }).add({
+      combo: 'v',
+      callback: (): void => this.PlayerService.toggleSubtitlesTrack(),
+    }).add({
+      combo: 'm',
+      description: 'ミュート',
+      callback: (): void => this.PlayerService.toggleMute(),
+    }).add({
+      combo: 'p',
+      description: '前の番組を再生',
+      callback: (): void => this.previous(),
+    }).add({
+      combo: 'n',
+      description: '次の番組を再生',
+      callback: (): void => this.next(),
+    }).add({
+      combo: 'f',
+      description: '全画面表示/解除',
+      callback: (): void => this.toggleFullscreen(),
+    }).add({
+      combo: 'mod+up',
+      description: '音量を上げる',
+      callback: (): void => this.PlayerService.increaseVolume(5),
+    }).add({
+      combo: 'mod+down',
+      description: '音量を下げる',
+      callback: (): void => this.PlayerService.decreaseVolume(5),
+    }).add({
+      combo: 'mod+left',
+      description: '10秒戻す',
+      callback: (): void => this.PlayerService.jumpBackward('11s'),
+    }).add({
+      combo: 'mod+right',
+      description: '30秒進める',
+      callback: (): void => this.PlayerService.jumpForward('29s'),
+    }).add({
+      combo: 'shift+left',
+      description: 'コメントを早める',
+      callback: (): void => {
+        this.options.commentDelay -= 500;
+      },
+    }).add({
+      combo: 'shift+right',
+      description: 'コメントを遅らせる',
+      callback: (): void => {
+        this.options.commentDelay += 500;
+      },
+    }).add({
+      combo: 'mod+s',
+      description: 'サイドバーを表示/非表示',
+      callback: (): void => {
+        this.sidebarCollapsed = !this.sidebarCollapsed;
+      },
+    });
 
     $scope.$watch(
       (): boolean => this.sidebarCollapsed,
