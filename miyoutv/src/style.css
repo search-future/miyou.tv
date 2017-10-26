@@ -872,7 +872,6 @@ Components
 }
 
 .fullscreen .player .view-content-header {
-  height: 1px;
   left: 0;
   margin: 0;
   opacity: 0;
@@ -880,13 +879,13 @@ Components
   right: 0;
   top: 0;
   transition-duration: 1s;
-  transition-property: opacity, height;
+  transition-property: opacity;
   z-index: 3;
 }
 
 .fullscreen .player .view-content-header:hover {
-  height: auto;
   opacity: 0.8;
+  z-index: 5;
 }
 
 
@@ -965,6 +964,7 @@ Components
 .sidebar {
   background-color: #333;
   color: #fff;
+  z-index: 4;
 }
 
 .sidebar .sidebar-close {
