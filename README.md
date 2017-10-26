@@ -139,8 +139,10 @@ channel: 27
 ## Build
 Node.jsのインストールが必要です。また、Linux版は開発パッケージとlibvlcの開発用パッケージを用意してください。
 ソース一式をダウンロードして、init.shまたはinit.cmdを実行するとビルド環境が整います。
+ガラポンTV機能を有効にするにはガラポンAPIのデベロッパーIDが必要です。
 ```
 $ ./init.sh
+$ echo GARAPON_DEVID=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX >> .env.local
 $ npm run dist --production
 ```
 
