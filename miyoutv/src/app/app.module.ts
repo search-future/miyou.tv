@@ -26,6 +26,7 @@ import {
   garaponDevId,
   garaponSiteUrl,
 } from './app.constants';
+import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 import { AppComponent } from './app.component';
 
@@ -33,6 +34,7 @@ import { AppComponent } from './app.component';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    CoreModule,
     SharedModule,
   ],
   declarations: [AppComponent],
