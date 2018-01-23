@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <meta charset="UTF-8">
-<div class="navbar navbar-expand-md navbar-fixed-top fixed-top p-0 navbar-dark bg-dark" [class.d-none]="path === '/programs/play'">
+<div class="navbar navbar-expand-md fixed-top px-0 py-1 py-md-0 navbar-dark bg-dark border-black" [class.d-none]="path === '/programs/play'">
     <span class="navbar-brand ml-3 d-md-none">
         <img width="20" height="20" alt="Logo" src="miyoutv.ico">
     </span>
@@ -24,40 +24,40 @@ limitations under the License.
             <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" [collapse]="isCollapsed">
-        <ul class="navbar-nav col-md-4 px-2">
-            <li class="nav-item" routerLinkActive="active">
-                <a class="nav-link" routerLink="/programs/table" (click)="isCollapsed = true">
+        <ul class="navbar-nav col-md-5 col-lg-4 px-0 px-md-2">
+            <li class="nav-item py-md-1 px-2 px-md-0" routerLinkActive="bg-black">
+                <a class="nav-link" routerLink="/programs/table" routerLinkActive="active" (click)="isCollapsed = true">
                     <span class="fa fa-th"></span> 番組表
                 </a>
             </li>
-            <li class="nav-item" routerLinkActive="active">
-                <a class="nav-link" routerLink="/programs/list" (click)="isCollapsed = true">
+            <li class="nav-item py-md-1 px-2 px-md-0" routerLinkActive="bg-black">
+                <a class="nav-link" routerLink="/programs/list" routerLinkActive="active" (click)="isCollapsed = true">
                     <span class="fa fa-list"></span> 番組一覧
                 </a>
             </li>
-            <!--<li class="nav-item" routerLinkActive="active">
+            <!--<li class="nav-item py-md-1" routerLinkActive="active">
                 <a class="nav-link" href="/programs/ranking" (click)="isCollapsed = true">
                     <span class="fa fa-star"></span> ランキング
                 </a>
             </li>-->
         </ul>
-        <form class="form-inline-md col-md-4 p-md-0 text-center" [formGroup]="searchForm" (submit)="search()">
-            <div class="input-group mx-md-auto m-0">
+        <form class="form-inline-md col-md-4 px-md-0 py-md-1 text-center" [formGroup]="searchForm" (submit)="search()">
+            <div class="input-group input-group-rounded mx-md-auto m-0">
                 <div class="input-group-prepend">
-                        <span class="fa fa-search input-group-text bg-dark text-light"></span>
+                    <span class="fa fa-search input-group-text"></span>
                 </div>
-                <input type="text" class="form-control text-center bg-dark text-light" placeholder="Search" formControlName="query">
+                <input type="text" class="form-control text-center mr-lg-5" placeholder="Search" formControlName="query">
             </div>
         </form>
-        <ul class="navbar-nav col-md-4 p-0">
+        <ul class="navbar-nav col-md-4 p-0 py-md-1">
             <li class="nav-item dropdown ml-md-auto mr-md-2" dropdown>
                 <a class="nav-link clickable p-2" dropdownToggle>
                         設定 <span class="fa fa-cog"></span>
                 </a>
-                <div class="dropdown-menu dropdown-menu-right p-0 bg-dark" *dropdownMenu>
-                    <a class="dropdown-item bg-dark text-light" href="" (click)="openViewSetting(); false">表示設定</a>
-                    <a class="dropdown-item bg-dark text-light" href="" (click)="openBackendSetting(); false">バックエンド</a>
-                    <a class="dropdown-item bg-dark text-light" href="" (click)="openMoritapoSetting(); false">モリタポアカウント</a>
+                <div class="dropdown-menu dropdown-menu-right" *dropdownMenu>
+                    <a class="dropdown-item" href="" (click)="openViewSetting(); false">表示設定</a>
+                    <a class="dropdown-item" href="" (click)="openBackendSetting(); false">バックエンド</a>
+                    <a class="dropdown-item" href="" (click)="openMoritapoSetting(); false">モリタポアカウント</a>
                 </div>
             </li>
         </ul>

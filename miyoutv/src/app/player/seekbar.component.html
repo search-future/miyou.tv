@@ -17,9 +17,9 @@ limitations under the License.
 <meta charset="UTF-8">
 <form class="seekbar w-100" [formGroup]="form">
     <div class="form-group w-100 m-0 p-1">
-        <div class="input-group input-group-media w-100 flex">
+        <div class="input-group input-group-media w-100">
             <div class="input-group-prepend">
-                <button class="btn btn-media" type="button" *ngIf="showPrevious" (click)="previous.emit()">
+                <button class="btn bg-transparent" type="button" *ngIf="showPrevious" (click)="previous.emit()">
                     <img class="img-icon-md" src="assets/step-backward.svg" alt="">
                 </button>
             </div>
@@ -40,7 +40,7 @@ limitations under the License.
                 <span class="input-group-text border-0 bg-transparent text-light clickable" (click)="useClock = !useClock">{{useClock && endTime ? (endTime | dateEx:hourFirst:hourFormat:'HHHH:mm:ss') : (length | formatTime)}}</span>
             </div>
             <div class="input-group-append">
-                <button class="btn btn-media" type="button" *ngIf="showNext" (click)="next.emit()">
+                <button class="btn bg-transparent" type="button" *ngIf="showNext" (click)="next.emit()">
                     <img class="img-icon-md" src="assets/step-forward.svg" alt="">
                 </button>
             </div>

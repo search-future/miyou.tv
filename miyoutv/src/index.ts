@@ -1,5 +1,5 @@
 /*!
-Copyright 2016 Brazil Ltd.
+Copyright 2016-2018 Brazil Ltd.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -230,6 +230,7 @@ function createWindow(): void {
     minHeight: 500,
     frame: false,
     autoHideMenuBar: true,
+    backgroundColor: '#808080',
   });
   win.loadURL('file://' + path.join(__dirname, '/index.html'));
 

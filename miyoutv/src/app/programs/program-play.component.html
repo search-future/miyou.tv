@@ -15,22 +15,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <meta charset="UTF-8">
-<div class="player view-content">
-    <div class="view-content-header row m-0 bg-dark text-light text-nowrap">
-        <div class="col-4 col-sm-2 p-0 text-left">
-            <button class="btn btn-media" title="再生を終了" (click)="stop()">
+<div class="player view-content d-flex flex-column fit">
+    <div class="view-content-header row align-items-center m-0 text-truncate bg-dark text-light">
+        <div class="col-2 col-sm-1 p-0 text-left">
+            <button class="btn bg-transparent" title="再生を終了" (click)="stop()">
                 <img class="img-icon-md" src="assets/back.svg">
             </button>
         </div>
-        <div class="col-4 col-sm-8 p-0 text-center">
+        <div class="col-10 px-0 py-2 text-center text-truncate">
             <span class="channel">{{info?.channelName}}</span>
             <span class="title">{{info?.fullTitle}}</span>
         </div>
     </div>
-    <div class="view-content-body">
-        <div class="row h-100 m-0">
-            <div class="col-12 d-sm-flex flex-column flex h-100 p-0" [class.col-lg-8]="!sidebarCollapsed" [class.col-md-7]="!sidebarCollapsed" [class.col-sm-6]="!sidebarCollapsed" [class.d-none]="!sidebarCollapsed" [contextMenu]="playerMenu">
-                <div class="screen flex-fill" (mousewheel)="onMouseWheel($event)">
+    <div class="view-content-body flex-fill position-relative">
+        <div class="row fit m-0">
+            <div class="col-12 flex-column h-100 p-0" [ngClass]="sidebarCollapsed ? ['d-flex'] : ['col-xl-8', 'col-lg-7', 'col-md-6', 'd-md-flex', 'd-none']" [contextMenu]="playerMenu">
+                <div class="screen flex-fill position-relative overflow-hidden text-nowrap text-white font-weight-bold" (mousewheel)="onMouseWheel($event)">
                     <video-screen class="video-screen fit" (dblclick)="toggleFullscreen()"></video-screen>
                     <comment-screen class="comment-screen fit"></comment-screen>
                 </div>
@@ -119,9 +119,9 @@ limitations under the License.
                     </ng-template>
                 </context-menu>
             </div>
-            <div class="sidebar col-12 col-sm-6 col-md-5 col-lg-4 h-100 p-0" [collapse]="sidebarCollapsed" (collapsed)="onSidebarCollapsed()" (expanded)="onSidebarExpanded()" [style.height]="'100%'">
-                <button class="sidebar-close close" (click)="sidebarCollapsed = true"><span class="fa fa-times-circle"></span></button>
-                <tabset type="tabs" class="sidebar-tabset h-100 nav-mtvblack nav-mtvblack-line">
+            <div class="sidebar col-12 col-md-6 col-lg-5 col-xl-4 h-100 p-0 bg-dark text-light" [collapse]="sidebarCollapsed" (collapsed)="onSidebarCollapsed()" (expanded)="onSidebarExpanded()">
+                <button class="sidebar-close close text-light mr-2" (click)="sidebarCollapsed = true"><span class="fa fa-times-circle"></span></button>
+                <tabset type="tabs" class="sidebar-tabset h-100">
                     <tab heading="コメント">
                         <comment-grid class="fit" (jump)="jump($event)"></comment-grid>
                     </tab>

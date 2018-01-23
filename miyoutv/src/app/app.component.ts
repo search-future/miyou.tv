@@ -126,7 +126,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
   public openQuitModal() {
     if (!this.hasModal) {
-      this.bsModalService.show(QuitModalComponent);
+      this.bsModalService.show(QuitModalComponent, {
+        class: 'modal-dialog-centered',
+      });
     }
   }
 }

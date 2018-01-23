@@ -15,42 +15,42 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <meta charset="UTF-8">
-<div class="flex flex-column h-100">
+<div class="d-flex flex-column h-100">
     <form class="form-thread d-flex p-2" [formGroup]="headForm">
         <div class="dropdown dropdown-channel form-group m-1" dropdown [autoClose]="false">
-            <button class="dropdown-toggle btn btn-outline-light bg-dark text-light" dropdownToggle>
+            <button class="dropdown-toggle btn btn-outline-secondary text-light" dropdownToggle>
                 チャンネル
             </button>
-            <div class="dropdown-menu bg-dark" *dropdownMenu>
+            <div class="dropdown-menu dropdown-menu" *dropdownMenu>
                 <ng-container *ngFor="let channel of channels; let i = index" formArrayName="channels">
-                    <div class="dropdown-item bg-dark text-light" *ngIf="headForm.value.channels[i]">
+                    <div class="dropdown-item" *ngIf="headForm.value.channels[i]">
                         <div class="form-check" [title]="channel.id">
                             <input class="form-check-input" type="checkbox" [id]="channel.id" [formControlName]="i">
                             <label class="form-check-label" [for]="channel.id">{{channel.id}}</label>
                         </div>
                     </div>
                 </ng-container>
-                <div class="dropdown-header text-light">地上</div>
+                <div class="dropdown-header">地上</div>
                 <ng-container *ngFor="let channel of channels; let i = index" formArrayName="channels">
-                    <div class="dropdown-item bg-dark text-light mh-10" *ngIf="channel.type === 'gr' && !headForm.value.channels[i]">
+                    <div class="dropdown-item" *ngIf="channel.type === 'gr' && !headForm.value.channels[i]">
                         <div class="form-check" [title]="channel.id">
                             <input class="form-check-input" type="checkbox" [id]="channel.id" [formControlName]="i">
                             <label class="form-check-label" [for]="channel.id">{{channel.id}}</label>
                         </div>
                     </div>
                 </ng-container>
-                <div class="dropdown-header text-light">BS</div>
+                <div class="dropdown-header">BS</div>
                 <ng-container *ngFor="let channel of channels; let i = index" formArrayName="channels">
-                    <div class="dropdown-item bg-dark text-light" *ngIf="channel.type === 'bs' && !headForm.value.channels[i]">
+                    <div class="dropdown-item" *ngIf="channel.type === 'bs' && !headForm.value.channels[i]">
                         <div class="form-check" [title]="channel.id">
                             <input class="form-check-input" type="checkbox" [id]="channel.id" [formControlName]="i">
                             <label class="form-check-label" [for]="channel.id">{{channel.id}}</label>
                         </div>
                     </div>
                 </ng-container>
-                <div class="dropdown-header text-light">CS</div>
+                <div class="dropdown-header">CS</div>
                 <ng-container *ngFor="let channel of channels; let i = index" formArrayName="channels">
-                    <div class="dropdown-item bg-dark text-light" *ngIf="channel.type === 'cs' && !headForm.value.channels[i]">
+                    <div class="dropdown-item" *ngIf="channel.type === 'cs' && !headForm.value.channels[i]">
                         <div class="form-check" [title]="channel.id">
                             <input class="form-check-input" type="checkbox" [id]="channel.id" [formControlName]="i">
                             <label class="form-check-label" [for]="channel.id">{{channel.id}}</label>
@@ -60,11 +60,11 @@ limitations under the License.
             </div>
         </div>
         <div class="dropdown dropdown-thread form-group m-1" dropdown [autoClose]="false">
-            <button class="dropdown-toggle btn btn-outline-light bg-dark text-light" dropdownToggle>
+            <button class="dropdown-toggle btn btn-outline-secondary text-light" dropdownToggle>
                 スレッド
             </button>
-            <div class="dropdown-menu bg-dark" *dropdownMenu>
-                <div class="dropdown-item bg-dark text-light" *ngFor="let thread of threads; let i = index" formArrayName="threads">
+            <div class="dropdown-menu" *dropdownMenu>
+                <div class="dropdown-item" *ngFor="let thread of threads; let i = index" formArrayName="threads">
                     <div class="form-check" [title]="thread">
                         <input class="form-check-input" type="checkbox" [id]="thread" [formControlName]="i">
                         <label class="form-check-label" [for]="thread">{{thread}}</label>
@@ -73,8 +73,8 @@ limitations under the License.
             </div>
         </div>
     </form>
-    <div class="flex-fill">
-        <ag-grid-angular class="grid ag-dark h-100" #grid [gridOptions]="gridOptions" [columnDefs]="columnDefs" [deltaRowDataMode]="true"></ag-grid-angular>
+    <div class="flex-fill position-relative">
+        <ag-grid-angular class="grid ag-dark fit" #grid [gridOptions]="gridOptions" [columnDefs]="columnDefs" [deltaRowDataMode]="true"></ag-grid-angular>
     </div>
     <form class="form-inline form-autoscroll" [formGroup]="footForm">
         <div class="form-check">

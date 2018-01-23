@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <meta charset="UTF-8">
-<form class="moritapo-setting modal-component" [formGroup]="form" (submit)="submit()">
+<form class="moritapo-setting modal-component bg-black text-light" [formGroup]="form" (submit)="submit()">
     <div class="modal-header">モリタポアカウント</div>
     <div class="modal-body">
         <div class="form-group">
@@ -36,6 +36,6 @@ limitations under the License.
     </div>
     <div class="modal-footer">
         <button class="btn btn-save" type="submit">OK</button>
-        <button class="btn btn-cancel" type="button" (click)="close()">キャンセル</button>
+        <button class="btn btn-secondary" type="button" (click)="close()">キャンセル</button>
     </div>
 </form>

@@ -61,15 +61,21 @@ export class HeadNavComponent implements OnInit, OnDestroy {
   }
 
   public openViewSetting() {
-    this.modalService.show(ViewSettingComponent);
+    this.modalService.show(ViewSettingComponent, {
+      class: 'modal-dialog-centered',
+    });
   }
 
   public openBackendSetting() {
-    this.modalService.show(BackendSettingComponent);
+    this.modalService.show(BackendSettingComponent, {
+      class: 'modal-dialog-centered',
+    });
   }
 
   public openMoritapoSetting() {
-    this.modalService.show(MoritapoSettingComponent);
+    this.modalService.show(MoritapoSettingComponent, {
+      class: 'modal-dialog-centered',
+    });
   }
 
   public search() {

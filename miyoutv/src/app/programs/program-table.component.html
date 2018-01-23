@@ -16,47 +16,47 @@ limitations under the License.
 -->
 <meta charset="UTF-8">
 <ngx-loading-bar></ngx-loading-bar>
-<div class="programs view-content mt-4">
-    <div class="view-content-header mt-2 pt-4 bg-dark">
+<div class="programs view-content d-flex flex-column fit pt-5">
+    <div class="view-content-header py-1 bg-black text-light">
         <form class="row m-0" [formGroup]="form">
             <div class="col-12 col-sm-3 col-lg-2">
                 <div class="input-group" title="表示データ" *ngIf="archiveEnabled">
                     <div class="input-group-prepend">
-                        <label class="input-group-text bg-dark text-light" for="source">
+                        <label class="input-group-text" for="source">
                             <span class="fa fa-database"></span>
                         </label>
                     </div>
-                    <select id="source" class="form-control bg-dark text-light" formControlName="source">
+                    <select id="source" class="form-control" formControlName="source">
                         <option value="archive">番組表</option>
                         <option value="recorded">録画情報</option>
                     </select>
                 </div>
             </div>
             <div class="col-12 col-sm-6 col-lg-8">
-                <ul class="nav justify-content-center" [ngClass]="{'d-none': dates.length >= 2, 'd-sm-flex': dates.length <= 3, 'd-md-flex': dates.length <= 5, 'd-lg-flex': dates.length <= 8}">
+                <ul class="nav nav-pills justify-content-center" [ngClass]="{'d-none': dates.length >= 2, 'd-sm-flex': dates.length <= 3, 'd-md-flex': dates.length <= 4, 'd-lg-flex': dates.length <= 8, 'd-xl-flex': dates.length <= 10}">
                     <li class="nav-item" *ngFor="let date of dates">
-                        <a  class="nav-link" href="" [routerLink]="[]" [queryParams]="{date: (date | date:'y-M-d')}" routerLinkActive="active">{{date | date:'M/d EEE'}}</a>
+                        <a class="nav-link px-1" href="" [routerLink]="[]" [queryParams]="{date: (date | date:'y-M-d')}" routerLinkActive="active border-bottom border-primary text-primary" #rla="routerLinkActive" [class.text-light]="!rla.isActive">{{date | date:'M/d EEE'}}</a>
                     </li>
                 </ul>
-                <div [ngClass]="{'d-none': dates.length < 2, 'd-sm-none': dates.length <= 3, 'd-md-none': dates.length <= 5, 'd-lg-none': dates.length <= 8}">
+                <div [ngClass]="{'d-none': dates.length < 2, 'd-sm-none': dates.length <= 3, 'd-md-none': dates.length <= 4, 'd-lg-none': dates.length <= 8, 'd-xl-none': dates.length <= 10}">
                     <div class="input-group">
-                        <input class="form-control bg-dark text-light text-center" type="text" formControlName="date" #dp="bsDatepicker" bsDatepicker [bsConfig]="dpConfig" [minDate]="minDate" [maxDate]="maxDate" [placeholder]="this.currentDate | date:'y/M/d EEE'">
+                        <input class="form-control text-center" type="text" formControlName="date" #dp="bsDatepicker" bsDatepicker [bsConfig]="dpConfig" [minDate]="minDate" [maxDate]="maxDate" [placeholder]="this.currentDate | date:'y/M/d EEE'">
                         <div class="input-group-append" title="日付を選択">
-                            <button class="btn btn-outline-light bg-dark text-light" type="button" (click)="dp.toggle()">
-                            <span class="fa fa-calendar"></span>
-                        </button>
+                            <button class="btn btn-outline-secondary text-light" type="button" (click)="dp.toggle()">
+                                <span class="fa fa-calendar"></span>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-12 col-sm-3 col-lg-2">
                 <div class="dropdown text-right" dropdown [autoClose]="false">
-                    <button class="dropdown-toggle btn btn-outline-light bg-dark text-light" dropdownToggle>
+                    <button class="dropdown-toggle btn btn-outline-secondary text-light" dropdownToggle>
                         番組カテゴリ
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-right bg-dark" *dropdownMenu>
-                        <li class="dropdown-item p-0 bg-dark text-light" [title]="category.name" *ngFor="let category of categoryTable; let i = index" formArrayName="categories">
-                            <div class="form-check px-2">
+                    <ul class="dropdown-menu dropdown-menu-right" *dropdownMenu>
+                        <li class="dropdown-item" [title]="category.name" *ngFor="let category of categoryTable; let i = index" formArrayName="categories">
+                            <div class="form-check px-0">
                                 <input type="checkbox" [id]="category.codeName" [formControlName]="i">
                                 <label class="form-check-label" [for]="category.codeName">{{category.name}}</label>
                             </div>
@@ -66,35 +66,36 @@ limitations under the License.
             </div>
         </form>
     </div>
-    <div class="view-content-body scrollable" (scroll)="onScroll($event)" #viewport>
-        <div class="program-header program-header-horizontal" [style.top]="scrollY + 'px'">
-            <div class="program-header-cell" *ngFor="let channel of data">
-                <div class="program-header-content clickable" title="チャンネルで検索" (click)="search('type:' + channel.type + ' ch:' + channel.channel)">
+    <div class="view-content-body position-relative flex-fill overflow-auto" (scroll)="onScroll($event)" #viewport>
+        <div class="program-header program-header-horizontal row w-100 m-0 flex-nowrap position-absolute text-center text-truncate bg-dark text-light" [style.top]="scrollY + 'px'">
+            <div class="program-header-cell col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 p-0 border-right border-secondary bg-dark" *ngFor="let channel of data">
+                <div class="program-header-content text-truncate clickable" title="チャンネルで検索" (click)="search('type:' + channel.type + ' ch:' + channel.channel)">
                     {{channel.channelName}}
                 </div>
             </div>
         </div>
-        <div class="program-header program-header-vertical" [style.left]="scrollX + 'px'">
-            <div class="program-header-cell" *ngFor="let hour of hours" [style.height]="baseHeight + 'px'" [style.lineHeight]="baseHeight + 'px'">
+        <div class="program-header program-header-vertical d-flex flex-column position-absolute text-center bg-dark text-light" [style.left]="scrollX + 'px'">
+            <div class="program-header-cell border-top border-secondary bg-dark" *ngFor="let hour of hours" [style.height]="baseHeight + 'px'" [style.lineHeight]="baseHeight + 'px'">
                 <div class="program-header-content">{{hour | dateEx:hourFirst:hourFormat:'HHH'}}</div>
             </div>
         </div>
-        <div class="program-table">
-            <div class="program-table-column" *ngFor="let column of data" [style.height]="baseHeight * 24 + 'px'" (dblclick)="playColumn($event, column)">
-                <div class="program-table-cell" *ngFor="let item of column.programs" [class.d-none]="activeCategories.length > 0 && activeCategories.indexOf(item.category.code) === -1" [style.top]="item.top + 'px'" [style.height]="selectedItem === item ? 'auto' : item.height + 'px'" [style.minHeight]="item.height + 'px'" [style.maxHeight]="item.maxHeight + 'px'">
-                    <div class="program-table-content selectable" [class.selected]="selectedItem === item" (click)="select(item)" (dblclick)="play(item); false" (mouseenter)="item.showPreview = true">
-                        <span class="badge badge-balloon" *ngIf="countMode !== 'none'" [title]="'コメント数: ' + (item.commentCount | async) + '\n勢い： ' + (item.commentSpeed | async | number:'1.1-1') + '/分'">
-                            {{countMode === 'speed' ? (item.commentSpeed | async | number:'1.1-1') : (item.commentCount | async)}}
-                        </span>
-                        <span class="time">{{item.start | dateEx:hourFirst:hourFormat:'AHHHH:mm'}}</span>
-                        <span class="title quick-search quick-search-hidden">
+        <div class="program-table row flex-nowrap w-100 m-0">
+            <div class="program-table-column col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 p-0 position-relative" *ngFor="let column of data" [style.height]="baseHeight * 24 + 'px'" (dblclick)="playColumn($event, column)">
+                <div class="program-table-cell d-flex w-100 position-absolute" *ngFor="let item of column.programs" [class.d-flex]="activeCategories.length === 0 ||  activeCategories.indexOf(item.category.code) >= 0" [class.d-none]="activeCategories.length > 0 && activeCategories.indexOf(item.category.code) === -1" [style.top]="item.top + 'px'" [style.height]="selectedItem === item ? 'auto' : item.height + 'px'"
+                    [style.minHeight]="item.height + 'px'" [style.maxHeight]="item.maxHeight + 'px'">
+                    <span class="badge badge-balloon badge-balloon-right" *ngIf="countMode !== 'none' && (item.commentCount | async)" [title]="'コメント数: ' + (item.commentCount | async) + '\n勢い： ' + (item.commentSpeed | async | number:'1.1-1') + '/分'">
+                        {{countMode === 'speed' ? (item.commentSpeed | async | number:'1.1-1') : (item.commentCount | async)}}
+                    </span>
+                    <div class="program-table-content p-2 flex-fill border bg-white overflow-hidden selectable" [class.selected]="selectedItem === item" (click)="select(item)" (dblclick)="play(item); false" (mouseenter)="item.showPreview = true">
+                        <span class="time text-primary font-weight-bold">{{item.start | dateEx:hourFirst:hourFormat:'AHHHH:mm'}}</span>
+                        <span class="title quick-search quick-search-hidden font-weight-bold">
                             {{item.fullTitle}}
                             <span class="fa fa-search quick-search-btn" title="番組名で検索" (click)="search(item.title)"></span>
                         </span>
-                        <a class="badge" title="カテゴリで検索" [ngClass]="'badge-' + item.category.codeName" (click)="search('cat:' + item.category.codeName)">
+                        <a class="badge" href="" title="カテゴリで検索" [ngClass]="'badge-' + item.category.codeName" (click)="search('cat:' + item.category.codeName); false">
                             {{item.category.name}}
                         </a>
-                        <div class="detail">{{item.detail}}</div>
+                        <div class="detail mt-2 small">{{item.detail}}</div>
                         <div class="preview text-center" *ngIf="previewEnabled && item.showPreview">
                             <img width="160" height="90" *ngIf="(item.preview | async) || false" [src]="item.preview | async">
                         </div>
@@ -103,7 +104,7 @@ limitations under the License.
             </div>
         </div>
     </div>
-    <form class="form-play">
-        <button class="btn btn-play" type="button" title="選択した番組を再生" click="play()">再生</button>
+    <form class="form-inline fixed-bottom col-3 col-sm-2 col-lg-1 m-4 ml-auto">
+        <button class="btn btn-primary ml-auto" type="button" title="選択した番組を再生" (click)="play()">再生</button>
     </form>
 </div>

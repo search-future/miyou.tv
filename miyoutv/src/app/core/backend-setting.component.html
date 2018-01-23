@@ -15,13 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <meta charset="UTF-8">
-<form class="backend-setting modal-component" [formGroup]="form" (submit)="submit()">
+<form class="backend-setting modal-component bg-black text-light" [formGroup]="form" (submit)="submit()">
     <div class="modal-header">バックエンド設定</div>
     <div class="modal-body">
         <fieldset *ngIf="garaponEnabled">
             <legend>バックエンドの種類</legend>
             <div class="form-group form-row">
-                <label class="col-sm-3 " for="backend-type">バックエンド</label>
+                <label class="col-sm-3 col-form-label" for="backend-type">バックエンド</label>
                 <div class="col-sm-9">
                     <select id="backend-type" class="form-control" formControlName="backendType">
                         <option value="chinachu">Chinachu</option>
@@ -100,6 +100,6 @@ limitations under the License.
     </div>
     <div class="modal-footer">
         <button class="btn btn-save" type="submit">OK</button>
-        <button class="btn btn-cancel" type="button" (click)="close()">キャンセル</button>
+        <button class="btn btn-secondary" type="button" (click)="close()">キャンセル</button>
     </div>
 </form>

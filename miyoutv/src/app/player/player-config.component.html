@@ -15,26 +15,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <meta charset="UTF-8">
-<div class="card bg-dark text-light">
-    <div class="card-header">再生設定</div>
+<div class="card m-1 border border-secondary bg-dark text-light">
+    <div class="card-header border-bottom border-secondary bg-black">再生設定</div>
     <div class="card-body">
         <form [formGroup]="playerForm">
             <div class="form-group form-row">
-                <label class="col-6 col-form-label" for="player-rate">再生速度</label>
-                <div class="col-6">
+                <label class="col-12 col-sm-6 col-form-label" for="player-rate">再生速度</label>
+                <div class="col-12 col-sm-6">
                     <input id="player-rate" class="form-control bg-dark text-light" type="number" step="0.1" min="0.1" max="64" formControlName="rate">
                 </div>
             </div>
         </form>
     </div>
 </div>
-<div class="card bg-dark text-light">
-    <div class="card-header">ビデオ設定</div>
+<div class="card m-1 border border-secondary bg-dark text-light">
+    <div class="card-header border-bottom border-secondary bg-black">ビデオ設定</div>
     <div class="card-body">
         <form [formGroup]="videoForm">
             <div class="form-group form-row">
-                <label class="col-6 col-form-label" for="player-video-deinterlace">インターレース解除</label>
-                <div class="col-6">
+                <label class="col-12 col-sm-6 col-form-label" for="player-video-deinterlace">インターレース解除</label>
+                <div class="col-12 col-sm-6">
                     <select id="player-video-deinterlace" class="form-control bg-dark text-light" formControlName="deinterlace">
                         <option value="">無効</option>
                         <option value="blend">ブレンド</option>
@@ -49,8 +49,8 @@ limitations under the License.
                 </div>
             </div>
             <div class="form-group form-row">
-                <label class="col-6 col-form-label" for="player-video-aspectratio">アスペクト比</label>
-                <div class="col-6">
+                <label class="col-12 col-sm-6 col-form-label" for="player-video-aspectratio">アスペクト比</label>
+                <div class="col-12 col-sm-6">
                     <select id="player-video-aspectratio" class="form-control bg-dark text-light" formControlName="aspectRatio">
                         <option value="16:9">16:9</option>
                         <option value="4:3">4:3</option>
@@ -67,21 +67,21 @@ limitations under the License.
         </form>
     </div>
 </div>
-<div class="card bg-dark text-light">
-    <div class="card-header">オーディオ設定</div>
+<div class="card m-1 border border-secondary bg-dark text-light">
+    <div class="card-header border-bottom border-secondary bg-black">オーディオ設定</div>
     <div class="card-body">
         <form [formGroup]="audioForm">
             <div class="form-group form-row">
-                <label class="col-6 col-form-label" for="player-audio-track">音声トラック</label>
-                <div class="col-6">
+                <label class="col-12 col-sm-6 col-form-label" for="player-audio-track">音声トラック</label>
+                <div class="col-12 col-sm-6">
                     <select id="player-audio-track" class="form-control bg-dark text-light" formControlName="track">
                         <option *ngFor="let track of audioTrackList" [value]="track.value">{{track.name}}</option>
                     </select>
                 </div>
             </div>
             <div class="form-group form-row">
-                <label class="col-6 col-form-label" for="player-audio-channel">音声チャンネル</label>
-                <div class="col-6">
+                <label class="col-12 col-sm-6 col-form-label" for="player-audio-channel">音声チャンネル</label>
+                <div class="col-12 col-sm-6">
                     <select id="player-audio-channel" class="form-control bg-dark text-light" formControlName="channel">
                         <option [value]="1">ステレオ</option>
                         <option [value]="3">左</option>

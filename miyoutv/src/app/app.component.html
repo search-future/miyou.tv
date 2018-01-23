@@ -19,10 +19,10 @@ limitations under the License.
     <input type="text" tabindex="-1">
     <input type="password" tabindex="-1">
 </form>
-<div class="app" [class.fullscreen]="isFullscreen" (window:move)="saveWindowState()" (window:resize)="saveWindowState()">
-    <titlebar></titlebar>
+<div class="app d-flex flex-column w-100vw h-100vh" [class.fullscreen]="isFullscreen" (window:move)="saveWindowState()" (window:resize)="saveWindowState()">
+    <titlebar [class.d-none]="isFullscreen"></titlebar>
     <head-nav></head-nav>
-    <div class="view">
+    <div class="view flex-fill position-relative overflow-hidden">
         <router-outlet></router-outlet>
     </div>
     <hotkeys-cheatsheet title="ショートカットキー一覧"></hotkeys-cheatsheet>
