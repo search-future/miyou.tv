@@ -14,21 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import { NgModule } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ModalModule } from 'ngx-bootstrap/modal';
 
 import { QuitModalComponent } from './quit-modal.component';
+import { ChinachuService } from './chinachu.service';
 import { StorageService } from './storage.service';
 import { WindowService } from './window.service';
 
 @NgModule({
   imports: [
+    HttpClientModule,
     ReactiveFormsModule,
     ModalModule.forRoot(),
   ],
   exports: [QuitModalComponent],
   declarations: [QuitModalComponent],
   providers: [
+    ChinachuService,
     StorageService,
     WindowService,
   ],
