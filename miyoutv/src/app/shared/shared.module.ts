@@ -15,6 +15,13 @@ limitations under the License.
 */
 import { NgModule } from '@angular/core';
 
+import { StorageService } from './storage.service';
+import { WindowService } from './window.service';
+
 @NgModule({
+  providers: [
+    StorageService,
+    WindowService,
+  ],
 })
 export class SharedModule { }
