@@ -19,6 +19,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ModalModule } from 'ngx-bootstrap/modal';
 
 import { QuitModalComponent } from './quit-modal.component';
+import { DateExPipe } from './date-ex.pipe';
 import { ChinachuService } from './chinachu.service';
 import { GaraponService } from './garapon.service';
 import { GaraponSiteService } from './garapon-site.service';
@@ -32,8 +33,8 @@ import { WindowService } from './window.service';
     ReactiveFormsModule,
     ModalModule.forRoot(),
   ],
-  exports: [QuitModalComponent],
-  declarations: [QuitModalComponent],
+  exports: [QuitModalComponent, DateExPipe],
+  declarations: [QuitModalComponent, DateExPipe],
   providers: [
     ChinachuService,
     GaraponService,
