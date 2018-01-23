@@ -21,6 +21,7 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { QuitModalComponent } from './quit-modal.component';
 import { ChinachuService } from './chinachu.service';
 import { GaraponService } from './garapon.service';
+import { GaraponSiteService } from './garapon-site.service';
 import { StorageService } from './storage.service';
 import { WindowService } from './window.service';
 
@@ -35,6 +36,7 @@ import { WindowService } from './window.service';
   providers: [
     ChinachuService,
     GaraponService,
+    GaraponSiteService,
     StorageService,
     WindowService,
   ],
