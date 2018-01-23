@@ -25,12 +25,14 @@ import {
   garaponDevId,
   garaponSiteUrl,
 } from './app.constants';
+import { SharedModule } from './shared/shared.module';
 import { AppComponent } from './app.component';
 
 @NgModule({
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    SharedModule,
   ],
   declarations: [AppComponent],
   bootstrap: [AppComponent],
