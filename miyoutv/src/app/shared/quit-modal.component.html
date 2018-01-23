@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-Copyright 2016 Brazil Ltd.
+Copyright 2016-2018 Brazil Ltd.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <meta charset="UTF-8">
-<form class="modal-component">
+<form class="modal-component" [formGroup] (submit)="submit()">
     <div class="modal-header">
         <span class="fa fa-question-circle text-danger"></span>
     </div>
@@ -23,7 +23,7 @@ limitations under the License.
         終了しますか？
     </div>
     <div class="modal-footer">
-        <button class="btn btn-danger" type="button" ng-click="$ctrl.yes()">はい</button>
-        <button class="btn btn-warning" type="button" ng-click="$ctrl.no()">いいえ</button>
+        <button class="btn btn-danger" type="submit">はい</button>
+        <button class="btn btn-warning" type="button" (click)="close()">いいえ</button>
     </div>
 </form>

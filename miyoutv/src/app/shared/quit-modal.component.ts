@@ -13,25 +13,25 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
-import { ModalModule } from 'ngx-bootstrap/modal';
-
-import { QuitModalComponent } from './quit-modal.component';
-import { StorageService } from './storage.service';
+import { Component } from '@angular/core';
+import { BsModalRef } from 'ngx-bootstrap/modal';
 import { WindowService } from './window.service';
 
-@NgModule({
-  imports: [
-    ReactiveFormsModule,
-    ModalModule.forRoot(),
-  ],
-  exports: [QuitModalComponent],
-  declarations: [QuitModalComponent],
-  providers: [
-    StorageService,
-    WindowService,
-  ],
-  entryComponents: [QuitModalComponent],
+@Component({
+  selector: 'quit-modal',
+  templateUrl: 'quit-modal.component.html',
 })
-export class SharedModule { }
+export class QuitModalComponent {
+  constructor(
+    private bsModalRef: BsModalRef,
+    private windowService: WindowService,
+  ) { }
+
+  public submit() {
+    this.windowService.quit();
+  }
+
+  public close() {
+    this.bsModalRef.hide();
+  }
+}
