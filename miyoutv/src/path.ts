@@ -13,14 +13,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { enableProdMode } from '@angular/core';
+import * as path from 'path';
+import { remote } from 'electron';
 
-import './path.ts';
-import { AppModule } from './app/app.module';
-
-if (process.env.ENV === 'production') {
-  enableProdMode();
+declare module NodeJS {
+  interface Global {
+    module: {
+      paths: string[];
+    };
+  }
 }
+declare const global: NodeJS.Global;
 
-platformBrowserDynamic().bootstrapModule(AppModule);
+global.module.paths.push(path.join(remote.app.getPath('exe'), '../node_modules'));
