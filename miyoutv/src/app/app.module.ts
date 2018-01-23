@@ -18,6 +18,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import {
+  categoryTable,
   commentTokenUrl,
   commentUrl,
   garaponAuthUrl,
@@ -37,6 +38,7 @@ import { AppComponent } from './app.component';
   declarations: [AppComponent],
   bootstrap: [AppComponent],
   providers: [
+    { provide: 'categoryTable', useValue: categoryTable },
     { provide: 'commentTokenUrl', useValue: commentTokenUrl },
     { provide: 'commentUrl', useValue: commentUrl },
     { provide: 'garaponAuthUrl', useValue: garaponAuthUrl },

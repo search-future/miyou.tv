@@ -19,3 +19,64 @@ export const garaponAuthUrl: string = 'http://garagw.garapon.info';
 export const garaponAuthUrlV4: string = 'https://gtvm.garapon.tv';
 export const garaponDevId: string = process.env.GARAPON_DEVID;
 export const garaponSiteUrl: string = 'https://siteapi.garapon.tv';
+
+export const categoryTable: {
+  code: number;
+  codeName?: string;
+  name: string;
+}[] = [{
+  code: 0,
+  codeName: 'news',
+  name: 'ニュース/報道',
+}, {
+  code: 1,
+  codeName: 'sports',
+  name: 'スポーツ',
+}, {
+  code: 2,
+  codeName: 'information',
+  name: '情報/ワイドショー',
+}, {
+  code: 3,
+  codeName: 'drama',
+  name: 'ドラマ',
+}, {
+  code: 4,
+  codeName: 'music',
+  name: '音楽',
+}, {
+  code: 5,
+  codeName: 'variety',
+  name: 'バラエティ',
+}, {
+  code: 6,
+  codeName: 'cinema',
+  name: '映画',
+}, {
+  code: 7,
+  codeName: 'anime',
+  name: 'アニメ/特撮',
+}, {
+  code: 8,
+  codeName: 'documentary',
+  name: 'ドキュメンタリー/教養',
+}, {
+  code: 9,
+  codeName: 'theater',
+  name: '劇場/公演',
+}, {
+  code: 10,
+  codeName: 'hobby',
+  name: '趣味/教育',
+}, {
+  code: 11,
+  codeName: 'welfare',
+  name: '福祉',
+}, {
+  code: 14,
+  name: '拡張',
+}, {
+  code: 15,
+  codeName: 'etc',
+  name: 'その他',
+}];
