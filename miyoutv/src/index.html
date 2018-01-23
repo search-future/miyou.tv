@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-Copyright 2016 Brazil Ltd.
+Copyright 2016-2018 Brazil Ltd.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -26,8 +26,9 @@ limitations under the License.
 </head>
 
 <body>
-    <app></app>
-    <img id="splash" src="assets/splash_screen.png" width="1440" height="789">
+    <miyoutv>
+        <img id="splash" src="assets/splash_screen.png" width="1440" height="789">
+    </miyoutv>
     <script>
         var splash = document.getElementById('splash');
         if (window.sessionStorage.getItem('isLoaded')) {
@@ -36,15 +37,6 @@ limitations under the License.
             splash.width = window.outerWidth;
             splash.height = window.outerHeight;
         }
-
-        function bootstrap() {
-            if (this.readyState === 'complete') {
-                angular.bootstrap(this, ['app']);
-                this.removeEventListener('readystatechange', bootstrap);
-                splash.remove();
-            }
-        }
-        document.addEventListener('readystatechange', bootstrap);
 
     </script>
     <script src="vendor.js"></script>
