@@ -1,6 +1,5 @@
 const path = require('path');
 const webpack = require('webpack');
-const glob = require('glob');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const discardFonts = require('postcss-discard-font-face');
@@ -34,18 +33,17 @@ const miyoutvConfigMain = {
     new webpack.EnvironmentPlugin(process.env.IS_PACK ? {
       NODE_ENV: 'development',
     } : []),
-    new UglifyJSPlugin({
-      sourceMap: true,
-    }),
   ],
   node: false,
 };
 
 const miyoutvConfigRenderer = {
   entry: {
-    app: glob.sync(path.join(__dirname, 'miyoutv/src/app/**/*.ts'), {
-      nosort: true,
-    }),
+    vendor: [
+      path.join(__dirname, 'miyoutv/src/vendor.ts'),
+      path.join(__dirname, 'miyoutv/src/vendor.css'),
+    ],
+    app: path.join(__dirname, 'miyoutv/src/main.ts'),
   },
   output: {
     path: path.join(__dirname, 'miyoutv/dist/'),
@@ -54,56 +52,32 @@ const miyoutvConfigRenderer = {
   module: {
     rules: [{
       test: /\.ts$/,
-      use: {
+      use: [{
         loader: 'awesome-typescript-loader',
         options: {
           configFileName: 'miyoutv/tsconfig.json',
         },
-      },
-    }],
-  },
-  devtool: 'source-map',
-  target: 'electron-renderer',
-  externals: [{
-    'webchimera.js': 'require("webchimera.js")',
-    'wcjs-prebuilt': 'require("wcjs-prebuilt")',
-    'fs-extra': 'require("fs-extra")',
-  }],
-  plugins: [
-    new webpack.EnvironmentPlugin(process.env.IS_PACK ? {
-      NODE_ENV: 'development',
-      GARAPON_DEVID: '',
-      GARAPON_ENTRY_URL: '',
-    } : []),
-    new UglifyJSPlugin({
-      sourceMap: true,
-    }),
-  ],
-  node: false,
-};
-
-const miyoutvConfigBundle = {
-  entry: {
-    bundle: [
-      path.join(__dirname, 'miyoutv/src/bundle.ts'),
-      path.join(__dirname, 'miyoutv/src/bundle.css'),
-    ],
-  },
-  output: {
-    path: path.join(__dirname, 'miyoutv/dist/'),
-    filename: '[name].js',
-  },
-  module: {
-    rules: [{
-      test: /\.ts$/,
+      }, {
+        loader: 'angular2-template-loader',
+      }, {
+        loader: 'angular-router-loader',
+      }],
+    }, {
+      test: /\.component\.html$/,
       use: {
-        loader: 'awesome-typescript-loader',
+        loader: 'html-loader',
         options: {
-          configFileName: 'miyoutv/tsconfig.json',
+          attrs: false,
         },
       },
     }, {
+      test: /\.component\.css$/,
+      use: [{
+        loader: 'raw-loader',
+      }],
+    }, {
       test: /\.css$/,
+      exclude: /\.component\.css$/,
       use: ExtractTextPlugin.extract({
         use: [{
           loader: 'css-loader',
@@ -124,15 +98,28 @@ const miyoutvConfigBundle = {
     }, {
       test: /(typeface|fonts).+\.(eot|otf|svg|ttf|woff2?)$/,
       use: 'file-loader?name=fonts/[name].[ext]',
-    }]
+    }],
+  },
+  resolve: {
+    extensions: ['.ts', '.js'],
   },
   devtool: 'source-map',
+  target: 'electron-renderer',
+  externals: [{
+    'webchimera.js': 'require("webchimera.js")',
+    'wcjs-prebuilt': 'require("wcjs-prebuilt")',
+  }],
   plugins: [
-    new UglifyJSPlugin({
-      sourceMap: true,
+    new webpack.EnvironmentPlugin(process.env.IS_PACK ? {
+      NODE_ENV: 'development',
+      GARAPON_DEVID: '',
+    } : []),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: ['app', 'vendor'],
     }),
     new ExtractTextPlugin('[name].css'),
-  ]
+  ],
+  node: false,
 };
 
 const agentConfig = {
@@ -148,20 +135,29 @@ const agentConfig = {
   node: false,
 };
 
+if (process.env.IS_PACK) {
+  miyoutvConfigMain.plugins.push(new UglifyJSPlugin({
+    parallel: true,
+    sourceMap: true,
+  }));
+  miyoutvConfigRenderer.plugins.push(new UglifyJSPlugin({
+    parallel: true,
+    sourceMap: true,
+  }));
+}
+
 module.exports = (env) => {
   const config = [];
   if (env.miyoutv || !env.agent) {
-    if (env.js) {
+    if (env.main) {
       config.push(miyoutvConfigMain);
-      config.push(miyoutvConfigRenderer);
     }
-    if (env.bundle) {
-      config.push(miyoutvConfigBundle);
+    if (env.renderer) {
+      config.push(miyoutvConfigRenderer);
     }
     if (config.length < 1) {
       config.push(miyoutvConfigMain);
       config.push(miyoutvConfigRenderer);
-      config.push(miyoutvConfigBundle);
     }
   }
   if (env.agent) {

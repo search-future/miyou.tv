@@ -121,13 +121,13 @@
   "productName": "MiyouTV",
   "repository": "https://github.com/search-future/miyou.tv",
   "scripts": {
-    "build": "env-cmd .env.local concurrently \"npm run build:js\" \"npm run build:bundle\" \"npm run build:resource\"",
+    "build": "env-cmd .env.local concurrently \"npm run build:main\" \"npm run build:renderer\" \"npm run build:resource\"",
     "build-agent": "env-cmd .env.local concurrently \"npm run build-agent:js\" \"npm run build-agent:resource\"",
-    "build-agent:js": "webpack --env.agent",
+    "build-agent:js": "webpack --env.agent --progress",
     "build-agent:resource": "cpx \"miyoutv-agent/**/!(src|*.js)\" build/miyoutv-agent/",
-    "build:js": "webpack --env.miyoutv --env.js",
-    "build:bundle": "webpack --env.miyoutv --env.bundle",
-    "build:resource": "cpx \"miyoutv/src/**/!(app|*.js|*.ts|package*.json|bundle.*)\" miyoutv/dist/",
+    "build:main": "webpack --env.miyoutv --env.main --progress",
+    "build:renderer": "webpack  --env.miyoutv --env.renderer --progress",
+    "build:resource": "cpx \"miyoutv/src/**/!(package*.json|vendor.*|*.ts|*.component.*)\" miyoutv/dist/",
     "clean": "rimraf miyoutv/dist/ \"build/miyoutv-*(agent|linux32|linux64|mac|win32|win64)\"",
     "dist": "env-cmd pack.env.js cross-conf-env npm run dist:%npm_config_pack_type%",
     "dist-agent": "cross-conf-env targz c build/miyoutv-agent/ build/miyoutv-agent-%npm_package_version%.tar.gz",
@@ -160,9 +160,9 @@
     "predist:win64": "env-cmd pack-win64.env npm run build && npm run dist:win64:copy && npm run dist:win64:config",
     "start": "env-cmd .env.local electron ./",
     "test": "tslint ./",
-    "watch": "env-cmd .env.local concurrently \"npm run watch:js\" \"npm run watch:bundle\" \"npm run watch:resource\"",
-    "watch:js": "npm run build:js -- -w",
-    "watch:bundle": "npm run build:bundle -- -w",
+    "watch": "env-cmd .env.local concurrently \"npm run watch:main\" \"npm run watch:renderer\" \"npm run watch:resource\"",
+    "watch:main": "npm run build:main -- -w",
+    "watch:renderer": "npm run build:renderer -- -w",
     "watch:resource": "npm run build:resource -- -w"
   }
 }
