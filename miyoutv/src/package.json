@@ -7,9 +7,7 @@
     "url": "http://razil.jp/"
   },
   "bugs": "https://github.com/search-future/miyou.tv/issues",
-  "dependencies": {
-    "fs-extra": "^4.0.2"
-  },
+  "dependencies": {},
   "devDependencies": {},
   "engines": {
     "node": ">=5.1.1"
