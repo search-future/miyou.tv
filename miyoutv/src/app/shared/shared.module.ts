@@ -22,6 +22,7 @@ import { QuitModalComponent } from './quit-modal.component';
 import { ChinachuService } from './chinachu.service';
 import { GaraponService } from './garapon.service';
 import { GaraponSiteService } from './garapon-site.service';
+import { ImageLoader } from './image-loader.service';
 import { StorageService } from './storage.service';
 import { WindowService } from './window.service';
 
@@ -37,6 +38,7 @@ import { WindowService } from './window.service';
     ChinachuService,
     GaraponService,
     GaraponSiteService,
+    ImageLoader,
     StorageService,
     WindowService,
   ],
