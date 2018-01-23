@@ -17,6 +17,14 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import {
+  commentTokenUrl,
+  commentUrl,
+  garaponAuthUrl,
+  garaponAuthUrlV4,
+  garaponDevId,
+  garaponSiteUrl,
+} from './app.constants';
 import { AppComponent } from './app.component';
 
 @NgModule({
@@ -26,5 +34,13 @@ import { AppComponent } from './app.component';
   ],
   declarations: [AppComponent],
   bootstrap: [AppComponent],
+  providers: [
+    { provide: 'commentTokenUrl', useValue: commentTokenUrl },
+    { provide: 'commentUrl', useValue: commentUrl },
+    { provide: 'garaponAuthUrl', useValue: garaponAuthUrl },
+    { provide: 'garaponAuthUrlV4', useValue: garaponAuthUrlV4 },
+    { provide: 'garaponDevId', useValue: garaponDevId },
+    { provide: 'garaponSiteUrl', useValue: garaponSiteUrl },
+  ],
 })
 export class AppModule { }
