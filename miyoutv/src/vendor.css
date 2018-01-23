@@ -1,5 +1,5 @@
 /*!
-Copyright 2016 Brazil Ltd.
+Copyright 2016-2018 Brazil Ltd.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,9 +16,8 @@ limitations under the License.
 @import "../../node_modules/typeface-roboto/index.css";
 @import "../../node_modules/typeface-notosans-jp/notosansjapanese.css";
 @import "../../node_modules/font-awesome/css/font-awesome.css";
-@import "../../node_modules/bootstrap/dist/css/bootstrap.css";
 @import "../../node_modules/ag-grid/dist/styles/ag-grid.css";
 @import "../../node_modules/ag-grid/dist/styles/theme-dark.css";
-@import "../../node_modules/angular-hotkeys/build/hotkeys.css";
-@import "../../node_modules/angularjs-toaster/toaster.css";
-@import "../../node_modules/angular-loading-bar/build/loading-bar.css";
+@import "../../node_modules/ng2-toastr/ng2-toastr.css";
+@import "../../node_modules/ngx-bootstrap/datepicker/bs-datepicker.css";
+
