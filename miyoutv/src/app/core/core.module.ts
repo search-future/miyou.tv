@@ -18,6 +18,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { SharedModule } from '../shared/shared.module';
+import { TitlebarComponent } from './titlebar.component';
 
 @NgModule({
   imports: [
@@ -25,7 +26,12 @@ import { SharedModule } from '../shared/shared.module';
     ReactiveFormsModule,
     SharedModule,
   ],
-  exports: [],
+  exports: [
+    TitlebarComponent,
+  ],
+  declarations: [
+    TitlebarComponent,
+  ],
 })
 export class CoreModule { }
 
