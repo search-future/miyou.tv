@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<!--
+/*!
 Copyright 2016-2018 Brazil Ltd.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,15 +12,21 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
--->
-<meta charset="UTF-8">
-<form style="width:0; height:0; overflow: hidden;">
-    <input type="text" tabindex="-1">
-    <input type="password" tabindex="-1">
-</form>
-<div class="app">
-    <titlebar></titlebar>
-    <div class="view">
-        <router-outlet></router-outlet>
-    </div>
-</div>
+*/
+import { NgModule } from '@angular/core';
+import { RouterModule } from '@angular/router';
+
+@NgModule({
+  imports: [
+    RouterModule.forRoot(
+      [],
+      {
+        useHash: true,
+      },
+    ),
+  ],
+  exports: [
+    RouterModule,
+  ],
+})
+export class AppRoutingModule { }
