@@ -22,6 +22,7 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 
 import { SharedModule } from '../shared/shared.module';
 import { TitlebarComponent } from './titlebar.component';
+import { ViewSettingComponent } from './view-setting.component';
 
 
 @NgModule({
@@ -35,9 +36,14 @@ import { TitlebarComponent } from './titlebar.component';
   ],
   exports: [
     TitlebarComponent,
+    ViewSettingComponent,
   ],
   declarations: [
     TitlebarComponent,
+    ViewSettingComponent,
+  ],
+  entryComponents: [
+    ViewSettingComponent,
   ],
 })
 export class CoreModule { }

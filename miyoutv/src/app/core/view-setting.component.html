@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<!--
+Copyright 2016-2018 Brazil Ltd.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<meta charset="UTF-8">
+<form class="modal-component" [formGroup]="form" (submit)="submit()">
+    <div class="modal-header">表示設定</div>
+    <div class="modal-body">
+        <fieldset>
+            <legend>番組情報</legend>
+            <div class="form-group form-row">
+                <label class="col-sm-3 col-form-label" for="countmode">カウント</label>
+                <div class="col-sm-9">
+                    <select id="countmode" class="form-control" formControlName="countMode">
+                        <option value="comment">コメント数</option>
+                        <option value="speed">勢い(コメント数/分)</option>
+                        <option value="none">非表示</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group form-row">
+                <label class="col-sm-3">プレビュー</label>
+                <div class="col-sm-9">
+                    <div class="form-check">
+                        <input id="preview" class="form-check-input" id="preview" type="checkbox" formControlName="previewEnabled">
+                        <label class="form-check-label" for="preview">表示する</label>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>時刻</legend>
+            <div class="form-group form-row">
+                <label class="col-sm-3 col-form-label" for="hourfirst">1日の始まり</label>
+                <div class="col-sm-9">
+                    <select id="hourfirst" class="form-control" formControlName="hourFirst">
+                        <option value="0">0時</option>
+                        <option value="1">1時</option>
+                        <option value="2">2時</option>
+                        <option value="3">3時</option>
+                        <option value="4">4時</option>
+                        <option value="5">5時</option>
+                        <option value="6">6時</option>
+                        <option value="7">7時</option>
+                        <option value="8">8時</option>
+                        <option value="9">9時</option>
+                        <option value="10">10時</option>
+                        <option value="11">11時</option>
+                        <option value="12">12時</option>
+                        <option value="13">13時</option>
+                        <option value="14">14時</option>
+                        <option value="15">15時</option>
+                        <option value="16">16時</option>
+                        <option value="17">17時</option>
+                        <option value="18">18時</option>
+                        <option value="19">19時</option>
+                        <option value="20">10時</option>
+                        <option value="21">21時</option>
+                        <option value="22">22時</option>
+                        <option value="23">23時</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group form-row">
+                <label class="col-sm-3 col-form-label" for="hourformat">フォーマット</label>
+                <div class="col-sm-9">
+                    <select id="hourformat" class="form-control" formControlName="hourFormat">
+                        <option value="0:12">0-11時表記</option>
+                        <option value="1:12">1-12時表記</option>
+                        <option value="0:24">0-23時表記</option>
+                        <option value="1:24">1-24時表記</option>
+                        <option value="">{{autoFormatName + '時表記'}}</option>
+                    </select>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-save" type="submit">OK</button>
+        <button class="btn btn-cancel" type="button" (click)="close()">キャンセル</button>
+    </div>
+</form>
