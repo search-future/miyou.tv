@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<!--
+Copyright 2016-2018 Brazil Ltd.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<meta charset="UTF-8">
+<form class="backend-setting modal-component" [formGroup]="form" (submit)="submit()">
+    <div class="modal-header">バックエンド設定</div>
+    <div class="modal-body">
+        <fieldset *ngIf="garaponEnabled">
+            <legend>バックエンドの種類</legend>
+            <div class="form-group form-row">
+                <label class="col-sm-3 " for="backend-type">バックエンド</label>
+                <div class="col-sm-9">
+                    <select id="backend-type" class="form-control" formControlName="backendType">
+                        <option value="chinachu">Chinachu</option>
+                        <option value="garaponv4">ガラポンTV API Ver.4 (六号機～)</option>
+                        <option value="garapon">ガラポンTV API Ver.3 (～伍号機)</option>
+                    </select>
+                </div>
+            </div>
+            <alert type="info" [class.d-none]="form.value.backendType !== 'chinachu'">Chinachu γ/βに対応しています。<a href="" (click)="open('https://chinachu.moe/'); false">七森中録画研究会サイト</a></alert>
+            <alert type="info" [class.d-none]="form.value.backendType !== 'garaponv4'">ガラポン六号機に対応しています。<a href="" (click)="open(garaponEntryUrl); false">ガラポンTVレンタル申込ページ</a></alert>
+            <alert type="info" [class.d-none]="form.value.backendType !== 'garapon'">ガラポン伍/四/参号機に対応しています。<a href="" (click)="open(garaponEntryUrl); false">ガラポンTVレンタル申込ページ</a></alert>
+        </fieldset>
+        <fieldset [class.d-none]="form.value.backendType !== 'chinachu'">
+            <legend>Chinachu設定</legend>
+            <alert type="info" *ngIf="!garaponEnabled">Chinachu β/γに対応しています。<a href="" (click)="open('https://chinachu.moe/'); false">七森中録画研究会サイト</a></alert>
+            <div class="form-group form-row">
+                <label class="col-sm-3 col-form-label" for="chinachu-url">URL</label>
+                <div class="col-sm-9">
+                    <input id="chinachu-url" class="form-control" type="url" placeholder="http://127.0.0.1:10772" formControlName="chinachuUrl" [class.is-valid]="form.controls['chinachuUrl'].valid" [class.is-invalid]="form.controls['chinachuUrl'].invalid">
+                </div>
+            </div>
+            <div class="form-group form-row">
+                <div class="col-sm-3">認証</div>
+                <div class="col-sm-9">
+                    <div class="form-check">
+                        <input id="chinachu-auth" class="form-check-input" type="checkbox" formControlName="chinachuAuth">
+                        <label for="chinachu-auth" class="form-check-label">ユーザー名とパスワードを使用する</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group form-row" [class.d-none]="!form.value.chinachuAuth">
+                <label class="col-sm-3 col-form-label" for="chinachu-user">ユーザー</label>
+                <div class="col-sm-9">
+                    <input id="chinachu-user" class="form-control" type="text" formControlName="chinachuUser" [class.is-valid]="form.controls['chinachuUser'].valid" [class.is-invalid]="form.controls['chinachuUser'].invalid">
+                </div>
+            </div>
+            <div class="form-group form-row" [class.d-none]="!form.value.chinachuAuth">
+                <label class="col-sm-3 col-form-label" for="chinachu-password">パスワード</label>
+                <div class="col-sm-9">
+                    <input id="chinachu-password" class="form-control" type="password" formControlName="chinachuPassword" [class.is-valid]="form.controls['chinachuPassword'].valid" [class.is-invalid]="form.controls['chinachuPassword'].invalid">
+                </div>
+            </div>
+        </fieldset>
+        <fieldset [class.d-none]="form.value.backendType !== 'garapon' && form.value.backendType !== 'garaponv4'">
+            <legend>ガラポンTV設定</legend>
+            <div class="form-group form-row" [class.d-none]="form.value.backendType === 'garaponv4'">
+                <div class="col-sm-3">URL自動取得</div>
+                <div class="col-sm-9">
+                    <div class="form-check">
+                        <input id="garapon-auth" class="form-check-input" type="checkbox" formControlName="garaponAuth">
+                        <label for="garapon-auth" class="form-check-label">
+                            ガラポンWeb認証APIからガラポンTVのURLを取得する
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group form-row" [class.d-none]="form.value.backendType === 'garaponv4' || form.value.garaponAuth">
+                <label class="col-sm-3 col-form-label" for="garapon-url">URL</label>
+                <div class="col-sm-9">
+                    <input id="garapon-url" class="form-control" type="url" placeholder="http://192.168.11.11" formControlName="garaponUrl" [class.is-valid]="form.controls['garaponUrl'].valid" [class.is-invalid]="form.controls['garaponUrl'].invalid">
+                </div>
+            </div>
+            <div class="form-group form-row">
+                <label class="col-sm-3 col-form-label" for="garapon-user">ログインID</label>
+                <div class="col-sm-9">
+                    <input id="garapon-user" class="form-control" type="text" formControlName="garaponUser" [class.is-valid]="form.controls['garaponUser'].valid" [class.is-invalid]="form.controls['garaponUser'].invalid">
+                </div>
+            </div>
+            <div class="form-group form-row">
+                <label class="col-sm-3 col-form-label" for="garapon-password">パスワード</label>
+                <div class="col-sm-9">
+                    <input id="garapon-password" class="form-control" type="password" formControlName="garaponPassword" [class.is-valid]="form.controls['garaponPassword'].valid" [class.is-invalid]="form.controls['garaponPassword'].invalid">
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-save" type="submit">OK</button>
+        <button class="btn btn-cancel" type="button" (click)="close()">キャンセル</button>
+    </div>
+</form>

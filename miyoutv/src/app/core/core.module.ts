@@ -21,6 +21,7 @@ import { AlertModule } from 'ngx-bootstrap/alert';
 import { ModalModule } from 'ngx-bootstrap/modal';
 
 import { SharedModule } from '../shared/shared.module';
+import { BackendSettingComponent } from './backend-setting.component';
 import { TitlebarComponent } from './titlebar.component';
 import { ViewSettingComponent } from './view-setting.component';
 
@@ -35,14 +36,17 @@ import { ViewSettingComponent } from './view-setting.component';
     SharedModule,
   ],
   exports: [
+    BackendSettingComponent,
     TitlebarComponent,
     ViewSettingComponent,
   ],
   declarations: [
+    BackendSettingComponent,
     TitlebarComponent,
     ViewSettingComponent,
   ],
   entryComponents: [
+    BackendSettingComponent,
     ViewSettingComponent,
   ],
 })
