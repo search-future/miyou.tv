@@ -16,14 +16,21 @@ limitations under the License.
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
+import { RouterModule } from '@angular/router';
+import { AlertModule } from 'ngx-bootstrap/alert';
+import { ModalModule } from 'ngx-bootstrap/modal';
 
 import { SharedModule } from '../shared/shared.module';
 import { TitlebarComponent } from './titlebar.component';
+
 
 @NgModule({
   imports: [
     BrowserModule,
     ReactiveFormsModule,
+    RouterModule,
+    AlertModule.forRoot(),
+    ModalModule.forRoot(),
     SharedModule,
   ],
   exports: [
