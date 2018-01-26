@@ -23,6 +23,7 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { SharedModule } from '../shared/shared.module';
 import { BackendSettingComponent } from './backend-setting.component';
 import { TitlebarComponent } from './titlebar.component';
+import { MoritapoSettingComponent } from './moritapo-setting.component';
 import { ViewSettingComponent } from './view-setting.component';
 
 
@@ -37,16 +38,19 @@ import { ViewSettingComponent } from './view-setting.component';
   ],
   exports: [
     BackendSettingComponent,
+    MoritapoSettingComponent,
     TitlebarComponent,
     ViewSettingComponent,
   ],
   declarations: [
     BackendSettingComponent,
+    MoritapoSettingComponent,
     TitlebarComponent,
     ViewSettingComponent,
   ],
   entryComponents: [
     BackendSettingComponent,
+    MoritapoSettingComponent,
     ViewSettingComponent,
   ],
 })
