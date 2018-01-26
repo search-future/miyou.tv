@@ -16,6 +16,8 @@ limitations under the License.
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { defineLocale } from 'ngx-bootstrap/chronos';
+import { jaLocale } from 'ngx-bootstrap/locale';
 
 import {
   categoryTable,
@@ -30,6 +32,8 @@ import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
+
+defineLocale('ja', jaLocale);
 
 @NgModule({
   imports: [

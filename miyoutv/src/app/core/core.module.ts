@@ -18,10 +18,13 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { AlertModule } from 'ngx-bootstrap/alert';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
 
 import { SharedModule } from '../shared/shared.module';
 import { BackendSettingComponent } from './backend-setting.component';
+import { HeadNavComponent } from './head-nav.component';
 import { TitlebarComponent } from './titlebar.component';
 import { MoritapoSettingComponent } from './moritapo-setting.component';
 import { ViewSettingComponent } from './view-setting.component';
@@ -33,17 +36,21 @@ import { ViewSettingComponent } from './view-setting.component';
     ReactiveFormsModule,
     RouterModule,
     AlertModule.forRoot(),
+    BsDropdownModule.forRoot(),
+    CollapseModule.forRoot(),
     ModalModule.forRoot(),
     SharedModule,
   ],
   exports: [
     BackendSettingComponent,
+    HeadNavComponent,
     MoritapoSettingComponent,
     TitlebarComponent,
     ViewSettingComponent,
   ],
   declarations: [
     BackendSettingComponent,
+    HeadNavComponent,
     MoritapoSettingComponent,
     TitlebarComponent,
     ViewSettingComponent,
