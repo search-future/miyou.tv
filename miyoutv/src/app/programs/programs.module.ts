@@ -24,6 +24,7 @@ import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { CommentModule } from '../comment/comment.module';
 import { SharedModule } from '../shared/shared.module';
 import { routedComponents, ProgramsRoutingModule } from './programs-routing.module';
+import { ProgramsService } from './programs.service';
 
 @NgModule({
   imports: [
@@ -42,6 +43,7 @@ import { routedComponents, ProgramsRoutingModule } from './programs-routing.modu
     routedComponents,
   ],
   providers: [
+    ProgramsService,
   ],
 })
 export class ProgramsModule { }
