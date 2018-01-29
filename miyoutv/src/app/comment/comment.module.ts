@@ -18,6 +18,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { SharedModule } from '../shared/shared.module';
+import { CommentService } from './comment.service';
 
 @NgModule({
   imports: [
@@ -30,6 +31,7 @@ import { SharedModule } from '../shared/shared.module';
   declarations: [
   ],
   providers: [
+    CommentService,
   ],
 })
 export class CommentModule { }
