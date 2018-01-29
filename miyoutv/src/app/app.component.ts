@@ -13,10 +13,37 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+
+import { StorageService } from './shared/storage.service';
 
 @Component({
   selector: 'miyoutv',
   templateUrl: 'app.component.html',
 })
-export class AppComponent { }
+export class AppComponent implements OnInit {
+  constructor(
+    private storageService: StorageService,
+  ) { }
+
+  public ngOnInit() {
+    if (!this.storageService.loadSessionStorage('isLoaded')) {
+      this.upgradeSetting();
+    }
+    this.storageService.saveSessionStorage('isLoaded', true);
+  }
+
+  protected upgradeSetting() {
+    const chinachuSetting: any = this.storageService.loadLocalStorage('chinachu');
+    if (chinachuSetting != null && typeof chinachuSetting === 'object') {
+      this.storageService.saveLocalStorage('chinachuUrl', chinachuSetting.url);
+      this.storageService.saveLocalStorage('chinachuUser', chinachuSetting.user);
+      this.storageService.saveLocalStorage('chinachuPassword', chinachuSetting.password);
+      this.storageService.removeLocalStorage('chinachu');
+    }
+    this.storageService.removeLocalStorage('commentCache');
+    this.storageService.removeLocalStorage('commentCountCache');
+    this.storageService.removeLocalStorage('comment_token');
+    this.storageService.removeFile('comments', 'commentCache.json');
+  }
+}
