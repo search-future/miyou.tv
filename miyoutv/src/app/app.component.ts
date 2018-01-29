@@ -28,6 +28,10 @@ export class AppComponent implements OnInit, OnDestroy {
     private windowService: WindowService,
   ) { }
 
+  get isFullscreen(): boolean {
+    return this.windowService.fullscreen;
+  }
+
   public ngOnInit() {
     if (!this.storageService.loadSessionStorage('isLoaded')) {
       this.upgradeSetting();

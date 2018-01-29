@@ -19,7 +19,7 @@ limitations under the License.
     <input type="text" tabindex="-1">
     <input type="password" tabindex="-1">
 </form>
-<div class="app" (window:move)="saveWindowState()" (window:resize)="saveWindowState()">
+<div class="app" [class.fullscreen]="isFullscreen" (window:move)="saveWindowState()" (window:resize)="saveWindowState()">
     <titlebar></titlebar>
     <head-nav></head-nav>
     <div class="view">
