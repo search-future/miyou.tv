@@ -16,6 +16,7 @@ limitations under the License.
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HotkeyModule } from 'angular2-hotkeys';
 import { defineLocale } from 'ngx-bootstrap/chronos';
 import { jaLocale } from 'ngx-bootstrap/locale';
 
@@ -39,6 +40,7 @@ defineLocale('ja', jaLocale);
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    HotkeyModule.forRoot(),
     AppRoutingModule,
     CoreModule,
     SharedModule,

@@ -14,16 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Hotkey, HotkeysService } from 'angular2-hotkeys';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { Subscription } from 'rxjs';
 
 import { StorageService } from './shared/storage.service';
 import { WindowService } from './shared/window.service';
+import { QuitModalComponent } from './shared/quit-modal.component';
 
 @Component({
   selector: 'miyoutv',
   templateUrl: 'app.component.html',
 })
 export class AppComponent implements OnInit, OnDestroy {
+  protected hasModal: boolean;
+  private subscriptions: Subscription[] = [];
+
   constructor(
+    private hotkeysService: HotkeysService,
+    private bsModalService: BsModalService,
     private storageService: StorageService,
     private windowService: WindowService,
   ) { }
@@ -38,10 +47,44 @@ export class AppComponent implements OnInit, OnDestroy {
       this.loadWindowState();
     }
     this.storageService.saveSessionStorage('isLoaded', true);
+
+    this.subscriptions.push(
+      this.bsModalService.onHide.subscribe(() => {
+        this.hasModal = false;
+      }),
+      this.bsModalService.onShow.subscribe(() => {
+        this.hasModal = true;
+      }),
+    );
+
+    this.hotkeysService.add([new Hotkey(
+      'mod+w',
+      (event: KeyboardEvent): boolean => {
+        this.openQuitModal();
+        return false;
+      },
+      [],
+      'MiyouTVを終了',
+    ), new Hotkey(
+      'esc',
+      (event: KeyboardEvent): boolean => {
+        if (this.windowService.fullscreen) {
+          this.windowService.fullscreen = false;
+        } else {
+          this.openQuitModal();
+        }
+        return true;
+      },
+      [],
+      '全画面表示解除/MiyouTVを終了',
+    )]);
   }
 
   public ngOnDestroy() {
     this.saveWindowState();
+    this.subscriptions.forEach((a: Subscription) => {
+      a.unsubscribe();
+    });
   }
 
   protected upgradeSetting() {
@@ -79,5 +122,11 @@ export class AppComponent implements OnInit, OnDestroy {
     window.moveTo(windowState.x, windowState.y);
     window.resizeTo(windowState.width, windowState.height);
     this.windowService.alwaysOnTop = this.storageService.loadLocalStorage('alwaysOnTop') === true;
+  }
+
+  public openQuitModal() {
+    if (!this.hasModal) {
+      this.bsModalService.show(QuitModalComponent);
+    }
   }
 }
