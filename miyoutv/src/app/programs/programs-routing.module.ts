@@ -14,29 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Routes, RouterModule } from '@angular/router';
+
+const routes: Routes = [
+];
 
 @NgModule({
-  imports: [
-    RouterModule.forRoot(
-      [
-        {
-          path: '',
-          redirectTo: 'programs',
-          pathMatch: 'full',
-        },
-        {
-          path: 'programs',
-          loadChildren: './programs/programs.module#ProgramsModule',
-        },
-      ],
-      {
-        useHash: true,
-      },
-    ),
-  ],
-  exports: [
-    RouterModule,
-  ],
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class ProgramsRoutingModule { }
+
+export const routedComponents: any[] = [
+];
