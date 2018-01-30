@@ -16,7 +16,11 @@ limitations under the License.
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
+import { ProgramTableComponent } from './program-table.component';
+
 const routes: Routes = [
+  { path: '', redirectTo: 'table', pathMatch: 'full' },
+  { path: 'table', component: ProgramTableComponent },
 ];
 
 @NgModule({
@@ -26,4 +30,5 @@ const routes: Routes = [
 export class ProgramsRoutingModule { }
 
 export const routedComponents: any[] = [
+  ProgramTableComponent,
 ];
