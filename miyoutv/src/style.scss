@@ -1,5 +1,5 @@
 /*
-Copyright 2016 Brazil Ltd.
+Copyright 2016-2018 Brazil Ltd.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+@import "~bootstrap/scss/bootstrap";
+
 body {
   -webkit-app-region: drag;
   font-family: 'Roboto', 'Noto Sans Japanese', '游ゴシック体', 'Yu Gothic', 'YuGothic', 'ヒラギノ角ゴ ProN W3', 'Hiragino Kaku Gothic ProN', 'メイリオ', 'Meiryo', 'ＭＳ Ｐゴシック', 'MS PGothic', sans-serif;
@@ -21,7 +23,6 @@ body {
   height: 0;
   margin: 0;
 }
-
 
 /*
  Layout
@@ -87,7 +88,6 @@ body {
   background-color: #fff;
 }
 
-
 /*
  Controls
 ---------- */
@@ -114,18 +114,15 @@ body {
   outline: solid 2px #db705f;
 }
 
-
 /*
 Components
 ---------- */
-
 
 /* Text */
 
 .text-nowrap {
   white-space: nowrap;
 }
-
 
 /* Label */
 
@@ -180,7 +177,6 @@ Components
 .label-etc {
   background-color: #666;
 }
-
 
 /* Form */
 
@@ -286,7 +282,6 @@ Components
   color: #fff;
 }
 
-
 /* Slider */
 
 .form-control-range {
@@ -325,7 +320,6 @@ Components
   width: 16px;
 }
 
-
 /* Image icon */
 
 .img-icon-md {
@@ -337,7 +331,6 @@ Components
   height: 44px;
   width: 44px;
 }
-
 
 /* Dropdown */
 
@@ -402,14 +395,12 @@ Components
   width: 100%;
 }
 
-
 /* Background */
 
 .bg-inverse {
   background-color: #1a1a1a;
   color: #fff;
 }
-
 
 /* Nav */
 
@@ -490,7 +481,6 @@ Components
   margin: 0;
 }
 
-
 /* Modal */
 
 .modal-component {
@@ -544,7 +534,6 @@ Components
   font-size: 18px;
 }
 
-
 /* Media */
 
 .media-list-program {
@@ -591,7 +580,6 @@ Components
   width: 0;
 }
 
-
 /* panel */
 
 .panel-dark {
@@ -608,7 +596,6 @@ Components
   background-color: #444;
 }
 
-
 /* Hotkeys */
 
 .cfp-hotkeys {
@@ -616,13 +603,11 @@ Components
   display: block;
 }
 
-
 /* Toast */
 
 .toast-top-right {
   top: 100px;
 }
-
 
 /* Loading bar */
 
@@ -630,7 +615,6 @@ Components
   left: 50%;
   top: 50%;
 }
-
 
 /* Quick search */
 
@@ -648,7 +632,6 @@ Components
   opacity: 1;
 }
 
-
 /* Fill container */
 
 .fill-container {
@@ -659,7 +642,6 @@ Components
   top: 0;
   width: 100%;
 }
-
 
 /*
  Containers
@@ -724,11 +706,9 @@ Components
   position: relative;
 }
 
-
 /*
  Pages
 ---------- */
-
 
 /* Programs */
 
@@ -858,7 +838,6 @@ Components
   margin-top: 6px;
 }
 
-
 /* Player */
 
 .player {
@@ -888,7 +867,6 @@ Components
   z-index: 5;
 }
 
-
 /* screen */
 
 .screen {
@@ -910,7 +888,6 @@ Components
 .video-screen {
   z-index: 1;
 }
-
 
 /* Controller */
 
@@ -957,7 +934,6 @@ Components
   stroke: #7f75ff;
   stroke-width: 3px;
 }
-
 
 /* Player Sidebar */
 

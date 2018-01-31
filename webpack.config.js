@@ -41,9 +41,10 @@ const miyoutvConfigRenderer = {
   entry: {
     vendor: [
       path.join(__dirname, 'miyoutv/src/vendor.ts'),
-      path.join(__dirname, 'miyoutv/src/vendor.css'),
+      path.join(__dirname, 'miyoutv/src/vendor.scss'),
     ],
     app: path.join(__dirname, 'miyoutv/src/main.ts'),
+    style: path.join(__dirname, 'miyoutv/src/style.scss'),
   },
   output: {
     path: path.join(__dirname, 'miyoutv/dist/'),
@@ -71,13 +72,15 @@ const miyoutvConfigRenderer = {
         },
       },
     }, {
-      test: /\.component\.css$/,
+      test: /\.component\.scss$/,
       use: [{
         loader: 'raw-loader',
+      }, {
+        loader: 'sass-loader',
       }],
     }, {
-      test: /\.css$/,
-      exclude: /\.component\.css$/,
+      test: /\.scss$/,
+      exclude: /\.component\.scss$/,
       use: ExtractTextPlugin.extract({
         use: [{
           loader: 'css-loader',
@@ -93,6 +96,8 @@ const miyoutvConfigRenderer = {
             plugins: [discardFonts(['woff2'])],
             sourceMap: true,
           },
+        }, {
+          loader: 'sass-loader',
         }],
       }),
     }, {
