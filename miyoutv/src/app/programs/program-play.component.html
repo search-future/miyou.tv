@@ -32,6 +32,7 @@ limitations under the License.
             <div class="col-12 d-sm-flex flex-column flex h-100 p-0" [class.col-lg-8]="!sidebarCollapsed" [class.col-md-7]="!sidebarCollapsed" [class.col-sm-6]="!sidebarCollapsed" [class.d-none]="!sidebarCollapsed" [contextMenu]="playerMenu">
                 <div class="screen flex-fill" (mousewheel)="onMouseWheel($event)">
                     <video-screen class="video-screen fit" (dblclick)="toggleFullscreen()"></video-screen>
+                    <comment-screen class="comment-screen fit"></comment-screen>
                 </div>
                 <div class="player-control bg-dark text-light">
                     <controlbar [commentEnabled]="commentEnabled" [fullscreenEnabled]="isFullscreen" [sidebarEnabled]="!sidebarCollapsed" (commentToggle)="toggleComment()" (fullscreenToggle)="toggleFullscreen()" (sidebarToggle)="sidebarCollapsed = !sidebarCollapsed"></controlbar>
