@@ -34,6 +34,7 @@ limitations under the License.
                     <video-screen class="video-screen fit" (dblclick)="toggleFullscreen()"></video-screen>
                 </div>
                 <div class="player-control bg-dark text-light">
+                    <controlbar [commentEnabled]="commentEnabled" [fullscreenEnabled]="isFullscreen" [sidebarEnabled]="!sidebarCollapsed" (commentToggle)="toggleComment()" (fullscreenToggle)="toggleFullscreen()" (sidebarToggle)="sidebarCollapsed = !sidebarCollapsed"></controlbar>
                 </div>
                 <context-menu #playerMenu>
                     <ng-template contextMenuItem (execute)="player.togglePause()">

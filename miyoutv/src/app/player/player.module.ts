@@ -19,6 +19,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { SharedModule } from '../shared/shared.module';
 import { Player } from './player.service';
+import { ControlbarComponent } from './controlbar.component';
 import { VideoScreenComponent } from './video-screen.component';
 
 @NgModule({
@@ -28,9 +29,11 @@ import { VideoScreenComponent } from './video-screen.component';
     SharedModule,
   ],
   exports: [
+    ControlbarComponent,
     VideoScreenComponent,
   ],
   declarations: [
+    ControlbarComponent,
     VideoScreenComponent,
   ],
   providers: [
