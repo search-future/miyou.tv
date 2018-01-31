@@ -19,6 +19,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { SharedModule } from '../shared/shared.module';
 import { CommentService } from './comment.service';
+import { CommentPlayer } from './comment-player.service';
 
 @NgModule({
   imports: [
@@ -32,6 +33,7 @@ import { CommentService } from './comment.service';
   ],
   providers: [
     CommentService,
+    CommentPlayer,
   ],
 })
 export class CommentModule { }
