@@ -35,6 +35,7 @@ limitations under the License.
                 </div>
                 <div class="player-control bg-dark text-light">
                     <controlbar [commentEnabled]="commentEnabled" [fullscreenEnabled]="isFullscreen" [sidebarEnabled]="!sidebarCollapsed" (commentToggle)="toggleComment()" (fullscreenToggle)="toggleFullscreen()" (sidebarToggle)="sidebarCollapsed = !sidebarCollapsed"></controlbar>
+                    <seekbar [offset]="offset" [chapters]="chapters" [chartPoints]="chartPoints" [showPrevious]="true" [showNext]="true" (previous)="previous()" (next)="next()"></seekbar>
                 </div>
                 <context-menu #playerMenu>
                     <ng-template contextMenuItem (execute)="player.togglePause()">

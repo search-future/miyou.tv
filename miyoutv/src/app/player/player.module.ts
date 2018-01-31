@@ -20,6 +20,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { SharedModule } from '../shared/shared.module';
 import { Player } from './player.service';
 import { ControlbarComponent } from './controlbar.component';
+import { SeekbarComponent } from './seekbar.component';
 import { VideoScreenComponent } from './video-screen.component';
 import { FormatTimePipe } from './format-time.pipe';
 
@@ -31,11 +32,13 @@ import { FormatTimePipe } from './format-time.pipe';
   ],
   exports: [
     ControlbarComponent,
+    SeekbarComponent,
     VideoScreenComponent,
     FormatTimePipe,
   ],
   declarations: [
     ControlbarComponent,
+    SeekbarComponent,
     VideoScreenComponent,
     FormatTimePipe,
   ],
