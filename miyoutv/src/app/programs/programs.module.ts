@@ -16,13 +16,18 @@ limitations under the License.
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HotkeyModule } from 'angular2-hotkeys';
 import { ToastModule } from 'ng2-toastr/ng2-toastr';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { TabsModule } from 'ngx-bootstrap/tabs';
+import { ContextMenuModule } from 'ngx-contextmenu';
 
 import { CommentModule } from '../comment/comment.module';
 import { SharedModule } from '../shared/shared.module';
+import { PlayerModule } from '../player/player.module';
 import { routedComponents, ProgramsRoutingModule } from './programs-routing.module';
 import { ProgramsService } from './programs.service';
 
@@ -30,13 +35,21 @@ import { ProgramsService } from './programs.service';
   imports: [
     CommonModule,
     FormsModule,
+    HotkeyModule,
     ReactiveFormsModule,
     ToastModule.forRoot(),
+    CollapseModule.forRoot(),
     BsDatepickerModule.forRoot(),
     BsDropdownModule.forRoot(),
     PaginationModule.forRoot(),
+    TabsModule.forRoot(),
+    ContextMenuModule.forRoot({
+      useBootstrap4: true,
+      autoFocus: true,
+    }),
     CommentModule,
     SharedModule,
+    PlayerModule,
     ProgramsRoutingModule,
   ],
   declarations: [

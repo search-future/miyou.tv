@@ -18,11 +18,13 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { ProgramTableComponent } from './program-table.component';
 import { ProgramListComponent } from './program-list.component';
+import { ProgramPlayComponent } from './program-play.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'table', pathMatch: 'full' },
   { path: 'table', component: ProgramTableComponent },
   { path: 'list', component: ProgramListComponent },
+  { path: 'play', component: ProgramPlayComponent },
 ];
 
 @NgModule({
@@ -31,7 +33,8 @@ const routes: Routes = [
 })
 export class ProgramsRoutingModule { }
 
-export const routedComponents: any[] = [
+export const routedComponents = [
   ProgramTableComponent,
   ProgramListComponent,
+  ProgramPlayComponent,
 ];
