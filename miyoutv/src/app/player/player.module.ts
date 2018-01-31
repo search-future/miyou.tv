@@ -23,6 +23,7 @@ import { ControlbarComponent } from './controlbar.component';
 import { SeekbarComponent } from './seekbar.component';
 import { VideoScreenComponent } from './video-screen.component';
 import { FormatTimePipe } from './format-time.pipe';
+import { PlayerConfigComponent } from './player-config.component';
 
 @NgModule({
   imports: [
@@ -32,12 +33,14 @@ import { FormatTimePipe } from './format-time.pipe';
   ],
   exports: [
     ControlbarComponent,
+    PlayerConfigComponent,
     SeekbarComponent,
     VideoScreenComponent,
     FormatTimePipe,
   ],
   declarations: [
     ControlbarComponent,
+    PlayerConfigComponent,
     SeekbarComponent,
     VideoScreenComponent,
     FormatTimePipe,
