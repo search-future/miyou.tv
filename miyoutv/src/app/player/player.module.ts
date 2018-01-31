@@ -21,6 +21,7 @@ import { SharedModule } from '../shared/shared.module';
 import { Player } from './player.service';
 import { ControlbarComponent } from './controlbar.component';
 import { VideoScreenComponent } from './video-screen.component';
+import { FormatTimePipe } from './format-time.pipe';
 
 @NgModule({
   imports: [
@@ -31,10 +32,12 @@ import { VideoScreenComponent } from './video-screen.component';
   exports: [
     ControlbarComponent,
     VideoScreenComponent,
+    FormatTimePipe,
   ],
   declarations: [
     ControlbarComponent,
     VideoScreenComponent,
+    FormatTimePipe,
   ],
   providers: [
     Player,
