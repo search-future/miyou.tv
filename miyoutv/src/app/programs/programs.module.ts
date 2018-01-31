@@ -30,13 +30,14 @@ import { SharedModule } from '../shared/shared.module';
 import { PlayerModule } from '../player/player.module';
 import { routedComponents, ProgramsRoutingModule } from './programs-routing.module';
 import { ProgramsService } from './programs.service';
+import { ProgramPlayInfoComponent } from './program-play-info.component';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
-    HotkeyModule,
     ReactiveFormsModule,
+    HotkeyModule,
     ToastModule.forRoot(),
     CollapseModule.forRoot(),
     BsDatepickerModule.forRoot(),
@@ -54,6 +55,7 @@ import { ProgramsService } from './programs.service';
   ],
   declarations: [
     routedComponents,
+    ProgramPlayInfoComponent,
   ],
   providers: [
     ProgramsService,

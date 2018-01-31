@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<!--
+Copyright 2016-2018 Brazil Ltd.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<meta charset="UTF-8">
+<div class="card bg-dark text-light" *ngIf="recordInfo">
+    <div class="card-header">録画情報</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-4">ID</div>
+            <div class="col-8">{{recordInfo.id}}</div>
+        </div>
+        <div class="row">
+            <div class="col-4">タイトル</div>
+            <div class="col-8">{{recordInfo.fullTitle}}</div>
+        </div>
+        <div class="row">
+            <div class="col-4">チャンネル</div>
+            <div class="col-8">{{recordInfo.channelName}}</div>
+        </div>
+        <div class="row">
+            <div class="col-4">開始日時</div>
+            <div class="col-8">{{recordInfo.start | dateEx:hourFirst:hourFormat:'yyyy/MM/dd(EEE) A HHHH:mm:ss'}}</div>
+        </div>
+        <div class="row">
+            <div class="col-4">終了日時</div>
+            <div class="col-8">{{recordInfo.end | dateEx:hourFirst:hourFormat:'yyyy/MM/dd(EEE) A HHHH:mm:ss'}}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card bg-dark text-light" *ngIf="programs && programs.length > 0">
+    <div class="card-header">番組情報</div>
+    <div class="card-body">
+        <div class="row" *ngFor="let program of programs">
+            <div class="col-4">
+                <span class="start">{{program.start | dateEx:hourFirst:hourFormat:'yyyy/MM/dd(EEE) A HHHH:mm:ss'}}</span> ～
+                <span class="end">{{program.end | dateEx:hourFirst:hourFormat:'yyyy/MM/dd(EEE) A HHHH:mm:ss'}}</span>
+            </div>
+            <div class="col-8">
+                <div class="card-header">{{program.title}}</div>
+                <div class="detail">{{program.detail}}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card bg-dark text-light" *ngIf="commentInfo">
+    <div class="card-header">コメント情報</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-4">チャンネル</div>
+            <div class="col-8">{{commentInfo.query}}</div>
+        </div>
+        <div class="row">
+            <div class="col-4">開始日時</div>
+            <div class="col-8">{{commentInfo.start | dateEx:hourFirst:hourFormat:'yyyy/MM/dd(EEE) A HHHH:mm:ss'}}</div>
+        </div>
+        <div class="row">
+            <div class="col-4">終了日時</div>
+            <div class="col-8">{{commentInfo.end | dateEx:hourFirst:hourFormat:'yyyy/MM/dd(EEE) A HHHH:mm:ss'}}</div>
+        </div>
+        <div class="row">
+            <div class="col-4">コメント数</div>
+            <div class="col-8">{{commentInfo.count}}</div>
+        </div>
+    </div>
+</div>
