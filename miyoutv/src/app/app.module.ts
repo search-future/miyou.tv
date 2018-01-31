@@ -28,6 +28,7 @@ import {
   garaponAuthUrlV4,
   garaponDevId,
   garaponSiteUrl,
+  playerOptions,
 } from './app.constants';
 import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
@@ -55,6 +56,7 @@ defineLocale('ja', jaLocale);
     { provide: 'garaponAuthUrlV4', useValue: garaponAuthUrlV4 },
     { provide: 'garaponDevId', useValue: garaponDevId },
     { provide: 'garaponSiteUrl', useValue: garaponSiteUrl },
+    { provide: 'playerOptions', useValue: playerOptions },
   ],
 })
 export class AppModule { }

@@ -80,3 +80,7 @@ export const categoryTable: {
   codeName: 'etc',
   name: 'その他',
 }];
+
+export const playerOptions: string[] = [
+  '--network-caching', '5000',
+];
