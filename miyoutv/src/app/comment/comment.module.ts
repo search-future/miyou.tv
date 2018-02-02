@@ -22,6 +22,7 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { SharedModule } from '../shared/shared.module';
 import { CommentService } from './comment.service';
 import { CommentPlayer } from './comment-player.service';
+import { CommentConfigComponent } from './comment-config.component';
 import { CommentGridComponent } from './comment-grid.component';
 import { CommentScreenComponent } from './comment-screen.component';
 
@@ -34,10 +35,12 @@ import { CommentScreenComponent } from './comment-screen.component';
     SharedModule,
   ],
   exports: [
+    CommentConfigComponent,
     CommentGridComponent,
     CommentScreenComponent,
   ],
   declarations: [
+    CommentConfigComponent,
     CommentGridComponent,
     CommentScreenComponent,
   ],

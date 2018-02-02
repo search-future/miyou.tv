@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<!--
+Copyright 2016-2018 Brazil Ltd.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<meta charset="UTF-8">
+<div class="card bg-dark text-light">
+    <div class="card-header">コメント設定</div>
+    <div class="card-body">
+        <form class="form-horizontal" [formGroup]="form">
+            <div class="form-group form-row">
+                <label class="col-6 col-form-label" for="player-comment-duration">表示時間（秒）</label>
+                <div class="col-6">
+                    <input id="player-comment-duration" class="form-control bg-dark text-light" type="number" step="0.5" min="0.5" formControlName="duration">
+                </div>
+            </div>
+            <div class="form-group form-row">
+                <label class="col-6 col-form-label" for="player-comment-delay">遅延表示（秒）</label>
+                <div class="col-6">
+                    <input id="player-comment-delay" class="form-control bg-dark text-light" type="number" step="0.5" formControlName="delay">
+                </div>
+            </div>
+            <div class="form-group form-row">
+                <label class="col-6 col-form-label" for="player-comment-maxlines">表示ライン数</label>
+                <div class="col-6">
+                    <input id="player-comment-maxlines" class="form-control bg-dark text-light" type="number" min="1" formControlName="maxLines">
+                </div>
+            </div>
+            <div class="form-group form-row">
+                <label class="col-6 col-form-label" for="player-comment-maxitems">同時コメント表示数</label>
+                <div class="col-6">
+                    <input id="player-comment-maxitems" class="form-control bg-dark text-light" type="number" min="1" formControlName="maxItems">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
