@@ -16,6 +16,8 @@ limitations under the License.
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { LoadingBarHttpClientModule } from '@ngx-loading-bar/http-client';
+import { LoadingBarRouterModule } from '@ngx-loading-bar/router';
 import { HotkeyModule } from 'angular2-hotkeys';
 import { ToastModule } from 'ng2-toastr/ng2-toastr';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
@@ -37,6 +39,8 @@ import { ProgramPlayInfoComponent } from './program-play-info.component';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    LoadingBarHttpClientModule,
+    LoadingBarRouterModule,
     HotkeyModule,
     ToastModule.forRoot(),
     CollapseModule.forRoot(),
