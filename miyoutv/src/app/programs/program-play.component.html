@@ -123,6 +123,7 @@ limitations under the License.
                 <button class="sidebar-close close" (click)="sidebarCollapsed = true"><span class="fa fa-times-circle"></span></button>
                 <tabset type="tabs" class="sidebar-tabset h-100 nav-mtvblack nav-mtvblack-line">
                     <tab heading="コメント">
+                        <comment-grid class="fit" (jump)="jump($event)"></comment-grid>
                     </tab>
                     <tab heading="情報">
                         <program-play-info [recordInfo]="info" [programs]="programs" [commentInfo]="commentInfo"></program-play-info>

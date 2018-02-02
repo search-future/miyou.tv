@@ -16,22 +16,29 @@ limitations under the License.
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { AgGridModule } from 'ag-grid-angular';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 
 import { SharedModule } from '../shared/shared.module';
 import { CommentService } from './comment.service';
 import { CommentPlayer } from './comment-player.service';
+import { CommentGridComponent } from './comment-grid.component';
 import { CommentScreenComponent } from './comment-screen.component';
 
 @NgModule({
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    BsDropdownModule.forRoot(),
+    AgGridModule.withComponents([]),
     SharedModule,
   ],
   exports: [
+    CommentGridComponent,
     CommentScreenComponent,
   ],
   declarations: [
+    CommentGridComponent,
     CommentScreenComponent,
   ],
   providers: [

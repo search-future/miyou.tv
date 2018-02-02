@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<!--
+Copyright 2016-2018 Brazil Ltd.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<meta charset="UTF-8">
+<div class="flex flex-column h-100">
+    <form class="form-thread d-flex p-2" [formGroup]="headForm">
+        <div class="dropdown dropdown-channel form-group m-1" dropdown [autoClose]="false">
+            <button class="dropdown-toggle btn btn-outline-light bg-dark text-light" dropdownToggle>
+                チャンネル
+            </button>
+            <div class="dropdown-menu bg-dark" *dropdownMenu>
+                <ng-container *ngFor="let channel of channels; let i = index" formArrayName="channels">
+                    <div class="dropdown-item bg-dark text-light" *ngIf="headForm.value.channels[i]">
+                        <div class="form-check" [title]="channel.id">
+                            <input class="form-check-input" type="checkbox" [id]="channel.id" [formControlName]="i">
+                            <label class="form-check-label" [for]="channel.id">{{channel.id}}</label>
+                        </div>
+                    </div>
+                </ng-container>
+                <div class="dropdown-header text-light">地上</div>
+                <ng-container *ngFor="let channel of channels; let i = index" formArrayName="channels">
+                    <div class="dropdown-item bg-dark text-light mh-10" *ngIf="channel.type === 'gr' && !headForm.value.channels[i]">
+                        <div class="form-check" [title]="channel.id">
+                            <input class="form-check-input" type="checkbox" [id]="channel.id" [formControlName]="i">
+                            <label class="form-check-label" [for]="channel.id">{{channel.id}}</label>
+                        </div>
+                    </div>
+                </ng-container>
+                <div class="dropdown-header text-light">BS</div>
+                <ng-container *ngFor="let channel of channels; let i = index" formArrayName="channels">
+                    <div class="dropdown-item bg-dark text-light" *ngIf="channel.type === 'bs' && !headForm.value.channels[i]">
+                        <div class="form-check" [title]="channel.id">
+                            <input class="form-check-input" type="checkbox" [id]="channel.id" [formControlName]="i">
+                            <label class="form-check-label" [for]="channel.id">{{channel.id}}</label>
+                        </div>
+                    </div>
+                </ng-container>
+                <div class="dropdown-header text-light">CS</div>
+                <ng-container *ngFor="let channel of channels; let i = index" formArrayName="channels">
+                    <div class="dropdown-item bg-dark text-light" *ngIf="channel.type === 'cs' && !headForm.value.channels[i]">
+                        <div class="form-check" [title]="channel.id">
+                            <input class="form-check-input" type="checkbox" [id]="channel.id" [formControlName]="i">
+                            <label class="form-check-label" [for]="channel.id">{{channel.id}}</label>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+        <div class="dropdown dropdown-thread form-group m-1" dropdown [autoClose]="false">
+            <button class="dropdown-toggle btn btn-outline-light bg-dark text-light" dropdownToggle>
+                スレッド
+            </button>
+            <div class="dropdown-menu bg-dark" *dropdownMenu>
+                <div class="dropdown-item bg-dark text-light" *ngFor="let thread of threads; let i = index" formArrayName="threads">
+                    <div class="form-check" [title]="thread">
+                        <input class="form-check-input" type="checkbox" [id]="thread" [formControlName]="i">
+                        <label class="form-check-label" [for]="thread">{{thread}}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="flex-fill">
+        <ag-grid-angular class="grid ag-dark h-100" #grid [gridOptions]="gridOptions" [columnDefs]="columnDefs" [deltaRowDataMode]="true"></ag-grid-angular>
+    </div>
+    <form class="form-inline form-autoscroll" [formGroup]="footForm">
+        <div class="form-check">
+            <input id="autoscroll" class="form-check-input" type="checkbox" formControlName="autoScroll">
+            <label class="form-check-label" for="autoscroll">自動スクロール</label>
+        </div>
+    </form>
+</div>
