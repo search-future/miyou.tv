@@ -18,6 +18,9 @@ import 'core-js/es7/reflect';
 import 'rxjs';
 import 'zone.js/dist/zone-mix';
 
+import '@fortawesome/fontawesome';
+import '@fortawesome/fontawesome-free-solid';
+
 import '@angular/animations';
 import '@angular/common';
 import '@angular/common/http';
