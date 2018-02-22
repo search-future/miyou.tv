@@ -51,8 +51,13 @@ limitations under the License.
                 <input type="text" class="form-control text-center mr-lg-5" placeholder="Search" formControlName="query">
             </div>
         </form>
-        <ul class="navbar-nav col-md-4 p-0 py-md-1">
-            <li class="nav-item dropdown ml-md-auto mr-md-2" dropdown>
+        <ul class="navbar-nav col-md-3 col-lg-4 p-0 py-md-1 justify-content-end">
+            <li class="nav-item">
+                <a class="nav-link p-2" [routerLink]="[]" [queryParams]="{ refresh: 1 }" queryParamsHandling="merge">
+                    更新 <span class="fas fa-sync"></span>
+                </a>
+            </li>
+            <li class="nav-item dropdown" dropdown>
                 <a class="nav-link clickable p-2" dropdownToggle>
                         設定 <span class="fas fa-cog"></span>
                 </a>
