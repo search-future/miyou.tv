@@ -22,7 +22,9 @@ limitations under the License.
             <div class="form-inline col-12 col-sm-6">
                 <div class="input-group mr-sm-1" title="表示データ" *ngIf="archiveEnabled">
                     <label class="input-group-prepend" for="source">
-                        <span class="fa fa-database input-group-text"></span>
+                        <span class="input-group-text d-inline-block">
+                            <span class="fas fa-database"></span>
+                        </span>
                     </label>
                     <select id="source" class="form-control" formControlName="source">
                         <option value="archive">番組表</option>
@@ -31,7 +33,9 @@ limitations under the License.
                 </div>
                 <div class="input-group mr-sm-1" title="並び順">
                     <label class="input-group-prepend" for="sort">
-                        <span class="fa fa-sort input-group-text"></span>
+                        <span class="input-group-text d-inline-block">
+                            <span class="fas fa-sort"></span>
+                        </span>
                     </label>
                     <select id="sort" class="form-control" formControlName="sort">
                         <option value="desc">放送日時(新しい順)</option>
@@ -42,7 +46,9 @@ limitations under the License.
             <div class="form-inline col-12 col-sm-6 d-block d-sm-flex justify-content-end text-right">
                 <div class="input-group mr-sm-1 order-sm-2" title="表示数">
                     <label class="input-group-prepend" for="view">
-                        <span class="fa fa-arrows-v input-group-text"></span>
+                        <span class="input-group-text d-inline-block">
+                            <span class="fas fa-arrows-alt-v"></span>
+                        </span>
                     </label>
                     <select id="view" class="form-control" formControlName="view">
                         <option value="10">10件表示</option>
@@ -72,8 +78,10 @@ limitations under the License.
                         <div class="info">
                             <span class="date text-primary font-weight-bold">{{item.start | dateEx:hourFirst:hourFormat:'y/M/d HHHH:mm'}}</span>
                             <span class="channel quick-search quick-search-hidden">
-                            {{item.channelName}}
-                            <span class="fa fa-search quick-search-btn" title="チャンネルで検索" (click)="search('type:' + item.type + ' ch:' + item.channel)"></span>
+                                {{item.channelName}}
+                                <span class="quick-search-btn" title="チャンネルで検索" (click)="search('type:' + item.type + ' ch:' + item.channel)">
+                                    <span class="fas fa-search"></span>
+                                </span>
                             </span>
                             <span class="length">{{'(' + (item.duration / 60000) + '分)'}}</span>
                             <a class="badge" href="" title="カテゴリで検索" [ngClass]="'badge-' + item.category.codeName" (click)="search('cat:' + item.category.codeName); false">
@@ -85,7 +93,9 @@ limitations under the License.
                         </div>
                         <div class="title quick-search quick-search-hidden font-weight-bold">
                             {{item.fullTitle}}
-                            <span class="fa fa-search quick-search-btn" title="番組名で検索" (click)="search(item.title)"></span>
+                            <span class="quick-search-btn" title="番組名で検索" (click)="search(item.title)">
+                                <span class="fas fa-search"></span>
+                            </span>
                         </div>
                         <div class="detail small">{{item.detail}}</div>
                     </div>

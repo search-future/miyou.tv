@@ -27,24 +27,26 @@ limitations under the License.
         <ul class="navbar-nav col-md-5 col-lg-4 px-0 px-md-2">
             <li class="nav-item py-md-1 px-2 px-md-0" routerLinkActive="bg-black">
                 <a class="nav-link" routerLink="/programs/table" routerLinkActive="active" (click)="isCollapsed = true">
-                    <span class="fa fa-th"></span> 番組表
+                    <span class="fas fa-th"></span> 番組表
                 </a>
             </li>
             <li class="nav-item py-md-1 px-2 px-md-0" routerLinkActive="bg-black">
                 <a class="nav-link" routerLink="/programs/list" routerLinkActive="active" (click)="isCollapsed = true">
-                    <span class="fa fa-list"></span> 番組一覧
+                    <span class="fas fa-list"></span> 番組一覧
                 </a>
             </li>
             <!--<li class="nav-item py-md-1" routerLinkActive="active">
                 <a class="nav-link" href="/programs/ranking" (click)="isCollapsed = true">
-                    <span class="fa fa-star"></span> ランキング
+                    <span class="fas fa-star"></span> ランキング
                 </a>
             </li>-->
         </ul>
         <form class="form-inline-md col-md-4 px-md-0 py-md-1 text-center" [formGroup]="searchForm" (submit)="search()">
             <div class="input-group input-group-rounded mx-md-auto m-0">
                 <div class="input-group-prepend">
-                    <span class="fa fa-search input-group-text"></span>
+                    <span class="input-group-text">
+                        <span class="fas fa-search"></span>
+                    </span>
                 </div>
                 <input type="text" class="form-control text-center mr-lg-5" placeholder="Search" formControlName="query">
             </div>
@@ -52,7 +54,7 @@ limitations under the License.
         <ul class="navbar-nav col-md-4 p-0 py-md-1">
             <li class="nav-item dropdown ml-md-auto mr-md-2" dropdown>
                 <a class="nav-link clickable p-2" dropdownToggle>
-                        設定 <span class="fa fa-cog"></span>
+                        設定 <span class="fas fa-cog"></span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" *dropdownMenu>
                     <a class="dropdown-item" href="" (click)="openViewSetting(); false">表示設定</a>

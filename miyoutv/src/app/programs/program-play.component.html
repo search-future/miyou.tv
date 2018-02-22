@@ -40,87 +40,87 @@ limitations under the License.
                 </div>
                 <context-menu #playerMenu>
                     <ng-template contextMenuItem (execute)="player.togglePause()">
-                        <span class="fa fa-fw" [class.fa-pause]="player.playing" [class.fa-play]="!player.playing"></span> {{player.playing ? '一時停止' : '再生'}}
+                        <span class="fas fa-fw" [class.fa-pause]="player.playing" [class.fa-play]="!player.playing"></span> {{player.playing ? '一時停止' : '再生'}}
                     </ng-template>
                     <ng-template contextMenuItem (execute)="player.jumpBackward('11s')">
-                        <span class="fa fa-fw fa-step-backward"></span> 10秒戻す
+                        <span class="fas fa-fw fa-caret-left"></span> 10秒戻す
                     </ng-template>
                     <ng-template contextMenuItem (execute)="player.jumpForward('29s')">
-                        <span class="fa fa-fw fa-step-forward"></span> 30秒進める
+                        <span class="fas fa-fw fa-caret-right"></span> 30秒進める
                     </ng-template>
                     <ng-template contextMenuItem [subMenu]="playerSpeedMenu">
-                        <span class="fa fa-fw"></span> 再生速度
+                        <span class="fas fa-fw fa-bars invisible"></span> 再生速度
                     </ng-template>
                     <context-menu #playerSpeedMenu>
                         <ng-template contextMenuItem (execute)="player.speedUp()">
-                            <span class="fa fa-fw fa-forward"></span> 速くする
+                            <span class="fas fa-fw fa-forward"></span> 速くする
                         </ng-template>
                         <ng-template contextMenuItem (execute)="player.normalSpeed()">
-                            <span class="fa fa-fw fa-play"></span> 通常再生
+                            <span class="fas fa-fw fa-play"></span> 通常再生
                         </ng-template>
                         <ng-template contextMenuItem (execute)="player.speedDown()">
-                            <span class="fa fa-fw fa-backward"></span> 遅くする
+                            <span class="fas fa-fw fa-backward"></span> 遅くする
                         </ng-template>
                     </context-menu>
                     <ng-template contextMenuItem [subMenu]="playerAudioMenu">
-                        <span class="fa fa-fw"></span> オーディオ
+                        <span class="fas fa-fw fa-bars invisible"></span> オーディオ
                     </ng-template>
                     <context-menu #playerAudioMenu>
                         <ng-template contextMenuItem (execute)="player.toggleAudioTrack()">
-                            <span class="fa fa-fw fa-rotate-right"></span> 音声切替
+                            <span class="fas fa-fw fa-redo"></span> 音声切替
                         </ng-template>
                         <ng-template contextMenuItem (execute)="player.increaseVolume(5)">
-                            <span class="fa fa-fw fa-volume-up"></span> 音量を上げる
+                            <span class="fas fa-fw fa-volume-up"></span> 音量を上げる
                         </ng-template>
                         <ng-template contextMenuItem (execute)="player.decreaseVolume(5)">
-                            <span class="fa fa-fw fa-volume-down"></span> 音量を下げる
+                            <span class="fas fa-fw fa-volume-down"></span> 音量を下げる
                         </ng-template>
                         <ng-template contextMenuItem (execute)="player.toggleMute()">
-                            <span class="fa fa-fw text-primary" [class.fa-check]="player.mute"></span> ミュート
+                            <span class="fas fa-fw fa-check text-primary" [class.invisible]="!player.mute"></span> ミュート
                         </ng-template>
                     </context-menu>
                     <ng-template contextMenuItem [subMenu]="playerVideoMenu">
-                        <span class="fa fa-fw"></span> ビデオ
+                        <span class="fas fa-fw fa-bars invisible"></span> ビデオ
                     </ng-template>
                     <context-menu #playerVideoMenu>
                         <ng-template contextMenuItem (execute)="toggleFullscreen()">
-                            <span class="fa fa-fw text-primary" [class.fa-check]="isFullscreen"></span> 全画面表示
+                            <span class="fas fa-fw fa-check text-primary" [class.invisible]="!isFullscreen"></span> 全画面表示
                         </ng-template>
                         <ng-template contextMenuItem (execute)="toggleAlwaysOnTop()">
-                            <span class="fa fa-fw text-primary" [class.fa-check]="isAlwaysOnTop"></span> 常に前面に表示
+                            <span class="fas fa-fw fa-check text-primary" [class.invisible]="!isAlwaysOnTop"></span> 常に前面に表示
                         </ng-template>
                     </context-menu>
 
                     <ng-template contextMenuItem [subMenu]="playerCommentMenu">
-                        <span class="fa fa-fw"></span> コメント
+                        <span class="fas fa-fw fa-bars invisible"></span> コメント
                     </ng-template>
                     <context-menu #playerCommentMenu>
                         <ng-template contextMenuItem (execute)="toggleComment()">
-                            <span class="fa fa-fw text-primary" [class.fa-check]="commentEnabled"></span> コメントを表示
+                            <span class="fas fa-fw fa-check text-primary" [class.invisible]="!commentEnabled"></span> コメントを表示
                         </ng-template>
                         <ng-template contextMenuItem (execute)="commentDelay = commentDelay - 500">
-                            <span class="fa fa-fw fa-chevron-left"></span> 早める
+                            <span class="fas fa-fw fa-chevron-left"></span> 早める
                         </ng-template>
                         <ng-template contextMenuItem (execute)="commentDelay = commentDelay + 500">
-                            <span class="fa fa-fw fa-chevron-right"></span> 遅らせる
+                            <span class="fas fa-fw fa-chevron-right"></span> 遅らせる
                         </ng-template>
                     </context-menu>
                     <ng-template contextMenuItem (execute)="previous()">
-                        <span class="fa fa-fw fa-fast-backward"></span> 前の番組へ
+                        <span class="fas fa-fw fa-backward"></span> 前の番組へ
                     </ng-template>
                     <ng-template contextMenuItem (execute)="next()">
-                        <span class="fa fa-fw fa-fast-forward"></span> 次の番組へ
+                        <span class="fas fa-fw fa-forward"></span> 次の番組へ
                     </ng-template>
                     <ng-template contextMenuItem (execute)="sidebarCollapsed = !sidebarCollapsed">
-                        <span class="fa fa-fw text-primary" [class.fa-check]="!sidebarCollapsed"></span> サイドバーを表示
+                        <span class="fas fa-fw fa-check text-primary" [class.invisible]="sidebarCollapsed"></span> サイドバーを表示
                     </ng-template>
                     <ng-template contextMenuItem (execute)="player.stop()">
-                        <span class="fa fa-fw fa-stop"></span> 再生を終了
+                        <span class="fas fa-fw fa-stop"></span> 再生を終了
                     </ng-template>
                 </context-menu>
             </div>
             <div class="sidebar col-12 col-md-6 col-lg-5 col-xl-4 h-100 p-0 bg-dark text-light" [collapse]="sidebarCollapsed" (collapsed)="onSidebarCollapsed()" (expanded)="onSidebarExpanded()">
-                <button class="sidebar-close close text-light mr-2" (click)="sidebarCollapsed = true"><span class="fa fa-times-circle"></span></button>
+                <button class="sidebar-close close text-light mr-2" (click)="sidebarCollapsed = true"><span class="fas fa-times-circle"></span></button>
                 <tabset type="tabs" class="sidebar-tabset h-100">
                     <tab heading="コメント">
                         <comment-grid class="fit" (jump)="jump($event)"></comment-grid>
