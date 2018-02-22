@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Hotkey, HotkeysService } from 'angular2-hotkeys';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Subscription } from 'rxjs';
@@ -31,6 +32,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
 
   constructor(
+    private router: Router,
     private hotkeysService: HotkeysService,
     private bsModalService: BsModalService,
     private storageService: StorageService,
@@ -58,6 +60,19 @@ export class AppComponent implements OnInit, OnDestroy {
     );
 
     this.hotkeysService.add([new Hotkey(
+      'mod+r',
+      (event: KeyboardEvent): boolean => {
+        this.router.navigate([], {
+          queryParams: {
+            refresh: 1,
+          },
+          queryParamsHandling: 'merge',
+        });
+        return false;
+      },
+      [],
+      'バックエンドのデータを更新',
+    ), new Hotkey(
       'mod+w',
       (event: KeyboardEvent): boolean => {
         this.openQuitModal();
