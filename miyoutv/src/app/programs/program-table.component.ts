@@ -338,18 +338,21 @@ export class ProgramTableComponent implements OnInit, OnDestroy {
           ))) {
             let commentCount: number = 0;
             let commentSpeed: number = 0;
+            let commentMaxSpeed: number = 0;
             if (
               Array.isArray(column.intervals) &&
               column.intervals.length > 0
             ) {
               const minutes: number = program.duration / 60000;
-              commentCount = column.intervals.filter((a: any): boolean => (
+              const intervals: any[] = column.intervals.filter((a: any): boolean => (
                 a.start >= program.start && a.start < program.end
-              )).map((a: any): number => a.n_hits).reduce(
+              ));
+              commentCount = intervals.map((a: any): number => a.n_hits).reduce(
                 (a: number, b: number): number => a + b,
                 0,
               );
               commentSpeed = commentCount / minutes;
+              commentMaxSpeed = Math.max.apply(null, intervals.map((a: any): number => a.n_hits));
             }
             column.programs.push(Object.assign({}, program, {
               top: this.calcTop(program.start),
@@ -357,6 +360,7 @@ export class ProgramTableComponent implements OnInit, OnDestroy {
               maxHeight: this.calcHeight(program.start, maxDate),
               commentCount: Observable.of(commentCount),
               commentSpeed: Observable.of(commentSpeed),
+              commentMaxSpeed: Observable.of(commentMaxSpeed),
               showPreview: false,
             }));
           }

@@ -88,8 +88,12 @@ limitations under the License.
                                 {{item.category.name}}
                             </a>
                             <span class="badge badge-balloon" [class.lv1]="(item.commentSpeed | async) >= 10" [class.lv2]="(item.commentSpeed | async) >= 25" [class.lv3]="(item.commentSpeed | async) >= 50" [class.lv4]="(item.commentSpeed | async) >= 100" [class.lv5]="(item.commentSpeed | async) >= 200"
-                                *ngIf="countMode !== 'none' && (item.commentCount | async) " [title]="'コメント数: ' + (item.commentCount | async) + '\n勢い： ' + (item.commentSpeed | async | number:'1.1-1') + '/分'">
-                                {{countMode === 'speed' ? (item.commentSpeed | async | number:'1.1-1') : (item.commentCount | async)}}
+                                *ngIf="countMode !== 'none' && (item.commentCount | async) " [title]="'コメント数: ' + (item.commentCount | async) + '\n勢い： ' + (item.commentSpeed | async | number:'1.1-1') + '/分(最大' + (item.commentMaxSpeed | async) + '/分)'">
+                                <ng-container [ngSwitch]="countMode">
+                                    <ng-container *ngSwitchCase="'speed'">{{item.commentSpeed | async | number:'1.1-1'}}</ng-container>
+                                    <ng-container *ngSwitchCase="'maxspeed'">{{item.commentMaxSpeed | async}}</ng-container>
+                                    <ng-container *ngSwitchDefault>{{item.commentCount | async}}</ng-container>
+                                </ng-container>
                             </span>
                         </div>
                         <div class="title quick-search quick-search-hidden font-weight-bold">

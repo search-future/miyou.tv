@@ -61,7 +61,7 @@ export class ViewSettingComponent implements OnInit, OnDestroy {
         countMode || 'speed',
         [
           Validators.required,
-          Validators.pattern(/^(comment|speed|none)$/),
+          Validators.pattern(/^(comment|speed|maxspeed|none)$/),
         ],
       ],
       previewEnabled: [

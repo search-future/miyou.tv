@@ -680,22 +680,27 @@ export class ProgramsService {
           this.streamParams,
         ].filter(a => a != null).join('?'));
       }
-      const commentCount: Observable<number> = this.commentService.request('GET', 'comments', {
+      const intervals: Observable<any> = this.commentService.request('GET', 'intervals', {
         params: new HttpParams()
           .set('channel', this.commentService.loadQuery(program.channel.name))
           .set('start', String(program.startAt))
           .set('end', String(program.startAt + program.duration))
-          .set('limit', '0'),
-      }).map((result: any): number => (
+          .set('interval', '1m'),
+      }).publishLast().refCount();
+      const commentCount: Observable<number> = intervals.map((result: any): number => (
         result.n_hits
       )).publishLast().refCount();
       const minutes: number = program.duration / 60000;
       const commentSpeed: Observable<number> = commentCount.map((count: number): number => (
         count / minutes
       ));
+      const commentMaxSpeed: Observable<number> = intervals.map((result: any): number => (
+        Math.max.apply(null, result.intervals.map((a: any): number => a.n_hits))
+      ));
       return {
         commentCount,
         commentSpeed,
+        commentMaxSpeed,
         preview,
         stream,
         id: program.id,
@@ -717,22 +722,27 @@ export class ProgramsService {
 
   protected getChinachuRecordedConverter(): (program: any) => any {
     return (program: any): any => {
-      const commentCount: Observable<number> = this.commentService.request('GET', 'comments', {
+      const intervals: Observable<any> = this.commentService.request('GET', 'intervals', {
         params: new HttpParams()
           .set('channel', this.commentService.loadQuery(program.channel.name))
           .set('start', String(program.start))
           .set('end', String(program.end))
-          .set('limit', '0'),
-      }).map((result: any): number => (
+          .set('interval', '1m'),
+      }).publishLast().refCount();
+      const commentCount: Observable<number> = intervals.map((result: any): number => (
         result.n_hits
       )).publishLast().refCount();
       const minutes: number = program.seconds / 60;
       const commentSpeed: Observable<number> = commentCount.map((count: number): number => (
         count / minutes
       ));
+      const commentMaxSpeed: Observable<number> = intervals.map((result: any): number => (
+        Math.max.apply(null, result.intervals.map((a: any): number => a.n_hits))
+      ));
       return {
         commentCount,
         commentSpeed,
+        commentMaxSpeed,
         id: program.id,
         type: program.channel.type,
         channel: String(program.channel.sid),
@@ -772,18 +782,22 @@ export class ProgramsService {
       const duration: number = GaraponService.convertDuration(program.duration);
       const start: Date = new Date(program.startdate);
       const end: Date = new Date(start.getTime() + duration);
-      const commentCount: Observable<number> = this.commentService.request('GET', 'comments', {
+      const intervals: Observable<any> = this.commentService.request('GET', 'intervals', {
         params: new HttpParams()
           .set('channel', this.commentService.loadQuery(program.bc))
           .set('start', String(start.getTime()))
           .set('end', String(end.getTime()))
-          .set('limit', '0'),
-      }).map((result: any): number => (
+          .set('interval', '1m'),
+      }).publishLast().refCount();
+      const commentCount: Observable<number> = intervals.map((result: any): number => (
         result.n_hits
       )).publishLast().refCount();
       const minutes: number = duration / 60000;
       const commentSpeed: Observable<number> = commentCount.map((count: number): number => (
         count / minutes
+      ));
+      const commentMaxSpeed: Observable<number> = intervals.map((result: any): number => (
+        Math.max.apply(null, result.intervals.map((a: any): number => a.n_hits))
       ));
       return {
         duration,
@@ -791,6 +805,7 @@ export class ProgramsService {
         end,
         commentCount,
         commentSpeed,
+        commentMaxSpeed,
         id: program.gtvid,
         type: program.gtvid.slice(0, 2),
         channel: String(program.ch),
@@ -818,23 +833,28 @@ export class ProgramsService {
           .set('service_type', program.service_type)
           .toString(),
       });
-      const commentCount: Observable<number> = this.commentService.request('GET', 'comments', {
+      const intervals: Observable<any> = this.commentService.request('GET', 'intervals', {
         params: new HttpParams()
           .set('channel', this.commentService.loadQuery(program.bcname))
           .set('start', String(program.starttime * 1000))
           .set('end', String(program.endtime * 1000))
-          .set('limit', '0'),
-      }).map((result: any): number => (
+          .set('interval', '1m'),
+      }).publishLast().refCount();
+      const commentCount: Observable<number> = intervals.map((result: any): number => (
         result.n_hits
       )).publishLast().refCount();
       const minutes: number = program.durationtime / 60;
       const commentSpeed: Observable<number> = commentCount.map((count: number): number => (
         count / minutes
       ));
+      const commentMaxSpeed: Observable<number> = intervals.map((result: any): number => (
+        Math.max.apply(null, result.intervals.map((a: any): number => a.n_hits))
+      ));
       return {
         isRecorded,
         commentCount,
         commentSpeed,
+        commentMaxSpeed,
         id: program.gtvid,
         type: program.gtvid.slice(0, 2),
         channel: String(program.tsid10),
