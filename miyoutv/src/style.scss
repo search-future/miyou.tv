@@ -97,6 +97,21 @@ body {
       border-color: theme-color(balloon) transparent transparent;
     }
   }
+  @for $i from 1 through 5 {
+    $color: adjust-hue(theme-color(balloon), $i * -5deg);
+    &.lv#{$i} {
+      background-color: $color;
+      font-size: $i * 5 + 75%;
+      &::after {
+        border-width: 6px 6px 6px 0;
+        border-color: $color $color transparent transparent;
+      }
+      &.badge-balloon-right::after {
+        border-width: 6px 6px 0 0;
+        border-color: $color transparent transparent;
+      }
+    }
+  }
 }
 
 // Buttons

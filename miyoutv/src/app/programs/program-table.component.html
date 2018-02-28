@@ -83,7 +83,8 @@ limitations under the License.
             <div class="program-table-column col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 p-0 position-relative" *ngFor="let column of data" [style.height]="baseHeight * 24 + 'px'" (dblclick)="playColumn($event, column)">
                 <div class="program-table-cell d-flex w-100 position-absolute" *ngFor="let item of column.programs" [class.d-flex]="activeCategories.length === 0 ||  activeCategories.indexOf(item.category.code) >= 0" [class.d-none]="activeCategories.length > 0 && activeCategories.indexOf(item.category.code) === -1"
                     [style.top]="item.top + 'px'" [style.height]="selectedItem === item ? 'auto' : item.height + 'px'" [style.minHeight]="item.height + 'px'" [style.maxHeight]="item.maxHeight + 'px'">
-                    <span class="badge badge-balloon badge-balloon-right" *ngIf="countMode !== 'none' && (item.commentCount | async)" [title]="'コメント数: ' + (item.commentCount | async) + '\n勢い： ' + (item.commentSpeed | async | number:'1.1-1') + '/分'">
+                    <span class="badge badge-balloon badge-balloon-right" [class.lv1]="(item.commentSpeed | async) >= 10" [class.lv2]="(item.commentSpeed | async) >= 25" [class.lv3]="(item.commentSpeed | async) >= 50" [class.lv4]="(item.commentSpeed | async) >= 100" [class.lv5]="(item.commentSpeed | async) >= 200"
+                        *ngIf="countMode !== 'none' && (item.commentCount | async)" [title]="'コメント数: ' + (item.commentCount | async) + '\n勢い： ' + (item.commentSpeed | async | number:'1.1-1') + '/分'">
                         {{countMode === 'speed' ? (item.commentSpeed | async | number:'1.1-1') : (item.commentCount | async)}}
                     </span>
                     <div class="program-table-content p-2 flex-fill border bg-white overflow-hidden selectable" [class.selected]="selectedItem === item" (click)="select(item)" (dblclick)="play(item); false" (mouseenter)="item.showPreview = true">
