@@ -139,20 +139,29 @@ export class ProgramPlayComponent implements OnInit, OnDestroy {
       )).subscribe(() => {
         this.next();
       }),
-      this.commentPlayer.count.subscribe((count: number) => {
+      Observable.zip(
+        this.commentPlayer.intervals,
+        this.commentPlayer.count,
+      ).subscribe((result: [any[], number]) => {
+        const [intervals, count]: [any[], number] = result;
         const query: string = (
           this.commentService.loadQuery(this.commentPlayer.channel) || ''
         ).split('||').join(',');
         const start: Date = this.commentPlayer.offset;
         const end: Date = new Date(this.commentPlayer.offset.getTime() + this.player.length);
+        const speed: number = Math.round(count * 60000 * 10 / this.player.length) / 10;
+        const maxSpeed: number = Math.max.apply(null, intervals.filter((a: any): boolean => (
+          a.start >= start &&
+          a.start < end
+        )).map((a: any): number => a.n_hits));
         this.commentInfo = {
           query,
           start,
           end,
           count,
+          speed,
+          maxSpeed,
         };
-      }),
-      this.commentPlayer.intervals.subscribe((intervals: any[]) => {
         this.intervals = intervals;
         this.updateChart();
       }),

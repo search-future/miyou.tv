@@ -76,5 +76,13 @@ limitations under the License.
             <div class="col-12 col-sm-6">コメント数</div>
             <div class="col-12 col-sm-6">{{commentInfo.count}}</div>
         </div>
+        <div class="row">
+            <div class="col-12 col-sm-6">平均勢い</div>
+            <div class="col-12 col-sm-6">{{commentInfo.speed || 0}}/分</div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-sm-6">最大勢い</div>
+            <div class="col-12 col-sm-6">{{commentInfo.maxSpeed || 0}}/分</div>
+        </div>
     </div>
 </div>
