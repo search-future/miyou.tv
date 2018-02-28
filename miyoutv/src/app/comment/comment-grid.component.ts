@@ -45,6 +45,9 @@ export class CommentGridComponent implements OnInit, OnDestroy {
   public footForm: FormGroup;
   public channels: any[] = [];
   public threads: string[] = [];
+  public intervals: any[] = [];
+  public count: number = 0;
+  public speed: number = 0;
   public autoScroll: boolean = true;
   public gridOptions: GridOptions = {
     rowSelection: 'single',
@@ -189,6 +192,7 @@ export class CommentGridComponent implements OnInit, OnDestroy {
         });
       }),
       this.commentPlayer.intervals.subscribe((intervals: any) => {
+        this.intervals = intervals;
         let getChannals: Observable<any[]>;
         if (this.channels.length > 0) {
           getChannals = Observable.of(this.channels);
@@ -229,6 +233,20 @@ export class CommentGridComponent implements OnInit, OnDestroy {
             });
           },
         );
+      }),
+      this.commentPlayer.count.subscribe((count: number) => {
+        this.count = count;
+      }),
+      this.commentPlayer.time.subscribe((time: number) => {
+        if (this.commentPlayer.offset) {
+          const start = time + this.commentPlayer.offset.getTime() - 60000;
+          for (const interval of this.intervals) {
+            if (interval.start >= start) {
+              this.speed = interval.n_hits;
+              break;
+            }
+          }
+        }
       }),
     );
   }
