@@ -18,12 +18,14 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { ProgramTableComponent } from './program-table.component';
 import { ProgramListComponent } from './program-list.component';
+import { ProgramRankingComponent } from './program-ranking.component';
 import { ProgramPlayComponent } from './program-play.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'table', pathMatch: 'full' },
   { path: 'table', component: ProgramTableComponent },
   { path: 'list', component: ProgramListComponent },
+  { path: 'ranking', component: ProgramRankingComponent },
   { path: 'play', component: ProgramPlayComponent },
 ];
 
@@ -36,5 +38,6 @@ export class ProgramsRoutingModule { }
 export const routedComponents = [
   ProgramTableComponent,
   ProgramListComponent,
+  ProgramRankingComponent,
   ProgramPlayComponent,
 ];

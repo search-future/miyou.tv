@@ -35,11 +35,11 @@ limitations under the License.
                     <span class="fas fa-list"></span> 番組一覧
                 </a>
             </li>
-            <!--<li class="nav-item py-md-1" routerLinkActive="active">
-                <a class="nav-link" href="/programs/ranking" (click)="isCollapsed = true">
+            <li class="nav-item py-md-1 px-2 px-md-0" routerLinkActive="bg-black">
+                <a class="nav-link" routerLink="/programs/ranking" routerLinkActive="active" (click)="isCollapsed = true">
                     <span class="fas fa-star"></span> ランキング
                 </a>
-            </li>-->
+            </li>
         </ul>
         <form class="form-inline-md col-md-4 px-md-0 py-md-1 text-center" [formGroup]="searchForm" (submit)="search()">
             <div class="input-group input-group-rounded mx-md-auto m-0">

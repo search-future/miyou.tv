@@ -16,6 +16,7 @@ limitations under the License.
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { LoadingBarModule } from '@ngx-loading-bar/core';
 import { LoadingBarHttpClientModule } from '@ngx-loading-bar/http-client';
 import { LoadingBarRouterModule } from '@ngx-loading-bar/router';
 import { HotkeyModule } from 'angular2-hotkeys';
@@ -23,6 +24,7 @@ import { ToastModule } from 'ng2-toastr/ng2-toastr';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { ModalModule } from 'ngx-bootstrap/modal';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ContextMenuModule } from 'ngx-contextmenu';
@@ -39,6 +41,7 @@ import { ProgramPlayInfoComponent } from './program-play-info.component';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    LoadingBarModule.forRoot(),
     LoadingBarHttpClientModule,
     LoadingBarRouterModule,
     HotkeyModule,
@@ -46,6 +49,7 @@ import { ProgramPlayInfoComponent } from './program-play-info.component';
     CollapseModule.forRoot(),
     BsDatepickerModule.forRoot(),
     BsDropdownModule.forRoot(),
+    ModalModule.forRoot(),
     PaginationModule.forRoot(),
     TabsModule.forRoot(),
     ContextMenuModule.forRoot({
