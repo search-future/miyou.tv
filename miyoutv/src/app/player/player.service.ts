@@ -88,6 +88,7 @@ export enum VlcState { NothingSpecial, Opening, Buffering, Playing, Paused, Stop
 export enum VlcAudio { Error, Stereo, ReverseStereo, Left, Right, Dolby }
 
 interface PlayerSetting {
+  rate: number;
   mute: boolean;
   volume: number;
   deinterlace: string;
@@ -339,6 +340,7 @@ export class Player {
     (this.valueChanges as EventEmitter<any>).emit({ rate: this.player.input.rate });
     const message: string = `再生速度 x${(Math.round(this.rate * 100) / 100)}`;
     this.screenText.next({ message });
+    this.saveSetting();
   }
   get rate(): number {
     return this.player.input.rate;
@@ -446,6 +448,7 @@ export class Player {
 
   protected saveSetting(): void {
     const setting: PlayerSetting = {
+      rate: this.rate,
       mute: this.mute,
       volume: this.volume,
       deinterlace: this.deinterlace,
@@ -456,6 +459,9 @@ export class Player {
 
   protected loadSetting(): void {
     const setting: PlayerSetting = this.storageService.loadLocalStorage('player') || {};
+    if (setting.rate != null) {
+      this.rate = setting.rate;
+    }
     if (setting.mute != null) {
       this.mute = setting.mute;
     }
