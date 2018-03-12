@@ -38,6 +38,7 @@ export class SeekbarComponent implements OnInit, OnDestroy {
   @Input() public showPrevious: boolean;
   @Input() public showNext: boolean;
   @Input() public chapters: number[] = [];
+  @Input() public peaks: any[] = [];
   @Input() public chartPoints: string;
   @Output() public previous: EventEmitter<null> = new EventEmitter();
   @Output() public next: EventEmitter<null> = new EventEmitter();
@@ -71,7 +72,7 @@ export class SeekbarComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.form.valueChanges.subscribe((data) => {
         if (this.isSeeking) {
-          this.player.position = data.position;
+          this.seek(data.position);
         }
       }),
       this.player.event.filter((event: any): boolean => (
@@ -95,5 +96,9 @@ export class SeekbarComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach((a: Subscription) => {
       a.unsubscribe();
     });
+  }
+
+  public seek(position: number) {
+    this.player.position = position;
   }
 }

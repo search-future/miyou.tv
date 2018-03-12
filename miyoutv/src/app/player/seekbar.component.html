@@ -35,6 +35,7 @@ limitations under the License.
                 <datalist id="chapters">
                     <option *ngFor="let chapter of chapters" [value]="chapter"></option>
                 </datalist>
+                <a class="badge badge-balloon" href="" *ngFor="let peak of peaks" [style.left]="peak.pos * 100 + '%'" (click)="seek(peak.pos); false">{{peak.n_hits}}</a>
             </div>
             <div class="input-group-append">
                 <span class="input-group-text border-0 bg-transparent text-light clickable" (click)="useClock = !useClock">{{useClock && endTime ? (endTime | dateEx:hourFirst:hourFormat:'HHHH:mm:ss') : (length | formatTime)}}</span>

@@ -44,6 +44,7 @@ export class ProgramPlayComponent implements OnInit, OnDestroy {
   public intervals: any[] = [];
   public chapters: number[] = [];
   public chartPoints: string = '';
+  public peaks: any[] = [];
   public sidebarCollapsed: boolean = false;
   public offset: Date;
   private subscriptions: Subscription[] = [];
@@ -164,6 +165,7 @@ export class ProgramPlayComponent implements OnInit, OnDestroy {
         };
         this.intervals = intervals;
         this.updateChart();
+        this.updatePeaks();
       }),
       this.commentPlayer.valueChanges.subscribe((data: any) => {
         const delay: number = data.delay;
@@ -171,6 +173,7 @@ export class ProgramPlayComponent implements OnInit, OnDestroy {
           this.offset = new Date(this.info.start);
           this.updateChart();
           this.updateChapters();
+          this.updatePeaks();
         }
       }),
     );
@@ -506,6 +509,41 @@ export class ProgramPlayComponent implements OnInit, OnDestroy {
     } else {
       this.chartPoints = '';
     }
+  }
+
+  protected updatePeaks() {
+    const start: number = this.commentPlayer.offset.getTime();
+    const end: number = start + this.player.length;
+    let peaks: any[] = [];
+    if (this.player.length && Array.isArray(this.intervals)) {
+      let threshold: number = Math.max.apply(
+        null,
+        this.intervals.map((a: any): number => a.n_hits),
+      ) / 2;
+      if (threshold < 10) {
+        threshold = 10;
+      }
+      peaks = this.intervals.filter((a: any, i: number, array: any[]) => (
+        a.n_hits >= threshold &&
+        a.start >= start &&
+        a.start < end &&
+        (!array[i - 1] || a.n_hits >= array[i - 1].n_hits) &&
+        (!array[i + 1] || a.n_hits >= array[i + 1].n_hits)
+      )).sort((a: any, b: any) => (
+        a.n_hits - b.n_hits
+      ));
+    }
+    this.peaks = peaks.slice(-5).map((a: any): any => {
+      let position: number = (a.start - start) / this.player.length;
+      if (position > 1) {
+        position = 1;
+      } else if (position < 0) {
+        position = 0;
+      }
+      return Object.assign({}, a, {
+        pos: Math.floor(position * 100000) / 100000,
+      });
+    });
   }
 
   public onMouseWheel(e: WheelEvent) {

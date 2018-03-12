@@ -335,6 +335,22 @@ body {
   }
 }
 
+// Seekbar
+.seekbar .badge-balloon {
+  top: -50%;
+  z-index: 1;
+  &::after {
+    right: auto;
+    bottom: -6px;
+    margin: 0;
+    border-width: 6px 6px 0 0;
+    border-color: theme-color(balloon) transparent transparent;
+  }
+  &:hover {
+    z-index: 2;
+  }
+}
+
 .sidebar {
   .sidebar-close {
     position: absolute;
