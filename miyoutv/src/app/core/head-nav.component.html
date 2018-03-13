@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <meta charset="UTF-8">
-<div class="navbar navbar-expand-md fixed-top px-0 py-1 py-md-0 navbar-dark bg-dark border-black" [class.d-none]="path === '/programs/play'">
+<div class="navbar navbar-expand-md fixed-top px-0 py-1 py-md-0 navbar-dark bg-dark border-black" [class.d-none]="['/programs/play', '/setup'].indexOf(path) >= 0">
     <span class="navbar-brand ml-3 d-md-none">
         <img width="20" height="20" alt="Logo" src="miyoutv.ico">
     </span>

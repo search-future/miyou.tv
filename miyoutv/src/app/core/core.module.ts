@@ -25,6 +25,7 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { SharedModule } from '../shared/shared.module';
 import { BackendSettingComponent } from './backend-setting.component';
 import { HeadNavComponent } from './head-nav.component';
+import { SetupComponent } from './setup.component';
 import { TitlebarComponent } from './titlebar.component';
 import { MoritapoSettingComponent } from './moritapo-setting.component';
 import { ViewSettingComponent } from './view-setting.component';
@@ -45,6 +46,7 @@ import { ViewSettingComponent } from './view-setting.component';
     BackendSettingComponent,
     HeadNavComponent,
     MoritapoSettingComponent,
+    SetupComponent,
     TitlebarComponent,
     ViewSettingComponent,
   ],
@@ -52,6 +54,7 @@ import { ViewSettingComponent } from './view-setting.component';
     BackendSettingComponent,
     HeadNavComponent,
     MoritapoSettingComponent,
+    SetupComponent,
     TitlebarComponent,
     ViewSettingComponent,
   ],

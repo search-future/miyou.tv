@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<!--
+Copyright 2016-2018 Brazil Ltd.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<meta charset="UTF-8">
+<div class="programs view-content d-flex flex-column fit">
+    <div class="view-content-body flex-fill overflow-auto bg-dark text-light">
+        <div class="container py-3">
+            <div class="h2">初期設定</div>
+            <div class="card m-2 border-secondary bg-dark text-light ">
+                <div class="card-header border-bottom border-secondary bg-black">バックエンド設定</div>
+                <div class="card-body">
+                    テレビ番組の視聴に使用するバックエンドを設定します。バックエンドには<a href="" (click)="open('https://chinachu.moe/'); false">Chinachu</a>と<a href="" (click)="open(garaponEntryUrl); false">ガラポンTV</a>が使用できます。デフォルトではローカルで動作しているChinachuに接続します。
+                </div>
+                <div class="card-footer">
+                    <button class="btn" (click)="openBackendSetting()">バックエンド設定を開く</button>
+                </div>
+            </div>
+            <div class="card m-2 border-secondary bg-dark text-light">
+                <div class="card-header border-bottom border-secondary bg-black">モリタポアカウント設定</div>
+                <div class="card-body">
+                    コメント機能をを利用するためのモリタポアカウントを設定します。設定するとコメントの表示やランキングなどの機能が使用できるようになります。
+                </div>
+                <div class="card-footer">
+                    <button class="btn" (click)="openMoritapoSetting()">モリタポアカウント設定を開く</button>
+                </div>
+            </div>
+            <div class="card m-2 border-secondary bg-dark text-light">
+                <div class="card-header border-bottom border-secondary bg-black">表示設定</div>
+                <div class="card-body">
+                    コメント数の表示や時刻表示の設定をします。
+                </div>
+                <div class="card-footer">
+                    <button class="btn" (click)="openViewSetting()">表示設定を開く</button>
+                </div>
+            </div>
+            <div class="text-right">
+                <button class="btn btn-primary" (click)="complete()">設定を完了する</button>
+            </div>
+        </div>
+    </div>
+</div>

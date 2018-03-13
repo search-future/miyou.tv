@@ -15,6 +15,7 @@ limitations under the License.
 */
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { SetupComponent } from './core/setup.component';
 
 @NgModule({
   imports: [
@@ -24,6 +25,10 @@ import { RouterModule } from '@angular/router';
           path: '',
           redirectTo: 'programs',
           pathMatch: 'full',
+        },
+        {
+          path: 'setup',
+          component: SetupComponent,
         },
         {
           path: 'programs',

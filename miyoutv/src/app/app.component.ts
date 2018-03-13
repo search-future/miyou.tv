@@ -93,6 +93,11 @@ export class AppComponent implements OnInit, OnDestroy {
       [],
       '全画面表示解除/MiyouTVを終了',
     )]);
+    if (!this.storageService.loadLocalStorage('isConfigured')) {
+      this.router.navigate(['setup'], {
+        replaceUrl: true,
+      });
+    }
   }
 
   public ngOnDestroy() {
