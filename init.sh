@@ -5,7 +5,7 @@ then
     export npm_config_wcjs_runtime_version="0.36.7"
 
     npm install --no-optional
-    npm install electron-prebuilt@0.36.7 webchimera.js 7zip-bin
+    npm install electron-prebuilt@0.36.7 webchimera.js 7zip-bin app-builder-bin
 elif [ "$(uname)" = "Darwin" ]
 then
     export WCJS_VERSION="v0.2.7"
@@ -13,7 +13,7 @@ then
     export WCJS_RUNTIME_VERSION="v1.4.13"
 
     npm install --no-optional
-    npm install electron@1.4.13 wcjs-prebuilt 7zip-bin
+    npm install electron@1.4.13 wcjs-prebuilt 7zip-bin app-builder-bin
 
 else
     export WCJS_VERSION="v0.2.7"
@@ -21,5 +21,5 @@ else
     export WCJS_RUNTIME_VERSION="v1.4.13"
 
     npm install --no-optional
-    npm install electron@1.4.13 wcjs-prebuilt 7zip-bin
+    npm install electron@1.4.13 wcjs-prebuilt 7zip-bin app-builder-bin
 fi
