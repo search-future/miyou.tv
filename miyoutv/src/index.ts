@@ -31,10 +31,7 @@ app.commandLine.appendSwitch('js-flags', '--max-old-space-size=512 --gc_interval
 
 try {
   require('electron-reload')(__dirname, {
-    electron: (
-      /^0/.test(process.versions.electron) ?
-        require('electron-prebuilt') : process.execPath
-    ),
+    electron: process.execPath,
   });
 } catch (e) { }
 

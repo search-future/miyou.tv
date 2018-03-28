@@ -1,7 +1,4 @@
 {
-  "devDependencies": {
-    "electron": "1.4.13"
-  },
   "dependencies": {
     "wcjs-prebuilt": "^3.0.0"
   }

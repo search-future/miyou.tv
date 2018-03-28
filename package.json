@@ -29,6 +29,7 @@
     "angular2-hotkeys": "^2.0.3",
     "bootstrap": "^4.0.0",
     "core-js": "^2.5.3",
+    "electron": "1.4.13",
     "ng2-toastr": "^4.1.2",
     "ngx-bootstrap": "^2.0.1",
     "ngx-contextmenu": "^4.1.2",
@@ -81,7 +82,7 @@
     "webpack": "^3.11.0"
   },
   "engines": {
-    "node": ">=4"
+    "node": ">=6.5.0"
   },
   "homepage": "http://miyou.tv/",
   "keywords": [
@@ -95,8 +96,6 @@
   "license": "Apache-2.0",
   "main": "miyoutv/dist/index.js",
   "optionalDependencies": {
-    "electron": "1.4.13",
-    "electron-prebuilt": "^0.36.0",
     "wcjs-prebuilt": "^3.0.0",
     "webchimera.js": "^0.2.7"
   },

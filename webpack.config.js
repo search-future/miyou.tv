@@ -26,7 +26,6 @@ const miyoutvConfigMain = {
   devtool: 'source-map',
   target: 'electron-main',
   externals: [{
-    'electron-prebuilt': 'require("electron-prebuilt")',
     'electron-reload': 'require("electron-reload")',
   }],
   plugins: [

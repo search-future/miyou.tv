@@ -1,7 +1,4 @@
 {
-  "devDependencies": {
-    "electron-prebuilt": "0.36.7"
-  },
   "dependencies": {
     "webchimera.js": "^0.2.7"
   }

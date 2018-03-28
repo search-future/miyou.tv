@@ -6,6 +6,7 @@ extraMetadata:
   author:
     name: "未来検索ブラジル"
     url: "http://razil.jp/"
+afterPack: "afterpack.js"
 linux:
   category: "AudioVideo"
   icon: "miyoutv.iconset"
