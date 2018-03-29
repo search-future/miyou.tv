@@ -33,6 +33,7 @@ import { Player, VlcState } from '../player/player.service';
 })
 export class ProgramPlayComponent implements OnInit, OnDestroy {
   public active: boolean = false;
+  public loading: boolean = true;
   public id: string;
   public type: string;
   public channel: string;
@@ -374,6 +375,7 @@ export class ProgramPlayComponent implements OnInit, OnDestroy {
   }
 
   public load() {
+    this.loading = true;
     if (
       this.type &&
       this.channel
@@ -452,9 +454,9 @@ export class ProgramPlayComponent implements OnInit, OnDestroy {
           });
           this.updateChapters();
           this.commentPlayer.init(info.start, info.duration, info.channelName);
+          this.loading = false;
         },
         (error: any) => {
-
           if (
             error == null || (
               typeof error === 'object' &&
