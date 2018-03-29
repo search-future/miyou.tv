@@ -375,9 +375,7 @@ export class ProgramRankingComponent implements OnInit, OnDestroy {
       intervals: results.map((a: any): any[] => a.intervals)
         .reduce((a: any[], b: any[]): any[] => [...a, ...b], [])
         .sort((a: any, b: any): number => b.n_hits - a.n_hits),
-    })).do(() => {
-      this.loadingBarService.start();
-    }).mergeMap(
+    })).mergeMap(
       (result: any): Observable<any> => Observable.concat(...result.intervals.map(
         (interval: any): Observable<any> => Observable.defer((): Observable<any> => {
           const item: any = this.data.filter((a: any): boolean => (
@@ -404,10 +402,12 @@ export class ProgramRankingComponent implements OnInit, OnDestroy {
             end: interval.start + 60000,
             reverse: true,
           }).delay(0).map((search: any): any => {
-            const program: any = search.programs.filter((a: any): boolean => (
-              a.end > interval.start
-            ))[0];
-            if (program) {
+            const [program]: [any] = search.programs;
+            if (
+              program != null &&
+              typeof program === 'object' &&
+              program.end > interval.start
+            ) {
               const minutes: number = program.duration / 60000;
               const intervals: any[] = result.intervals.filter((a: any): boolean => (
                 a.type === program.type &&
@@ -436,22 +436,22 @@ export class ProgramRankingComponent implements OnInit, OnDestroy {
           });
         }).delay(100).catch((): Observable<any> => Observable.empty()),
       )).take(this.view),
-    ).subscribe((result: any) => {
-      if (
-        result != null &&
-        typeof result === 'object'
-      ) {
+    ).subscribe(
+      (result: any) => {
         index += 1;
         if (current !== result.n_hits) {
           rank = index;
           current = result.n_hits;
         }
         this.data.push(Object.assign({}, result, { rank, index }));
-        if (index >= this.view) {
-          this.loadingBarService.complete();
-        }
-      }
-    });
+        this.loadingBarService.complete();
+        this.loadingBarService.start();
+      },
+      null,
+      () => {
+        this.loadingBarService.complete();
+      },
+    );
   }
 
   public search(query: string) {
