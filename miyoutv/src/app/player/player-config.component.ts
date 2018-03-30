@@ -98,7 +98,7 @@ export class PlayerConfigComponent implements OnInit, OnDestroy {
             options,
           );
         }
-        if (data.channel != null) {
+        if (data.channel > 0) {
           this.audioForm.patchValue(
             { channel: data.audioChannel },
             options,
