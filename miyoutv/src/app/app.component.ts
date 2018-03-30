@@ -138,7 +138,12 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   public loadWindowState() {
-    const windowState: any = this.storageService.loadLocalStorage('windowState') || {};
+    const windowState: any = this.storageService.loadLocalStorage('windowState') || {
+      x: window.screen.width > 900 ? (window.screen.width - 900) / 2 : 0,
+      y: window.screen.height > 500 ? (window.screen.height - 500) / 2 : 0,
+      width: 900,
+      height: 500,
+    };
     window.moveTo(windowState.x, windowState.y);
     window.resizeTo(windowState.width, windowState.height);
     this.windowService.alwaysOnTop = this.storageService.loadLocalStorage('alwaysOnTop') === true;
