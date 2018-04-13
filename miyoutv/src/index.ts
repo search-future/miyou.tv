@@ -24,28 +24,24 @@ declare namespace NodeJS {
 }
 declare const global: NodeJS.Global;
 
-let win: Electron.BrowserWindow = null;
-const nodeEnv: string = process.env.NODE_ENV;
-
-app.commandLine.appendSwitch('js-flags', '--max-old-space-size=512 --gc_interval=100');
+process.mainModule.paths.push(path.join(app.getPath('exe'), '../node_modules'));
 
 try {
-  require('electron-reload')(__dirname, {
+  __non_webpack_require__('electron-reload')(__dirname, {
     electron: process.execPath,
   });
 } catch (e) { }
 
+app.commandLine.appendSwitch('js-flags', '--max-old-space-size=512 --gc_interval=100');
+
 if (process.platform === 'win32' && !process.env.VLC_PLUGIN_PATH) {
   process.env.VLC_PLUGIN_PATH = path.join(
-    app.getPath('exe'),
-    '../node_modules/wcjs-prebuilt/bin/plugins',
+    path.dirname(__non_webpack_require__.resolve('wcjs-prebuilt')),
+    'bin/plugins',
   );
-  try {
-    fs.statSync(process.env.VLC_PLUGIN_PATH);
-  } catch (e) {
-    process.env.VLC_PLUGIN_PATH = path.resolve('node_modules/wcjs-prebuilt/bin/plugins');
-  }
 }
+
+let win: Electron.BrowserWindow = null;
 
 function buildAppMenu(): Electron.Menu {
   const template: Electron.MenuItemOptions[] = [];
@@ -246,7 +242,7 @@ function createWindow(): void {
     global.contextMenu = buildContextMenu();
   }
 
-  if (nodeEnv !== 'production') {
+  if (process.env.NODE_ENV !== 'production') {
     win.webContents.openDevTools();
   }
 }

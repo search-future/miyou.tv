@@ -18,7 +18,6 @@ import faSolid from '@fortawesome/fontawesome-free-solid';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { enableProdMode } from '@angular/core';
 
-import './path.ts';
 import { AppModule } from './app/app.module';
 
 fontawesome.library.add(faSolid);

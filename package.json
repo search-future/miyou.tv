@@ -45,6 +45,7 @@
     "@types/core-js": "^0.9.45",
     "@types/electron": "~1.4.38",
     "@types/webpack": "^3.8.11",
+    "@types/webpack-env": "^1.13.6",
     "angular-router-loader": "^0.8.2",
     "angular2-template-loader": "^0.6.2",
     "awesome-typescript-loader": "^4.0.1",
