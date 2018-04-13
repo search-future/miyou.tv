@@ -17,13 +17,6 @@ import { app, shell, BrowserWindow, Menu } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 
-declare namespace NodeJS {
-  interface Global {
-    contextMenu: Electron.Menu;
-  }
-}
-declare const global: NodeJS.Global;
-
 process.mainModule.paths.push(path.join(app.getPath('exe'), '../node_modules'));
 
 try {
@@ -238,10 +231,6 @@ function createWindow(): void {
   );
 
   Menu.setApplicationMenu(buildAppMenu());
-  if (/^0/.test(process.versions.electron)) {
-    global.contextMenu = buildContextMenu();
-  }
-
   if (process.env.NODE_ENV !== 'production') {
     win.webContents.openDevTools();
   }

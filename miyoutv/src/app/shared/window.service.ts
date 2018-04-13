@@ -34,12 +34,6 @@ export class WindowService {
       this.shell = remote.shell;
       this.win = remote.getCurrentWindow();
       this.powerSaveBlocker = remote.powerSaveBlocker;
-      if (/^0/.test(process.versions.electron)) {
-        window.addEventListener('contextmenu', (e: Event) => {
-          e.preventDefault();
-          remote.getGlobal('contextMenu').popup();
-        });
-      }
     }
   }
 
