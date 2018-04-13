@@ -14,13 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import fontawesome from '@fortawesome/fontawesome';
-import faSolid from '@fortawesome/fontawesome-free-solid';
+import fontawesomeFreeSolid from '@fortawesome/fontawesome-free-solid';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { enableProdMode } from '@angular/core';
 
 import { AppModule } from './app/app.module';
 
-fontawesome.library.add(faSolid);
+fontawesome.library.add(fontawesomeFreeSolid);
 
 if (process.env.ENV === 'production') {
   enableProdMode();
