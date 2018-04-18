@@ -482,10 +482,14 @@ export class ProgramPlayComponent implements OnInit, OnDestroy {
   }
 
   protected updateChapters() {
-    this.chapters = this.programs.map((a: any): number => {
-      const position: number = (a.start.getTime() - this.offset.getTime()) / this.player.length;
-      return Math.floor(position * 100000) / 100000;
-    });
+    if (this.player.length && Array.isArray(this.programs)) {
+      this.chapters = this.programs.map((a: any): number => {
+        const position: number = (a.start.getTime() - this.offset.getTime()) / this.player.length;
+        return Math.floor(position * 100000) / 100000;
+      });
+    } else {
+      this.chapters = [];
+    }
   }
 
   protected updateChart() {
