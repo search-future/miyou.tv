@@ -13,79 +13,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import * as fs from 'fs';
-import * as path from 'path';
-import { remote } from 'electron';
-import { EventEmitter, Inject, Injectable, Optional } from '@angular/core';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { EventEmitter, Inject, Injectable } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
 import { StorageService } from '../shared/storage.service';
-
-declare const wcjsRenderer: any;
-
-declare module NodeJS {
-  interface Global {
-    require: {
-      resolve: (name: string) => string;
-    };
-  }
-}
-declare const global: NodeJS.Global;
-
-let wcjs: any;
-if (process.platform === 'darwin' && !process.env.WCJS_TARGET) {
-  const wcjsPath: string = path.join(
-    global.require.resolve('wcjs-prebuilt'),
-    '../bin',
-  );
-  const wcjsTarget: string = path.join(
-    remote.app.getPath('temp'),
-    remote.app.getName(),
-    'webchimera.js',
-  );
-  try {
-    const paths: string[] = [wcjsPath];
-    const libs: string[] = fs.readdirSync(path.join(wcjsPath, 'lib'));
-    try {
-      fs.mkdirSync(path.join(wcjsTarget, '..'));
-    } catch (e) { }
-    while (paths.length > 0) {
-      const src: string = paths.shift();
-      const dest: string = src.replace(wcjsPath, wcjsTarget);
-      try {
-        const stat: fs.Stats = fs.lstatSync(src);
-        if (stat.isDirectory()) {
-          paths.push(...fs.readdirSync(src).map((a: string): string => path.join(src, a)));
-          fs.mkdirSync(dest);
-        } else if (stat.isSymbolicLink()) {
-          if (fs.existsSync(dest)) {
-            fs.unlinkSync(dest);
-          }
-          if (/\.dylib$/.test(src)) {
-            const basename: string = path.basename(src);
-            const lib: string = libs.filter((a: string): boolean => (
-              a.indexOf(`${basename.split('.')[0]}.`) === 0 && a !== basename
-            ))[0];
-            fs.symlinkSync(path.join(wcjsTarget, 'lib', lib), dest);
-          } else {
-            fs.symlinkSync(src, dest);
-          }
-        } else {
-          fs.writeFileSync(dest, fs.readFileSync(src));
-        }
-      } catch (e) { }
-    }
-    process.env.WCJS_TARGET = wcjsTarget;
-  } catch (e) { }
-}
-try {
-  wcjs = require('wcjs-prebuilt');
-} catch (e) {
-  wcjs = require('webchimera.js');
-}
-
-export enum VlcLogLevel { Debug, Info, Warning, Error }
-export enum VlcState { NothingSpecial, Opening, Buffering, Playing, Paused, Stopped, Ended, Error }
-export enum VlcAudio { Error, Stereo, ReverseStereo, Left, Right, Dolby }
+import { VlcService } from './vlc.service';
+export { VlcState as PlayerState } from './vlc.service';
 
 interface PlayerSetting {
   rate: number;
@@ -97,367 +29,252 @@ interface PlayerSetting {
 
 @Injectable()
 export class Player {
-  public static deinterlaceList: string[] = [
-    'blend',
-    'bob',
-    'discard',
-    'linear',
-    'mean',
-    'x',
-    'yadif',
-    'yadif2x',
-  ];
-
   public readonly event: Observable<any> = new EventEmitter();
-  public readonly player: any;
   public readonly screenText: Subject<{ message: string, force?: boolean }> = new Subject();
   public readonly valueChanges: Observable<any> = new EventEmitter();
   public active: boolean = false;
   public overwriteLength: number = 0;
   public playerRateLimit: number = 8;
   public preseekTime: number = 0;
-  protected _deinterlace: string = '';
-  protected _aspectRatio: string = '16:9';
-  protected renderContext: any;
+  protected player: VlcService;
 
   constructor(
     @Inject('playerOptions') private playerOptions: string[],
     private storageService: StorageService,
+    private vlc: VlcService,
   ) {
-    this.player = wcjs.createPlayer(playerOptions || []);
-    this.player.onFrameSetup = (
-      width: number,
-      height: number,
-      pixelFormat: string,
-      videoFrame: any,
-    ) => {
-      (this.event as EventEmitter<any>).emit({
-        width,
-        height,
-        pixelFormat,
-        videoFrame,
-        name: 'FrameSetup',
-      });
-    };
-    this.player.onFrameReady = (videoFrame: any) => {
-      (this.event as EventEmitter<any>).emit({
-        videoFrame,
-        name: 'FrameReady',
-      });
-    };
-    this.player.onFrameCleanup = () => {
-      (this.event as EventEmitter<any>).emit({ name: 'FrameCleanup' });
-    };
-    this.player.onMediaChanged = () => {
-      (this.event as EventEmitter<any>).emit({ name: 'MediaChanged' });
-    };
-    this.player.onNothingSpecial = () => {
-      (this.event as EventEmitter<any>).emit({ name: 'NothingSpecial' });
-    };
-    this.player.onOpening = () => {
-      (this.event as EventEmitter<any>).emit({ name: 'Opening' });
-    };
-    this.player.onBuffering = (percents: number) => {
-      (this.event as EventEmitter<any>).emit({
-        percents,
-        name: 'Buffering',
-      });
-    };
-    this.player.onPlaying = () => {
-      (this.event as EventEmitter<any>).emit({ name: 'Playing' });
-    };
-    this.player.onPaused = () => {
-      (this.event as EventEmitter<any>).emit({ name: 'Paused' });
-    };
-    this.player.onForward = () => {
-      (this.event as EventEmitter<any>).emit({ name: 'Forward' });
-    };
-    this.player.onBackward = () => {
-      (this.event as EventEmitter<any>).emit({ name: 'Backward' });
-    };
-    this.player.onEncounteredError = () => {
-      (this.event as EventEmitter<any>).emit({ name: 'EncounteredError' });
-    };
-    this.player.onEndReached = () => {
-      (this.event as EventEmitter<any>).emit({ name: 'EndReached' });
-    };
-    this.player.onStopped = () => {
-      (this.event as EventEmitter<any>).emit({ name: 'Stopped' });
-    };
-    this.player.onTimeChanged = (time: number) => {
-      (this.event as EventEmitter<any>).emit({
-        time,
-        name: 'TimeChanged',
-      });
-    };
-    this.player.onPositionChanged = (position: number) => {
-      (this.event as EventEmitter<any>).emit({
-        position,
-        name: 'PositionChanged',
-      });
-    };
-    this.player.onSeekableChanged = (seekable: boolean) => {
-      (this.event as EventEmitter<any>).emit({
-        seekable,
-        name: 'SeekableChanged',
-      });
-    };
-    this.player.onPausableChanged = (pausable: boolean) => {
-      (this.event as EventEmitter<any>).emit({
-        pausable,
-        name: 'PausableChanged',
-      });
-    };
-    this.player.onLengthChanged = (length: number) => {
-      (this.event as EventEmitter<any>).emit({
-        length,
-        name: 'LengthChanged',
-      });
-    };
-    this.player.onLogMessage = (level: number, message: string, format: string) => {
-      (this.event as EventEmitter<any>).emit({
-        level, message, format, length,
-        name: 'LogMessage',
-      });
-    };
+    this.vlc.valueChanges.subscribe((value: any) => {
+      (this.valueChanges as EventEmitter<any>).emit(value);
+    });
+    this.vlc.event.subscribe((event: any) => {
+      (this.event as EventEmitter<any>).emit(event);
+    });
 
-    this.event.filter((event: any): boolean => (
-      event.name === 'LogMessage'
-    )).subscribe((event: any) => {
-      switch (event.level) {
-        case VlcLogLevel.Error:
-          if (event.message.indexOf('Unexpected channel configuration change') >= 0) {
-            const track: number = this.audioTrack;
-            this.audioTrack = 0;
-            this.audioTrack = track;
-            this.position = this.position;
-          }
-          break;
-        default:
-      }
-    });
-    this.event.filter(
-      (event: any): boolean => event.name === 'FrameReady',
-    ).subscribe((event: any) => {
-      this.renderContext.render(
-        event.videoFrame,
-        event.videoFrame.width,
-        event.videoFrame.height,
-        event.videoFrame.uOffset,
-        event.videoFrame.vOffset,
-      );
-    });
-    this.event.filter(
-      (event: any): boolean => event.name === 'MediaChanged',
-    ).mergeMap((event: any): Observable<any> => {
-      this.active = false;
-      return this.event.filter((event: any): boolean => event.name === 'Playing');
-    }).delay(0).subscribe((event: any) => {
+    Observable.zip(
+      this.event.filter((event: any): boolean => event.name === 'Mediachanged'),
+      this.event.filter((event: any): boolean => event.name === 'Playing'),
+    ).subscribe(() => {
       this.loadSetting();
-      if (this.preseekTime !== 0) {
-        this.time = this.preseekTime - 10000;
-      }
-      this.preseekTime = 0;
-      this.active = true;
+      (this.valueChanges as EventEmitter<any>).emit({
+        audioTrack: this.audioTrack,
+        videoTrack: this.videoTrack,
+        subtitlesTrack: this.subtitlesTrack,
+      });
+      this.event.filter(
+        (event: any): boolean => event.name === 'PositionChanged',
+      ).skip(1).take(1).subscribe(() => {
+        if (this.preseekTime !== 0) {
+          this.time = this.preseekTime - 10000;
+        }
+        this.preseekTime = 0;
+        this.active = true;
+      });
     });
   }
 
   get playing(): boolean {
-    return this.player.playing;
+    return this.player ? this.player.playing : false;
   }
 
   get state(): number {
-    return this.player.state;
+    return this.player ? this.player.state : 0;
   }
 
   get length(): number {
-    if (this.player.length === 0 && this.overwriteLength > 0) {
-      return this.overwriteLength;
+    if (this.player) {
+      if (this.player.length === 0 && this.overwriteLength > 0) {
+        return this.overwriteLength;
+      }
+      return this.player.length;
     }
-    return this.player.length;
+    return 0;
   }
 
   set position(position: number) {
-    this.player.position = position;
+    if (this.player) {
+      this.player.position = position;
+    }
   }
   get position(): number {
-    return this.player.position;
+    return this.player ? this.player.position : 0;
   }
 
   set time(time: number) {
-    const newTime: number = time;
-    if (this.player.time === 0 && this.overwriteLength > 0) {
-      this.position = newTime / this.overwriteLength;
-    } else {
-      this.player.time = newTime;
+    if (this.player) {
+      if (this.player.time === 0 && this.overwriteLength > 0) {
+        this.position = time / this.overwriteLength;
+      } else {
+        this.player.time = time;
+      }
     }
   }
-
   get time(): number {
-    if (this.player.time === 0 && this.overwriteLength > 0) {
-      return this.position * this.overwriteLength;
+    if (this.player) {
+      if (this.player.time === 0 && this.overwriteLength > 0) {
+        return this.position * this.overwriteLength;
+      }
+      return this.player.time;
     }
-    return this.player.time;
+    return 0;
   }
 
   set volume(volume: number) {
-    if (volume > 200) {
-      this.player.volume = 200;
-    } else if (volume < 0) {
-      this.player.volume = 0;
-    } else {
-      this.player.volume = volume;
+    if (this.player) {
+      if (volume > 200) {
+        this.player.volume = 200;
+      } else if (volume < 0) {
+        this.player.volume = 0;
+      } else {
+        this.player.volume = volume;
+      }
+      const message: string = `音量 ${this.volume}%`;
+      this.screenText.next({ message });
+      this.saveSetting();
     }
-    (this.valueChanges as EventEmitter<any>).emit({ volume: this.player.volume });
-    const message: string = `音量 ${this.volume}%`;
-    this.screenText.next({ message });
-    this.saveSetting();
   }
   get volume(): number {
-    return this.player.volume;
+    return this.player ? this.player.volume : 0;
   }
 
   set mute(value: boolean) {
-    this.player.mute = value;
-    (this.valueChanges as EventEmitter<any>).emit({ mute: this.player.mute });
-    this.saveSetting();
+    if (this.player) {
+      this.player.mute = value;
+      this.saveSetting();
+    }
   }
   get mute(): boolean {
-    return this.player.mute;
+    return this.player ? this.player.mute : false;
   }
 
   set rate(rate: number) {
-    const newRate: number = rate;
-    if (newRate >= this.playerRateLimit) {
-      this.player.input.rate = this.playerRateLimit;
-    } else if (newRate > 64) {
-      this.player.input.rate = 64;
-    } else if (newRate < 1 / 32) {
-      this.player.input.rate = 1 / 32;
-    } else {
-      this.player.input.rate = newRate;
+    if (this.player) {
+      const newRate: number = rate;
+      if (newRate >= this.playerRateLimit) {
+        this.player.rate = this.playerRateLimit;
+      } else if (newRate > 64) {
+        this.player.rate = 64;
+      } else if (newRate < 1 / 32) {
+        this.player.rate = 1 / 32;
+      } else {
+        this.player.rate = newRate;
+      }
+      const message: string = `再生速度 x${(Math.round(this.rate * 100) / 100)}`;
+      this.screenText.next({ message });
+      this.saveSetting();
     }
-    (this.valueChanges as EventEmitter<any>).emit({ rate: this.player.input.rate });
-    const message: string = `再生速度 x${(Math.round(this.rate * 100) / 100)}`;
-    this.screenText.next({ message });
-    this.saveSetting();
   }
   get rate(): number {
-    return this.player.input.rate;
+    return this.player ? this.player.rate : 1;
   }
 
   get audioTrackCount(): number {
-    return this.player.audio.count;
+    return this.player ? this.player.audioTrackCount : 0;
   }
 
   set audioTrack(track: number) {
-    this.player.audio.track = track;
+    this.player.audioTrack = track;
     let message: string;
     if (this.audioTrack > 0) {
       message = `音声${this.audioTrack}`;
     } else {
       message = '音声無効';
     }
-    (this.valueChanges as EventEmitter<any>).emit({ audioTrack: this.audioTrack });
     this.screenText.next({ message });
   }
   get audioTrack(): number {
-    return this.player.audio.track;
+    return this.player ? this.player.audioTrack : 0;
   }
 
   set audioChannel(channel: number) {
-    this.player.audio.channel = channel;
-    (this.valueChanges as EventEmitter<any>).emit({ audioChannel: this.audioChannel });
+    this.player.audioChannel = channel;
   }
   get audioChannel(): number {
-    return this.player.audio.channel;
+    return this.player ? this.player.audioChannel : 0;
   }
 
   set audioDelay(delay: number) {
-    this.player.audio.delay = delay;
-    (this.valueChanges as EventEmitter<any>).emit({ audioDelay: this.audioDelay });
+    this.player.audioDelay = delay;
   }
   get audioDelay(): number {
-    return this.player.audio.delay;
+    return this.player ? this.player.audioDelay : 0;
   }
 
   get videoTrackCount(): number {
-    return this.player.video.count;
+    return this.player ? this.player.videoTrackCount : 0;
   }
 
   set videoTrack(track: number) {
-    this.player.video.track = track;
+    this.player.videoTrack = track;
     let message: string;
     if (this.videoTrack > 0) {
       message = `映像${this.videoTrack}`;
     } else {
       message = '映像無効';
     }
-    (this.valueChanges as EventEmitter<any>).emit({ videoTrack: this.videoTrack });
     this.screenText.next({ message });
   }
   get videoTrack(): number {
-    return this.player.video.track;
+    return this.player ? this.player.videoTrack : 0;
   }
 
   set aspectRatio(value: string) {
-    this._aspectRatio = value;
-    (this.valueChanges as EventEmitter<any>).emit({ aspectRatio: this.aspectRatio });
-    this.saveSetting();
+    if (this.player) {
+      this.player.aspectRatio = value;
+      this.saveSetting();
+    }
   }
   get aspectRatio() {
-    return this._aspectRatio;
+    return this.player ? this.player.aspectRatio : '16:9';
   }
 
   set deinterlace(mode: string) {
-    const isEnabled: boolean = Player.deinterlaceList.some(
-      (a: string): boolean => a === mode,
-    );
-    if (isEnabled) {
-      this.player.video.deinterlace.enable(mode);
-      this._deinterlace = mode;
-    } else {
-      this.player.video.deinterlace.disable();
-      this._deinterlace = '';
+    if (this.player) {
+      this.player.deinterlace = mode;
+      this.saveSetting();
     }
-    (this.valueChanges as EventEmitter<any>).emit({ deinterlace: this.deinterlace });
-    this.saveSetting();
   }
   get deinterlace(): string {
-    return this._deinterlace;
+    return this.player ? this.player.deinterlace : '';
   }
 
   get subtitlesCount(): number {
-    return this.player.subtitles.count;
+    return this.player ? this.player.subtitlesCount : 0;
   }
 
   set subtitlesTrack(track: number) {
-    this.player.subtitles.track = track;
-    let message: string;
-    if (this.subtitlesTrack > 0) {
-      message = `字幕${this.subtitlesTrack}`;
-    } else {
-      message = '字幕無効';
+    if (this.player) {
+      this.player.subtitlesTrack = track;
+      let message: string;
+      if (this.subtitlesTrack > 0) {
+        message = `字幕${this.subtitlesTrack}`;
+      } else {
+        message = '字幕無効';
+      }
+      this.screenText.next({ message });
     }
-    (this.valueChanges as EventEmitter<any>).emit({ subtitlesTrack: this.subtitlesTrack });
-    this.screenText.next({ message });
   }
   get subtitlesTrack(): number {
-    return this.player.subtitles.track;
+    return this.player ? this.player.subtitlesTrack : 0;
   }
 
-  protected saveSetting(): void {
-    const setting: PlayerSetting = {
-      rate: this.rate,
-      mute: this.mute,
-      volume: this.volume,
-      deinterlace: this.deinterlace,
-      aspectRatio: this.aspectRatio,
-    };
-    this.storageService.saveLocalStorage('player', setting);
+  protected saveSetting() {
+    if (this.active) {
+      this.valueChanges.take(1).delay(500).subscribe(() => {
+        if (this.active) {
+          const setting: PlayerSetting = {
+            rate: this.rate,
+            mute: this.mute,
+            volume: this.volume,
+            deinterlace: this.deinterlace,
+            aspectRatio: this.aspectRatio,
+          };
+          this.storageService.saveLocalStorage('player', setting);
+        }
+      });
+    }
   }
 
-  protected loadSetting(): void {
+  protected loadSetting() {
     const setting: PlayerSetting = this.storageService.loadLocalStorage('player') || {};
     if (setting.rate != null) {
       this.rate = setting.rate;
@@ -476,49 +293,62 @@ export class Player {
     }
   }
 
-  public init(screen: HTMLCanvasElement): void {
-    this.renderContext = wcjsRenderer.setupCanvas(screen);
-    this.renderContext.fillBlack();
+  public initVlc(screen: HTMLCanvasElement) {
+    this.vlc.init(screen);
+    this.player = this.vlc;
   }
 
-  public suspend(): void {
-    this.player.stop();
-    this.player.playlist.clear();
-    this.renderContext.fillBlack();
-  }
-
-  public play(mrl?: string): void {
-    if (mrl) {
-      this.active = false;
-      this.player.play(mrl);
-    } else {
-      this.player.play();
+  public suspend() {
+    if (this.player) {
+      this.player.suspend();
+      this.player = null;
     }
   }
-  public pause(): void {
-    this.player.pause();
+
+  public play(mrl?: string) {
+    if (this.player) {
+      if (mrl) {
+        this.active = false;
+        this.player.play(mrl);
+      } else {
+        this.player.play();
+      }
+    }
   }
 
-  public togglePause(): void {
-    this.player.togglePause();
+  public pause() {
+    if (this.player) {
+      this.player.pause();
+    }
   }
 
-  public stop(): void {
+  public togglePause() {
+    if (this.player) {
+      this.player.togglePause();
+    }
+  }
+
+  public stop() {
     this.active = false;
-    this.player.stop();
+    if (this.player) {
+      this.player.stop();
+    }
   }
 
-  public toggleMute(): void {
-    this.player.toggleMute();
-    this.saveSetting();
-    (this.event as EventEmitter<any>).emit({ name: 'ValueChanged' });
+  public toggleMute() {
+    if (this.player) {
+      this.player.toggleMute();
+      this.saveSetting();
+    }
   }
 
-  public close(): void {
-    this.player.close();
+  public close() {
+    if (this.player) {
+      this.player.close();
+    }
   }
 
-  public toggleAudioTrack(): void {
+  public toggleAudioTrack() {
     let track: number = this.audioTrack + 1;
     if (track <= 0) {
       track = 1;
@@ -526,7 +356,7 @@ export class Player {
     this.audioTrack = track;
   }
 
-  public toggleVideoTrack(): void {
+  public toggleVideoTrack() {
     let track: number = this.videoTrack + 1;
     if (track <= 0) {
       track = 1;
@@ -534,7 +364,7 @@ export class Player {
     this.videoTrack = track;
   }
 
-  public toggleSubtitlesTrack(): void {
+  public toggleSubtitlesTrack() {
     let track: number = this.subtitlesTrack + 1;
     if (track <= 0) {
       track = 1;
@@ -542,11 +372,11 @@ export class Player {
     this.subtitlesTrack = track;
   }
 
-  public normalSpeed(): void {
+  public normalSpeed() {
     this.rate = 1;
   }
 
-  public speedUp(): void {
+  public speedUp() {
     let newRate: number = this.rate;
     switch (Math.floor(parseFloat(newRate.toFixed(1)))) {
       case 3:
@@ -562,7 +392,7 @@ export class Player {
     this.rate = newRate;
   }
 
-  public speedDown(): void {
+  public speedDown() {
     let newRate: number = this.rate;
     switch (Math.ceil(parseFloat(newRate.toFixed(1)))) {
       case 4:
@@ -578,7 +408,7 @@ export class Player {
     this.rate = newRate;
   }
 
-  public jumpForward(time: string): void {
+  public jumpForward(time: string) {
     if (/^-?[0-9.]+ms/.test(time as string)) {
       this.time = this.time + parseFloat(time as string);
     } else if (/^-?[0-9.]+s/.test(time as string)) {
@@ -588,7 +418,7 @@ export class Player {
     }
   }
 
-  public jumpBackward(time: string): void {
+  public jumpBackward(time: string) {
     if (/^-?[0-9.]+ms/.test(time as string)) {
       this.time = this.time - parseFloat(time);
     } else if (/^-?[0-9.]+s/.test(time as string)) {
@@ -598,11 +428,11 @@ export class Player {
     }
   }
 
-  public increaseVolume(value: number): void {
+  public increaseVolume(value: number) {
     this.volume = this.volume + value;
   }
 
-  public decreaseVolume(value: number): void {
+  public decreaseVolume(value: number) {
     this.volume = this.volume - value;
   }
 }

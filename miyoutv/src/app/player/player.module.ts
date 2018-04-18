@@ -19,6 +19,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { SharedModule } from '../shared/shared.module';
 import { Player } from './player.service';
+import { VlcService } from './vlc.service';
 import { ControlbarComponent } from './controlbar.component';
 import { SeekbarComponent } from './seekbar.component';
 import { VideoScreenComponent } from './video-screen.component';
@@ -47,6 +48,7 @@ import { PlayerConfigComponent } from './player-config.component';
   ],
   providers: [
     Player,
+    VlcService,
   ],
   entryComponents: [
     VideoScreenComponent,

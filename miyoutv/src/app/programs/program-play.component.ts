@@ -25,7 +25,7 @@ import { WindowService } from '../shared/window.service';
 import { ProgramsService, SearchOptions } from './programs.service';
 import { CommentService } from '../comment/comment.service';
 import { CommentPlayer } from '../comment/comment-player.service';
-import { Player, VlcState } from '../player/player.service';
+import { Player, PlayerState } from '../player/player.service';
 
 @Component({
   selector: 'program-play',
@@ -584,10 +584,10 @@ export class ProgramPlayComponent implements OnInit, OnDestroy {
 
   public stop() {
     if (
-      this.player.state === VlcState.NothingSpecial ||
-      this.player.state === VlcState.Stopped ||
-      this.player.state === VlcState.Ended ||
-      this.player.state === VlcState.Error
+      this.player.state === PlayerState.NothingSpecial ||
+      this.player.state === PlayerState.Stopped ||
+      this.player.state === PlayerState.Ended ||
+      this.player.state === PlayerState.Error
     ) {
       this.location.back();
     } else {

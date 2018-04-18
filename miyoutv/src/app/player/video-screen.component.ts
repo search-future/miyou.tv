@@ -15,6 +15,7 @@ limitations under the License.
 */
 import {
   AfterViewChecked,
+  AfterViewInit,
   ChangeDetectorRef,
   Component,
   ElementRef,
@@ -28,12 +29,12 @@ import { Player } from './player.service';
 
 @Component({
   selector: 'video-screen',
-  template: '<canvas [ngStyle]="canvasStyle" (window:resize)="adjustSize()" #screen></canvas> \
+  template: '<canvas [ngStyle]="screenStyle" (window:resize)="adjustSize()" #vlcScreen></canvas> \
     <div [ngStyle]="textStyle">{{text}}</div>',
 })
-export class VideoScreenComponent implements OnInit, OnDestroy, AfterViewChecked {
-  @ViewChild('screen') screen: ElementRef;
-  public canvasStyle: any = {
+export class VideoScreenComponent implements OnInit, OnDestroy, AfterViewInit, AfterViewChecked {
+  @ViewChild('vlcScreen') vlcScreen: ElementRef;
+  public screenStyle: any = {
     position: 'absolute',
     top: 0,
     right: 0,
@@ -60,7 +61,6 @@ export class VideoScreenComponent implements OnInit, OnDestroy, AfterViewChecked
   ) { }
 
   public ngOnInit() {
-    this.player.init(this.screen.nativeElement);
     this.player.screenText.do((screenText: any) => {
       if (this.player.active || screenText.force) {
         this.text = screenText.message;
@@ -73,6 +73,10 @@ export class VideoScreenComponent implements OnInit, OnDestroy, AfterViewChecked
       this.textStyle.transitionDelay = '2s';
       this.textStyle.transitionDuration = '1s';
     });
+  }
+
+  public ngAfterViewInit() {
+    this.player.initVlc(this.vlcScreen.nativeElement);
   }
 
   public ngAfterViewChecked() {
@@ -110,7 +114,7 @@ export class VideoScreenComponent implements OnInit, OnDestroy, AfterViewChecked
       width = element.offsetWidth;
       height = element.offsetHeight;
     }
-    this.canvasStyle.width = `${width}px`;
-    this.canvasStyle.height = `${height}px`;
+    this.screenStyle.width = `${width}px`;
+    this.screenStyle.height = `${height}px`;
   }
 }
