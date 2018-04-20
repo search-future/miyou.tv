@@ -583,12 +583,7 @@ export class ProgramPlayComponent implements OnInit, OnDestroy {
   }
 
   public stop() {
-    if (
-      this.player.state === PlayerState.NothingSpecial ||
-      this.player.state === PlayerState.Stopped ||
-      this.player.state === PlayerState.Ended ||
-      this.player.state === PlayerState.Error
-    ) {
+    if (this.player.state === PlayerState.Stopped) {
       this.location.back();
     } else {
       this.player.stop();

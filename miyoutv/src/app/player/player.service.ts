@@ -16,8 +16,14 @@ limitations under the License.
 import { EventEmitter, Inject, Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { StorageService } from '../shared/storage.service';
-import { VlcService } from './vlc.service';
-export { VlcState as PlayerState } from './vlc.service';
+import { VlcService, VlcState } from './vlc.service';
+
+export enum PlayerState {
+  Stopped = 'stopped',
+  Playing = 'playing',
+  Paused = 'paused',
+  Loading = 'loading',
+}
 
 interface PlayerSetting {
   rate: number;
@@ -96,8 +102,26 @@ export class Player {
     return this.player ? this.player.playing : false;
   }
 
-  get state(): number {
-    return this.player ? this.player.state : 0;
+  get state(): PlayerState {
+    if (this.player) {
+      switch (this.player.state) {
+        case 'Opening':
+        case 'Buffering':
+          return PlayerState.Loading;
+        case 'Playing':
+          return PlayerState.Playing;
+        case 'Paused':
+          return PlayerState.Paused;
+        case 'NothingSpecial':
+        case 'Stopped':
+        case 'Ended':
+        case 'Error':
+          return PlayerState.Stopped;
+        default:
+      }
+      return this.player.state;
+    }
+    return PlayerState.Stopped;
   }
 
   get length(): number {
