@@ -37,6 +37,18 @@ export class Player {
   public playerRateLimit: number = 8;
   public preseekTime: number = 0;
   protected player: VlcService;
+  private eventNameTable: any = {
+    NothingSpecial: 'emptied',
+    Opening: 'loadstart',
+    Buffering: 'progress',
+    Playing: 'play',
+    Paused: 'pause',
+    Forward: 'seeked',
+    Backward: 'seeked',
+    EncounteredError: 'error',
+    EndReached: 'ended',
+    LengthChanged: 'durationchange',
+  };
 
   constructor(
     @Inject('playerOptions') private playerOptions: string[],
@@ -47,12 +59,20 @@ export class Player {
       (this.valueChanges as EventEmitter<any>).emit(value);
     });
     this.vlc.event.subscribe((event: any) => {
-      (this.event as EventEmitter<any>).emit(event);
+      if (this.eventNameTable[event.name]) {
+        (this.event as EventEmitter<any>).emit(Object.assign({}, event, {
+          name: this.eventNameTable[event.name],
+        }));
+      } else {
+        (this.event as EventEmitter<any>).emit(Object.assign({}, event, {
+          name: event.name.toLocaleLowerCase(),
+        }));
+      }
     });
 
     Observable.zip(
-      this.event.filter((event: any): boolean => event.name === 'Mediachanged'),
-      this.event.filter((event: any): boolean => event.name === 'Playing'),
+      this.event.filter((event: any): boolean => event.name === 'mediachanged'),
+      this.event.filter((event: any): boolean => event.name === 'play'),
     ).subscribe(() => {
       this.loadSetting();
       (this.valueChanges as EventEmitter<any>).emit({
@@ -61,7 +81,7 @@ export class Player {
         subtitlesTrack: this.subtitlesTrack,
       });
       this.event.filter(
-        (event: any): boolean => event.name === 'PositionChanged',
+        (event: any): boolean => event.name === 'positionchanged',
       ).skip(1).take(1).subscribe(() => {
         if (this.preseekTime !== 0) {
           this.time = this.preseekTime - 10000;
@@ -259,7 +279,7 @@ export class Player {
 
   protected saveSetting() {
     if (this.active) {
-      this.valueChanges.take(1).delay(500).subscribe(() => {
+      Observable.timer(500, 1000).take(2).subscribe(() => {
         if (this.active) {
           const setting: PlayerSetting = {
             rate: this.rate,

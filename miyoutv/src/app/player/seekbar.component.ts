@@ -76,7 +76,7 @@ export class SeekbarComponent implements OnInit, OnDestroy {
         }
       }),
       this.player.event.filter((event: any): boolean => (
-        event.name === 'PositionChanged'
+        event.name === 'positionchanged'
       )).subscribe((event: any) => {
         if (!this.isSeeking) {
           this.form.patchValue({ position: event.position }, { emitEvent: false });

@@ -119,17 +119,17 @@ export class ProgramPlayComponent implements OnInit, OnDestroy {
         }
       }),
       this.player.event.filter((event: any): boolean => (
-        event.name === 'PositionChanged'
+        event.name === 'positionchanged'
       )).subscribe(() => {
         this.commentPlayer.seek(this.player.time);
       }),
       this.player.event.filter((event: any): boolean => (
-        event.name === 'Stopped'
+        event.name === 'stopped'
       )).subscribe(() => {
         this.location.back();
       }),
       this.player.event.filter((event: any): boolean => (
-        event.name === 'EncounteredError'
+        event.name === 'error'
       )).subscribe(() => {
         this.toastsManager.error(
           'vlc has encountered an error and is unable to continue.',
@@ -137,7 +137,7 @@ export class ProgramPlayComponent implements OnInit, OnDestroy {
         );
       }),
       this.player.event.filter((event: any): boolean => (
-        event.name === 'EndReached'
+        event.name === 'ended'
       )).subscribe(() => {
         this.next();
       }),
