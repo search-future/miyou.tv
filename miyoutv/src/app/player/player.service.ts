@@ -14,8 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import { EventEmitter, Inject, Injectable } from '@angular/core';
+import { VgAPI, VgStates } from 'videogular2/core';
 import { Observable, Subject } from 'rxjs';
+
 import { StorageService } from '../shared/storage.service';
+import { VgWrapper } from './vg-wrapper.service';
 import { VlcService, VlcState } from './vlc.service';
 
 export enum PlayerState {
@@ -39,10 +42,11 @@ export class Player {
   public readonly screenText: Subject<{ message: string, force?: boolean }> = new Subject();
   public readonly valueChanges: Observable<any> = new EventEmitter();
   public active: boolean = false;
+  public mode: string = 'vlc';
   public overwriteLength: number = 0;
   public playerRateLimit: number = 8;
   public preseekTime: number = 0;
-  protected player: VlcService;
+  protected player: any;
   private eventNameTable: any = {
     NothingSpecial: 'emptied',
     Opening: 'loadstart',
@@ -59,8 +63,35 @@ export class Player {
   constructor(
     @Inject('playerOptions') private playerOptions: string[],
     private storageService: StorageService,
+    private vgWrapper: VgWrapper,
     private vlc: VlcService,
   ) {
+    this.vgWrapper.valueChanges.subscribe((value: any) => {
+      (this.valueChanges as EventEmitter<any>).emit(value);
+    });
+    this.vgWrapper.event.subscribe((event: any) => {
+      switch (event.name) {
+        case 'timeupdate':
+          (this.event as EventEmitter<any>).emit({
+            name: 'positionchanged',
+            position: this.position,
+          });
+          (this.event as EventEmitter<any>).emit({
+            name: 'timechanged',
+            time: this.time,
+          });
+          break;
+        default:
+          if (this.eventNameTable[event.name]) {
+            (this.event as EventEmitter<any>).emit(Object.assign({}, event, {
+              name: this.eventNameTable[event.name],
+            }));
+          } else {
+            (this.event as EventEmitter<any>).emit(event);
+          }
+      }
+    });
+
     this.vlc.valueChanges.subscribe((value: any) => {
       (this.valueChanges as EventEmitter<any>).emit(value);
     });
@@ -107,15 +138,19 @@ export class Player {
       switch (this.player.state) {
         case 'Opening':
         case 'Buffering':
+        case VgStates.VG_LOADING:
           return PlayerState.Loading;
         case 'Playing':
+        case VgStates.VG_PLAYING:
           return PlayerState.Playing;
         case 'Paused':
+        case VgStates.VG_PAUSED:
           return PlayerState.Paused;
         case 'NothingSpecial':
         case 'Stopped':
         case 'Ended':
         case 'Error':
+        case VgStates.VG_ENDED:
           return PlayerState.Stopped;
         default:
       }
@@ -132,6 +167,10 @@ export class Player {
       return this.player.length;
     }
     return 0;
+  }
+
+  get vgUrl(): Observable<string> {
+    return this.vgWrapper.url;
   }
 
   set position(position: number) {
@@ -338,8 +377,17 @@ export class Player {
   }
 
   public initVlc(screen: HTMLCanvasElement) {
-    this.vlc.init(screen);
-    this.player = this.vlc;
+    if (this.mode === 'vlc') {
+      this.vlc.init(screen);
+      this.player = this.vlc;
+    }
+  }
+
+  public initVg(api: VgAPI) {
+    if (this.mode === 'vg') {
+      this.vgWrapper.init(api);
+      this.player = this.vgWrapper;
+    }
   }
 
   public suspend() {

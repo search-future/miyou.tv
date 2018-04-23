@@ -48,11 +48,15 @@ import 'ngx-bootstrap/pagination';
 import 'ngx-bootstrap/tabs';
 import 'ngx-contextmenu';
 import 'ts-md5/dist/md5';
-import 'webgl-video-renderer';
+import 'videogular2/core';
+import 'videogular2/buffering';
+import 'videogular2/streaming';
 
 interface Window {
+  Hls: any;
   wcjsRenderer: any;
 }
 declare const window: Window;
 
+window.Hls = require('hls.js');
 window.wcjsRenderer = require('webgl-video-renderer');

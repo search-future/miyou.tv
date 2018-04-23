@@ -16,9 +16,13 @@ limitations under the License.
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { VgCoreModule } from 'videogular2/core';
+import { VgBufferingModule } from 'videogular2/buffering';
+import { VgStreamingModule } from 'videogular2/streaming';
 
 import { SharedModule } from '../shared/shared.module';
 import { Player } from './player.service';
+import { VgWrapper } from './vg-wrapper.service';
 import { VlcService } from './vlc.service';
 import { ControlbarComponent } from './controlbar.component';
 import { SeekbarComponent } from './seekbar.component';
@@ -31,6 +35,9 @@ import { PlayerConfigComponent } from './player-config.component';
     CommonModule,
     ReactiveFormsModule,
     SharedModule,
+    VgCoreModule,
+    VgBufferingModule,
+    VgStreamingModule,
   ],
   exports: [
     ControlbarComponent,
@@ -48,6 +55,7 @@ import { PlayerConfigComponent } from './player-config.component';
   ],
   providers: [
     Player,
+    VgWrapper,
     VlcService,
   ],
   entryComponents: [

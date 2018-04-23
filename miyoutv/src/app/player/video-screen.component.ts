@@ -19,6 +19,7 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  Input,
   OnDestroy,
   OnInit,
   ViewChild,
@@ -29,8 +30,7 @@ import { Player } from './player.service';
 
 @Component({
   selector: 'video-screen',
-  template: '<canvas [ngStyle]="screenStyle" (window:resize)="adjustSize()" #vlcScreen></canvas> \
-    <div [ngStyle]="textStyle">{{text}}</div>',
+  templateUrl: 'video-screen.component.html',
 })
 export class VideoScreenComponent implements OnInit, OnDestroy, AfterViewInit, AfterViewChecked {
   @ViewChild('vlcScreen') vlcScreen: ElementRef;
@@ -57,7 +57,7 @@ export class VideoScreenComponent implements OnInit, OnDestroy, AfterViewInit, A
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private elementRef: ElementRef,
-    private player: Player,
+    public player: Player,
   ) { }
 
   public ngOnInit() {
@@ -76,7 +76,9 @@ export class VideoScreenComponent implements OnInit, OnDestroy, AfterViewInit, A
   }
 
   public ngAfterViewInit() {
-    this.player.initVlc(this.vlcScreen.nativeElement);
+    if (this.player.mode === 'vlc') {
+      this.player.initVlc(this.vlcScreen.nativeElement);
+    }
   }
 
   public ngAfterViewChecked() {
