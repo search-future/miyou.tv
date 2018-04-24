@@ -48,6 +48,7 @@ export class ProgramsService {
   public useArchive: boolean = true;
   public previewParams: string;
   public previewPos: number = 70;
+  public streamType: string = 'm2ts';
   public streamParams: string;
   protected commentReady: boolean = false;
   protected requests: {
@@ -676,7 +677,7 @@ export class ProgramsService {
           },
         );
         stream = this.chinachuService.getUrl([
-          `/api/recorded/${recordedProgram.id}/watch.m2ts`,
+          `/api/recorded/${recordedProgram.id}/watch.${this.streamType}`,
           this.streamParams,
         ].filter(a => a != null).join('?'));
       }
@@ -766,7 +767,7 @@ export class ProgramsService {
           },
         ),
         stream: this.chinachuService.getUrl([
-          `/api/recorded/${program.id}/watch.m2ts`,
+          `/api/recorded/${program.id}/watch.${this.streamType}`,
           this.streamParams,
         ].filter(a => a != null).join('?')),
         isRecorded: this.chinachuService.isRecorded(program.id),
