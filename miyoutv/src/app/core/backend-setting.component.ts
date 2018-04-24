@@ -49,6 +49,7 @@ export class BackendSettingComponent implements OnInit, OnDestroy {
     const garaponUrl: string = this.storageService.loadLocalStorage('garaponUrl');
     const garaponUser: string = this.storageService.loadLocalStorage('garaponUser');
     const garaponPassword: string = this.storageService.loadLocalStorage('garaponPassword');
+    const playerMode: string = this.storageService.loadLocalStorage('playerMode');
 
     this.garaponEnabled = true;
     this.form = this.formBuilder.group({
@@ -101,6 +102,9 @@ export class BackendSettingComponent implements OnInit, OnDestroy {
           /^garapon/.test(this.form.value.backendType) ? Validators.required(c) : null
         ),
       ],
+      playerMode: [
+        playerMode || 'vlc',
+      ],
     });
 
     this.subscriptions.push(
@@ -135,6 +139,7 @@ export class BackendSettingComponent implements OnInit, OnDestroy {
           'chinachuPassword',
           this.form.value.chinachuAuth ? this.form.value.chinachuPassword : '',
         );
+        this.storageService.saveLocalStorage('playerMode', 'vlc');
         break;
       case 'garapon':
         this.storageService.saveLocalStorage('garaponAuth', this.form.value.garaponAuth);
@@ -142,9 +147,14 @@ export class BackendSettingComponent implements OnInit, OnDestroy {
           'garaponUrl',
           this.form.value.garaponAuth ? '' : this.form.value.garaponUrl,
         );
+        this.storageService.saveLocalStorage('garaponUser', this.form.value.garaponUser);
+        this.storageService.saveLocalStorage('garaponPassword', this.form.value.garaponPassword);
+        this.storageService.saveLocalStorage('playerMode', 'vlc');
+        break;
       case 'garaponv4':
         this.storageService.saveLocalStorage('garaponUser', this.form.value.garaponUser);
         this.storageService.saveLocalStorage('garaponPassword', this.form.value.garaponPassword);
+        this.storageService.saveLocalStorage('playerMode', this.form.value.playerMode);
         break;
       default:
     }
