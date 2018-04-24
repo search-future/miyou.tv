@@ -89,6 +89,7 @@ export class ProgramPlayComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.player.mode = this.storageService.loadLocalStorage('playerMode') || 'vlc';
     this.initHotkeys();
     this.toastsManager.setRootViewContainerRef(this.viewContainerRef);
     this.windowService.powerSave = false;
@@ -131,10 +132,12 @@ export class ProgramPlayComponent implements OnInit, OnDestroy {
       this.player.event.filter((event: any): boolean => (
         event.name === 'error'
       )).subscribe(() => {
-        this.toastsManager.error(
-          'vlc has encountered an error and is unable to continue.',
-          'Player error',
-        );
+        if (this.player.mode === 'vlc') {
+          this.toastsManager.error(
+            'vlc has encountered an error and is unable to continue.',
+            'Player error',
+          );
+        }
       }),
       this.player.event.filter((event: any): boolean => (
         event.name === 'ended'
