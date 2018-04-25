@@ -6,6 +6,7 @@ extraMetadata:
   author:
     name: "未来検索ブラジル"
     url: "http://razil.jp/"
+npmArgs: "--runtime=node "
 afterPack: "afterpack.js"
 linux:
   category: "AudioVideo"
@@ -18,6 +19,8 @@ linux:
     - "node_modules/"
 mac:
   icon: "miyoutv.icns"
+  extraResources:
+    - "mpv/**/*"
 nsis:
   artifactName: "${productName} Setup ${version} (${env.NSIS_ARCH}).${ext}"
   deleteAppDataOnUninstall: true
@@ -28,3 +31,4 @@ win:
     - "nsis"
   extraFiles:
     - "node_modules/"
+

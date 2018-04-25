@@ -12,6 +12,7 @@
       {
         "devDependencies": [
           "**/*webpack.config.js",
+          "afterpack.js",
           "download.js"
         ]
       }

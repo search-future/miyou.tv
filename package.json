@@ -124,7 +124,7 @@
     "dist:linux64:copy": "cpx \"miyoutv/dist/**/!(miyoutv.icns)\" build/miyoutv-linux64/",
     "dist:mac": "env-cmd pack-mac.env build --mac --x64 --project  build/miyoutv-mac/",
     "dist:mac:config": "cat miyoutv/src/package.json miyoutv/src/package-mac.json | json --deep-merge > build/miyoutv-mac/package.json",
-    "dist:mac:copy": "cpx \"miyoutv/dist/**/!(install.sh|miyoutv.iconset)\" build/miyoutv-mac/",
+    "dist:mac:copy": "cpx \"miyoutv/dist/**/!(install.sh|miyoutv.iconset)\" build/miyoutv-mac/ && ./collect-dylib-deps.sh",
     "dist:win32": "env-cmd pack-win32.env build --win --ia32 --project build/miyoutv-win32/",
     "dist:win32:config": "cat miyoutv/src/package.json miyoutv/src/package-win.json | json --deep-merge > build/miyoutv-win32/package.json",
     "dist:win32:copy": "cpx \"miyoutv/dist/**/!(install.sh|miyoutv.icns|miyoutv.iconset)\" build/miyoutv-win32/",
