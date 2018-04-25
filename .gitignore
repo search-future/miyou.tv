@@ -2,6 +2,7 @@ bower_components/
 build/
 cache/
 dist/
+mpv/
 node_modules/
 package-lock.json
 .env.local

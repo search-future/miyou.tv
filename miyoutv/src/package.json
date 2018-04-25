@@ -7,7 +7,9 @@
     "url": "http://razil.jp/"
   },
   "bugs": "https://github.com/search-future/miyou.tv/issues",
-  "dependencies": {},
+  "dependencies": {
+    "mpv.js": "^0.2.2"
+  },
   "devDependencies": {
     "electron": "1.4.13"
   },

@@ -14,4 +14,8 @@ else
 
     npm install --no-optional
     npm install wcjs-prebuilt 7zip-bin app-builder-bin
+    if [ "$(expr substr $(uname -s) 1 5)" = "MINGW" ]
+    then
+        node "$(dirname $0)/download.js"
+    fi
 fi

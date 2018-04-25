@@ -6,11 +6,13 @@
   "extends": "airbnb-base",
   "rules": {
     "comma-dangle": "off",
+    "no-console":"off",
     "import/no-extraneous-dependencies": [
       "error",
       {
         "devDependencies": [
-          "**/*webpack.config.js"
+          "**/*webpack.config.js",
+          "download.js"
         ]
       }
     ]

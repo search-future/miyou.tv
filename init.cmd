@@ -4,3 +4,4 @@ set WCJS_RUNTIME_VERSION="v1.4.13"
 
 npm install --no-optional
 npm install wcjs-prebuilt 7zip-bin app-builder-bin
+node download.js

@@ -25,6 +25,9 @@ const miyoutvConfigMain = {
   },
   devtool: 'source-map',
   target: 'electron-main',
+  externals: [{
+    react: true,
+  }],
   plugins: [
     new webpack.EnvironmentPlugin(process.env.IS_PACK ? {
       NODE_ENV: 'development',

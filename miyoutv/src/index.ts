@@ -34,6 +34,24 @@ if (process.platform === 'win32' && !process.env.VLC_PLUGIN_PATH) {
   );
 }
 
+let pluginPath = '';
+try {
+  pluginPath = path.join(app.getAppPath(), '../mpv/mpvjs.dylib');
+  if (!fs.existsSync(pluginPath)) {
+    pluginPath = path.resolve(
+      path.dirname(__non_webpack_require__.resolve('mpv.js')) || 'node_modules/mpv.js/',
+      'build/Release/mpvjs.node',
+    );
+  }
+} catch (e) {
+  pluginPath = path.resolve('node_modules/mpv.js/build/Release/mpvjs.node');
+}
+if (process.platform !== 'linux') {
+  process.chdir(path.dirname(pluginPath));
+}
+app.commandLine.appendSwitch('ignore-gpu-blacklist');
+app.commandLine.appendSwitch('register-pepper-plugins', `${pluginPath};application/x-mpvjs`);
+
 let win: Electron.BrowserWindow = null;
 
 function buildAppMenu(): Electron.Menu {
@@ -217,6 +235,7 @@ function createWindow(): void {
     frame: false,
     autoHideMenuBar: true,
     backgroundColor: '#808080',
+    webPreferences: { plugins: true },
   });
   win.loadURL('file://' + path.join(__dirname, '/index.html'));
 
