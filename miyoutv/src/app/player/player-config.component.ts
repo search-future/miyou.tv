@@ -93,40 +93,31 @@ export class PlayerConfigComponent implements OnInit, OnDestroy {
           );
         }
         if (data.audioTrack != null) {
+          const audioTrackList: { name: string, value: number }[] = [];
+          if (this.player.audioTrackCount > 0) {
+            audioTrackList.push({ name: '無効', value: -1 });
+            for (let i: number = 1; i < this.player.audioTrackCount; i += 1) {
+              audioTrackList.push({
+                name: `トラック ${i}`,
+                value: i,
+              });
+            }
+          }
+          this.audioTrackList = audioTrackList;
           this.audioForm.patchValue(
-            { track: data.audioTrack },
+            {
+              track: this.player.audioTrack,
+              channel: this.player.audioChannel,
+            },
             options,
           );
         }
-        if (data.channel > 0) {
+        if (data.audioChannel > 0) {
           this.audioForm.patchValue(
             { channel: data.audioChannel },
             options,
           );
         }
-      }),
-      this.player.event.filter((e: any): boolean => (
-        e.name === 'MediaChanged'
-      )).mergeMap((): Observable<any> => this.player.event.filter((e: any): boolean => (
-        e.name === 'Playing'
-      ))).delay(0).subscribe(() => {
-        const audioTrackList: { name: string, value: number }[] = [
-          { name: '無効', value: -1 },
-        ];
-        for (let i: number = 1; i < this.player.audioTrackCount; i += 1) {
-          audioTrackList.push({
-            name: `トラック ${i}`,
-            value: i,
-          });
-        }
-        this.audioTrackList = audioTrackList;
-        this.audioForm.patchValue(
-          {
-            track: this.player.audioTrack,
-            channel: this.player.audioChannel,
-          },
-          { emitEvent: false },
-        );
       }),
     );
   }
