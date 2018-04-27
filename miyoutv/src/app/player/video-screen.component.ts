@@ -33,6 +33,7 @@ import { Player } from './player.service';
   templateUrl: 'video-screen.component.html',
 })
 export class VideoScreenComponent implements OnInit, OnDestroy, AfterViewInit, AfterViewChecked {
+  @ViewChild('mpvScreen') mpvScreen: ElementRef;
   @ViewChild('vlcScreen') vlcScreen: ElementRef;
   public screenStyle: any = {
     position: 'absolute',
@@ -76,7 +77,9 @@ export class VideoScreenComponent implements OnInit, OnDestroy, AfterViewInit, A
   }
 
   public ngAfterViewInit() {
-    if (this.player.mode === 'vlc') {
+    if (this.player.mode === 'mpv') {
+      this.player.initMpv(this.mpvScreen.nativeElement);
+    } else if (this.player.mode === 'vlc') {
       this.player.initVlc(this.vlcScreen.nativeElement);
     }
   }

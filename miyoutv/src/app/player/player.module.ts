@@ -21,6 +21,7 @@ import { VgBufferingModule } from 'videogular2/buffering';
 import { VgStreamingModule } from 'videogular2/streaming';
 
 import { SharedModule } from '../shared/shared.module';
+import { MpvService } from './mpv.service';
 import { Player } from './player.service';
 import { VgWrapper } from './vg-wrapper.service';
 import { VlcService } from './vlc.service';
@@ -54,6 +55,7 @@ import { PlayerConfigComponent } from './player-config.component';
     FormatTimePipe,
   ],
   providers: [
+    MpvService,
     Player,
     VgWrapper,
     VlcService,

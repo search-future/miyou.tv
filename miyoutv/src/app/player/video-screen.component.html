@@ -19,5 +19,6 @@ limitations under the License.
     <vg-buffering></vg-buffering>
     <video autoplay [ngStyle]="screenStyle" [vgMedia]="media" [vgHls]="(player.vgUrl | async) || ''" #media></video>
 </vg-player>
+<embed *ngIf="player.mode === 'mpv'" type="application/x-mpvjs" [ngStyle]="screenStyle" (window:resize)="adjustSize()" #mpvScreen>
 <canvas *ngIf="player.mode === 'vlc'" [ngStyle]="screenStyle" (window:resize)="adjustSize()" #vlcScreen></canvas>
 <div [ngStyle]="textStyle">{{text}}</div>

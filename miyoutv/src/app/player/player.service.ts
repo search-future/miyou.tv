@@ -18,6 +18,7 @@ import { VgAPI, VgStates } from 'videogular2/core';
 import { Observable, Subject } from 'rxjs';
 
 import { StorageService } from '../shared/storage.service';
+import { MpvService } from './mpv.service';
 import { VgWrapper } from './vg-wrapper.service';
 import { VlcService, VlcState } from './vlc.service';
 
@@ -63,9 +64,17 @@ export class Player {
   constructor(
     @Inject('playerOptions') private playerOptions: string[],
     private storageService: StorageService,
+    private mpv: MpvService,
     private vgWrapper: VgWrapper,
     private vlc: VlcService,
   ) {
+    this.mpv.valueChanges.subscribe((value: any) => {
+      (this.valueChanges as EventEmitter<any>).emit(value);
+    });
+    this.mpv.event.subscribe((event: any) => {
+      (this.event as EventEmitter<any>).emit(event);
+    });
+
     this.vgWrapper.valueChanges.subscribe((value: any) => {
       (this.valueChanges as EventEmitter<any>).emit(value);
     });
@@ -387,6 +396,13 @@ export class Player {
     if (this.mode === 'vg') {
       this.vgWrapper.init(api);
       this.player = this.vgWrapper;
+    }
+  }
+
+  public initMpv(screen: HTMLEmbedElement) {
+    if (this.mode === 'mpv') {
+      this.mpv.init(screen);
+      this.player = this.mpv;
     }
   }
 
