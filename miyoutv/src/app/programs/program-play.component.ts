@@ -89,7 +89,7 @@ export class ProgramPlayComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.player.mode = this.storageService.loadLocalStorage('playerMode') || 'vlc';
+    this.player.mode = this.storageService.loadLocalStorage('playerMode') || 'mpv';
     this.initHotkeys();
     this.toastsManager.setRootViewContainerRef(this.viewContainerRef);
     this.windowService.powerSave = false;

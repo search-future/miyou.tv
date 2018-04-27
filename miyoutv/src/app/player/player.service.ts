@@ -43,7 +43,7 @@ export class Player {
   public readonly screenText: Subject<{ message: string, force?: boolean }> = new Subject();
   public readonly valueChanges: Observable<any> = new EventEmitter();
   public active: boolean = false;
-  public mode: string = 'vlc';
+  public mode: string = 'mpv';
   public overwriteLength: number = 0;
   public playerRateLimit: number = 8;
   public preseekTime: number = 0;

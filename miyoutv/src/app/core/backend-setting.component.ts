@@ -103,7 +103,7 @@ export class BackendSettingComponent implements OnInit, OnDestroy {
         ),
       ],
       playerMode: [
-        playerMode || 'vlc',
+        playerMode || 'mpv',
       ],
     });
 
