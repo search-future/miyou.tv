@@ -139,7 +139,7 @@ export class BackendSettingComponent implements OnInit, OnDestroy {
           'chinachuPassword',
           this.form.value.chinachuAuth ? this.form.value.chinachuPassword : '',
         );
-        this.storageService.saveLocalStorage('playerMode', 'vlc');
+        this.storageService.saveLocalStorage('playerMode', this.form.value.playerMode);
         break;
       case 'garapon':
         this.storageService.saveLocalStorage('garaponAuth', this.form.value.garaponAuth);
@@ -149,7 +149,7 @@ export class BackendSettingComponent implements OnInit, OnDestroy {
         );
         this.storageService.saveLocalStorage('garaponUser', this.form.value.garaponUser);
         this.storageService.saveLocalStorage('garaponPassword', this.form.value.garaponPassword);
-        this.storageService.saveLocalStorage('playerMode', 'vlc');
+        this.storageService.saveLocalStorage('playerMode', this.form.value.playerMode);
         break;
       case 'garaponv4':
         this.storageService.saveLocalStorage('garaponUser', this.form.value.garaponUser);

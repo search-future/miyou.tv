@@ -96,12 +96,15 @@ limitations under the License.
                     <input id="garapon-password" class="form-control" type="password" formControlName="garaponPassword" [class.is-valid]="form.controls['garaponPassword'].valid" [class.is-invalid]="form.controls['garaponPassword'].invalid">
                 </div>
             </div>
-            <div class="form-group form-row" [class.d-none]="form.value.backendType === 'garapon'">
+        </fieldset>
+        <fieldset>
+            <div class="form-group form-row">
                 <label class="col-sm-3 col-form-label" for="player-mode">プレイヤー</label>
                 <div class="col-sm-9">
                     <select id="player-mode" class="form-control" formControlName="playerMode">
+                        <option value="mpv">MPV.js</option>
                         <option value="vlc">WebChimera.js(VLC)</option>
-                        <option value="vg">HTML5</option>
+                        <option *ngIf="form.value.backendType === 'garaponv4'" value="vg">HTML5</option>
                     </select>
                 </div>
             </div>
