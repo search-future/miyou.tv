@@ -219,7 +219,7 @@ export class Player {
       } else {
         this.player.volume = volume;
       }
-      const message: string = `音量 ${this.volume}%`;
+      const message: string = `音量 ${Math.floor(this.volume / 2)}%`;
       this.screenText.next({ message });
       this.saveSetting();
     }
