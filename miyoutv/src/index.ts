@@ -28,10 +28,22 @@ try {
 app.commandLine.appendSwitch('js-flags', '--max-old-space-size=512 --gc_interval=100');
 
 if (process.platform === 'win32' && !process.env.VLC_PLUGIN_PATH) {
-  process.env.VLC_PLUGIN_PATH = path.join(
-    path.dirname(__non_webpack_require__.resolve('wcjs-prebuilt')),
-    'bin/plugins',
-  );
+  try {
+    process.env.VLC_PLUGIN_PATH = path.join(
+      path.dirname(__non_webpack_require__.resolve('wcjs-prebuilt')),
+      'bin/plugins',
+    );
+  } catch (e) {
+  }
+  if (!fs.existsSync(process.env.VLC_PLUGIN_PATH)) {
+    try {
+      process.env.VLC_PLUGIN_PATH = path.join(
+        path.dirname(__non_webpack_require__.resolve('webchimera.js')),
+        'plugins',
+      );
+    } catch (e) {
+    }
+  }
 }
 
 let pluginPath = '';

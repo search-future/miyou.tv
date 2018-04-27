@@ -21,65 +21,63 @@ import { Observable } from 'rxjs';
 
 declare const wcjsRenderer: any;
 
-declare module NodeJS {
-  interface Global {
-    require: {
-      resolve: (name: string) => string;
-    };
-  }
-}
-declare const global: NodeJS.Global;
+process.mainModule.paths.push(path.join(remote.app.getPath('exe'), '../node_modules'));
 
-let wcjs: any;
 if (process.platform === 'darwin' && !process.env.WCJS_TARGET) {
-  const wcjsPath: string = path.join(
-    global.require.resolve('wcjs-prebuilt'),
-    '../bin',
-  );
-  const wcjsTarget: string = path.join(
-    remote.app.getPath('temp'),
-    remote.app.getName(),
-    'webchimera.js',
-  );
+  let wcjsPath: string = '';
   try {
-    const paths: string[] = [wcjsPath];
-    const libs: string[] = fs.readdirSync(path.join(wcjsPath, 'lib'));
-    try {
-      fs.mkdirSync(path.join(wcjsTarget, '..'));
-    } catch (e) { }
-    while (paths.length > 0) {
-      const src: string = paths.shift();
-      const dest: string = src.replace(wcjsPath, wcjsTarget);
-      try {
-        const stat: fs.Stats = fs.lstatSync(src);
-        if (stat.isDirectory()) {
-          paths.push(...fs.readdirSync(src).map((a: string): string => path.join(src, a)));
-          fs.mkdirSync(dest);
-        } else if (stat.isSymbolicLink()) {
-          if (fs.existsSync(dest)) {
-            fs.unlinkSync(dest);
-          }
-          if (/\.dylib$/.test(src)) {
-            const basename: string = path.basename(src);
-            const lib: string = libs.filter((a: string): boolean => (
-              a.indexOf(`${basename.split('.')[0]}.`) === 0 && a !== basename
-            ))[0];
-            fs.symlinkSync(path.join(wcjsTarget, 'lib', lib), dest);
-          } else {
-            fs.symlinkSync(src, dest);
-          }
-        } else {
-          fs.writeFileSync(dest, fs.readFileSync(src));
-        }
-      } catch (e) { }
-    }
-    process.env.WCJS_TARGET = wcjsTarget;
+    wcjsPath = path.join(
+      __non_webpack_require__.resolve('wcjs-prebuilt'),
+      '../bin',
+    );
   } catch (e) { }
-}
-try {
-  wcjs = require('wcjs-prebuilt');
-} catch (e) {
-  wcjs = require('webchimera.js');
+  try {
+    if (!fs.existsSync(wcjsPath)) {
+      wcjsPath = path.join(
+        __non_webpack_require__.resolve('webchimera.js'),
+        '..',
+      );
+    }
+    const wcjsTarget: string = path.join(
+      remote.app.getPath('temp'),
+      remote.app.getName(),
+      'webchimera.js',
+    );
+    try {
+      const paths: string[] = [wcjsPath];
+      const libs: string[] = fs.readdirSync(path.join(wcjsPath, 'lib'));
+      try {
+        fs.mkdirSync(path.join(wcjsTarget, '..'));
+      } catch (e) { }
+      while (paths.length > 0) {
+        const src: string = paths.shift();
+        const dest: string = src.replace(wcjsPath, wcjsTarget);
+        try {
+          const stat: fs.Stats = fs.lstatSync(src);
+          if (stat.isDirectory()) {
+            paths.push(...fs.readdirSync(src).map((a: string): string => path.join(src, a)));
+            fs.mkdirSync(dest);
+          } else if (stat.isSymbolicLink()) {
+            if (fs.existsSync(dest)) {
+              fs.unlinkSync(dest);
+            }
+            if (/\.dylib$/.test(src)) {
+              const basename: string = path.basename(src);
+              const lib: string = libs.filter((a: string): boolean => (
+                a.indexOf(`${basename.split('.')[0]}.`) === 0 && a !== basename
+              ))[0];
+              fs.symlinkSync(path.join(wcjsTarget, 'lib', lib), dest);
+            } else {
+              fs.symlinkSync(src, dest);
+            }
+          } else {
+            fs.writeFileSync(dest, fs.readFileSync(src));
+          }
+        } catch (e) { }
+      }
+      process.env.WCJS_TARGET = wcjsTarget;
+    } catch (e) { }
+  } catch (e) { }
 }
 
 export enum VlcLogLevel { Debug, Info, Warning, Error }
@@ -119,6 +117,16 @@ export class VlcService {
   constructor(
     @Inject('playerOptions') private playerOptions: string[],
   ) {
+    let wcjs: any;
+    try {
+      wcjs = __non_webpack_require__('wcjs-prebuilt');
+    } catch (e) {
+      try {
+        wcjs = __non_webpack_require__('webchimera.js');
+      } catch (e) {
+        return;
+      }
+    }
     this.player = wcjs.createPlayer(playerOptions || []);
     this.player.onFrameSetup = (
       width: number,
