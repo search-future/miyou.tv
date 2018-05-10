@@ -43,10 +43,10 @@ export class Player {
   public readonly screenText: Subject<{ message: string, force?: boolean }> = new Subject();
   public readonly valueChanges: Observable<any> = new EventEmitter();
   public active: boolean = false;
-  public mode: string = 'mpv';
   public overwriteLength: number = 0;
   public playerRateLimit: number = 8;
   public preseekTime: number = 0;
+  protected _mode: string = 'mpv';
   protected player: any;
   private eventNameTable: any = {
     NothingSpecial: 'emptied',
@@ -136,6 +136,28 @@ export class Player {
         this.active = true;
       });
     });
+  }
+
+  set mode(mode: string) {
+    this._mode = mode;
+  }
+
+  get mode() {
+    if (
+      (this._mode === 'mpv' || (
+        this._mode === 'vlc' && !this.vlcEnabled
+      )) && this.mpvEnabled
+    ) {
+      return 'mpv';
+    }
+    if (
+      (this._mode === 'vlc' || (
+        this._mode === 'mpv' && !this.mpvEnabled
+      )) && this.vlcEnabled
+    ) {
+      return 'vlc';
+    }
+    return 'vg';
   }
 
   get mpvEnabled() {
