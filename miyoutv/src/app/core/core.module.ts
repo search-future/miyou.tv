@@ -29,6 +29,7 @@ import { SetupComponent } from './setup.component';
 import { TitlebarComponent } from './titlebar.component';
 import { MoritapoSettingComponent } from './moritapo-setting.component';
 import { ViewSettingComponent } from './view-setting.component';
+import { PlayerModule } from '../player/player.module';
 
 
 @NgModule({
@@ -41,6 +42,7 @@ import { ViewSettingComponent } from './view-setting.component';
     CollapseModule.forRoot(),
     ModalModule.forRoot(),
     SharedModule,
+    PlayerModule,
   ],
   exports: [
     BackendSettingComponent,

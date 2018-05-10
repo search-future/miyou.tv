@@ -21,6 +21,7 @@ import { Subscription } from 'rxjs';
 
 import { StorageService } from '../shared/storage.service';
 import { WindowService } from '../shared/window.service';
+import { Player } from '../player/player.service';
 
 @Component({
   selector: 'backend-setting',
@@ -38,7 +39,16 @@ export class BackendSettingComponent implements OnInit, OnDestroy {
     private modalRef: BsModalRef,
     private storageService: StorageService,
     private windowService: WindowService,
+    private player: Player,
   ) { }
+
+  get mpvEnabled() {
+    return this.player.mpvEnabled;
+  }
+
+  get vlcEnabled() {
+    return this.player.vlcEnabled;
+  }
 
   public ngOnInit() {
     const backendType: string = this.storageService.loadLocalStorage('backendType');

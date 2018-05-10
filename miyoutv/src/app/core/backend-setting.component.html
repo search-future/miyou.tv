@@ -102,8 +102,8 @@ limitations under the License.
                 <label class="col-sm-3 col-form-label" for="player-mode">プレイヤー</label>
                 <div class="col-sm-9">
                     <select id="player-mode" class="form-control" formControlName="playerMode">
-                        <option value="mpv">MPV.js</option>
-                        <option value="vlc">WebChimera.js(VLC)</option>
+                        <option *ngIf="mpvEnabled" value="mpv">MPV.js</option>
+                        <option *ngIf="vlcEnabled" value="vlc">WebChimera.js(VLC)</option>
                         <option *ngIf="form.value.backendType === 'garaponv4'" value="vg">HTML5</option>
                     </select>
                 </div>
