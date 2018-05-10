@@ -375,6 +375,9 @@ export class VlcService {
     if (isEnabled) {
       this.player.video.deinterlace.enable(mode);
       this._deinterlace = mode;
+    } else if (mode === 'auto') {
+      this.player.video.deinterlace.enable('discard');
+      this._deinterlace = 'discard';
     } else {
       this.player.video.deinterlace.disable();
       this._deinterlace = '';
