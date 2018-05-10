@@ -138,6 +138,24 @@ export class Player {
     });
   }
 
+  get mpvEnabled() {
+    try {
+      const { remote } = require('electron');
+      const path = require('path');
+      const fs = require('fs');
+      return fs.existsSync(path.join(
+        path.dirname(__non_webpack_require__.resolve('mpv.js')),
+        'build/Release/mpvjs.node',
+      ));
+    } catch (e) {
+      return false;
+    }
+  }
+
+  get vlcEnabled() {
+    return !!this.vlc.player;
+  }
+
   get playing(): boolean {
     return this.player ? this.player.playing : false;
   }
