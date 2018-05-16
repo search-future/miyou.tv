@@ -28,7 +28,7 @@ limitations under the License.
         </form>
     </div>
 </div>
-<div class="card m-1 border border-secondary bg-dark text-light">
+<div class="card m-1 border border-secondary bg-dark text-light" *ngIf="player.mode !== 'vg'">
     <div class="card-header border-bottom border-secondary bg-black">ビデオ設定</div>
     <div class="card-body">
         <form [formGroup]="videoForm">
@@ -37,14 +37,17 @@ limitations under the License.
                 <div class="col-12 col-sm-6">
                     <select id="player-video-deinterlace" class="form-control bg-dark text-light" formControlName="deinterlace">
                         <option value="">無効</option>
-                        <option value="blend">ブレンド</option>
-                        <option value="bob">Bob</option>
-                        <option value="discard">破棄</option>
-                        <option value="linear">リニア</option>
-                        <option value="mean">中間</option>
-                        <option value="x">X</option>
-                        <option value="yadif">Yadif</option>
-                        <option value="yadif2x">Yadif(2x)</option>
+                        <option value="auto" *ngIf="player.mode === 'mpv'">自動</option>
+                        <ng-container *ngIf="player.mode === 'vlc'">
+                            <option value="blend">ブレンド</option>
+                            <option value="bob">Bob</option>
+                            <option value="discard">破棄</option>
+                            <option value="linear">リニア</option>
+                            <option value="mean">中間</option>
+                            <option value="x">X</option>
+                            <option value="yadif">Yadif</option>
+                            <option value="yadif2x">Yadif(2x)</option>
+                        </ng-container>
                     </select>
                 </div>
             </div>
@@ -67,7 +70,7 @@ limitations under the License.
         </form>
     </div>
 </div>
-<div class="card m-1 border border-secondary bg-dark text-light">
+<div class="card m-1 border border-secondary bg-dark text-light" *ngIf="player.mode !== 'vg'">
     <div class="card-header border-bottom border-secondary bg-black">オーディオ設定</div>
     <div class="card-body">
         <form [formGroup]="audioForm">
@@ -83,11 +86,12 @@ limitations under the License.
                 <label class="col-12 col-sm-6 col-form-label" for="player-audio-channel">音声チャンネル</label>
                 <div class="col-12 col-sm-6">
                     <select id="player-audio-channel" class="form-control bg-dark text-light" formControlName="channel">
-                        <option [value]="1">ステレオ</option>
-                        <option [value]="3">左</option>
-                        <option [value]="4">右</option>
-                        <option [value]="2">ステレオ反転</option>
-                        <option [value]="5">ドルビーサラウンド</option>
+                        <option [value]="0" *ngIf="player.mode === 'mpv'">自動</option>
+                        <option [value]="1">ステレオ(主/副)</option>
+                        <option [value]="3">左(主音声)</option>
+                        <option [value]="4">右(副音声)</option>
+                        <option [value]="2" *ngIf="player.mode === 'vlc'">ステレオ反転</option>
+                        <option [value]="5" *ngIf="player.mode === 'vlc'">ドルビーサラウンド</option>
                     </select>
                 </div>
             </div>
