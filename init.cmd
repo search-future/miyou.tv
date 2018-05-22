@@ -1,7 +1,4 @@
-set WCJS_VERSION="v0.2.7"
-set WCJS_RUNTIME="electron"
-set WCJS_RUNTIME_VERSION="v1.4.13"
-
-npm install --no-optional
-npm install wcjs-prebuilt 7zip-bin app-builder-bin
+if "%PROCESSOR_ARCHITECTURE%" equ "x86" set ARCH=ia32
+if "%PROCESSOR_ARCHITECTURE%" equ "AMD64" set ARCH=x64
+npm install --wcjs_runtime="electron" --wcjs_runtime_version="1.8.7" --wcjs_arch="%ARCH%"
 node download.js

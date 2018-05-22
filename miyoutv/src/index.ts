@@ -30,19 +30,10 @@ app.commandLine.appendSwitch('js-flags', '--max-old-space-size=512 --gc_interval
 if (process.platform === 'win32' && !process.env.VLC_PLUGIN_PATH) {
   try {
     process.env.VLC_PLUGIN_PATH = path.join(
-      path.dirname(__non_webpack_require__.resolve('wcjs-prebuilt')),
-      'bin/plugins',
+      path.dirname(__non_webpack_require__.resolve('webchimera.js')),
+      'plugins',
     );
   } catch (e) {
-  }
-  if (!fs.existsSync(process.env.VLC_PLUGIN_PATH)) {
-    try {
-      process.env.VLC_PLUGIN_PATH = path.join(
-        path.dirname(__non_webpack_require__.resolve('webchimera.js')),
-        'plugins',
-      );
-    } catch (e) {
-    }
   }
 }
 
@@ -67,7 +58,7 @@ app.commandLine.appendSwitch('register-pepper-plugins', `${pluginPath};applicati
 let win: Electron.BrowserWindow = null;
 
 function buildAppMenu(): Electron.Menu {
-  const template: Electron.MenuItemOptions[] = [];
+  const template: Electron.MenuItemConstructorOptions[] = [];
 
   if (process.platform === 'darwin') {
     template.unshift({
@@ -170,7 +161,7 @@ function buildAppMenu(): Electron.Menu {
 
 function buildContextMenu(params?: Electron.ContextMenuParams): Electron.Menu {
   const noParams: boolean = typeof params !== 'object';
-  const template: Electron.MenuItemOptions[] = [{
+  const template: Electron.MenuItemConstructorOptions[] = [{
     label: '戻る',
     click: (): void => win.webContents.goBack(),
     visible: noParams || win.webContents.canGoBack(),
@@ -227,7 +218,7 @@ function buildContextMenu(params?: Electron.ContextMenuParams): Electron.Menu {
     role: 'quit',
     click: (): void => app.quit(),
   }];
-  template.forEach((a: Electron.MenuItemOptions): void => {
+  template.forEach((a: Electron.MenuItemConstructorOptions): void => {
     if (a.visible === false) {
       a.type = null;
       a.role = null;
