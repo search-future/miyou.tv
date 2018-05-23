@@ -26,12 +26,6 @@ process.mainModule.paths.push(path.join(remote.app.getPath('exe'), '../node_modu
 if (process.platform === 'darwin' && !process.env.WCJS_TARGET) {
   let wcjsPath: string = '';
   try {
-    wcjsPath = path.join(
-      __non_webpack_require__.resolve('wcjs-prebuilt'),
-      '../bin',
-    );
-  } catch (e) { }
-  try {
     if (!fs.existsSync(wcjsPath)) {
       wcjsPath = path.join(
         __non_webpack_require__.resolve('webchimera.js'),
