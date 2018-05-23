@@ -103,7 +103,10 @@ export class CommentPlayer {
   }
 
   get offset(): Date {
-    return new Date(this._offset.getTime() - this.delay);
+    if (this._offset) {
+      return new Date(this._offset.getTime() - this.delay);
+    }
+    return new Date('');
   }
 
   protected saveValue(key: string, value: any) {
