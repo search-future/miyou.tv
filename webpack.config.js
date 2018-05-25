@@ -1,10 +1,10 @@
 const path = require('path');
 const webpack = require('webpack');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const discardFonts = require('postcss-discard-font-face');
 
 const miyoutvConfigMain = {
+  mode: process.env.NODE_ENV || 'development',
   entry: {
     index: path.join(__dirname, 'miyoutv/src/index.ts'),
   },
@@ -21,7 +21,7 @@ const miyoutvConfigMain = {
           configFileName: 'miyoutv/tsconfig.json',
         },
       },
-    }]
+    }],
   },
   devtool: 'source-map',
   target: 'electron-main',
@@ -37,12 +37,10 @@ const miyoutvConfigMain = {
 };
 
 const miyoutvConfigRenderer = {
+  mode: process.env.NODE_ENV || 'development',
   entry: {
-    vendor: [
-      path.join(__dirname, 'miyoutv/src/vendor.ts'),
-      path.join(__dirname, 'miyoutv/src/vendor.scss'),
-    ],
     app: path.join(__dirname, 'miyoutv/src/main.ts'),
+    vendor: path.join(__dirname, 'miyoutv/src/vendor.scss'),
     style: path.join(__dirname, 'miyoutv/src/style.scss'),
   },
   output: {
@@ -80,8 +78,9 @@ const miyoutvConfigRenderer = {
     }, {
       test: /\.scss$/,
       exclude: /\.component\.scss$/,
-      use: ExtractTextPlugin.extract({
-        use: [{
+      use: [
+        MiniCssExtractPlugin.loader,
+        {
           loader: 'css-loader',
           options: {
             minimize: true,
@@ -97,8 +96,8 @@ const miyoutvConfigRenderer = {
           },
         }, {
           loader: 'sass-loader',
-        }],
-      }),
+        },
+      ],
     }, {
       test: /(typeface|fonts).+\.(eot|otf|svg|ttf|woff2?)$/,
       use: 'file-loader?name=fonts/[name].[ext]',
@@ -109,24 +108,32 @@ const miyoutvConfigRenderer = {
   },
   devtool: 'source-map',
   target: 'electron-renderer',
-  externals: [{
-    'webchimera.js': 'require("webchimera.js")',
-    'wcjs-prebuilt': 'require("wcjs-prebuilt")',
-  }],
   plugins: [
     new webpack.EnvironmentPlugin(process.env.IS_PACK ? {
       NODE_ENV: 'development',
       GARAPON_DEVID: '',
     } : []),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: ['app', 'vendor'],
+    new MiniCssExtractPlugin({
+      filename: '[name].css',
     }),
-    new ExtractTextPlugin('[name].css'),
   ],
   node: false,
+  optimization: {
+    minimize: false,
+    splitChunks: {
+      chunks: 'initial',
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendor',
+        },
+      },
+    },
+  },
 };
 
 const agentConfig = {
+  mode: process.env.NODE_ENV || 'development',
   entry: {
     'miyoutv-agent': path.join(__dirname, 'miyoutv-agent/src/miyoutv-agent.js'),
     'tools/servicelist': path.join(__dirname, 'miyoutv-agent/src/servicelist.js'),
@@ -138,17 +145,6 @@ const agentConfig = {
   target: 'node',
   node: false,
 };
-
-if (process.env.IS_PACK) {
-  miyoutvConfigMain.plugins.push(new UglifyJSPlugin({
-    parallel: true,
-    sourceMap: true,
-  }));
-  miyoutvConfigRenderer.plugins.push(new UglifyJSPlugin({
-    parallel: true,
-    sourceMap: true,
-  }));
-}
 
 module.exports = (env) => {
   const config = [];

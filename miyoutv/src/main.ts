@@ -13,12 +13,25 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+import 'core-js/es6/reflect';
+import 'core-js/es7/reflect';
+import 'zone.js/dist/zone-mix';
+
 import fontawesome from '@fortawesome/fontawesome';
 import fontawesomeFreeSolid from '@fortawesome/fontawesome-free-solid';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { enableProdMode } from '@angular/core';
 
 import { AppModule } from './app/app.module';
+
+interface Window {
+  Hls: any;
+  wcjsRenderer: any;
+}
+declare const window: Window;
+
+window.Hls = require('hls.js');
+window.wcjsRenderer = require('webgl-video-renderer');
 
 fontawesome.library.add(fontawesomeFreeSolid);
 

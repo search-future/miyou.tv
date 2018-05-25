@@ -50,7 +50,7 @@
     "@types/webpack-env": "^1.13.6",
     "angular-router-loader": "^0.8.5",
     "angular2-template-loader": "^0.6.2",
-    "awesome-typescript-loader": "^4.0.1",
+    "awesome-typescript-loader": "^5.0.0",
     "concurrently": "^3.5.1",
     "cpx": "^1.5.0",
     "cross-conf-env": "^1.1.2",
@@ -62,10 +62,10 @@
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.12.0",
     "eslint-plugin-node": "^6.0.1",
-    "extract-text-webpack-plugin": "^3.0.2",
     "file-loader": "^1.1.11",
     "html-loader": "^0.5.5",
     "json": "^9.0.6",
+    "mini-css-extract-plugin": "^0.4.0",
     "node-sass": "^4.9.0",
     "postcss": "^6.0.22",
     "postcss-discard-font-face": "^3.0.0",
@@ -81,9 +81,8 @@
     "tslint-config-airbnb": "^5.9.2",
     "typeface-notosans-jp": "^1.0.1",
     "typescript": "^2.8.3",
-    "uglify-js": "^3.3.26",
-    "uglifyjs-webpack-plugin": "^1.2.5",
-    "webpack": "^3.12.0"
+    "webpack": "^4.8.3",
+    "webpack-cli": "^2.1.4"
   },
   "engines": {
     "node": ">=6.5.0"
@@ -111,7 +110,7 @@
     "build-agent:resource": "cpx \"miyoutv-agent/**/!(src|*.js)\" build/miyoutv-agent/",
     "build:main": "webpack --env.miyoutv --env.main --progress",
     "build:renderer": "webpack  --env.miyoutv --env.renderer --progress",
-    "build:resource": "cpx \"miyoutv/src/**/!(vendor.*|*.ts|*.scss|*.component.*)\" miyoutv/dist/",
+    "build:resource": "cpx \"miyoutv/src/**/!(*.ts|*.scss|*.component.*)\" miyoutv/dist/",
     "clean": "rimraf miyoutv/dist/ \"build/miyoutv-*(agent|linux32|linux64|mac|win32|win64)\"",
     "dist": "env-cmd pack.env.js cross-conf-env npm run dist:%npm_config_pack_type%",
     "dist-agent": "cross-conf-env tar cvzf build/miyoutv-agent-%npm_package_version%.tar.gz build/miyoutv-agent/",
