@@ -9,7 +9,7 @@ MiyouTVのシステムは録画バックエンドと番組データを取得し�
 ガラポンTV、またはChinachuとMirakurunが導入されているLinux環境が必須です。
 
 ### 再生アプリケーション miyoutv が動作するクライアントPC(以降「クライアントPC」)
-Linux、Windows、Macに対応しています。モリタポアカウントを設定することでコメントを再生することができます。
+Linux、Windows、macOSに対応しています。モリタポアカウントを設定することでコメントを再生することができます。
 
 クライアントPCはChinachuやMirakurunと同一機でも大丈夫です。また、全録サーバーをLANの何処かに置き、クライアントPCで再生するといった使い方ができます。
 
@@ -41,15 +41,15 @@ Chinachu betaでの全録を支援するプログラムです。以下の機能�
 バックエンドとして、ガラポンTV、またはChinachuとMirakurunが導入されているLinux環境が必要です。
 
 ### miyoutv(Linux, AppImage)
-* `$ sudo apt-get install vlc`
+* `$ sudo apt-get install mpv vlc`
 
-vlcのインストールが必要です。
+mpvかvlcのインストールが必要です。
 
 ### miyoutv(Linux, tar.gz)
 * [Node.js](http://nodejs.org/)
-* `$ sudo apt-get install build-essential cmake libvlc-dev`
+* `$ sudo apt-get install build-essential cmake libvlc-dev mpv`
 
-WebChimera.jsをビルドできる環境が必要です。
+mpvのインストール、またはWebChimera.jsをビルドできる環境が必要です。
 
 ### miyoutv-agent
 * [Chinachu](https://github.com/Chinachu/Chinachu)
@@ -66,7 +66,7 @@ miyoutvはガラポンTVとChinachuのクライアントとして動作します
 <https://github.com/search-future/miyou.tv/releases>
 
 ### miyoutv(Linux, AppImage)
-ダウンロードしたAppImageファイルを実行してください。vlcのインストールが必要です。
+ダウンロードしたAppImageファイルを実行してください。mpvまたはvlcのインストールが必要です。
 
 ### miyoutv(Linux, tar.gz)
 アーカイブファイルを使用する場合は展開されたディレクトリ内のinstall.shを実行してください。
@@ -79,7 +79,7 @@ $ mv miyoutv-v*.*.* miyoutv
 ### miyoutv(Windows)
 インストーラーをダウンロードして実行してください。
 
-### miyoutv(Mac)
+### miyoutv(macOS)
 パッケージを展開して実行してください。
 
 ### miyoutv-agent(Linux)
@@ -137,7 +137,8 @@ channel: 27
 6. 番組を選択して再生ボタンを押すか番組をダブルクリックで再生します。
 
 ## Build
-Node.jsのインストールが必要です。また、Linux版は開発パッケージとlibvlcの開発用パッケージを用意してください。
+ビルドにはNode.jsのインストールが必要です。
+macOSはHomebrewでmpvをインストールしてください。Linuxは開発パッケージとlibvlcの開発用パッケージを用意します。
 ソース一式をダウンロードして、init.shまたはinit.cmdを実行するとビルド環境が整います。
 ガラポンTV機能を有効にするにはガラポンAPIのデベロッパーIDが必要です。
 ```
