@@ -407,7 +407,13 @@ export class Player {
   }
 
   protected loadSetting() {
-    const setting: PlayerSetting = this.storageService.loadLocalStorage('player') || {};
+    const setting: PlayerSetting = this.storageService.loadLocalStorage('player') || {
+      rate: 1,
+      mute: false,
+      volume: 50,
+      deinterlace: 'auto',
+      aspectRatio: '16:9',
+    };
     if (setting.rate != null) {
       this.rate = setting.rate;
     }
