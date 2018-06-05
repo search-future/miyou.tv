@@ -57,9 +57,9 @@ if (process.platform === 'darwin' && !process.env.WCJS_TARGET) {
             }
             if (/\.dylib$/.test(src)) {
               const basename: string = path.basename(src);
-              const lib: string = libs.filter((a: string): boolean => (
+              const lib: string = libs.find((a: string): boolean => (
                 a.indexOf(`${basename.split('.')[0]}.`) === 0 && a !== basename
-              ))[0];
+              ));
               fs.symlinkSync(path.join(wcjsTarget, 'lib', lib), dest);
             } else {
               fs.symlinkSync(src, dest);

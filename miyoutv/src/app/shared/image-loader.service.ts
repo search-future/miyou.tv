@@ -167,9 +167,9 @@ export class ImageLoader {
   }
 
   protected loadCache(url: string): string {
-    const cache: PreviewCache = this.previewCache.filter(
+    const cache: PreviewCache = this.previewCache.find(
       (a: PreviewCache): boolean => a.url === url,
-    )[0];
+    );
     if (cache) {
       return this.storageService.loadFile('previews', cache.key);
     }

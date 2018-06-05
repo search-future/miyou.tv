@@ -137,10 +137,10 @@ export class ProgramTableComponent implements OnInit, OnDestroy {
         }
         if (params.select) {
           this.selectedItem = this.data.map(
-            (column: any): any[] => column.programs.filter(
+            (column: any): any[] => column.programs.find(
               (a: any): boolean => String(a.id) === String(params.select),
-            )[0],
-          ).filter((a: any): boolean => a)[0];
+            ),
+          ).find((a: any): boolean => a);
         }
         if (this.active) {
           if (this.minDate && date.getTime() < this.minDate.getTime()) {

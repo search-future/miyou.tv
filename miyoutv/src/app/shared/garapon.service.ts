@@ -68,7 +68,7 @@ export class GaraponService implements GaraponService {
   public convertCategory(value: string = '15'): any {
     const categoryNumber: string[] = value.split('/');
     const code: number = parseInt(categoryNumber[0], 10);
-    const category: any = this.categoryTable.filter((a: any): boolean => a.code === code)[0];
+    const category: any = this.categoryTable.find((a: any): boolean => a.code === code);
     if (category) {
       return category;
     }
@@ -215,7 +215,6 @@ export class GaraponService implements GaraponService {
     this.requestCache = {};
   }
 
-
   public login(force?: boolean): Observable<any> {
     const params: HttpParams = new HttpParams()
       .set('type', 'login')
@@ -273,7 +272,6 @@ export class GaraponService implements GaraponService {
       throw response;
     });
   }
-
 
   public loginV4(): Observable<any> {
     let observable: Observable<any>;

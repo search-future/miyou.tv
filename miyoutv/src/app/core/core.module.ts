@@ -31,7 +31,6 @@ import { MoritapoSettingComponent } from './moritapo-setting.component';
 import { ViewSettingComponent } from './view-setting.component';
 import { PlayerModule } from '../player/player.module';
 
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -67,4 +66,3 @@ import { PlayerModule } from '../player/player.module';
   ],
 })
 export class CoreModule { }
-

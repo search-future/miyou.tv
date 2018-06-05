@@ -31,11 +31,11 @@ export class ChinachuService {
   public convertCategory(value?: any): any {
     let category: any;
     if (!isNaN(value)) {
-      category = this.categoryTable.filter((a: any): boolean => a.code === parseInt(value, 10))[0];
+      category = this.categoryTable.find((a: any): boolean => a.code === parseInt(value, 10));
     } else if (value) {
-      category = this.categoryTable.filter((a: any): boolean => (
+      category = this.categoryTable.find((a: any): boolean => (
         a.codeName === value || a.name === value
-      ))[0];
+      ));
     }
     if (category) {
       return category;
@@ -118,4 +118,3 @@ export class ChinachuService {
     });
   }
 }
-

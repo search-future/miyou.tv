@@ -219,7 +219,7 @@ function buildContextMenu(params?: Electron.ContextMenuParams): Electron.Menu {
     click: (): void => app.quit(),
   }];
   template.forEach((a: Electron.MenuItemConstructorOptions): void => {
-    if (a.visible === false) {
+    if (a.visible != null && !a.visible) {
       a.type = null;
       a.role = null;
     }

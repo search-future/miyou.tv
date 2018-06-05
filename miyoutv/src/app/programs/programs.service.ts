@@ -226,11 +226,11 @@ export class ProgramsService {
     this.requests.recordedChannels = this.requests.recorded.map((response: any): any => {
       const result: any[] = [];
       for (const program of response) {
-        const channel: any = result.filter((a: any): boolean => (
+        const channel: any = result.find((a: any): boolean => (
           a.channel === String(program.channel.sid) &&
           a.channelName === program.channel.name &&
           a.type === program.channel.type
-        ))[0];
+        ));
         if (channel) {
           channel.channelName = program.channel.name;
         } else {
@@ -264,10 +264,10 @@ export class ProgramsService {
         a.startAt < end &&
         a.startAt + a.duration > start
       )).map((program: any): any => Object.assign({}, program, {
-        channel: channels.filter((channel: any): boolean => (
+        channel: channels.find((channel: any): boolean => (
           channel.networkId === program.networkId &&
           channel.serviceId === program.serviceId
-        ))[0],
+        )),
       })).filter((a: any): boolean => a.channel);
       programs.sort((a: any, b: any): Number => a.startAt - b.startAt);
       return programs;
@@ -459,7 +459,6 @@ export class ProgramsService {
     }
   }
 
-
   protected searchChinachu(
     options: SearchOptions,
     useArchive: boolean = this.useArchive,
@@ -562,9 +561,9 @@ export class ProgramsService {
     if (!isNaN(options.category)) {
       params = params.set('genre0', String(options.category));
     } else if (options.category) {
-      const category: any = this.categoryTable.filter((a: any): boolean => (
+      const category: any = this.categoryTable.find((a: any): boolean => (
         a.codeName === options.category || a.name === options.category
-      ))[0];
+      ));
       if (category) {
         params = params.set('genre0', String(category.code));
       } else {
@@ -610,9 +609,9 @@ export class ProgramsService {
       if (!isNaN(options.category)) {
         params = params.set('genre1_no', String(options.category));
       } else if (options.category) {
-        const category: any = this.categoryTable.filter((a: any): boolean => (
+        const category: any = this.categoryTable.find((a: any): boolean => (
           a.codeName === options.category || a.name === options.category
-        ))[0];
+        ));
         if (category) {
           params = params.set('genre1_no', String(category.code));
         } else {
@@ -649,12 +648,12 @@ export class ProgramsService {
       if (Array.isArray(program.genres)) {
         category = program.genres[0].lv1;
       }
-      const recordedProgram: any = recorded.filter((a: any): boolean => (
+      const recordedProgram: any = recorded.find((a: any): boolean => (
         a.channel.type === program.channel.type &&
         a.channel.sid === program.channel.serviceId &&
         a.start < program.startAt + program.duration &&
         a.end > program.startAt
-      ))[0];
+      ));
       let previewPos: number = this.previewPos;
       let preview: Observable<String>;
       let stream: any;

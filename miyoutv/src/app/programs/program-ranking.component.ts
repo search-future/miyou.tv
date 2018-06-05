@@ -174,9 +174,9 @@ export class ProgramRankingComponent implements OnInit, OnDestroy {
         const days: number = Math.round((end.getTime() - start.getTime()) / 86400000);
 
         if (params.select) {
-          this.selectedItem = this.data.filter(
+          this.selectedItem = this.data.find(
             (a: any): boolean => String(a.index) === params.select,
-          )[0];
+          );
         }
         if (this.active) {
           if (this.minDate && start.getTime() < this.minDate.getTime()) {
@@ -378,12 +378,12 @@ export class ProgramRankingComponent implements OnInit, OnDestroy {
     })).mergeMap(
       (result: any): Observable<any> => Observable.concat(...result.intervals.map(
         (interval: any): Observable<any> => Observable.defer((): Observable<any> => {
-          const item: any = this.data.filter((a: any): boolean => (
+          const item: any = this.data.find((a: any): boolean => (
             a.program.type === interval.type &&
             a.program.channel === interval.channel &&
             a.program.start <= interval.start + 60000 &&
             a.program.end > interval.start
-          ))[0];
+          ));
           if (item) {
             return this.unique ? Observable.empty() : Observable.of(Object.assign(
               {},

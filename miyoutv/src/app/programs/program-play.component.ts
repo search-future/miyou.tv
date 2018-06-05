@@ -408,10 +408,10 @@ export class ProgramPlayComponent implements OnInit, OnDestroy {
       ).map(
         (result: any): any => {
           if (result.hits > 0) {
-            return this.start ? result.programs.filter((a: any): boolean => (
+            return this.start ? result.programs.find((a: any): boolean => (
               a.start.getTime() <= this.start &&
               a.end.getTime() > this.start
-            ))[0] : result.programs[0];
+            )) : result.programs[0];
           }
           throw result;
         },

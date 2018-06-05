@@ -92,9 +92,9 @@ export class ProgramListComponent implements OnInit, OnDestroy {
         const view: number = !isNaN(params.view) ? parseInt(params.view, 10) : this.view;
         const page: number = !isNaN(params.page) ? parseInt(params.page, 10) : this.page;
         if (params.select) {
-          this.selectedItem = this.data.filter(
+          this.selectedItem = this.data.find(
             (a: any): boolean => String(a.id) === String(params.select),
-          )[0];
+          );
         }
         if (this.active) {
           if (params.refresh) {
