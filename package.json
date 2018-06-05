@@ -137,7 +137,7 @@
     "predist:win32": "env-cmd pack-win32.env npm run build && npm run dist:win32:copy",
     "predist:win64": "env-cmd pack-win64.env npm run build && npm run dist:win64:copy",
     "start": "env-cmd .env.local electron ./",
-    "test": "tslint ./",
+    "test": "tslint -p package.json",
     "watch": "env-cmd .env.local concurrently \"npm run watch:main\" \"npm run watch:renderer\" \"npm run watch:resource\"",
     "watch:main": "npm run build:main -- -w",
     "watch:renderer": "npm run build:renderer -- -w",
