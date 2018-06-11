@@ -19,22 +19,22 @@ limitations under the License.
     <div class="d-none d-md-block col-md-4 text-left"><img src="miyoutv.ico" width="20" height="20"></div>
     <div class="d-none d-md-block col-md-4 text-center">MiyouTV</div>
     <div class="col-12 col-md-4 px-0 text-right">
-        <button class="btn btn-sm btn-black" title="常に前面に表示" [class.text-primary]="isAlwaysOnTop" (click)="toggleAlwaysOnTop()">
+        <button class="btn btn-sm btn-black" tabindex="-1" title="常に前面に表示" [class.text-primary]="isAlwaysOnTop" (click)="toggleAlwaysOnTop()">
             <span class="fas fa-fw fa-thumbtack"></span>
         </button>
-        <button class="btn btn-sm btn-black" title="最小化" (click)="minimize()">
+        <button class="btn btn-sm btn-black" tabindex="-1" title="最小化" (click)="minimize()">
             <span class="fas fa-fw fa-window-minimize"></span>
         </button>
-        <button class="btn btn-sm btn-black" title="最大化" [class.d-none]="isMaximized" (click)="maximize()">
+        <button class="btn btn-sm btn-black" tabindex="-1" title="最大化" [class.d-none]="isMaximized" (click)="maximize()">
             <span class="fas fa-fw fa-window-maximize"></span>
         </button>
-        <button class="btn btn-sm btn-black" title="元のサイズに戻す" [class.d-none]="!isMaximized" (click)="restore()">
+        <button class="btn btn-sm btn-black" tabindex="-1" title="元のサイズに戻す" [class.d-none]="!isMaximized" (click)="restore()">
             <span class="fas fa-fw fa-window-restore"></span>
         </button>
-        <button class="btn btn-sm btn-black" title="全画面表示" (click)="fullscreen()">
+        <button class="btn btn-sm btn-black" tabindex="-1" title="全画面表示" (click)="fullscreen()">
             <span class="fas fa-fw fa-square-full"></span>
         </button>
-        <button class="btn btn-sm btn-danger-black" title="閉じる" (click)="close()">
+        <button class="btn btn-sm btn-danger-black" tabindex="-1" title="閉じる" (click)="close()">
             <span class="fas fa-fw fa-times"></span>
         </button>
     </div>
