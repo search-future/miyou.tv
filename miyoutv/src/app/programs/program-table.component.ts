@@ -46,6 +46,99 @@ export class ProgramTableComponent implements OnInit, OnDestroy {
     dateInputFormat: 'yyyy/MM/dd',
     showWeekNumbers: false,
   };
+  public hotkeys: any[] = [{
+    up: (): boolean => {
+      if (
+        document.elementFromPoint(0, 0).className !== 'cfp-hotkeys' &&
+        this.viewport.nativeElement.contains(document.activeElement)
+      ) {
+        const focusable: NodeList = this.viewport.nativeElement.querySelectorAll((
+          '[tabindex]:not([tabindex^="-"])'
+        ));
+        for (let i = 0; i < focusable.length; i += 1) {
+          if (focusable[i] === document.activeElement) {
+            let index = i - 1;
+            if (index <= 0) {
+              index = focusable.length - 1;
+            }
+            (focusable[index] as HTMLElement).focus();
+            return false;
+          }
+        }
+      }
+      return true;
+    },
+  }, {
+    down: (): boolean => {
+      if (
+        document.elementFromPoint(0, 0).className !== 'cfp-hotkeys' &&
+        this.viewport.nativeElement.contains(document.activeElement)
+      ) {
+        const focusable: NodeList = this.viewport.nativeElement.querySelectorAll((
+          '[tabindex]:not([tabindex^="-"])'
+        ));
+        for (let i = 0; i < focusable.length; i += 1) {
+          if (focusable[i] === document.activeElement) {
+            let index = i + 1;
+            if (index >= focusable.length) {
+              index = 0;
+            }
+            (focusable[index] as HTMLElement).focus();
+            return false;
+          }
+        }
+      }
+      return true;
+    },
+  }, {
+    left: (): boolean => {
+      if (
+        document.elementFromPoint(0, 0).className !== 'cfp-hotkeys' &&
+        this.viewport.nativeElement.contains(document.activeElement)
+      ) {
+        const focusable: NodeList = this.viewport.nativeElement.querySelectorAll((
+          '[tabindex]:not([tabindex^="-"])'
+        ));
+        const currentRect: ClientRect = document.activeElement.getBoundingClientRect();
+        for (let i = focusable.length - 1; i >= 0; i -= 1) {
+          const rect: ClientRect = (focusable[i] as HTMLElement).getBoundingClientRect();
+          if (
+            rect.top <= currentRect.top &&
+            rect.bottom > currentRect.top &&
+            rect.right < currentRect.right
+          ) {
+            (focusable[i] as HTMLElement).focus();
+            return false;
+          }
+        }
+      }
+      return true;
+    },
+  }, {
+    right: (): boolean => {
+      if (
+        document.elementFromPoint(0, 0).className !== 'cfp-hotkeys' &&
+        this.viewport.nativeElement.contains(document.activeElement)
+      ) {
+        const focusable: NodeList = this.viewport.nativeElement.querySelectorAll((
+          '[tabindex]:not([tabindex^="-"])'
+        ));
+        const currentRect: ClientRect = document.activeElement.getBoundingClientRect();
+        for (let i = 0; i < focusable.length; i += 1) {
+          const rect: ClientRect = (focusable[i] as HTMLElement).getBoundingClientRect();
+          if (
+            rect.top <= currentRect.top &&
+            rect.bottom > currentRect.top &&
+            rect.left > currentRect.left
+          ) {
+            (focusable[i] as HTMLElement).focus();
+            return false;
+          }
+        }
+      }
+      return true;
+    },
+  }];
   public active: boolean = false;
   public archiveEnabled: boolean = false;
   public previewEnabled: boolean = true;

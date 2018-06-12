@@ -16,7 +16,7 @@ limitations under the License.
 -->
 <meta charset="UTF-8">
 <ngx-loading-bar></ngx-loading-bar>
-<div class="programs view-content d-flex flex-column fit pt-5">
+<div class="programs view-content d-flex flex-column fit pt-5" [hotkeys]="hotkeys">
     <div class="view-content-header py-1 bg-black text-light">
         <form class="row m-0" [formGroup]="form">
             <div class="col-12 col-sm-3 col-lg-2">
@@ -91,7 +91,7 @@ limitations under the License.
                             <ng-container *ngSwitchDefault>{{item.commentCount | async}}</ng-container>
                         </ng-container>
                     </span>
-                    <div class="program-table-content p-2 flex-fill border bg-white overflow-hidden selectable" [class.selected]="selectedItem === item" (click)="select(item)" (dblclick)="play(item); false" (mouseenter)="item.showPreview = true">
+                    <div class="program-table-content p-2 flex-fill border bg-white overflow-hidden selectable" tabindex="0" [class.selected]="selectedItem === item" (focus)="select(item); item.showPreview = true" (dblclick)="play(item); false" (keydown.enter)="play(item)">
                         <span class="time text-primary font-weight-bold">{{item.start | dateEx:hourFirst:hourFormat:'AHHHH:mm'}}</span>
                         <span class="title quick-search quick-search-hidden font-weight-bold">
                             {{item.fullTitle}}
@@ -99,7 +99,7 @@ limitations under the License.
                                 <span class="fas fa-search"></span>
                             </span>
                         </span>
-                        <a class="badge" href="" title="カテゴリで検索" [ngClass]="'badge-' + item.category.codeName" (click)="search('cat:' + item.category.codeName); false">
+                        <a class="badge" href="" title="カテゴリで検索" tabindex="-1" [ngClass]="'badge-' + item.category.codeName" (click)="search('cat:' + item.category.codeName); false">
                             {{item.category.name}}
                         </a>
                         <div class="detail mt-2 small">{{item.detail}}</div>
