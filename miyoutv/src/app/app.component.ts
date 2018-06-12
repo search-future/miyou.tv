@@ -61,32 +61,45 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.hotkeysService.add([new Hotkey(
       'mod+r',
-      (event: KeyboardEvent): boolean => {
-        this.router.navigate([], {
-          queryParams: {
-            refresh: 1,
-          },
-          queryParamsHandling: 'merge',
-        });
-        return false;
+      (): boolean => {
+        if (document.elementFromPoint(0, 0).className !== 'cfp-hotkeys') {
+          this.router.navigate([], {
+            queryParams: {
+              refresh: 1,
+            },
+            queryParamsHandling: 'merge',
+          });
+          return false;
+        }
+        return true;
       },
       [],
       'バックエンドのデータを更新',
     ), new Hotkey(
       'mod+w',
-      (event: KeyboardEvent): boolean => {
-        this.openQuitModal();
-        return false;
+      (): boolean => {
+        if (document.elementFromPoint(0, 0).className !== 'cfp-hotkeys') {
+          this.openQuitModal();
+          return false;
+        }
+        return true;
       },
       [],
       'MiyouTVを終了',
     ), new Hotkey(
       'esc',
-      (event: KeyboardEvent): boolean => {
+      (): boolean => {
+        if (document.elementFromPoint(0, 0).className === 'cfp-hotkeys') {
+          this.hotkeysService.cheatSheetToggle.next(false);
+          return false;
+        }
         if (this.windowService.fullscreen) {
           this.windowService.fullscreen = false;
-        } else {
+          return false;
+        }
+        if (!this.hasModal) {
           this.openQuitModal();
+          return false;
         }
         return true;
       },
@@ -155,5 +168,25 @@ export class AppComponent implements OnInit, OnDestroy {
         class: 'modal-dialog-centered',
       });
     }
+  }
+
+  public helpScroller(event: KeyboardEvent): boolean {
+    const element: HTMLElement = document.elementFromPoint(0, 0) as HTMLElement;
+    if (element.className === 'cfp-hotkeys') {
+      const movement: number = ({
+        ArrowUp: -40,
+        ArrowDown: 40,
+        PageUp: -element.clientHeight,
+        PageDown: element.clientHeight,
+        Home: -element.scrollHeight,
+        End: element.scrollHeight,
+      } as { [key: string]: number })[event.key];
+      if (movement) {
+        element.scrollTop += movement;
+        return false;
+      }
+    }
+    return true;
+
   }
 }

@@ -42,7 +42,9 @@ defineLocale('ja', jaLocale);
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    HotkeyModule.forRoot(),
+    HotkeyModule.forRoot({
+      cheatSheetDescription: 'ショートカット一覧を表示/非表示',
+    }),
     LoadingBarRouterModule,
     AppRoutingModule,
     CoreModule,

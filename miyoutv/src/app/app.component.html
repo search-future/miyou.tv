@@ -25,6 +25,6 @@ limitations under the License.
     <div class="view flex-fill position-relative overflow-hidden">
         <router-outlet></router-outlet>
     </div>
-    <hotkeys-cheatsheet title="ショートカットキー一覧"></hotkeys-cheatsheet>
+    <hotkeys-cheatsheet title="ショートカットキー一覧" (window:keydown)="helpScroller($event)"></hotkeys-cheatsheet>
     <ngx-loading-bar></ngx-loading-bar>
 </div>

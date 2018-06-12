@@ -138,8 +138,9 @@ body {
 
 // Hotkeys
 .cfp-hotkeys {
-  display: block;
+  display: block !important;
   overflow-y: auto;
+  padding: 1rem;
 }
 
 // Loading bar
