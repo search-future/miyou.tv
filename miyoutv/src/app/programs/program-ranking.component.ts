@@ -15,6 +15,7 @@ limitations under the License.
 */
 import {
   Component,
+  ElementRef,
   OnDestroy,
   OnInit,
   TemplateRef,
@@ -39,7 +40,9 @@ import { LoadingBarService } from '@ngx-loading-bar/core';
   templateUrl: 'program-ranking.component.html',
 })
 export class ProgramRankingComponent implements OnInit, OnDestroy {
+  @ViewChild('viewport') viewport: ElementRef;
   @ViewChild('confirm') confirmTemplateRef: TemplateRef<any>;
+  protected hasModal: boolean = false;
   public form: FormGroup;
   public modalRef: BsModalRef;
   public dpConfig: Partial<BsDatepickerConfig> = {
@@ -47,6 +50,51 @@ export class ProgramRankingComponent implements OnInit, OnDestroy {
     dateInputFormat: 'yyyy/MM/dd',
     showWeekNumbers: false,
   };
+  public hotkeys: any[] = [{
+    up: (): boolean => {
+      if (
+        document.elementFromPoint(0, 0).className !== 'cfp-hotkeys' &&
+        this.viewport.nativeElement.contains(document.activeElement)
+      ) {
+        const focusable: NodeList = this.viewport.nativeElement.querySelectorAll((
+          '[tabindex]:not([tabindex^="-"])'
+        ));
+        for (let i = 0; i < focusable.length; i += 1) {
+          if (focusable[i] === document.activeElement) {
+            let index = i - 1;
+            if (index <= 0) {
+              index = focusable.length - 1;
+            }
+            (focusable[index] as HTMLElement).focus();
+            return false;
+          }
+        }
+      }
+      return true;
+    },
+  }, {
+    down: (): boolean => {
+      if (
+        document.elementFromPoint(0, 0).className !== 'cfp-hotkeys' &&
+        this.viewport.nativeElement.contains(document.activeElement)
+      ) {
+        const focusable: NodeList = this.viewport.nativeElement.querySelectorAll((
+          '[tabindex]:not([tabindex^="-"])'
+        ));
+        for (let i = 0; i < focusable.length; i += 1) {
+          if (focusable[i] === document.activeElement) {
+            let index = i + 1;
+            if (index >= focusable.length) {
+              index = 0;
+            }
+            (focusable[index] as HTMLElement).focus();
+            return false;
+          }
+        }
+      }
+      return true;
+    },
+  }];
   public active: boolean = false;
   public type: string;
   public channel: string;
@@ -243,6 +291,12 @@ export class ProgramRankingComponent implements OnInit, OnDestroy {
           },
           queryParamsHandling: 'merge',
         });
+      }),
+      this.bsModalService.onHide.subscribe(() => {
+        this.hasModal = false;
+      }),
+      this.bsModalService.onShow.subscribe(() => {
+        this.hasModal = true;
       }),
     );
 
@@ -474,8 +528,8 @@ export class ProgramRankingComponent implements OnInit, OnDestroy {
     });
   }
 
-  playModal(item: any = this.selectedItem) {
-    if (item) {
+  public playModal(item: any = this.selectedItem) {
+    if (!this.hasModal && item) {
       this.selectedItem = item;
       this.select(item);
       this.modalRef = this.bsModalService.show(this.confirmTemplateRef, {

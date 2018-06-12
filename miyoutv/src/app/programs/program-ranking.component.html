@@ -16,7 +16,7 @@ limitations under the License.
 -->
 <meta charset="UTF-8">
 <ngx-loading-bar></ngx-loading-bar>
-<div class="programs view-content d-flex flex-column fit pt-5">
+<div class="programs view-content d-flex flex-column fit pt-5" [hotkeys]="hotkeys">
     <div class="view-content-header py-1 bg-black text-light">
         <form class="row m-0" [formGroup]="form">
             <div class="form-inline col-12 col-sm-7 justify-content-start">
@@ -83,10 +83,10 @@ limitations under the License.
             期間: {{start | dateEx:hourFirst:hourFormat:'y/M/d HHHH:mm'}}～{{end | dateEx:hourFirst:hourFormat:'y/M/d HHHH:mm'}}
         </span>
     </div>
-    <div class="view-content-body flex-fill overflow-auto">
+    <div class="view-content-body flex-fill overflow-auto" #viewport>
         <div class="container">
             <ol class="list-unstyled mt-3">
-                <li class="media media-program m-0 position-relative border-bottom border-secondary bg-white selectable" *ngFor="let item of data" [class.selected]="selectedItem === item" (click)="select(item)" (dblclick)="playModal(item)">
+                <li class="media media-program m-0 position-relative border-bottom border-secondary bg-white selectable" tabindex="0" *ngFor="let item of data" [class.selected]="selectedItem === item" (focus)="select(item)" (dblclick)="playModal(item)"  (keydown.enter)="playModal(item)">
                     <div class="media-body">
                         <div class="media-heading m-0 font-weight-bold">
                             <span class="rank h3 text-primary">{{item.rank}}</span>
@@ -111,13 +111,13 @@ limitations under the License.
                             </span>
                             </span>
                             <span class="date">{{item.program.start | dateEx:hourFirst:hourFormat:'y/M/d HHHH:mm'}}～{{item.program.end | dateEx:hourFirst:hourFormat:'HHHH:mm'}}</span>
-                            <a class="badge" href="" title="カテゴリで検索" [ngClass]="'badge-' + item.program.category.codeName" (click)="search('cat:' + item.program.category.codeName); false">
+                            <a class="badge" href="" title="カテゴリで検索" tabindex="-1" [ngClass]="'badge-' + item.program.category.codeName" (click)="search('cat:' + item.program.category.codeName); false">
                                 {{item.program.category.name}}
                             </a>
                         </div>
                         <div class="detail small">{{item.program.detail}}</div>
                     </div>
-                    <a class="m-3" href="" *ngIf="previewEnabled" (click)="playModal(item); false">
+                    <a class="m-3" href="" tabindex="-1" *ngIf="previewEnabled" (click)="playModal(item); false">
                         <img class="preview" width="160" height="90"
                             [src]="(item.program.preview | async) || 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII='">
                     </a>
