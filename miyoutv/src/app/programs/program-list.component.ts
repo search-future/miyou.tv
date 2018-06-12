@@ -13,7 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import { Component, OnDestroy, OnInit, ViewContainerRef } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  ViewContainerRef,
+} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
@@ -27,7 +34,93 @@ import { ProgramsService } from './programs.service';
   templateUrl: 'program-list.component.html',
 })
 export class ProgramListComponent implements OnInit, OnDestroy {
+  @ViewChild('viewport') viewport: ElementRef;
   public form: FormGroup;
+  public hotkeys: any[] = [{
+    up: (): boolean => {
+      if (
+        document.elementFromPoint(0, 0).className !== 'cfp-hotkeys' &&
+        this.viewport.nativeElement.contains(document.activeElement)
+      ) {
+        const focusable: NodeList = this.viewport.nativeElement.querySelectorAll((
+          '[tabindex]:not([tabindex^="-"])'
+        ));
+        for (let i = 0; i < focusable.length; i += 1) {
+          if (focusable[i] === document.activeElement) {
+            let index = i - 1;
+            if (index <= 0) {
+              index = focusable.length - 1;
+            }
+            (focusable[index] as HTMLElement).focus();
+            return false;
+          }
+        }
+      }
+      return true;
+    },
+  }, {
+    down: (): boolean => {
+      if (
+        document.elementFromPoint(0, 0).className !== 'cfp-hotkeys' &&
+        this.viewport.nativeElement.contains(document.activeElement)
+      ) {
+        const focusable: NodeList = this.viewport.nativeElement.querySelectorAll((
+          '[tabindex]:not([tabindex^="-"])'
+        ));
+        for (let i = 0; i < focusable.length; i += 1) {
+          if (focusable[i] === document.activeElement) {
+            let index = i + 1;
+            if (index >= focusable.length) {
+              index = 0;
+            }
+            (focusable[index] as HTMLElement).focus();
+            return false;
+          }
+        }
+      }
+      return true;
+    },
+  }, {
+    left: (): boolean => {
+      if (
+        document.elementFromPoint(0, 0).className !== 'cfp-hotkeys' &&
+        this.viewport.nativeElement.contains(document.activeElement)
+      ) {
+        const page = this.page - 1;
+        if (page > 0) {
+          this.router.navigate([], {
+            queryParams: {
+              page,
+              select: '',
+            },
+            queryParamsHandling: 'merge',
+          });
+          return false;
+        }
+      }
+      return true;
+    },
+  }, {
+    right: (): boolean => {
+      if (
+        document.elementFromPoint(0, 0).className !== 'cfp-hotkeys' &&
+        this.viewport.nativeElement.contains(document.activeElement)
+      ) {
+        const page = this.page + 1;
+        if (page < this.hits / this.view + 1) {
+          this.router.navigate([], {
+            queryParams: {
+              page,
+              select: '',
+            },
+            queryParamsHandling: 'merge',
+          });
+          return false;
+        }
+      }
+      return true;
+    },
+  }];
   public active: boolean = false;
   public query: string = '';
   public reverse: boolean = true;
