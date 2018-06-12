@@ -48,6 +48,7 @@ export class ProgramPlayComponent implements OnInit, OnDestroy {
   public peaks: any[] = [];
   public sidebarCollapsed: boolean = false;
   public offset: Date;
+  protected oldHotkeys: Hotkey[] = [];
   private subscriptions: Subscription[] = [];
 
   constructor(
@@ -191,178 +192,227 @@ export class ProgramPlayComponent implements OnInit, OnDestroy {
 
   public ngOnDestroy() {
     this.windowService.powerSave = true;
+    this.deinitHotkeys();
     this.subscriptions.forEach((a: Subscription) => {
       a.unsubscribe();
     });
   }
 
   protected initHotkeys() {
-    this.hotkeysService.add([
-      new Hotkey(
-        's',
-        (): boolean => {
+    this.oldHotkeys = Object.assign([], this.hotkeysService.get());
+    this.hotkeysService.add([new Hotkey(
+      's',
+      (): boolean => {
+        if (document.elementFromPoint(0, 0).className !== 'cfp-hotkeys') {
           this.stop();
           return false;
-        },
-        [],
-        '再生を終了',
-      ),
-      new Hotkey(
-        'space',
-        (): boolean => {
+        }
+        return true;
+      },
+      [],
+      '再生を終了',
+    ), new Hotkey(
+      'space',
+      (): boolean => {
+        if (document.elementFromPoint(0, 0).className !== 'cfp-hotkeys') {
           this.player.togglePause();
           return false;
-        },
-        [],
-        '再生/一時停止',
-      ),
-      new Hotkey(
-        '=',
-        (): boolean => {
+        }
+        return true;
+      },
+      [],
+      '再生/一時停止',
+    ), new Hotkey(
+      '=',
+      (): boolean => {
+        if (document.elementFromPoint(0, 0).className !== 'cfp-hotkeys') {
           this.player.normalSpeed();
           return false;
-        },
-        [],
-        '再生速度を通常に戻す',
-      ),
-      new Hotkey(
-        ['-', 'pagedown'],
-        (): boolean => {
+        }
+        return true;
+      },
+      [],
+      '再生速度を通常に戻す',
+    ), new Hotkey(
+      ['-', 'pagedown'],
+      (): boolean => {
+        if (document.elementFromPoint(0, 0).className !== 'cfp-hotkeys') {
           this.player.speedDown();
           return false;
-        },
-        [],
-        '再生速度を下げる',
-      ),
-      new Hotkey(
-        ['+', 'pageup'],
-        (): boolean => {
+        }
+        return true;
+      },
+      [],
+      '再生速度を下げる',
+    ), new Hotkey(
+      ['+', 'pageup'],
+      (): boolean => {
+        if (document.elementFromPoint(0, 0).className !== 'cfp-hotkeys') {
           this.player.speedUp();
           return false;
-        },
-        [],
-        '再生速度を上げる',
-      ),
-      new Hotkey(
-        'b',
-        (): boolean => {
+        }
+        return true;
+      },
+      [],
+      '再生速度を上げる',
+    ), new Hotkey(
+      'b',
+      (): boolean => {
+        if (document.elementFromPoint(0, 0).className !== 'cfp-hotkeys') {
           this.player.toggleAudioTrack();
           return false;
-        },
-        [],
-        '音声切り替え',
-      ),
-      new Hotkey(
-        'v',
-        (): boolean => {
+        }
+        return true;
+      },
+      [],
+      '音声切り替え',
+    ), new Hotkey(
+      'v',
+      (): boolean => {
+        if (document.elementFromPoint(0, 0).className !== 'cfp-hotkeys') {
           this.player.toggleSubtitlesTrack();
           return false;
-        },
-        [],
-        '',
-      ),
-      new Hotkey(
-        'm',
-        (): boolean => {
+        }
+        return true;
+      },
+      [],
+      '',
+    ), new Hotkey(
+      'm',
+      (): boolean => {
+        if (document.elementFromPoint(0, 0).className !== 'cfp-hotkeys') {
           this.player.toggleMute();
           return false;
-        },
-        [],
-        'ミュート',
-      ),
-      new Hotkey(
-        ['home', 'p'],
-        (): boolean => {
+        }
+        return true;
+
+      },
+      [],
+      'ミュート',
+    ), new Hotkey(
+      ['home', 'p'],
+      (): boolean => {
+        if (document.elementFromPoint(0, 0).className !== 'cfp-hotkeys') {
           this.previous();
           return false;
-        },
-        [],
-        '前の番組を再生',
-      ),
-      new Hotkey(
-        ['end', 'n'],
-        (): boolean => {
+        }
+        return true;
+
+      },
+      [],
+      '前の番組を再生',
+    ), new Hotkey(
+      ['end', 'n'],
+      (): boolean => {
+        if (document.elementFromPoint(0, 0).className !== 'cfp-hotkeys') {
           this.next();
           return false;
-        },
-        [],
-        '次の番組を再生',
-      ),
-      new Hotkey(
-        'f',
-        (): boolean => {
+        }
+        return true;
+
+      },
+      [],
+      '次の番組を再生',
+    ), new Hotkey(
+      'f',
+      (): boolean => {
+        if (document.elementFromPoint(0, 0).className !== 'cfp-hotkeys') {
           this.toggleFullscreen();
           return false;
-        },
-        [],
-        '全画面表示/解除',
-      ),
-      new Hotkey(
-        ['up', 'mod+up'],
-        (): boolean => {
+        }
+        return true;
+
+      },
+      [],
+      '全画面表示/解除',
+    ), new Hotkey(
+      ['up', 'mod+up'],
+      (): boolean => {
+        if (document.elementFromPoint(0, 0).className !== 'cfp-hotkeys') {
           this.player.mute = false;
           this.player.increaseVolume(5);
           return false;
-        },
-        [],
-        '音量を上げる',
-      ),
-      new Hotkey(
-        ['down', 'mod+down'],
-        (): boolean => {
+        }
+        return true;
+
+      },
+      [],
+      '音量を上げる',
+    ), new Hotkey(
+      ['down', 'mod+down'],
+      (): boolean => {
+        if (document.elementFromPoint(0, 0).className !== 'cfp-hotkeys') {
           this.player.mute = false;
           this.player.decreaseVolume(5);
           return false;
-        },
-        [],
-        '音量を下げる',
-      ),
-      new Hotkey(
-        ['left', 'mod+left'],
-        (): boolean => {
+        }
+        return true;
+
+      },
+      [],
+      '音量を下げる',
+    ), new Hotkey(
+      ['left', 'mod+left'],
+      (): boolean => {
+        if (document.elementFromPoint(0, 0).className !== 'cfp-hotkeys') {
           this.player.jumpBackward('11s');
           return false;
-        },
-        [],
-        '10秒戻す',
-      ),
-      new Hotkey(
-        ['right', 'mod+right'],
-        (): boolean => {
+        }
+        return true;
+      },
+      [],
+      '10秒戻す',
+    ), new Hotkey(
+      ['right', 'mod+right'],
+      (): boolean => {
+        if (document.elementFromPoint(0, 0).className !== 'cfp-hotkeys') {
           this.player.jumpForward('29s');
           return false;
-        },
-        [],
-        '30秒進める',
-      ),
-      new Hotkey(
-        ['shift+left', '['],
-        (): boolean => {
+        }
+        return true;
+      },
+      [],
+      '30秒進める',
+    ), new Hotkey(
+      ['shift+left', '['],
+      (): boolean => {
+        if (document.elementFromPoint(0, 0).className !== 'cfp-hotkeys') {
           this.commentPlayer.delay -= 500;
           return false;
-        },
-        [],
-        'コメントを早める',
-      ),
-      new Hotkey(
-        ['shift+right', ']'],
-        (): boolean => {
+        }
+        return true;
+      },
+      [],
+      'コメントを早める',
+    ), new Hotkey(
+      ['shift+right', ']'],
+      (): boolean => {
+        if (document.elementFromPoint(0, 0).className !== 'cfp-hotkeys') {
           this.commentPlayer.delay += 500;
           return false;
-        },
-        [],
-        'コメントを遅らせる',
-      ),
-      new Hotkey(
-        ['o', 'mod+s'],
-        (): boolean => {
+        }
+        return true;
+      },
+      [],
+      'コメントを遅らせる',
+    ), new Hotkey(
+      ['o', 'mod+s'],
+      (): boolean => {
+        if (document.elementFromPoint(0, 0).className !== 'cfp-hotkeys') {
           this.sidebarCollapsed = !this.sidebarCollapsed;
           return false;
-        },
-        [],
-        'サイドバーを表示/非表示',
-      ),
-    ]);
+        }
+        return true;
+      },
+      [],
+      'サイドバーを表示/非表示',
+    )]);
+  }
+
+  public deinitHotkeys() {
+    this.hotkeysService.remove();
+    this.hotkeysService.hotkeys = [];
+    this.hotkeysService.add(this.oldHotkeys);
   }
 
   public init() {
