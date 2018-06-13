@@ -186,7 +186,7 @@ body {
     background: color("white");
     cursor: pointer;
 
-    -webkit-appearance: none;
+    appearance: none;
   }
   &.form-control-range-round::-webkit-slider-thumb {
     width: 1rem;
