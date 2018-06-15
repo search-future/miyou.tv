@@ -14,9 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import { Inject, Injectable } from '@angular/core';
-import { HttpParams, HttpErrorResponse } from '@angular/common/http';
+import { HttpParams } from '@angular/common/http';
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
-import { Observable, Subscriber, Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { ChinachuService } from '../shared/chinachu.service';
 import { GaraponService } from '../shared/garapon.service';

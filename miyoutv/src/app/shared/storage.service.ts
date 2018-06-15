@@ -17,7 +17,6 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { remote } from 'electron';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
 
 @Injectable()
 export class StorageService {

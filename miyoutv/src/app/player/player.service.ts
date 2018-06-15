@@ -20,7 +20,7 @@ import { Observable, Subject } from 'rxjs';
 import { StorageService } from '../shared/storage.service';
 import { MpvService } from './mpv.service';
 import { VgWrapper } from './vg-wrapper.service';
-import { VlcService, VlcState } from './vlc.service';
+import { VlcService } from './vlc.service';
 
 export enum PlayerState {
   Stopped = 'stopped',

@@ -25,7 +25,7 @@ import {
   ViewChild,
   ViewChildren,
 } from '@angular/core';
-import { AnimationBuilder, AnimationPlayer, style, animate } from '@angular/animations';
+import { AnimationBuilder, style, animate } from '@angular/animations';
 import { Observable, Subscription } from 'rxjs';
 
 import { CommentPlayer } from './comment-player.service';

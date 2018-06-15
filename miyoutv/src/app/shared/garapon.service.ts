@@ -15,7 +15,7 @@ limitations under the License.
 */
 import { Inject, Injectable } from '@angular/core';
 import { HttpHeaders, HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, Subscriber } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Md5 } from 'ts-md5/dist/md5';
 
 import { StorageService } from '../shared/storage.service';

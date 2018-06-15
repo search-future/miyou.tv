@@ -23,8 +23,8 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import { HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { HttpParams } from '@angular/common/http';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
