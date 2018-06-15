@@ -47,7 +47,7 @@ export class ProgramRankingComponent implements OnInit, OnDestroy {
   public modalRef: BsModalRef;
   public dpConfig: Partial<BsDatepickerConfig> = {
     containerClass: 'theme-default',
-    dateInputFormat: 'yyyy/MM/dd',
+    dateInputFormat: 'YYYY/MM/DD',
     showWeekNumbers: false,
   };
   public hotkeys: any[] = [{

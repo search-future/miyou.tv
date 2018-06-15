@@ -43,7 +43,7 @@ export class ProgramTableComponent implements OnInit, OnDestroy {
   public form: FormGroup;
   public dpConfig: Partial<BsDatepickerConfig> = {
     containerClass: 'theme-default',
-    dateInputFormat: 'yyyy/MM/dd',
+    dateInputFormat: 'YYYY/MM/DD',
     showWeekNumbers: false,
   };
   public hotkeys: any[] = [{
