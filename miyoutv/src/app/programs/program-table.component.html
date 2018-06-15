@@ -104,7 +104,7 @@ limitations under the License.
                         </a>
                         <div class="detail mt-2 small">{{item.detail}}</div>
                         <div class="preview text-center" *ngIf="previewEnabled && item.showPreview">
-                            <img width="160" height="90" *ngIf="(item.preview | async) || false" [src]="item.preview | async">
+                            <img width="160" height="90" *ngIf="(item.preview | async) || false" [src]="(item.preview | async) || ''">
                         </div>
                     </div>
                 </div>
