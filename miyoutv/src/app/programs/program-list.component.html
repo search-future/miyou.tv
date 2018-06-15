@@ -58,7 +58,7 @@ limitations under the License.
                     </select>
                 </div>
                 <div class="form-group mb-0 mr-sm-1 order-sm-1">
-                    <span class="form-control-plaintext">
+                    <span class="form-control-plaintext text-light">
                         {{pageStatus}}
                     </span>
                 </div>
@@ -108,11 +108,13 @@ limitations under the License.
             </ul>
         </div>
     </div>
-    <div class="view-content-footer row m-0">
-        <pagination class="mx-auto" [class.d-none]="true" [class.d-sm-flex]="view < hits" previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;" [maxSize]="10" [rotate]="true" [boundaryLinks]="true" [itemsPerPage]="view" [totalItems]="hits"
-            (pageChanged)="onPageChanged($event)" [ngModel]="page"></pagination>
-        <pagination class="mx-auto" [class.d-sm-none]="true" [class.d-none]="view >= hits" previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;" [maxSize]="1" [rotate]="true" [boundaryLinks]="true" [itemsPerPage]="view" [totalItems]="hits"
-            (pageChanged)="onPageChanged($event)" [ngModel]="page"></pagination>
+    <div class="view-content-footer">
+        <div class="row">
+            <pagination class="mx-auto my-1" [class.d-none]="true" [class.d-sm-flex]="view < hits" previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;" [maxSize]="10" [rotate]="true" [boundaryLinks]="true" [itemsPerPage]="view" [totalItems]="hits"
+                (pageChanged)="onPageChanged($event)" [ngModel]="page"></pagination>
+            <pagination class="mx-auto my-1" [class.d-sm-none]="true" [class.d-none]="view >= hits" previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;" [maxSize]="1" [rotate]="true" [boundaryLinks]="true" [itemsPerPage]="view" [totalItems]="hits"
+                (pageChanged)="onPageChanged($event)" [ngModel]="page"></pagination>
+        </div>
     </div>
     <form class="form-inline fixed-bottom col-3 col-sm-2 col-lg-1 m-4 mb-sm-5 mb-md-4 ml-auto">
         <button class="btn btn-primary ml-auto" type="button" title="選択した番組を再生" (click)="play()">再生</button>
