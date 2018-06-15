@@ -335,6 +335,9 @@ export class ProgramRankingComponent implements OnInit, OnDestroy {
     this.previewEnabled = this.storageService.loadLocalStorage('previewEnabled') !== false;
     this.hourFirst = this.storageService.loadLocalStorage('hourFirst');
     this.hourFormat = this.storageService.loadLocalStorage('hourFormat');
+    if (this.hourFirst == null) {
+      this.hourFirst = 4;
+    }
     Observable.zip(
       this.programsService.channels,
       this.programsService.startTime,

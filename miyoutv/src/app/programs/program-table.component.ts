@@ -326,6 +326,9 @@ export class ProgramTableComponent implements OnInit, OnDestroy {
     this.countMode = this.storageService.loadLocalStorage('countMode') || 'speed';
     this.hourFirst = this.storageService.loadLocalStorage('hourFirst');
     this.hourFormat = this.storageService.loadLocalStorage('hourFormat');
+    if (this.hourFirst == null) {
+      this.hourFirst = 4;
+    }
     this.currentDate.setHours(this.hourFirst);
     Observable.zip(
       this.programsService.channels,
