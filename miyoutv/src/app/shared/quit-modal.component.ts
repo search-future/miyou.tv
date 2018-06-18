@@ -14,7 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import { Component } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { BsModalRef } from 'ngx-bootstrap/modal';
+
 import { WindowService } from './window.service';
 
 @Component({
@@ -22,6 +24,8 @@ import { WindowService } from './window.service';
   templateUrl: 'quit-modal.component.html',
 })
 export class QuitModalComponent {
+  public form: FormGroup = new FormGroup({});
+
   constructor(
     private bsModalRef: BsModalRef,
     private windowService: WindowService,
