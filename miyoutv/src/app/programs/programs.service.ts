@@ -107,6 +107,7 @@ export class ProgramsService {
     const moritapoPassword: string = this.storageService.loadLocalStorage('moritapoPassword');
     let auth: boolean;
     let url: string;
+    let apiVersion: number;
     let user: string;
     let password: string;
     let backendInit: Observable<any>;
@@ -115,10 +116,11 @@ export class ProgramsService {
       case 'garapon':
         this.archiveEnabled = false;
         auth = this.storageService.loadLocalStorage('garaponAuth');
-        url = this.storageService.loadLocalStorage('garaponUrl');
+        url = auth ? this.storageService.loadLocalStorage('garaponUrl') : null;
+        apiVersion = auth ? this.storageService.loadLocalStorage('garaponApiVersion') || 3 : null;
         user = this.storageService.loadLocalStorage('garaponUser');
         password = this.storageService.loadLocalStorage('garaponPassword');
-        backendInit = this.initGarapon(user, password, auth ? null : url);
+        backendInit = this.initGarapon(user, password, url, apiVersion);
         break;
       case 'garaponv4':
         this.archiveEnabled = false;
@@ -278,18 +280,20 @@ export class ProgramsService {
     );
   }
 
-  public initGarapon(user: string, password: string, url?: string): Observable<any> {
+  public initGarapon(user: string, password: string, url?: string, apiVersion?: number): Observable<any> {
     let login: Observable<any>;
     this.backendType = 'garapon';
     this.garaponService.user = user;
     this.garaponService.password = password;
     if (url) {
       this.garaponService.url = url;
+      this.garaponService.apiVersion = apiVersion;
       login = this.garaponService.login();
+    } else {
+      login = this.garaponService.loadBackend().mergeMap(
+        (): Observable<any> => this.garaponService.login(),
+      );
     }
-    login = this.garaponService.loadBackend().mergeMap(
-      (): Observable<any> => this.garaponService.login(),
-    );
     return login.do(() => {
       this.requests.channels = this.garaponService.request('POST', 'channel').map(
         (response: any): any => {
