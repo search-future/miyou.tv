@@ -68,12 +68,12 @@ limitations under the License.
         <fieldset [class.d-none]="form.value.backendType !== 'garapon' && form.value.backendType !== 'garaponv4'">
             <legend>ガラポンTV設定</legend>
             <div class="form-group form-row" [class.d-none]="form.value.backendType === 'garaponv4'">
-                <div class="col-sm-3">URL自動取得</div>
+                <div class="col-sm-3">端末情報の自動取得</div>
                 <div class="col-sm-9">
                     <div class="form-check">
                         <input id="garapon-auth" class="form-check-input" type="checkbox" formControlName="garaponAuth">
                         <label for="garapon-auth" class="form-check-label">
-                            ガラポンWeb認証APIからガラポンTVのURLを取得する
+                            ガラポンWeb認証APIからガラポンTV端末の情報を取得する
                         </label>
                     </div>
                 </div>
@@ -82,6 +82,12 @@ limitations under the License.
                 <label class="col-sm-3 col-form-label" for="garapon-url">URL</label>
                 <div class="col-sm-9">
                     <input id="garapon-url" class="form-control" type="url" placeholder="http://192.168.11.11" formControlName="garaponUrl" [class.is-valid]="form.controls['garaponUrl'].valid" [class.is-invalid]="form.controls['garaponUrl'].invalid">
+                </div>
+            </div>
+            <div class="form-group form-row" [class.d-none]="form.value.backendType === 'garaponv4' || form.value.garaponAuth">
+                <label class="col-sm-3 col-form-label" for="garapon-apiversion">APIバージョン</label>
+                <div class="col-sm-9">
+                    <input id="garapon-url" class="form-control" type="number" formControlName="garaponApiVersion" min="1" max="3" [class.is-valid]="form.controls['garaponApiVersion'].valid" [class.is-invalid]="form.controls['garaponApiVersion'].invalid">
                 </div>
             </div>
             <div class="form-group form-row">

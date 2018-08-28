@@ -57,6 +57,7 @@ export class BackendSettingComponent implements OnInit, OnDestroy {
     const chinachuPassword: string = this.storageService.loadLocalStorage('chinachuPassword');
     const garaponAuth: boolean = this.storageService.loadLocalStorage('garaponAuth');
     const garaponUrl: string = this.storageService.loadLocalStorage('garaponUrl');
+    const garaponApiVersion: boolean = this.storageService.loadLocalStorage('garaponApiVersion');
     const garaponUser: string = this.storageService.loadLocalStorage('garaponUser');
     const garaponPassword: string = this.storageService.loadLocalStorage('garaponPassword');
     const playerMode: string = this.storageService.loadLocalStorage('playerMode');
@@ -99,6 +100,12 @@ export class BackendSettingComponent implements OnInit, OnDestroy {
           this.form.value.backendType === 'garapon' && !this.form.value.garaponAuth ?
             Validators.required(c) : null
         ),
+      ],
+      garaponApiVersion: [garaponApiVersion || 3,
+        (c: FormControl): any => (
+          this.form.value.backendType === 'garapon' && !this.form.value.garaponAuth ?
+            Validators.required(c) : null
+        )
       ],
       garaponUser: [
         garaponUser || '',
@@ -156,6 +163,10 @@ export class BackendSettingComponent implements OnInit, OnDestroy {
         this.storageService.saveLocalStorage(
           'garaponUrl',
           this.form.value.garaponAuth ? '' : this.form.value.garaponUrl,
+        );
+        this.storageService.saveLocalStorage(
+          'garaponApiVersion',
+          this.form.value.garaponAuth ? 3 : this.form.value.garaponApiVersion,
         );
         this.storageService.saveLocalStorage('garaponUser', this.form.value.garaponUser);
         this.storageService.saveLocalStorage('garaponPassword', this.form.value.garaponPassword);
