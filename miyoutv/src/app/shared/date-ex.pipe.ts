@@ -32,7 +32,7 @@ export class DateExPipe implements PipeTransform {
     firstHour: number,
     hourFormat: string,
     format: string,
-    ...args: any[],
+    ...args: any[]
   ): string {
     const formatArray: string[] = (hourFormat || '').split(':');
     const useMarker: boolean = /12$/.test(hourFormat);
