@@ -116,8 +116,8 @@ export class ProgramsService {
       case 'garapon':
         this.archiveEnabled = false;
         auth = this.storageService.loadLocalStorage('garaponAuth');
-        url = auth ? this.storageService.loadLocalStorage('garaponUrl') : null;
-        apiVersion = auth ? this.storageService.loadLocalStorage('garaponApiVersion') || 3 : null;
+        url = auth ? null : this.storageService.loadLocalStorage('garaponUrl');
+        apiVersion = auth ? null : this.storageService.loadLocalStorage('garaponApiVersion') || 3;
         user = this.storageService.loadLocalStorage('garaponUser');
         password = this.storageService.loadLocalStorage('garaponPassword');
         backendInit = this.initGarapon(user, password, url, apiVersion);
