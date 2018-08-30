@@ -312,7 +312,7 @@ export class ProgramsService {
             }
             return channels;
           }
-          return [];
+          throw new Error(`Status code: ${response.status}`);
         },
       ).publishLast().refCount();
       this.requests.start = this.garaponService.request('POST', 'search', {
@@ -325,7 +325,7 @@ export class ProgramsService {
         if (response.status === 1) {
           return new Date(response.program[0].startdate).getTime();
         }
-        throw response;
+        throw new Error(`Status code: ${response.status}`);
       }).publishLast().refCount();
       this.requests.end = this.garaponService.request('POST', 'search', {
         body: new HttpParams()
@@ -339,7 +339,7 @@ export class ProgramsService {
           const duration: number = GaraponService.convertDuration(response.program[0].duration);
           return start + duration;
         }
-        throw response;
+        throw new Error(`Status code: ${response.status}`);
       }).publishLast().refCount();
     }).publishLast().refCount();
   }
@@ -359,6 +359,7 @@ export class ProgramsService {
         }
         return Observable.of(response);
       }
+      throw new Error(`Status code: ${response.status}`);
     }).do(() => {
       this.requests.tsids = this.garaponService.request('POST', 'Tuner/', {
         body: new HttpParams().set('action', 'getrecch').toString(),
@@ -366,7 +367,7 @@ export class ProgramsService {
         if (response.status === 1) {
           return response.data.map((a: any): string => a.tsid10);
         }
-        throw response;
+        throw new Error(response.status);
       }).publishLast().refCount();
       this.requests.time = this.garaponService.request('POST', 'Tuner/', {
         body: new HttpParams().set('action', 'getrecdate').toString(),
@@ -374,7 +375,7 @@ export class ProgramsService {
         if (response.status === 1) {
           return response.data;
         }
-        throw response;
+        throw new Error(response.status);
       }).publishLast().refCount();
       this.requests.start = this.requests.time.map((result): number => {
         const date: Date = new Date(result[0]);
@@ -406,7 +407,7 @@ export class ProgramsService {
           }
           return Observable.zip(...requests);
         }
-        return Observable.throw(response);
+        return Observable.throw(new Error(response.status));
       }).map((results: any[]): any => {
         const channels: any[] = [];
         for (const result of results) {
@@ -642,7 +643,7 @@ export class ProgramsService {
           programs: result.programs.map(this.getGaraponV4Converter()),
         };
       }
-      throw result;
+      throw new Error(result.status);
     });
   }
 

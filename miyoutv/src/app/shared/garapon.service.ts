@@ -121,7 +121,7 @@ export class GaraponService implements GaraponService {
       if (result[0] === 'success') {
         return result;
       }
-      throw result;
+      throw new Error(result[1]);
     });
   }
 
@@ -242,8 +242,11 @@ export class GaraponService implements GaraponService {
           this.gtvsession = response.gtvsession;
           return response.gtvsession;
         }
-        throw response;
-      },
+        if (response.status === 1) {
+          throw new Error(`Login code: ${response.login}`);
+        }
+        throw new Error(`Status code: ${response.status}`);
+        },
     );
   }
 
@@ -269,7 +272,10 @@ export class GaraponService implements GaraponService {
         }
         return response;
       }
-      throw response;
+      if (response.status === 1) {
+        throw new Error(`Login code: ${response.login}`);
+      }
+      throw new Error(`Status code: ${response.status}`);
     });
   }
 
@@ -294,7 +300,7 @@ export class GaraponService implements GaraponService {
           this.apiVersion = 4;
           return result;
         }
-        throw result;
+        throw new Error(result.status);
       },
     );
   }

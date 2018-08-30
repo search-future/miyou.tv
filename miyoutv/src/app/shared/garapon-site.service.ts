@@ -69,7 +69,7 @@ export class GaraponSiteService implements GaraponSiteService {
         this.authkey = result.authkey;
         return result;
       }
-      throw result;
+      throw new Error(`Status code: ${result.status}`);
     });
   }
 
