@@ -18,8 +18,6 @@ import { HttpHeaders, HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Md5 } from 'ts-md5/dist/md5';
 
-import { StorageService } from '../shared/storage.service';
-
 @Injectable()
 export class GaraponService implements GaraponService {
   public url: string = '';
@@ -58,7 +56,6 @@ export class GaraponService implements GaraponService {
     @Inject('garaponDevId') private garaponDevId: string,
     @Inject('categoryTable') private categoryTable: any[],
     private httpClient: HttpClient,
-    private storageService: StorageService,
   ) { }
 
   get md5password(): string {

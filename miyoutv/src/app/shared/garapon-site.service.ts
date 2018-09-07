@@ -16,7 +16,6 @@ limitations under the License.
 import { Inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { request } from 'http';
 
 @Injectable()
 export class GaraponSiteService implements GaraponSiteService {
