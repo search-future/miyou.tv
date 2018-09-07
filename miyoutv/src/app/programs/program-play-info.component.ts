@@ -35,7 +35,7 @@ export class ProgramPlayInfoComponent implements OnInit {
 
   ngOnInit() {
     this.hourFirst = this.storageService.loadLocalStorage('hourFirst');
-    this.hourFormat = this.storageService.loadLocalStorage('hourFormat') || '';
+    this.hourFormat = String(this.storageService.loadLocalStorage('hourFormat')) || '';
     if (this.hourFirst == null) {
       this.hourFirst = 4;
     }

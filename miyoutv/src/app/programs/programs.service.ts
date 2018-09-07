@@ -103,8 +103,8 @@ export class ProgramsService {
   }
 
   public init() {
-    const moritapoUser: string = this.storageService.loadLocalStorage('moritapoEmail');
-    const moritapoPassword: string = this.storageService.loadLocalStorage('moritapoPassword');
+    const moritapoUser: string = String(this.storageService.loadLocalStorage('moritapoEmail'));
+    const moritapoPassword: string = String(this.storageService.loadLocalStorage('moritapoPassword'));
     let auth: boolean;
     let url: string;
     let apiVersion: number;
@@ -116,23 +116,23 @@ export class ProgramsService {
       case 'garapon':
         this.archiveEnabled = false;
         auth = this.storageService.loadLocalStorage('garaponAuth');
-        url = auth ? null : this.storageService.loadLocalStorage('garaponUrl');
+        url = auth ? null : String(this.storageService.loadLocalStorage('garaponUrl'));
         apiVersion = auth ? null : this.storageService.loadLocalStorage('garaponApiVersion') || 3;
-        user = this.storageService.loadLocalStorage('garaponUser');
-        password = this.storageService.loadLocalStorage('garaponPassword');
+        user = String(this.storageService.loadLocalStorage('garaponUser'));
+        password = String(this.storageService.loadLocalStorage('garaponPassword'));
         backendInit = this.initGarapon(user, password, url, apiVersion);
         break;
       case 'garaponv4':
         this.archiveEnabled = false;
-        user = this.storageService.loadLocalStorage('garaponUser');
-        password = this.storageService.loadLocalStorage('garaponPassword');
+        user = String(this.storageService.loadLocalStorage('garaponUser'));
+        password = String(this.storageService.loadLocalStorage('garaponPassword'));
         backendInit = this.initGaraponV4(user, password);
         break;
       case 'chinachu':
       default:
-        url = this.storageService.loadLocalStorage('chinachuUrl');
-        user = this.storageService.loadLocalStorage('chinachuUser');
-        password = this.storageService.loadLocalStorage('chinachuPassword');
+        url = String(this.storageService.loadLocalStorage('chinachuUrl'));
+        user = String(this.storageService.loadLocalStorage('chinachuUser'));
+        password = String(this.storageService.loadLocalStorage('chinachuPassword'));
         backendInit = this.initChinachu(url, user, password).do((result: any[]) => {
           this.archiveEnabled = result[1] != null;
         });

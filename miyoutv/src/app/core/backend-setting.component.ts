@@ -52,14 +52,14 @@ export class BackendSettingComponent implements OnInit, OnDestroy {
 
   public ngOnInit() {
     const backendType: string = this.storageService.loadLocalStorage('backendType');
-    const chinachuUrl: string = this.storageService.loadLocalStorage('chinachuUrl');
-    const chinachuUser: string = this.storageService.loadLocalStorage('chinachuUser');
+    const chinachuUrl: string = String(this.storageService.loadLocalStorage('chinachuUrl'));
+    const chinachuUser: string = String(this.storageService.loadLocalStorage('chinachuUser'));
     const chinachuPassword: string = this.storageService.loadLocalStorage('chinachuPassword');
     const garaponAuth: boolean = this.storageService.loadLocalStorage('garaponAuth');
-    const garaponUrl: string = this.storageService.loadLocalStorage('garaponUrl');
+    const garaponUrl: string = String(this.storageService.loadLocalStorage('garaponUrl'));
     const garaponApiVersion: boolean = this.storageService.loadLocalStorage('garaponApiVersion');
-    const garaponUser: string = this.storageService.loadLocalStorage('garaponUser');
-    const garaponPassword: string = this.storageService.loadLocalStorage('garaponPassword');
+    const garaponUser: string = String(this.storageService.loadLocalStorage('garaponUser'));
+    const garaponPassword: string = String(this.storageService.loadLocalStorage('garaponPassword'));
     const playerMode: string = this.storageService.loadLocalStorage('playerMode');
 
     this.garaponEnabled = true;

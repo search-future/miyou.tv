@@ -55,7 +55,7 @@ export class ViewSettingComponent implements OnInit, OnDestroy {
     const countMode: string = this.storageService.loadLocalStorage('countMode');
     const previewEnabled: boolean = this.storageService.loadLocalStorage('previewEnabled');
     const hourFirst: number = this.storageService.loadLocalStorage('hourFirst');
-    const hourFormat: string = this.storageService.loadLocalStorage('hourFormat');
+    const hourFormat: string = String(this.storageService.loadLocalStorage('hourFormat'));
     this.form = this.formBuilder.group({
       countMode: [
         countMode || 'speed',
