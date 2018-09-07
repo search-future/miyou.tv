@@ -275,7 +275,7 @@ export class ProgramListComponent implements OnInit, OnDestroy {
     this.previewEnabled = this.storageService.loadLocalStorage('previewEnabled') !== false;
     this.countMode = this.storageService.loadLocalStorage('countMode') || 'speed';
     this.hourFirst = this.storageService.loadLocalStorage('hourFirst');
-    this.hourFormat = String(this.storageService.loadLocalStorage('hourFormat'));
+    this.hourFormat = String(this.storageService.loadLocalStorage('hourFormat') || '');
     if (this.hourFirst == null) {
       this.hourFirst = 4;
     }

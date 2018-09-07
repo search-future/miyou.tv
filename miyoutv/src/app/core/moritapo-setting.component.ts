@@ -36,8 +36,8 @@ export class MoritapoSettingComponent implements OnInit {
   ) { }
 
   public ngOnInit() {
-    const email: string = String(this.storageService.loadLocalStorage('moritapoEmail'));
-    const password: string = String(this.storageService.loadLocalStorage('moritapoPassword'));
+    const email: string = String(this.storageService.loadLocalStorage('moritapoEmail') || '');
+    const password: string = String(this.storageService.loadLocalStorage('moritapoPassword') || '');
     this.form = this.formBuilder.group({
       email: [
         email,

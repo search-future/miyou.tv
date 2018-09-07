@@ -61,7 +61,7 @@ export class SeekbarComponent implements OnInit, OnDestroy {
 
   public ngOnInit() {
     this.hourFirst = this.storageService.loadLocalStorage('hourFirst');
-    this.hourFormat = String(this.storageService.loadLocalStorage('hourFormat')) || '';
+    this.hourFormat = String(this.storageService.loadLocalStorage('hourFormat') || '');
     if (this.hourFirst == null) {
       this.hourFirst = 4;
     }
