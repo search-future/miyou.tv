@@ -1,0 +1,55 @@
+{
+  "name": "miyoutv",
+  "description": "MiyouTV",
+  "version": "1.0.0",
+  "author": {
+    "name": "takaaki, Brazil Ltd.",
+    "url": "http://razil.jp/"
+  },
+  "bugs": {
+    "url": "https://github.com/search-future/miyou.tv/issues"
+  },
+  "dependencies": {
+    "react": "16.6.3",
+    "react-native": "0.58.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@types/jest": "^23.3.13",
+    "@types/react": "^16.7.22",
+    "@types/react-native": "^0.57.33",
+    "@types/react-test-renderer": "^16.0.3",
+    "babel-core": "7.0.0-bridge.0",
+    "babel-jest": "24.0.0",
+    "babel-plugin-transform-inline-environment-variables": "^0.4.3",
+    "jest": "24.0.0",
+    "metro-react-native-babel-preset": "0.51.1",
+    "react-test-renderer": "16.6.3",
+    "typescript": "^3.2.4"
+  },
+  "homepage": "http://miyou.tv/",
+  "jest": {
+    "preset": "react-native"
+  },
+  "keywords": [
+    "chinachu",
+    "dtv",
+    "dvr",
+    "garapontv",
+    "mirakurun",
+    "miyoutv",
+    "tv"
+  ],
+  "license": "Apache-2.0",
+  "private": true,
+  "productName": "MiyouTV",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/search-future/miyou.tv.git"
+  },
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest",
+    "tsc": "tsc"
+  }
+}

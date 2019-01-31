@@ -1,0 +1,3 @@
+rootProject.name = 'miyoutv'
+
+include ':app'
