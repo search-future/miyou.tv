@@ -65,6 +65,10 @@
   },
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
+    "android": "node node_modules/react-native/local-cli/cli.js run-android",
+    "ios": "node node_modules/react-native/local-cli/cli.js run-ios",
+    "electron": "electron .",
+    "start-web": "webpack -d --colors -w",
     "test": "jest",
     "tsc": "tsc"
   }
