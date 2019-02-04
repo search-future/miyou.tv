@@ -28,6 +28,8 @@
     "babel-loader": "^8.0.5",
     "babel-plugin-react-native-web": "^0.10.0",
     "babel-plugin-transform-inline-environment-variables": "^0.4.3",
+    "electron": "^4.0.4",
+    "electron-reload": "^1.4.0",
     "jest": "24.0.0",
     "metro-react-native-babel-preset": "0.51.1",
     "prettier": "^1.16.3",
@@ -54,6 +56,7 @@
     "tv"
   ],
   "license": "Apache-2.0",
+  "main": "index.electron.js",
   "private": true,
   "productName": "MiyouTV",
   "repository": {

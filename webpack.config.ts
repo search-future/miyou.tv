@@ -42,6 +42,8 @@ const config: webpack.Configuration = {
     path: path.resolve(__dirname, "dist/")
   },
 
+  target: "electron-renderer",
+
   module: {
     rules: [
       tsLoaderConfiguration,
