@@ -35,6 +35,12 @@ const imageLoaderConfiguration: webpack.RuleSetRule = {
   }
 };
 
+const iconLoaderConfiguration: webpack.RuleSetRule = {
+  test: /\.ttf$/,
+  loader: "url-loader",
+  include: path.resolve(__dirname, "node_modules/react-native-vector-icons")
+};
+
 const config: webpack.Configuration = {
   entry: [path.resolve(__dirname, "index.web.js")],
 
@@ -48,7 +54,8 @@ const config: webpack.Configuration = {
     rules: [
       tsLoaderConfiguration,
       jsLoaderConfiguration,
-      imageLoaderConfiguration
+      imageLoaderConfiguration,
+      iconLoaderConfiguration
     ]
   },
 

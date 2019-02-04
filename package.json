@@ -14,6 +14,7 @@
     "react-art": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-native": "0.58.3",
+    "react-native-vector-icons": "^6.2.0",
     "react-native-web": "^0.10.0"
   },
   "devDependencies": {
@@ -21,6 +22,7 @@
     "@types/jest": "^23.3.13",
     "@types/react": "^16.7.22",
     "@types/react-native": "^0.57.33",
+    "@types/react-native-vector-icons": "^4.6.4",
     "@types/react-test-renderer": "^16.0.3",
     "@types/webpack": "^4.4.24",
     "babel-core": "7.0.0-bridge.0",
