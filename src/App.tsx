@@ -13,9 +13,28 @@ limitations under the License.
 
 import React, { Component } from "react";
 import { View } from "react-native";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
+import { createStore, applyMiddleware } from "redux";
+import createSagaMiddleware from "redux-saga";
+import { persistReducer, persistStore } from "redux-persist";
+
+import rootReducer, { persistConfig, rootSaga } from "./modules";
 
 export default class App extends Component {
   render() {
-    return <View />;
+    return (
+      <Provider store={store}>
+        <PersistGate persistor={persistor}>
+          <View />
+        </PersistGate>
+      </Provider>
+    );
   }
 }
+
+const sagaMiddleware = createSagaMiddleware();
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+const store = createStore(persistedReducer, applyMiddleware(sagaMiddleware));
+const persistor = persistStore(store);
+sagaMiddleware.run(rootSaga);
