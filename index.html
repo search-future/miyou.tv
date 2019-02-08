@@ -19,11 +19,22 @@
         display: flex;
         height: 100%;
       }
+
+      .splash {
+        object-fit: cover;
+      }
     </style>
   </head>
 
   <body>
-    <div id="react-app"></div>
+    <div id="react-app">
+      <img
+        class="splash"
+        src="assets/splash_screen.png"
+        width="1440"
+        height="789"
+      />
+    </div>
     <script src="dist/main.js"></script>
   </body>
 </html>

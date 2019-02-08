@@ -19,6 +19,7 @@ import createSagaMiddleware from "redux-saga";
 import { persistReducer, persistStore } from "redux-persist";
 
 import Main from "./containers/Main";
+import Splash from "./components/Splash";
 import rootReducer, { persistConfig, rootSaga } from "./modules";
 import init from "./utils/init";
 
@@ -27,6 +28,7 @@ export default class App extends Component {
     return (
       <Provider store={store}>
         <PersistGate
+          loading={<Splash />}
           onBeforeLift={() => {
             init(store);
           }}
