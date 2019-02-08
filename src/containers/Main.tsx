@@ -11,6 +11,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export const appName = "MiyouTV";
+import React, { Component } from "react";
+import { View, StyleSheet } from "react-native";
+import { connect } from "react-redux";
 
-export const persistSecretKey = process.env["PERSIST_KEY"] || appName;
+import Titlebar from "./Titlebar";
+
+class Main extends Component {
+  render() {
+    return (
+      <View style={styles.container}>
+        <Titlebar />
+      </View>
+    );
+  }
+}
+export default connect()(Main);
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1
+  }
+});

@@ -15,10 +15,11 @@ import { combineReducers } from "redux";
 import { PersistConfig } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import createEncryptor from "redux-persist-transform-encrypt";
-import { all } from "redux-saga/effects";
+import { all, fork } from "redux-saga/effects";
 
 import { persistSecretKey } from "../config/constants";
 import settingReducer from "./setting";
+import windowReducer, { windowSaga } from "./window";
 
 const encryptor = createEncryptor({
   secretKey: persistSecretKey
@@ -32,10 +33,11 @@ export const persistConfig: PersistConfig = {
 };
 
 const rootReducer = combineReducers({
-  setting: settingReducer
+  setting: settingReducer,
+  window: windowReducer
 });
 export default rootReducer;
 
 export function* rootSaga() {
-  yield all([]);
+  yield all([fork(windowSaga)]);
 }
