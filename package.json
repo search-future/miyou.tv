@@ -10,6 +10,7 @@
     "url": "https://github.com/search-future/miyou.tv/issues"
   },
   "dependencies": {
+    "mousetrap": "^1.6.2",
     "react": "16.6.3",
     "react-art": "^16.7.0",
     "react-dom": "^16.7.0",
@@ -26,6 +27,7 @@
   "devDependencies": {
     "@babel/core": "^7.2.2",
     "@types/jest": "^23.3.13",
+    "@types/mousetrap": "^1.6.1",
     "@types/react": "^16.7.22",
     "@types/react-native": "^0.57.33",
     "@types/react-native-vector-icons": "^4.6.4",
