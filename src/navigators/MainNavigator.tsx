@@ -12,26 +12,52 @@ limitations under the License.
 */
 
 import React, { Component } from "react";
-import { View, StyleSheet } from "react-native";
-import { connect } from "react-redux";
+import { StyleSheet, View } from "react-native";
+import {
+  createSwitchNavigator,
+  NavigationProp,
+  NavigationScreenProp
+} from "react-navigation";
 
-import AppNavigator from "../navigators";
-import Titlebar from "./Titlebar";
+const SwitchNavigator = createSwitchNavigator(
+  {
+    Table: {
+      screen: View
+    },
+    List: {
+      screen: View
+    },
+    Ranking: {
+      screen: View
+    }
+  },
+  {
+    initialRouteName: "Table"
+  }
+);
 
-class Main extends Component {
+type Props = {
+  navigation: NavigationScreenProp<{}> & NavigationProp<{}>;
+};
+export default class MainNavigator extends Component<Props> {
+  static router = SwitchNavigator.router;
   render() {
+    const { navigation } = this.props;
     return (
       <View style={styles.container}>
-        <Titlebar />
-        <AppNavigator />
+        <View style={styles.main}>
+          <SwitchNavigator navigation={navigation} />
+        </View>
       </View>
     );
   }
 }
-export default connect()(Main);
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1
+  },
+  main: {
     flex: 1
   }
 });
