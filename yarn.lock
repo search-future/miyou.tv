@@ -6816,6 +6816,11 @@ react-native-elements@^1.0.0:
     react-native-ratings "^6.3.0"
     react-native-status-bar-height "^2.2.0"
 
+react-native-popup-menu@^0.15.0:
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/react-native-popup-menu/-/react-native-popup-menu-0.15.0.tgz#f4d46939a285d0dbaf2827910a8d9a759debd6c0"
+  integrity sha512-iJIzVNq46oCxKQVFw+4ceNwYDfbvbtn8nchSOluVB3NlPZKLCOZ+0u1KzA0fyxPtQdLf2yFbbVPi/A8XbP0eOg==
+
 react-native-ratings@^6.3.0:
   version "6.3.0"
   resolved "https://registry.yarnpkg.com/react-native-ratings/-/react-native-ratings-6.3.0.tgz#becda9379616776a81d9d90bfc95ea40b76286fb"

@@ -13,6 +13,7 @@ limitations under the License.
 
 import React, { Component } from "react";
 import { Provider } from "react-redux";
+import { MenuProvider } from "react-native-popup-menu";
 import { PersistGate } from "redux-persist/integration/react";
 import { createStore, applyMiddleware } from "redux";
 import createSagaMiddleware from "redux-saga";
@@ -34,7 +35,9 @@ export default class App extends Component {
           }}
           persistor={persistor}
         >
-          <Main />
+          <MenuProvider>
+            <Main />
+          </MenuProvider>
         </PersistGate>
       </Provider>
     );
