@@ -14,6 +14,7 @@ limitations under the License.
 import React, { Component } from "react";
 import { View, StyleSheet } from "react-native";
 import { connect } from "react-redux";
+import { MenuProvider } from "react-native-popup-menu";
 
 import AppNavigator from "../navigators";
 import Titlebar from "./Titlebar";
@@ -23,7 +24,9 @@ class Main extends Component {
     return (
       <View style={styles.container}>
         <Titlebar />
-        <AppNavigator />
+        <MenuProvider backHandler>
+          <AppNavigator />
+        </MenuProvider>
       </View>
     );
   }
