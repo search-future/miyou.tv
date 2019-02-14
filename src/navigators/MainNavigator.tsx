@@ -19,6 +19,9 @@ import {
   NavigationScreenProp
 } from "react-navigation";
 
+import AppFooter from "../containers/AppFooter";
+import AppHeader from "../containers/AppHeader";
+
 const SwitchNavigator = createSwitchNavigator(
   {
     Table: {
@@ -45,9 +48,11 @@ export default class MainNavigator extends Component<Props> {
     const { navigation } = this.props;
     return (
       <View style={styles.container}>
+        <AppHeader />
         <View style={styles.main}>
           <SwitchNavigator navigation={navigation} />
         </View>
+        <AppFooter />
       </View>
     );
   }
