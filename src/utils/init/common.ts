@@ -12,21 +12,13 @@ limitations under the License.
 */
 
 import { Store } from "redux";
-import { BackHandler } from "react-native";
-import { NavigationState, StackActions } from "react-navigation";
+import { StackActions } from "react-navigation";
 
-import common from "./common";
-
-export default function init(store: Store) {
-  BackHandler.addEventListener("hardwareBackPress", () => {
-    const { nav }: { nav: NavigationState } = store.getState();
-    const { index } = nav;
-    if (index > 1) {
-      store.dispatch(StackActions.pop({}));
-      return true;
-    }
-    return false;
-  });
-
-  common(store);
+export default function common(store: Store) {
+  const { setting } = store.getState();
+  const { isConfigured } = setting;
+  store.dispatch(StackActions.popToTop({}));
+  if (!isConfigured) {
+    store.dispatch(StackActions.push({ routeName: "Setup" }));
+  }
 }

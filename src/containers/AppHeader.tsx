@@ -20,7 +20,11 @@ import {
   SearchBar,
   Text
 } from "react-native-elements";
-import { NavigationActions, NavigationState } from "react-navigation";
+import {
+  NavigationActions,
+  NavigationState,
+  StackActions
+} from "react-navigation";
 import FontAwesome5Icon, {
   FontAwesome5IconProps
 } from "react-native-vector-icons/FontAwesome5";
@@ -143,7 +147,13 @@ class AppHeader extends Component<Props, State> {
               style={[containerStyle.row, containerStyle.right, styles.right]}
             >
               <HeaderButton title="更新" icon={{ name: "sync" }} />
-              <HeaderButton title="設定" icon={{ name: "cog" }} />
+              <HeaderButton
+                title="設定"
+                icon={{ name: "cog" }}
+                onPress={() => {
+                  this.setup();
+                }}
+              />
             </View>
           </View>
         ) : (
@@ -173,7 +183,12 @@ class AppHeader extends Component<Props, State> {
               <TouchableOpacity style={styles.iconButton}>
                 <FontAwesome5Icon name="sync" solid size={24} color={light} />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.iconButton}>
+              <TouchableOpacity
+                style={styles.iconButton}
+                onPress={() => {
+                  this.setup();
+                }}
+              >
                 <FontAwesome5Icon name="cog" solid size={24} color={light} />
               </TouchableOpacity>
             </View>
@@ -190,6 +205,11 @@ class AppHeader extends Component<Props, State> {
   navigate(routeName: string) {
     const { dispatch } = this.props;
     dispatch(NavigationActions.navigate({ routeName }));
+  }
+
+  setup() {
+    const { dispatch } = this.props;
+    dispatch(StackActions.push({ routeName: "Setup" }));
   }
 }
 

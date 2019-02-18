@@ -14,11 +14,15 @@ limitations under the License.
 import { createStackNavigator } from "react-navigation";
 
 import MainNavigator from "./MainNavigator";
+import Setup from "../containers/Setup";
 
 const StackNavigator = createStackNavigator(
   {
     MainNavigator: {
       screen: MainNavigator
+    },
+    Setup: {
+      screen: Setup
     }
   },
   {

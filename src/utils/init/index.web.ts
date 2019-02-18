@@ -17,6 +17,7 @@ import Mousetrap from "mousetrap";
 
 import { SettingActions } from "../../modules/setting";
 import { WindowActions } from "../../modules/window";
+import common from "./common";
 
 export default function init(store: Store) {
   const { setting } = store.getState();
@@ -69,4 +70,6 @@ export default function init(store: Store) {
     win.webContents.toggleDevTools();
     return false;
   });
+
+  common(store);
 }
