@@ -21,6 +21,7 @@ import {
 
 import AppFooter from "../containers/AppFooter";
 import AppHeader from "../containers/AppHeader";
+import Loading from "../containers/Loading";
 
 const SwitchNavigator = createSwitchNavigator(
   {
@@ -53,6 +54,7 @@ export default class MainNavigator extends Component<Props> {
           <SwitchNavigator navigation={navigation} />
         </View>
         <AppFooter />
+        <Loading />
       </View>
     );
   }

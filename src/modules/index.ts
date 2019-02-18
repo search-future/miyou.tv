@@ -18,6 +18,7 @@ import createEncryptor from "redux-persist-transform-encrypt";
 import { all, fork } from "redux-saga/effects";
 
 import { persistSecretKey } from "../config/constants";
+import loadingReducer from "./loading";
 import navReducer from "./nav";
 import settingReducer from "./setting";
 import windowReducer, { windowSaga } from "./window";
@@ -34,6 +35,7 @@ export const persistConfig: PersistConfig = {
 };
 
 const rootReducer = combineReducers({
+  loading: loadingReducer,
   nav: navReducer,
   setting: settingReducer,
   window: windowReducer
