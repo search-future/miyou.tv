@@ -34,6 +34,7 @@ import { Dispatch } from "redux";
 import colorStyle, { active, gray, light } from "../styles/color";
 import containerStyle from "../styles/container";
 import textStyle from "../styles/text";
+import { ServiceActions } from "../modules/service";
 import searchNavRoute from "../utils/searchNavRoute";
 import { appName } from "../config/constants";
 
@@ -146,7 +147,13 @@ class AppHeader extends Component<Props, State> {
             <View
               style={[containerStyle.row, containerStyle.right, styles.right]}
             >
-              <HeaderButton title="更新" icon={{ name: "sync" }} />
+              <HeaderButton
+                title="更新"
+                icon={{ name: "sync" }}
+                onPress={() => {
+                  this.reload();
+                }}
+              />
               <HeaderButton
                 title="設定"
                 icon={{ name: "cog" }}
@@ -180,7 +187,12 @@ class AppHeader extends Component<Props, State> {
             <View
               style={[containerStyle.row, containerStyle.right, styles.right]}
             >
-              <TouchableOpacity style={styles.iconButton}>
+              <TouchableOpacity
+                style={styles.iconButton}
+                onPress={() => {
+                  this.reload();
+                }}
+              >
                 <FontAwesome5Icon name="sync" solid size={24} color={light} />
               </TouchableOpacity>
               <TouchableOpacity
@@ -210,6 +222,12 @@ class AppHeader extends Component<Props, State> {
   setup() {
     const { dispatch } = this.props;
     dispatch(StackActions.push({ routeName: "Setup" }));
+  }
+
+  reload() {
+    const { dispatch } = this.props;
+    dispatch(ServiceActions.backendInit());
+    dispatch(ServiceActions.commentInit());
   }
 }
 

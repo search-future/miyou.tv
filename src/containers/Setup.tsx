@@ -30,12 +30,16 @@ import { Dispatch } from "redux";
 import colorStyle, { light } from "../styles/color";
 import containerStyle from "../styles/container";
 import { SettingActions, SettingState } from "../modules/setting";
+import { ServiceActions } from "../modules/service";
+import { garaponDevId } from "../config/constants";
 
 type Props = {
   dispatch: Dispatch;
   setting: SettingState;
 };
 class Setup extends Component<Props> {
+  changes: string[] = [];
+
   render() {
     const { dispatch, setting } = this.props;
     const {
@@ -116,14 +120,18 @@ class Setup extends Component<Props> {
                 }}
               >
                 <Picker.Item label="Chinachu" value="chinachu" />
-                <Picker.Item
-                  label="ガラポンTV API Ver.3 (～伍号機)"
-                  value="garapon"
-                />
-                <Picker.Item
-                  label="ガラポンTV API Ver.4 (六号機～)"
-                  value="garaponv4"
-                />
+                {garaponDevId && (
+                  <Picker.Item
+                    label="ガラポンTV API Ver.3 (～伍号機)"
+                    value="garapon"
+                  />
+                )}
+                {garaponDevId && (
+                  <Picker.Item
+                    label="ガラポンTV API Ver.4 (六号機～)"
+                    value="garaponv4"
+                  />
+                )}
               </Picker>
             </View>
             {backendType === "chinachu" && (
@@ -508,12 +516,22 @@ class Setup extends Component<Props> {
   }
 
   componentWillUnmount() {
+    const { dispatch } = this.props;
     this.update("isConfigured", true);
+    if (this.changes.indexOf("backend") >= 0) {
+      dispatch(ServiceActions.backendInit());
+    }
+    if (this.changes.indexOf("comment") >= 0) {
+      dispatch(ServiceActions.commentInit());
+    }
   }
 
   update(key: string, value: any) {
     const { dispatch } = this.props;
     dispatch(SettingActions.update(key, value));
+    if (this.changes.indexOf(key) < 0) {
+      this.changes.push(key);
+    }
   }
 }
 

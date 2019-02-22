@@ -15,6 +15,7 @@ import { Store } from "redux";
 import { remote } from "electron";
 import Mousetrap from "mousetrap";
 
+import { ServiceActions } from "../../modules/service";
 import { SettingActions } from "../../modules/setting";
 import { WindowActions } from "../../modules/window";
 import common from "./common";
@@ -68,6 +69,11 @@ export default function init(store: Store) {
   });
   Mousetrap.bind("mod+I", () => {
     win.webContents.toggleDevTools();
+    return false;
+  });
+  Mousetrap.bind("mod+r", () => {
+    store.dispatch(ServiceActions.backendInit());
+    store.dispatch(ServiceActions.commentInit());
     return false;
   });
 

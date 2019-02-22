@@ -13,6 +13,7 @@ limitations under the License.
 
 import { Store } from "redux";
 import { StackActions } from "react-navigation";
+import { ServiceActions } from "../../modules/service";
 
 export default function common(store: Store) {
   const { setting } = store.getState();
@@ -20,5 +21,8 @@ export default function common(store: Store) {
   store.dispatch(StackActions.popToTop({}));
   if (!isConfigured) {
     store.dispatch(StackActions.push({ routeName: "Setup" }));
+  } else {
+    store.dispatch(ServiceActions.backendInit());
+    store.dispatch(ServiceActions.commentInit());
   }
 }
