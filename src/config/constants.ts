@@ -11,6 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import { ToastOptions } from "react-native-root-toast";
+
 export const appName = "MiyouTV";
 
 export const persistSecretKey = process.env["PERSIST_KEY"] || appName;
@@ -107,3 +109,10 @@ export const categoryTable: {
     color: "#555"
   }
 ];
+
+export const toastOptions: ToastOptions = {
+  opacity: 0.8,
+  textStyle: {
+    textAlign: "left"
+  }
+};

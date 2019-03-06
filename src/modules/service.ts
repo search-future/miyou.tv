@@ -13,6 +13,7 @@ limitations under the License.
 
 import { all, call, put, select, takeLatest } from "redux-saga/effects";
 import { AnyAction } from "redux";
+import Toast from "react-native-root-toast";
 
 import {
   initBackendService,
@@ -24,6 +25,7 @@ import BackendService from "../services/BackendService";
 import CommentService from "../services/CommentService";
 import { LoadingActions } from "./loading";
 import { SettingState } from "./setting";
+import { toastOptions } from "../config/constants";
 
 export const BACKEND_INIT = "BACKEND_INIT";
 function backendInit() {
@@ -45,6 +47,10 @@ function* backendInitSaga() {
     yield put(backendReady(backendService.hasArchive));
   } catch (e) {
     yield put(LoadingActions.complete());
+    Toast.show(e.message || JSON.stringify(e, null, 2), {
+      ...toastOptions,
+      duration: Toast.durations.LONG
+    });
   }
 }
 
@@ -92,6 +98,10 @@ function* commentInitSaga() {
     yield put(commentReady(channels));
   } catch (e) {
     yield put(LoadingActions.complete());
+    Toast.show(e.message || JSON.stringify(e, null, 2), {
+      ...toastOptions,
+      duration: Toast.durations.LONG
+    });
   }
 }
 
