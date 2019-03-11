@@ -20,6 +20,7 @@ import { all, fork } from "redux-saga/effects";
 import { persistSecretKey } from "../config/constants";
 import loadingReducer from "./loading";
 import navReducer from "./nav";
+import programReducer, { programSaga } from "./program";
 import serviceReducer, { serviceSaga } from "./service";
 import settingReducer from "./setting";
 import windowReducer, { windowSaga } from "./window";
@@ -38,6 +39,7 @@ export const persistConfig: PersistConfig = {
 const rootReducer = combineReducers({
   loading: loadingReducer,
   nav: navReducer,
+  program: programReducer,
   service: serviceReducer,
   setting: settingReducer,
   window: windowReducer
@@ -45,5 +47,5 @@ const rootReducer = combineReducers({
 export default rootReducer;
 
 export function* rootSaga() {
-  yield all([fork(serviceSaga), fork(windowSaga)]);
+  yield all([fork(programSaga), fork(serviceSaga), fork(windowSaga)]);
 }
