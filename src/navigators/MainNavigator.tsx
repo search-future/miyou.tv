@@ -22,11 +22,12 @@ import {
 import AppFooter from "../containers/AppFooter";
 import AppHeader from "../containers/AppHeader";
 import Loading from "../containers/Loading";
+import ProgramTable from "../containers/ProgramTable";
 
 const SwitchNavigator = createSwitchNavigator(
   {
     Table: {
-      screen: View
+      screen: ProgramTable
     },
     List: {
       screen: View

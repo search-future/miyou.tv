@@ -29,6 +29,9 @@ import {
   PROGRAM_UPDATE,
   ProgramActions
 } from "./actions";
+import { tableSaga } from "./table";
+
+export { ProgramTableData, ProgramTableProgram } from "./table";
 
 export {
   PROGRAM_INIT,
@@ -39,7 +42,9 @@ export {
 
 const modules: {
   [key: string]: () => void;
-} = {};
+} = {
+  table: tableSaga
+};
 
 function* initSaga() {
   yield put(ProgramActions.load());
