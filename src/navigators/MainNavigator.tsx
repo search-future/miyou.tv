@@ -23,6 +23,7 @@ import AppFooter from "../containers/AppFooter";
 import AppHeader from "../containers/AppHeader";
 import Loading from "../containers/Loading";
 import ProgramTable from "../containers/ProgramTable";
+import ProgramList from "../containers/ProgramList";
 
 const SwitchNavigator = createSwitchNavigator(
   {
@@ -30,7 +31,7 @@ const SwitchNavigator = createSwitchNavigator(
       screen: ProgramTable
     },
     List: {
-      screen: View
+      screen: ProgramList
     },
     Ranking: {
       screen: View

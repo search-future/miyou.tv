@@ -30,8 +30,10 @@ import {
   ProgramActions
 } from "./actions";
 import { tableSaga } from "./table";
+import { listSaga } from "./list";
 
 export { ProgramTableData, ProgramTableProgram } from "./table";
+export { ProgramListData, ProgramListProgram } from "./list";
 
 export {
   PROGRAM_INIT,
@@ -43,7 +45,8 @@ export {
 const modules: {
   [key: string]: () => void;
 } = {
-  table: tableSaga
+  table: tableSaga,
+  list: listSaga
 };
 
 function* initSaga() {

@@ -41,7 +41,7 @@ const programStyle = StyleSheet.create({
   },
   listContents: {
     minHeight: "100%",
-    paddingBottom: 48
+    paddingBottom: 96
   },
   listItemLeft: {
     alignSelf: "flex-start",
