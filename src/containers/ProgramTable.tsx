@@ -25,6 +25,7 @@ import {
 } from "react-native";
 import { Text, CheckBox, Badge } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
+import { NavigationActions } from "react-navigation";
 import { Menu, MenuTrigger, MenuOptions } from "react-native-popup-menu";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
@@ -338,15 +339,24 @@ class ProgramTable extends Component<Props, State> {
                 styles.channelHeader
               ]}
             >
-              {tableColumns.map(({ channelName }, index) => (
-                <View
+              {tableColumns.map(({ type, channel, channelName }, index) => (
+                <TouchableOpacity
                   key={index}
                   style={[colorStyle.borderGrayDark, styles.channelCell]}
+                  onPress={() => {
+                    const { dispatch } = this.props;
+                    dispatch(
+                      ProgramActions.update("list", {
+                        query: `type:${type} channel:${channel}`
+                      })
+                    );
+                    dispatch(NavigationActions.navigate({ routeName: "List" }));
+                  }}
                 >
                   <Text style={[textStyle.center, colorStyle.light]}>
                     {channelName}
                   </Text>
-                </View>
+                </TouchableOpacity>
               ))}
               <TouchableOpacity
                 style={styles.buttonLeft}

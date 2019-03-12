@@ -22,11 +22,17 @@ import { Dispatch } from "redux";
 import colorStyle, { active, gray, light } from "../styles/color";
 import containerStyle from "../styles/container";
 import textStyle from "../styles/text";
+import {
+  ProgramActions,
+  ProgramState,
+  ProgramListData
+} from "../modules/program";
 import searchNavRoute from "../utils/searchNavRoute";
 
 type Props = {
   dispatch: Dispatch;
   nav: NavigationState;
+  list: ProgramListData;
 };
 type State = {
   containerWidth: number;
@@ -105,6 +111,9 @@ class AppFooter extends Component<Props, State> {
                 const route = searchNavRoute(nav, "MainNavigator");
                 const { routes = [] } = route || {};
                 const { routeName = "" } = routes[index];
+                if (routeName === "List") {
+                  dispatch(ProgramActions.update("list", { query: "" }));
+                }
                 dispatch(NavigationActions.navigate({ routeName }));
               }}
             />
@@ -149,6 +158,16 @@ class AppFooter extends Component<Props, State> {
                   onChangeText={query => {
                     this.setState({ query });
                   }}
+                  onSubmitEditing={() => {
+                    const { dispatch } = this.props;
+                    const { query } = this.state;
+                    dispatch(ProgramActions.update("list", { query }));
+                    dispatch(NavigationActions.navigate({ routeName: "List" }));
+                  }}
+                  onClear={() => {
+                    const { dispatch } = this.props;
+                    dispatch(ProgramActions.update("list", { query: "" }));
+                  }}
                 />
                 <TouchableOpacity
                   style={styles.searchButton}
@@ -171,14 +190,32 @@ class AppFooter extends Component<Props, State> {
     );
   }
 
+  componentDidUpdate(prevProps: Props) {
+    const { list } = this.props;
+    const { query = "" } = list;
+    const { query: prevQuery = "" } = prevProps.list;
+    if (query !== prevQuery) {
+      this.setState({ query });
+    }
+  }
+
   componentWillUnmount() {
     clearTimeout(this.layoutCallbackId);
   }
 }
 
-export default connect(({ nav }: { nav: NavigationState }) => ({ nav }))(
-  AppFooter
-);
+export default connect(
+  ({
+    nav,
+    program: { list = {} }
+  }: {
+    nav: NavigationState;
+    program: ProgramState;
+  }) => ({
+    nav,
+    list
+  })
+)(AppFooter);
 
 const breakpoint = 768;
 

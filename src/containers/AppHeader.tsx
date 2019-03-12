@@ -35,12 +35,18 @@ import colorStyle, { active, gray, light } from "../styles/color";
 import containerStyle from "../styles/container";
 import textStyle from "../styles/text";
 import { ServiceActions } from "../modules/service";
+import {
+  ProgramActions,
+  ProgramState,
+  ProgramListData
+} from "../modules/program";
 import searchNavRoute from "../utils/searchNavRoute";
 import { appName } from "../config/constants";
 
 type Props = {
   dispatch: Dispatch;
   nav: NavigationState;
+  list: ProgramListData;
 };
 type State = {
   containerWidth: number;
@@ -98,6 +104,8 @@ class AppHeader extends Component<Props, State> {
                 routeName="List"
                 icon={{ name: "list" }}
                 onPress={() => {
+                  const { dispatch } = this.props;
+                  dispatch(ProgramActions.update("list", { query: "" }));
                   this.navigate("List");
                 }}
               />
@@ -141,6 +149,16 @@ class AppHeader extends Component<Props, State> {
                 value={query}
                 onChangeText={query => {
                   this.setState({ query });
+                }}
+                onSubmitEditing={() => {
+                  const { dispatch } = this.props;
+                  const { query } = this.state;
+                  dispatch(ProgramActions.update("list", { query }));
+                  this.navigate("List");
+                }}
+                onClear={() => {
+                  const { dispatch } = this.props;
+                  dispatch(ProgramActions.update("list", { query: "" }));
                 }}
               />
             </View>
@@ -210,6 +228,15 @@ class AppHeader extends Component<Props, State> {
     );
   }
 
+  componentDidUpdate(prevProps: Props) {
+    const { list } = this.props;
+    const { query = "" } = list;
+    const { query: prevQuery = "" } = prevProps.list;
+    if (query !== prevQuery) {
+      this.setState({ query });
+    }
+  }
+
   componentWillUnmount() {
     clearTimeout(this.layoutCallbackId);
   }
@@ -231,9 +258,18 @@ class AppHeader extends Component<Props, State> {
   }
 }
 
-export default connect(({ nav }: { nav: NavigationState }) => ({ nav }))(
-  AppHeader
-);
+export default connect(
+  ({
+    nav,
+    program: { list = {} }
+  }: {
+    nav: NavigationState;
+    program: ProgramState;
+  }) => ({
+    nav,
+    list
+  })
+)(AppHeader);
 
 class HeaderButton extends Component<
   ButtonProps & {
