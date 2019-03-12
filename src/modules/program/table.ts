@@ -97,10 +97,13 @@ export function* tableSaga() {
   try {
     yield put(LoadingActions.start(true));
 
+    const { initilized }: { initilized: boolean } = yield select(
+      ({ program = {} }) => program
+    );
     let { table: data }: { table: ProgramTableData } = yield select(
       ({ program = {} }) => program
     );
-    if (!data) {
+    if (!initilized || !data) {
       yield call(init);
       data = yield select(({ program: { table = {} } }) => table);
     }
@@ -261,7 +264,9 @@ export function* tableSaga() {
           });
         }
       }
-      yield put(ProgramActions.update("table", { columns, start: new Date(start) }));
+      yield put(
+        ProgramActions.update("table", { columns, start: new Date(start) })
+      );
     }
   } catch (e) {
     Toast.show(e.message || JSON.stringify(e, null, 2), {

@@ -31,9 +31,11 @@ import {
 } from "./actions";
 import { tableSaga } from "./table";
 import { listSaga } from "./list";
+import { rankingSaga } from "./ranking";
 
 export { ProgramTableData, ProgramTableProgram } from "./table";
 export { ProgramListData, ProgramListProgram } from "./list";
+export { ProgramRankingData, ProgramRankingProgram } from "./ranking";
 
 export {
   PROGRAM_INIT,
@@ -46,7 +48,8 @@ const modules: {
   [key: string]: () => void;
 } = {
   table: tableSaga,
-  list: listSaga
+  list: listSaga,
+  ranking: rankingSaga
 };
 
 function* initSaga() {
