@@ -43,6 +43,7 @@ import {
 } from "../modules/program";
 import { ServiceState } from "../modules/service";
 import { SettingActions, SettingState } from "../modules/setting";
+import { ViewerActions, ViewerState } from "../modules/viewer";
 import DateFormatter from "../utils/DateFormatter";
 
 type Props = {
@@ -61,6 +62,7 @@ type Props = {
       hourFormat?: string;
     };
   };
+  viewer: ViewerState;
 };
 type State = {
   containerWidth: number;
@@ -117,7 +119,7 @@ class ProgramList extends Component<Props, State> {
   }
 
   render() {
-    const { data, service, setting } = this.props;
+    const { data, service, setting, viewer } = this.props;
     const { hits = 0, page = 1, programs = [], query = "" } = data;
     const { archiveActive } = service;
     const {
@@ -127,6 +129,8 @@ class ProgramList extends Component<Props, State> {
     } = setting;
     const { hourFirst = "4", hourFormat = "" } = viewSetting;
     const { view = "25", reverse = true } = listOptions;
+    const { programs: viewerPrograms, index: viewerIndex } = viewer;
+    const viewerProgram = viewerPrograms[viewerIndex] || {};
     const { containerWidth, headerHeight, viewX } = this.state;
 
     const dateFormatter = new DateFormatter(
@@ -301,6 +305,7 @@ class ProgramList extends Component<Props, State> {
               keyExtractor={({}, index) => String(index)}
               renderItem={({
                 item: {
+                  id,
                   channelName,
                   fullTitle,
                   category,
@@ -309,7 +314,8 @@ class ProgramList extends Component<Props, State> {
                   commentCount = 0,
                   commentMaxSpeed = 0,
                   commentSpeed = 0
-                }
+                },
+                index
               }) => {
                 const {
                   setting: { view: { countMode = "speed" } = {} }
@@ -345,6 +351,9 @@ class ProgramList extends Component<Props, State> {
                 }
                 return (
                   <ListItem
+                    containerStyle={
+                      id === viewerProgram.id && programStyle.selected
+                    }
                     titleStyle={[textStyle.bold, colorStyle.black]}
                     title={fullTitle}
                     bottomDivider
@@ -380,6 +389,9 @@ class ProgramList extends Component<Props, State> {
                         <View style={programStyle.listItemLeft} />
                       )
                     }
+                    onPress={() => {
+                      this.open(programs, index);
+                    }}
                   />
                 );
               }}
@@ -506,13 +518,23 @@ class ProgramList extends Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props) {
-    const { data } = this.props;
+    const { data, viewer } = this.props;
     if (this.list && data !== prevProps.data) {
       this.list.scrollToOffset({ offset: 0, animated: false });
     }
     if (data.query !== prevProps.data.query) {
       this.update({ page: 1 });
       this.load();
+    }
+    if (
+      viewer !== prevProps.viewer &&
+      viewer.index !== prevProps.viewer.index
+    ) {
+      const { programs, index } = viewer;
+      const program = programs[index];
+      if (program) {
+        this.scrollToProgram(program);
+      }
     }
   }
 
@@ -561,21 +583,41 @@ class ProgramList extends Component<Props, State> {
       this.load();
     }
   }
+
+  open(programs: ProgramListProgram[], index: number) {
+    const { dispatch } = this.props;
+    dispatch(ViewerActions.open(programs, index));
+  }
+
+  scrollToProgram(program: ProgramListProgram) {
+    if (this.list) {
+      const { data } = this.props;
+      const { programs = [] } = data;
+      const { id: itemId } = program;
+      const item = programs.find(({ id }) => id === itemId);
+      if (item) {
+        this.list.scrollToItem({ item, viewPosition: 0.5 });
+      }
+    }
+  }
 }
 
 export default connect(
   ({
     program: { list: data = {} },
     service,
-    setting
+    setting,
+    viewer
   }: {
     program: ProgramState;
     service: ServiceState;
     setting: SettingState;
+    viewer: ViewerState;
   }) => ({
     data,
     service,
-    setting
+    setting,
+    viewer
   })
 )(ProgramList);
 

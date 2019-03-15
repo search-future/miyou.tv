@@ -42,6 +42,7 @@ import {
 } from "../modules/program";
 import { ServiceState } from "../modules/service";
 import { SettingActions, SettingState } from "../modules/setting";
+import { ViewerActions, ViewerState } from "../modules/viewer";
 import DateFormatter from "../utils/DateFormatter";
 
 type Props = {
@@ -59,6 +60,7 @@ type Props = {
       hourFormat?: string;
     };
   };
+  viewer: ViewerState;
 };
 type State = {
   containerWidth: number;
@@ -112,7 +114,7 @@ class ProgramRanking extends Component<Props, State> {
   }
 
   render() {
-    const { data, service, setting } = this.props;
+    const { data, service, setting, viewer } = this.props;
     const {
       programs = [],
       maxDate,
@@ -135,6 +137,8 @@ class ProgramRanking extends Component<Props, State> {
     } = setting;
     const { unique = true, view = "25" } = rankingOptions;
     const { hourFirst = "4", hourFormat = "" } = viewSetting;
+    const { programs: viewerPrograms, index: viewerIndex } = viewer;
+    const viewerProgram = viewerPrograms[viewerIndex] || {};
     const { containerWidth, headerHeight, viewX } = this.state;
 
     const { label: targetName = "" } =
@@ -315,6 +319,7 @@ class ProgramRanking extends Component<Props, State> {
               keyExtractor={({}, index) => String(index)}
               renderItem={({
                 item: {
+                  id,
                   channelName,
                   fullTitle,
                   category,
@@ -325,9 +330,15 @@ class ProgramRanking extends Component<Props, State> {
                   commentSpeed = 0,
                   commentMaxSpeed = 0,
                   commentMaxSpeedTime
-                }
+                },
+                index
               }) => (
                 <ListItem
+                  containerStyle={
+                    index === viewerIndex &&
+                    id === viewerProgram.id &&
+                    programStyle.selected
+                  }
                   titleStyle={[textStyle.bold, colorStyle.black]}
                   title={fullTitle}
                   chevron
@@ -379,6 +390,9 @@ class ProgramRanking extends Component<Props, State> {
                       </Text>
                     </View>
                   }
+                  onPress={() => {
+                    this.open(programs, index);
+                  }}
                 />
               )}
               ListHeaderComponent={
@@ -427,6 +441,25 @@ class ProgramRanking extends Component<Props, State> {
     this.load();
   }
 
+  componentDidUpdate(prevProps: Props) {
+    const { viewer, data } = this.props;
+    if (this.selected && viewer.isOpened && data !== prevProps.data) {
+      const { programs = [] } = data;
+      const { index } = viewer;
+      this.open(programs, index);
+    }
+    if (
+      viewer !== prevProps.viewer &&
+      viewer.index !== prevProps.viewer.index
+    ) {
+      const { programs, index } = viewer;
+      const program = programs[index];
+      if (program) {
+        this.scrollToProgram(program, index);
+      }
+    }
+  }
+
   componentWillUnmount() {
     clearTimeout(this.layoutCallbackId);
   }
@@ -446,6 +479,27 @@ class ProgramRanking extends Component<Props, State> {
     dispatch(ProgramActions.load("ranking"));
     if (this.list) {
       this.list.scrollToOffset({ offset: 0, animated: false });
+    }
+    this.selected = false;
+  }
+
+  open(programs: ProgramRankingProgram[], index: number) {
+    const { dispatch } = this.props;
+    dispatch(ViewerActions.open(programs, index));
+    this.selected = true;
+  }
+
+  scrollToProgram(program: ProgramRankingProgram, index?: number) {
+    if (this.list) {
+      const { data } = this.props;
+      const { programs = [] } = data;
+      const { id: itemId } = program;
+      const item = programs.find(
+        ({ id }, i) => id === itemId && (index == null || i === index)
+      );
+      if (item) {
+        this.list.scrollToItem({ item, viewPosition: 0.5 });
+      }
     }
   }
 
@@ -472,15 +526,18 @@ export default connect(
   ({
     program: { ranking: data = {} },
     service,
-    setting
+    setting,
+    viewer
   }: {
     program: ProgramState;
     service: ServiceState;
     setting: SettingState;
+    viewer: ViewerState;
   }) => ({
     data,
     service,
-    setting
+    setting,
+    viewer
   })
 )(ProgramRanking);
 

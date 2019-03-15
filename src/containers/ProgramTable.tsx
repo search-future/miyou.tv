@@ -46,10 +46,12 @@ import programStyle from "../styles/program";
 import {
   ProgramActions,
   ProgramState,
-  ProgramTableData
+  ProgramTableData,
+  ProgramTableProgram
 } from "../modules/program";
 import { ServiceState } from "../modules/service";
 import { SettingActions, SettingState } from "../modules/setting";
+import { ViewerActions, ViewerState } from "../modules/viewer";
 import DateFormatter from "../utils/DateFormatter";
 import { categoryTable } from "../config/constants";
 
@@ -68,6 +70,7 @@ type Props = {
     };
     useArchive?: boolean;
   };
+  viewer: ViewerState;
 };
 type State = {
   containerWidth: number;
@@ -108,7 +111,7 @@ class ProgramTable extends Component<Props, State> {
   }
 
   render() {
-    const { data, service, setting } = this.props;
+    const { data, service, setting, viewer } = this.props;
     const {
       columns = [],
       maxDate,
@@ -128,6 +131,8 @@ class ProgramTable extends Component<Props, State> {
       hourFirst = "4",
       hourFormat = ""
     } = viewSetting;
+    const { programs: viewerPrograms, index: viewerIndex } = viewer;
+    const viewerProgram = viewerPrograms[viewerIndex] || {};
     const { containerWidth, headerHeight, viewX } = this.state;
 
     const dateFormatter = new DateFormatter(
@@ -476,6 +481,7 @@ class ProgramTable extends Component<Props, State> {
                     .map(
                       (
                         {
+                          id,
                           start,
                           fullTitle,
                           detail,
@@ -490,6 +496,9 @@ class ProgramTable extends Component<Props, State> {
                           style={[
                             colorStyle.bgWhite,
                             colorStyle.borderLight,
+                            index === viewerIndex &&
+                              id === viewerProgram.id &&
+                              programStyle.selected,
                             styles.tableCellWrapper,
                             {
                               top: position * hourSize,
@@ -497,7 +506,12 @@ class ProgramTable extends Component<Props, State> {
                             }
                           ]}
                         >
-                          <TouchableOpacity style={styles.tableCell}>
+                          <TouchableOpacity
+                            style={styles.tableCell}
+                            onPress={() => {
+                              this.open(programs, index);
+                            }}
+                          >
                             <View
                               style={[containerStyle.row, containerStyle.wrap]}
                             >
@@ -580,6 +594,9 @@ class ProgramTable extends Component<Props, State> {
                               color={black}
                               backgroundColor={balloonColor}
                               pointing="left"
+                              onPress={() => {
+                                this.open(programs, index);
+                              }}
                             >
                               {count}
                             </Balloon>
@@ -597,6 +614,17 @@ class ProgramTable extends Component<Props, State> {
 
   componentDidMount() {
     this.load();
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    const { viewer } = this.props;
+    if (viewer !== prevProps.viewer) {
+      const { programs, index } = viewer;
+      const program = programs[index];
+      if (program) {
+        this.scrollToProgram(program, index);
+      }
+    }
   }
 
   componentWillUnmount() {
@@ -649,21 +677,49 @@ class ProgramTable extends Component<Props, State> {
       }
     }
   }
+
+  open(programs: ProgramTableProgram[], index: number) {
+    const { dispatch } = this.props;
+    dispatch(ViewerActions.open(programs, index));
+  }
+
+  scrollToProgram(item: ProgramTableProgram, index?: number) {
+    if (this.view) {
+      const { data } = this.props;
+      const { columns = [] } = data;
+      const { id: itemId, type: itemType, channel: itemChannel } = item;
+      const column = columns.find(
+        ({ type, channel }) => type === itemType && channel === itemChannel
+      );
+      if (column) {
+        const program = column.programs.find(
+          ({ id }, i) => id === itemId && (index == null || i === index)
+        );
+        if (program && program.position) {
+          const y = (program.position - 0.5) * hourSize;
+          this.view.scrollTo({ y });
+        }
+      }
+    }
+  }
 }
 
 export default connect(
   ({
     program: { table: data = {} },
     service,
-    setting
+    setting,
+    viewer
   }: {
     program: ProgramState;
     service: ServiceState;
     setting: SettingState;
+    viewer: ViewerState;
   }) => ({
     data,
     service,
-    setting
+    setting,
+    viewer
   })
 )(ProgramTable);
 

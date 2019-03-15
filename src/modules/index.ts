@@ -23,6 +23,7 @@ import navReducer from "./nav";
 import programReducer, { programSaga } from "./program";
 import serviceReducer, { serviceSaga } from "./service";
 import settingReducer from "./setting";
+import viewerReducer, { viewerSaga } from "./viewer";
 import windowReducer, { windowSaga } from "./window";
 
 const encryptor = createEncryptor({
@@ -42,10 +43,16 @@ const rootReducer = combineReducers({
   program: programReducer,
   service: serviceReducer,
   setting: settingReducer,
+  viewer: viewerReducer,
   window: windowReducer
 });
 export default rootReducer;
 
 export function* rootSaga() {
-  yield all([fork(programSaga), fork(serviceSaga), fork(windowSaga)]);
+  yield all([
+    fork(programSaga),
+    fork(serviceSaga),
+    fork(viewerSaga),
+    fork(windowSaga)
+  ]);
 }
