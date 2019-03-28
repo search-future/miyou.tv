@@ -77,6 +77,7 @@ class ProgramList extends Component<Props, State> {
     headerHeight: new Animated.Value(256),
     viewX: new Animated.Value(0)
   };
+  bindKeys: (string | string[])[] = [];
   layoutCallbackId?: number;
   scrollPos = 0;
   headerHeight = 256;
@@ -515,6 +516,44 @@ class ProgramList extends Component<Props, State> {
   componentDidMount() {
     this.update({ page: 1 });
     this.load();
+
+    if (Platform.OS === "web") {
+      const Mousetrap = require("mousetrap");
+      this.bindKeys.push("up");
+      Mousetrap.bind("up", () => {
+        const { data, viewer } = this.props;
+        const { programs = [] } = data;
+        const viewerProgram = viewer.programs[viewer.index];
+        if (viewerProgram) {
+          const { id } = viewerProgram;
+          const index = programs.findIndex(a => a.id === id);
+          if (programs[index - 1]) {
+            this.open(programs, index - 1);
+          }
+        }
+      });
+      this.bindKeys.push("down");
+      Mousetrap.bind("down", () => {
+        const { data, viewer } = this.props;
+        const { programs = [] } = data;
+        const viewerProgram = viewer.programs[viewer.index];
+        if (viewerProgram) {
+          const { id } = viewerProgram;
+          const index = programs.findIndex(a => a.id === id);
+          if (programs[index + 1]) {
+            this.open(programs, index + 1);
+          }
+        }
+      });
+      this.bindKeys.push("left");
+      Mousetrap.bind("left", () => {
+        this.setPage(this.getPage() - 1);
+      });
+      this.bindKeys.push("right");
+      Mousetrap.bind("right", () => {
+        this.setPage(this.getPage() + 1);
+      });
+    }
   }
 
   componentDidUpdate(prevProps: Props) {
@@ -540,6 +579,12 @@ class ProgramList extends Component<Props, State> {
 
   componentWillUnmount() {
     clearTimeout(this.layoutCallbackId);
+    if (Platform.OS === "web") {
+      const Mousetrap = require("mousetrap");
+      for (const key of this.bindKeys) {
+        Mousetrap.unbind(key);
+      }
+    }
   }
 
   save(options = {}) {

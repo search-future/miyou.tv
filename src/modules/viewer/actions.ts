@@ -11,6 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import { LayoutRectangle } from "react-native";
+
 import { Program } from "../../services/BackendService";
 
 export type ViewerProgram = Program & {
@@ -20,6 +22,21 @@ export type ViewerProgram = Program & {
   commentMaxSpeedTime?: Date;
   rank?: number;
 };
+
+export const VIEWER_INIT = "VIEWER_INIT";
+function init(mode: "stack" | "view" | "child") {
+  return {
+    type: VIEWER_INIT,
+    mode
+  };
+}
+
+export const VIEWER_READY = "VIEWER_READY";
+function ready() {
+  return {
+    type: VIEWER_READY
+  };
+}
 
 export const VIEWER_OPEN = "VIEWER_OPEN";
 function open(programs: ViewerProgram[], index: number) {
@@ -37,6 +54,20 @@ function close() {
   };
 }
 
+export const VIEWER_DOCK = "VIEWER_DOCK";
+function dock() {
+  return {
+    type: VIEWER_DOCK
+  };
+}
+
+export const VIEWER_UNDOCK = "VIEWER_UNDOCK";
+function undock() {
+  return {
+    type: VIEWER_UNDOCK
+  };
+}
+
 export const VIEWER_SEARCH = "VIEWER_SEARCH";
 function search(query: string) {
   return {
@@ -45,17 +76,21 @@ function search(query: string) {
   };
 }
 
-export const VIEWER_SETTING = "VIEWER_SETTING";
-function setting(key: string, setting: any) {
+export const VIEWER_RESIZE = "VIEWER_RESIZE";
+function resize(layout: LayoutRectangle) {
   return {
-    type: VIEWER_SETTING,
-    key,
-    setting
+    type: VIEWER_RESIZE,
+    layout
   };
 }
 
 export const VIEWER_UPDATE = "VIEWER_UPDATE";
-function update(data: { programs?: ViewerProgram[]; index?: number }) {
+function update(data: {
+  programs?: ViewerProgram[];
+  index?: number;
+  extraIndex?: number;
+  stacking?: boolean;
+}) {
   return {
     type: VIEWER_UPDATE,
     data
@@ -63,9 +98,13 @@ function update(data: { programs?: ViewerProgram[]; index?: number }) {
 }
 
 export const ViewerActions = {
+  init,
+  ready,
   open,
   close,
+  dock,
+  undock,
   search,
-  setting,
+  resize,
   update
 };

@@ -21,7 +21,6 @@ import {
   VIEWER_SEARCH
 } from "./actions";
 import { ProgramActions } from "../program";
-import { SettingActions } from "../setting";
 import searchNavRoute from "../../utils/searchNavRoute";
 
 function* openSaga() {
@@ -41,11 +40,6 @@ function* searchSaga(action: AnyAction) {
   yield put(StackActions.popToTop({}));
   yield put(ProgramActions.update("list", { query }));
   yield put(NavigationActions.navigate({ routeName: "List" }));
-}
-
-function* settingSaga(action: AnyAction) {
-  const { key, setting } = action;
-  yield put(SettingActions.update(key, setting));
 }
 
 export function* viewerSaga() {

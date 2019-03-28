@@ -12,29 +12,16 @@ limitations under the License.
 */
 
 import React, { Component } from "react";
-import { View, StyleSheet } from "react-native";
-import { connect } from "react-redux";
 import { MenuProvider } from "react-native-popup-menu";
 
 import AppNavigator from "../navigators";
-import Titlebar from "./Titlebar";
 
-class Main extends Component {
+export default class Main extends Component {
   render() {
     return (
-      <View style={styles.container}>
-        <Titlebar />
-        <MenuProvider backHandler>
-          <AppNavigator />
-        </MenuProvider>
-      </View>
+      <MenuProvider backHandler>
+        <AppNavigator />
+      </MenuProvider>
     );
   }
 }
-export default connect()(Main);
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  }
-});

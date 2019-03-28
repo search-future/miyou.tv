@@ -85,6 +85,7 @@ class ProgramTable extends Component<Props, State> {
     headerHeight: new Animated.Value(256),
     viewX: new Animated.Value(0)
   };
+  bindKeys: (string | string[])[] = [];
   layoutCallbackId?: number;
   scrollPos = 0;
   headerHeight = 256;
@@ -614,6 +615,151 @@ class ProgramTable extends Component<Props, State> {
 
   componentDidMount() {
     this.load();
+
+    if (Platform.OS === "web") {
+      const Mousetrap = require("mousetrap");
+      this.bindKeys.push("up");
+      Mousetrap.bind("up", () => {
+        const { data, viewer } = this.props;
+        const { columns = [] } = data;
+        const { programs, index } = viewer;
+        const program = programs[index];
+        if (program) {
+          const { type, channel } = program;
+          const column = columns.find(
+            a => a.type === type && a.channel === channel
+          );
+          if (column) {
+            const { id } = program;
+            const index = column.programs.findIndex(a => a.id === id);
+            if (index >= 0) {
+              const prevIndex = index - 1;
+              if (column.programs[prevIndex]) {
+                this.open(column.programs, prevIndex);
+              } else {
+                this.previous();
+              }
+              return false;
+            }
+          }
+        }
+        if (columns[0] && columns[0].programs[0]) {
+          this.open(columns[0].programs, 0);
+          return false;
+        }
+        return true;
+      });
+      this.bindKeys.push("down");
+      Mousetrap.bind("down", () => {
+        const { data, viewer } = this.props;
+        const { columns = [] } = data;
+        const { programs, index } = viewer;
+        const program = programs[index];
+        if (program) {
+          const { type, channel } = program;
+          const column = columns.find(
+            a => a.type === type && a.channel === channel
+          );
+          if (column) {
+            const { id } = program;
+            const index = column.programs.findIndex(a => a.id === id);
+            if (index >= 0) {
+              const nextIndex = index + 1;
+              if (column.programs[nextIndex]) {
+                this.open(column.programs, nextIndex);
+              } else {
+                this.next();
+              }
+              return false;
+            }
+          }
+        }
+        if (columns[0] && columns[0].programs[0]) {
+          this.open(columns[0].programs, 0);
+          return false;
+        }
+        return true;
+      });
+      this.bindKeys.push("left");
+      Mousetrap.bind("left", () => {
+        const { data, viewer } = this.props;
+        const { columns = [], offset = 0 } = data;
+        const { programs, index } = viewer;
+        const program = programs[index];
+        if (program) {
+          const { type, channel } = program;
+          const columnIndex = columns.findIndex(
+            a => a.type === type && a.channel === channel
+          );
+          const prevColumnIndex =
+            (columns.length + columnIndex - 1) % columns.length;
+          const outerIndex = (offset + columns.length - 1) % columns.length;
+          if (prevColumnIndex === outerIndex) {
+            this.update({
+              offset: (columns.length + offset - 1) % columns.length
+            });
+          }
+          const prevColumn = columns[prevColumnIndex];
+          if (prevColumn) {
+            const { start } = program;
+            const nextIndex = prevColumn.programs.findIndex(
+              a => new Date(a.end).getTime() > new Date(start).getTime()
+            );
+            if (prevColumn.programs[nextIndex]) {
+              this.open(prevColumn.programs, nextIndex);
+              return false;
+            }
+          }
+        }
+        if (columns[0] && columns[0].programs[0]) {
+          this.open(columns[0].programs, 0);
+          return false;
+        }
+        return true;
+      });
+      this.bindKeys.push("right");
+      Mousetrap.bind("right", () => {
+        const { data, viewer } = this.props;
+        const { containerWidth } = this.state;
+        const { columns = [], offset = 0 } = data;
+        const { programs, index } = viewer;
+        const program = programs[index];
+        if (program) {
+          const { type, channel } = program;
+          const columnIndex = columns.findIndex(
+            a => a.type === type && a.channel === channel
+          );
+          const length =
+            Platform.OS === "web"
+              ? Math.floor((containerWidth - 49) / 200)
+              : Math.floor((containerWidth - 32) / 200);
+
+          const nextColumnIndex = (columnIndex + 1) % columns.length;
+          const outerIndex = (offset + length) % columns.length;
+          if (nextColumnIndex === outerIndex) {
+            this.update({
+              offset: (columns.length + offset + 1) % columns.length
+            });
+          }
+          const nextColumn = columns[nextColumnIndex];
+          if (nextColumn) {
+            const { start } = program;
+            const nextIndex = nextColumn.programs.findIndex(
+              a => new Date(a.end).getTime() > new Date(start).getTime()
+            );
+            if (nextColumn.programs[nextIndex]) {
+              this.open(nextColumn.programs, nextIndex);
+              return false;
+            }
+          }
+        }
+        if (columns[0] && columns[0].programs[0]) {
+          this.open(columns[0].programs, 0);
+          return false;
+        }
+        return true;
+      });
+    }
   }
 
   componentDidUpdate(prevProps: Props) {
@@ -629,6 +775,12 @@ class ProgramTable extends Component<Props, State> {
 
   componentWillUnmount() {
     clearTimeout(this.layoutCallbackId);
+    if (Platform.OS === "web") {
+      const Mousetrap = require("mousetrap");
+      for (const key of this.bindKeys) {
+        Mousetrap.unbind(key);
+      }
+    }
   }
 
   save(options = {}) {

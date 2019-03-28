@@ -1,4 +1,4 @@
-const { app, shell, BrowserWindow, Menu } = require("electron");
+const { app, shell, BrowserWindow, BrowserView, Menu } = require("electron");
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -264,6 +264,12 @@ function createWindow() {
     // when you should delete the corresponding element.
     win = null;
   });
+
+  const view = new BrowserView();
+  view.webContents.loadFile("index.html", { hash: "view" });
+  view.webContents.openDevTools();
+  win.setBrowserView(view);
+
   Menu.setApplicationMenu(buildAppMenu());
 }
 

@@ -12,19 +12,27 @@ limitations under the License.
 */
 
 import { AnyAction } from "redux";
+import { LayoutRectangle } from "react-native";
 
 import {
+  VIEWER_INIT,
   VIEWER_OPEN,
   VIEWER_CLOSE,
+  VIEWER_RESIZE,
   VIEWER_UPDATE,
   ViewerProgram
 } from "./actions";
 
 export {
+  VIEWER_INIT,
+  VIEWER_READY,
   VIEWER_OPEN,
   VIEWER_CLOSE,
+  VIEWER_DOCK,
+  VIEWER_UNDOCK,
   VIEWER_SEARCH,
   VIEWER_SETTING,
+  VIEWER_RESIZE,
   VIEWER_UPDATE,
   ViewerProgram,
   ViewerActions
@@ -33,24 +41,41 @@ export { viewerSaga } from "./saga";
 
 export type ViewerState = {
   isOpened: boolean;
+  mode: "stack" | "view" | "child";
   programs: ViewerProgram[];
   index: number;
   extraIndex: number;
+  layout: LayoutRectangle;
+  stacking: boolean;
 };
 const initialState: ViewerState = {
   isOpened: false,
+  mode: "stack",
   programs: [],
   index: 0,
-  extraIndex: 0
+  extraIndex: 0,
+  layout: { x: 0, y: 0, width: 0, height: 0 },
+  stacking: false
 };
 export default function viewerReducer(state = initialState, action: AnyAction) {
   switch (action.type) {
+    case VIEWER_INIT: {
+      const { mode } = action;
+      return { ...state, mode };
+    }
     case VIEWER_OPEN: {
       const { programs = [], index = 0 } = action;
       return { ...state, programs, index, isOpened: true, extraIndex: 0 };
     }
     case VIEWER_CLOSE: {
       return { ...state, isOpened: false };
+    }
+    case VIEWER_RESIZE: {
+      const { layout } = action;
+      return {
+        ...state,
+        layout
+      };
     }
     case VIEWER_UPDATE: {
       const { data = {} } = action;

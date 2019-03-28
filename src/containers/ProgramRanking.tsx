@@ -19,6 +19,7 @@ import {
   View,
   ViewStyle,
   StyleSheet,
+  Platform,
   Animated,
   PanResponderInstance,
   PanResponder
@@ -75,6 +76,7 @@ class ProgramRanking extends Component<Props, State> {
     headerHeight: new Animated.Value(256),
     viewX: new Animated.Value(0)
   };
+  bindKeys: (string | string[])[] = [];
   layoutCallbackId?: number;
   scrollPos = 0;
   headerHeight = 256;
@@ -439,6 +441,41 @@ class ProgramRanking extends Component<Props, State> {
 
   componentDidMount() {
     this.load();
+
+    if (Platform.OS === "web") {
+      const Mousetrap = require("mousetrap");
+      this.bindKeys.push("up");
+      Mousetrap.bind("up", () => {
+        const { data, viewer } = this.props;
+        const { programs = [] } = data;
+        if (viewer.programs[viewer.index]) {
+          const { id } = viewer.programs[viewer.index];
+          const index = programs.findIndex(a => a.id === id);
+          if (programs[index - 1]) {
+            this.open(programs, index - 1);
+          }
+        }
+      });
+      this.bindKeys.push("down");
+      Mousetrap.bind("down", () => {
+        const { data, viewer } = this.props;
+        const { programs = [] } = data;
+        if (viewer.programs[viewer.index]) {
+          const { id } = viewer.programs[viewer.index];
+          const index = programs.findIndex(a => a.id === id);
+          if (programs[index + 1]) {
+            this.open(programs, index + 1);
+          }
+        }
+      });
+      Mousetrap.bind("left", () => {
+        this.previous();
+      });
+      this.bindKeys.push("right");
+      Mousetrap.bind("right", () => {
+        this.next();
+      });
+    }
   }
 
   componentDidUpdate(prevProps: Props) {
@@ -462,6 +499,12 @@ class ProgramRanking extends Component<Props, State> {
 
   componentWillUnmount() {
     clearTimeout(this.layoutCallbackId);
+    if (Platform.OS === "web") {
+      const Mousetrap = require("mousetrap");
+      for (const key of this.bindKeys) {
+        Mousetrap.unbind(key);
+      }
+    }
   }
 
   save(options = {}) {
@@ -486,7 +529,7 @@ class ProgramRanking extends Component<Props, State> {
   open(programs: ProgramRankingProgram[], index: number) {
     const { dispatch } = this.props;
     dispatch(ViewerActions.open(programs, index));
-    this.selected = true;
+    this.selected = Platform.OS === "web";
   }
 
   scrollToProgram(program: ProgramRankingProgram, index?: number) {

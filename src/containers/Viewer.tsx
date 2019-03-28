@@ -46,7 +46,7 @@ class Viewer extends Component<Props, State> {
 
   render() {
     const { viewer } = this.props;
-    const { programs, index } = viewer;
+    const { programs, index, mode } = viewer;
     const {
       containerWidth,
       containerHeight,
@@ -106,23 +106,70 @@ class Viewer extends Component<Props, State> {
                   isLandscape && styles.primaryHeaderExpand
                 ]}
               >
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    this.close();
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name="chevron-circle-left"
-                    solid
-                    color={light}
-                    size={24}
-                  />
-                </TouchableOpacity>
+                {mode === "stack" && (
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => {
+                      this.close();
+                    }}
+                  >
+                    <FontAwesome5Icon
+                      name="chevron-circle-left"
+                      solid
+                      color={light}
+                      size={24}
+                    />
+                  </TouchableOpacity>
+                )}
+                {mode === "view" && (
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => {
+                      this.undock();
+                    }}
+                  >
+                    <FontAwesome5Icon
+                      name="external-link-alt"
+                      solid
+                      color={light}
+                      size={24}
+                    />
+                  </TouchableOpacity>
+                )}
+                {mode === "child" && (
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => {
+                      this.dock();
+                    }}
+                  >
+                    <FontAwesome5Icon
+                      name="columns"
+                      solid
+                      color={light}
+                      size={24}
+                    />
+                  </TouchableOpacity>
+                )}
                 <Text h4 style={[colorStyle.light, styles.title]}>
                   {program.rank ? `${program.rank}. ` : ""}
                   {program.fullTitle}
                 </Text>
+                {mode === "view" && (
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => {
+                      this.close();
+                    }}
+                  >
+                    <FontAwesome5Icon
+                      name="times"
+                      solid
+                      color={light}
+                      size={24}
+                    />
+                  </TouchableOpacity>
+                )}
               </View>
               {programs[index - 1] && (
                 <TouchableOpacity
@@ -197,6 +244,16 @@ class Viewer extends Component<Props, State> {
   close() {
     const { dispatch } = this.props;
     dispatch(ViewerActions.close());
+  }
+
+  dock() {
+    const { dispatch } = this.props;
+    dispatch(ViewerActions.dock());
+  }
+
+  undock() {
+    const { dispatch } = this.props;
+    dispatch(ViewerActions.undock());
   }
 
   setIndex(value: number) {
