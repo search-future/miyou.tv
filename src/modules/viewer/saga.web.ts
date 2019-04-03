@@ -119,7 +119,10 @@ function* openSaga(action: AnyAction) {
           width: 800,
           height: 600,
           frame: false,
-          show: false
+          show: false,
+          webPreferences: {
+            plugins: true
+          }
         });
         viewerWindow.loadURL(`${location.href}#child`);
         yield take(VIEWER_READY);

@@ -10,10 +10,12 @@
     "url": "https://github.com/search-future/miyou.tv/issues"
   },
   "dependencies": {
+    "7zip-bin": "^4.1.0",
     "axios": "^0.18.0",
     "md5": "^2.2.1",
     "moment": "^2.24.0",
     "mousetrap": "^1.6.2",
+    "mpv.js": "^0.3.0",
     "qs": "^6.6.0",
     "react": "16.6.3",
     "react-art": "^16.7.0",
@@ -95,6 +97,7 @@
     "ios": "node node_modules/react-native/local-cli/cli.js run-ios",
     "electron": "electron .",
     "start-web": "webpack -d --colors -w",
+    "download-mpv": "node download-mpv.js",
     "test": "jest",
     "tsc": "tsc"
   }

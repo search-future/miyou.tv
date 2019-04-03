@@ -265,7 +265,11 @@ function createWindow() {
     win = null;
   });
 
-  const view = new BrowserView();
+  const view = new BrowserView({
+    webPreferences: {
+      plugins: true
+    }
+  });
   view.webContents.loadFile("index.html", { hash: "view" });
   view.webContents.openDevTools();
   win.setBrowserView(view);
@@ -304,6 +308,9 @@ app.on("web-contents-created", (e, webContents) => {
 });
 
 const path = require("path");
+process.mainModule.paths.push(path.join(app.getPath('exe'), '../node_modules'));
+const { getPluginEntry } = require("mpv.js");
+
 try {
   require("electron-reload")(
     [
@@ -316,3 +323,20 @@ try {
     }
   );
 } catch (e) {}
+
+// Absolute path to the plugin directory.
+const pluginDir = path.join(
+  path.dirname(require.resolve("mpv.js")),
+  "build",
+  "Release"
+);
+// See pitfalls section for details.
+if (process.platform !== "linux") {
+  process.chdir(pluginDir);
+}
+// To support a broader number of systems.
+app.commandLine.appendSwitch("ignore-gpu-blacklist");
+app.commandLine.appendSwitch(
+  "register-pepper-plugins",
+  getPluginEntry(pluginDir)
+);
