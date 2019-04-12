@@ -70,6 +70,7 @@
 		E6C9945558334722885958D5 /* FontAwesome5_Brands.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 31EC73DE631B42AE90A700EA /* FontAwesome5_Brands.ttf */; };
 		ED297163215061F000B7C4FE /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED297162215061F000B7C4FE /* JavaScriptCore.framework */; };
 		ED2971652150620600B7C4FE /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED2971642150620600B7C4FE /* JavaScriptCore.framework */; };
+		F19037C484584FDD9BF438D0 /* libRCTVideo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6BA86EB749FE45519CDE6E85 /* libRCTVideo.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -311,54 +312,68 @@
 			remoteGlobalIDString = 58B5119B1A9E6C1200147676;
 			remoteInfo = RCTText;
 		};
-		A47740E822B73EA7007E0884 /* PBXContainerItemProxy */ = {
+		A477412F22B73F7F007E0884 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 146833FF1AC3E56700842450 /* React.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = EDEBC6D6214B3E7000DD5AC8;
 			remoteInfo = jsi;
 		};
-		A47740EA22B73EA7007E0884 /* PBXContainerItemProxy */ = {
+		A477413122B73F7F007E0884 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 146833FF1AC3E56700842450 /* React.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = EDEBC73B214B45A300DD5AC8;
 			remoteInfo = jsiexecutor;
 		};
-		A47740EC22B73EA7007E0884 /* PBXContainerItemProxy */ = {
+		A477413322B73F7F007E0884 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 146833FF1AC3E56700842450 /* React.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = ED296FB6214C9A0900B7C4FE;
 			remoteInfo = "jsi-tvOS";
 		};
-		A47740EE22B73EA7007E0884 /* PBXContainerItemProxy */ = {
+		A477413522B73F7F007E0884 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 146833FF1AC3E56700842450 /* React.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = ED296FEE214C9CF800B7C4FE;
 			remoteInfo = "jsiexecutor-tvOS";
 		};
-		A47740F522B73EA7007E0884 /* PBXContainerItemProxy */ = {
+		A477413D22B73F7F007E0884 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 7500DB50780949C8BD248C6B /* RCTVLCPlayer.xcodeproj */;
+			containerPortal = BDE42A23728F451680445A3A /* RCTVideo.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 0CA30C441D07E0DB003B09F9;
-			remoteInfo = RCTVLCPlayer;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RCTVideo;
 		};
-		A47740F922B73EA7007E0884 /* PBXContainerItemProxy */ = {
+		A477413F22B73F7F007E0884 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BDE42A23728F451680445A3A /* RCTVideo.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 641E28441F0EEC8500443AF6;
+			remoteInfo = "RCTVideo-tvOS";
+		};
+		A477414322B73F7F007E0884 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 69A0E07B9EBC4CDCA40BF6DF /* RNVectorIcons.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 5DBEB1501B18CEA900B34395;
 			remoteInfo = RNVectorIcons;
 		};
-		A47740FB22B73EA7007E0884 /* PBXContainerItemProxy */ = {
+		A477414522B73F7F007E0884 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 69A0E07B9EBC4CDCA40BF6DF /* RNVectorIcons.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = A39873CE1EA65EE60051E01A;
 			remoteInfo = "RNVectorIcons-tvOS";
+		};
+		A477414A22B73F7F007E0884 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7500DB50780949C8BD248C6B /* RCTVLCPlayer.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 0CA30C441D07E0DB003B09F9;
+			remoteInfo = RCTVLCPlayer;
 		};
 		ADBDB9261DFEBF0700ED6528 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -403,6 +418,7 @@
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
 		69A0E07B9EBC4CDCA40BF6DF /* RNVectorIcons.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNVectorIcons.xcodeproj; path = "../node_modules/react-native-vector-icons/RNVectorIcons.xcodeproj"; sourceTree = "<group>"; };
 		6AFBC5E34A594ED298349854 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
+		6BA86EB749FE45519CDE6E85 /* libRCTVideo.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRCTVideo.a; sourceTree = "<group>"; };
 		7500DB50780949C8BD248C6B /* RCTVLCPlayer.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RCTVLCPlayer.xcodeproj; path = "../node_modules/react-native-yz-vlcplayer/ios/RCTVLCPlayer.xcodeproj"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		7B8F6E69E3B648B1A623F8EE /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
@@ -424,6 +440,7 @@
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
 		B00EBF4FFD9E4A8BB8280D18 /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
 		BCCE49C5F2DD484785DB4021 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
+		BDE42A23728F451680445A3A /* RCTVideo.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RCTVideo.xcodeproj; path = "../node_modules/react-native-video/ios/RCTVideo.xcodeproj"; sourceTree = "<group>"; };
 		E2F0114714C349699E078C52 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		E9EEB0BE13E74AB284FD9E10 /* libRCTVLCPlayer.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRCTVLCPlayer.a; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -472,6 +489,7 @@
 				A4A07F9522B7434D00F5D8A4 /* MobileVLCKit.framework in Frameworks */,
 				075BA7D9BBA64242B6B9F53C /* libRNVectorIcons.a in Frameworks */,
 				163DE20E036D4136BE008BA2 /* libRCTVLCPlayer.a in Frameworks */,
+				F19037C484584FDD9BF438D0 /* libRCTVideo.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -611,10 +629,10 @@
 				2DF0FFE52056DD460020B375 /* libthird-party.a */,
 				2DF0FFE72056DD460020B375 /* libdouble-conversion.a */,
 				2DF0FFE92056DD460020B375 /* libdouble-conversion.a */,
-				A47740E922B73EA7007E0884 /* libjsi.a */,
-				A47740EB22B73EA7007E0884 /* libjsiexecutor.a */,
-				A47740ED22B73EA7007E0884 /* libjsi-tvOS.a */,
-				A47740EF22B73EA7007E0884 /* libjsiexecutor-tvOS.a */,
+				A477413022B73F7F007E0884 /* libjsi.a */,
+				A477413222B73F7F007E0884 /* libjsiexecutor.a */,
+				A477413422B73F7F007E0884 /* libjsi-tvOS.a */,
+				A477413622B73F7F007E0884 /* libjsiexecutor-tvOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -698,6 +716,7 @@
 				139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */,
 				69A0E07B9EBC4CDCA40BF6DF /* RNVectorIcons.xcodeproj */,
 				7500DB50780949C8BD248C6B /* RCTVLCPlayer.xcodeproj */,
+				BDE42A23728F451680445A3A /* RCTVideo.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -720,7 +739,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				55A7050B488C48108C9954F6 /* Resources */,
-				A47740C222B73EA6007E0884 /* Recovered References */,
+				A477410922B73F7E007E0884 /* Recovered References */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -738,29 +757,39 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		A47740C222B73EA6007E0884 /* Recovered References */ = {
+		A477410922B73F7E007E0884 /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
 				9285BC4CC09F4CE393999EC3 /* libRNVectorIcons.a */,
 				E9EEB0BE13E74AB284FD9E10 /* libRCTVLCPlayer.a */,
+				6BA86EB749FE45519CDE6E85 /* libRCTVideo.a */,
 				1740D6E0B7C841FE8DFE36A1 /* libRNVectorIcons-tvOS.a */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
 		};
-		A47740F022B73EA7007E0884 /* Products */ = {
+		A477413722B73F7F007E0884 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A47740F622B73EA7007E0884 /* libRCTVLCPlayer.a */,
+				A477414422B73F7F007E0884 /* libRNVectorIcons.a */,
+				A477414622B73F7F007E0884 /* libRNVectorIcons-tvOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		A47740F222B73EA7007E0884 /* Products */ = {
+		A477413922B73F7F007E0884 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A47740FA22B73EA7007E0884 /* libRNVectorIcons.a */,
-				A47740FC22B73EA7007E0884 /* libRNVectorIcons-tvOS.a */,
+				A477413E22B73F7F007E0884 /* libRCTVideo.a */,
+				A477414022B73F7F007E0884 /* libRCTVideo.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A477414722B73F7F007E0884 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A477414B22B73F7F007E0884 /* libRCTVLCPlayer.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -927,7 +956,11 @@
 					ProjectRef = 00C302DF1ABCB9EE00DB3ED1 /* RCTVibration.xcodeproj */;
 				},
 				{
-					ProductGroup = A47740F022B73EA7007E0884 /* Products */;
+					ProductGroup = A477413922B73F7F007E0884 /* Products */;
+					ProjectRef = BDE42A23728F451680445A3A /* RCTVideo.xcodeproj */;
+				},
+				{
+					ProductGroup = A477414722B73F7F007E0884 /* Products */;
 					ProjectRef = 7500DB50780949C8BD248C6B /* RCTVLCPlayer.xcodeproj */;
 				},
 				{
@@ -939,7 +972,7 @@
 					ProjectRef = 146833FF1AC3E56700842450 /* React.xcodeproj */;
 				},
 				{
-					ProductGroup = A47740F222B73EA7007E0884 /* Products */;
+					ProductGroup = A477413722B73F7F007E0884 /* Products */;
 					ProjectRef = 69A0E07B9EBC4CDCA40BF6DF /* RNVectorIcons.xcodeproj */;
 				},
 			);
@@ -1178,53 +1211,67 @@
 			remoteRef = 832341B41AAA6A8300B99B32 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		A47740E922B73EA7007E0884 /* libjsi.a */ = {
+		A477413022B73F7F007E0884 /* libjsi.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libjsi.a;
-			remoteRef = A47740E822B73EA7007E0884 /* PBXContainerItemProxy */;
+			remoteRef = A477412F22B73F7F007E0884 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		A47740EB22B73EA7007E0884 /* libjsiexecutor.a */ = {
+		A477413222B73F7F007E0884 /* libjsiexecutor.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libjsiexecutor.a;
-			remoteRef = A47740EA22B73EA7007E0884 /* PBXContainerItemProxy */;
+			remoteRef = A477413122B73F7F007E0884 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		A47740ED22B73EA7007E0884 /* libjsi-tvOS.a */ = {
+		A477413422B73F7F007E0884 /* libjsi-tvOS.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = "libjsi-tvOS.a";
-			remoteRef = A47740EC22B73EA7007E0884 /* PBXContainerItemProxy */;
+			remoteRef = A477413322B73F7F007E0884 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		A47740EF22B73EA7007E0884 /* libjsiexecutor-tvOS.a */ = {
+		A477413622B73F7F007E0884 /* libjsiexecutor-tvOS.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = "libjsiexecutor-tvOS.a";
-			remoteRef = A47740EE22B73EA7007E0884 /* PBXContainerItemProxy */;
+			remoteRef = A477413522B73F7F007E0884 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		A47740F622B73EA7007E0884 /* libRCTVLCPlayer.a */ = {
+		A477413E22B73F7F007E0884 /* libRCTVideo.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
-			path = libRCTVLCPlayer.a;
-			remoteRef = A47740F522B73EA7007E0884 /* PBXContainerItemProxy */;
+			path = libRCTVideo.a;
+			remoteRef = A477413D22B73F7F007E0884 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		A47740FA22B73EA7007E0884 /* libRNVectorIcons.a */ = {
+		A477414022B73F7F007E0884 /* libRCTVideo.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRCTVideo.a;
+			remoteRef = A477413F22B73F7F007E0884 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		A477414422B73F7F007E0884 /* libRNVectorIcons.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libRNVectorIcons.a;
-			remoteRef = A47740F922B73EA7007E0884 /* PBXContainerItemProxy */;
+			remoteRef = A477414322B73F7F007E0884 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		A47740FC22B73EA7007E0884 /* libRNVectorIcons-tvOS.a */ = {
+		A477414622B73F7F007E0884 /* libRNVectorIcons-tvOS.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = "libRNVectorIcons-tvOS.a";
-			remoteRef = A47740FB22B73EA7007E0884 /* PBXContainerItemProxy */;
+			remoteRef = A477414522B73F7F007E0884 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		A477414B22B73F7F007E0884 /* libRCTVLCPlayer.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRCTVLCPlayer.a;
+			remoteRef = A477414A22B73F7F007E0884 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */ = {
@@ -1391,12 +1438,14 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-yz-vlcplayer/ios/RCTVLCPlayer",
+					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
 				);
 				INFOPLIST_FILE = miyoutvTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1420,12 +1469,14 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-yz-vlcplayer/ios/RCTVLCPlayer",
+					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
 				);
 				INFOPLIST_FILE = miyoutvTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1453,6 +1504,7 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-yz-vlcplayer/ios/RCTVLCPlayer",
+					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
 				);
 				INFOPLIST_FILE = miyoutv/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
@@ -1480,6 +1532,7 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-yz-vlcplayer/ios/RCTVLCPlayer",
+					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
 				);
 				INFOPLIST_FILE = miyoutv/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
@@ -1511,11 +1564,13 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-yz-vlcplayer/ios/RCTVLCPlayer",
+					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
 				);
 				INFOPLIST_FILE = "miyoutv-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1548,11 +1603,13 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-yz-vlcplayer/ios/RCTVLCPlayer",
+					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
 				);
 				INFOPLIST_FILE = "miyoutv-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1584,11 +1641,13 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-yz-vlcplayer/ios/RCTVLCPlayer",
+					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
 				);
 				INFOPLIST_FILE = "miyoutv-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1620,11 +1679,13 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-yz-vlcplayer/ios/RCTVLCPlayer",
+					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
 				);
 				INFOPLIST_FILE = "miyoutv-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
