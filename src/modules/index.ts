@@ -20,6 +20,7 @@ import { all, fork } from "redux-saga/effects";
 import { persistSecretKey } from "../config/constants";
 import loadingReducer from "./loading";
 import navReducer from "./nav";
+import networkReducer from "./network";
 import playerReducer from "./player";
 import programReducer, { programSaga } from "./program";
 import serviceReducer, { serviceSaga } from "./service";
@@ -41,6 +42,7 @@ export const persistConfig: PersistConfig = {
 const rootReducer = combineReducers({
   loading: loadingReducer,
   nav: navReducer,
+  network: networkReducer,
   player: playerReducer,
   program: programReducer,
   service: serviceReducer,

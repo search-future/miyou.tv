@@ -12,8 +12,11 @@ limitations under the License.
 */
 
 import { Store } from "redux";
+import { NetInfo } from "react-native";
 import { StackActions } from "react-navigation";
+
 import { ServiceActions } from "../../modules/service";
+import { NetworkActions } from "../../modules/network";
 
 export default function common(store: Store) {
   const { setting } = store.getState();
@@ -25,4 +28,13 @@ export default function common(store: Store) {
     store.dispatch(ServiceActions.backendInit());
     store.dispatch(ServiceActions.commentInit());
   }
+
+  NetInfo.getConnectionInfo().then(connectionInfo => {
+    store.dispatch(NetworkActions.update(connectionInfo));
+  });
+  NetInfo.addEventListener("connectionChange", connectionInfo => {
+    if (typeof connectionInfo === "object") {
+      store.dispatch(NetworkActions.update(connectionInfo));
+    }
+  });
 }
