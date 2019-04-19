@@ -53,7 +53,11 @@ class Setup extends Component<Props> {
       version: backendVersion = "3",
       url: backendUrl = "",
       user: backendUser = "",
-      password: backendPassword = ""
+      password: backendPassword = "",
+      streamType = "m2ts",
+      streamParams = "c:v=copy&c:a=copy",
+      mobileStreamType = "mp4",
+      mobileStreamParams = "b:v=1M&b:a=128k&s=1280x720"
     } = backendSetting;
     const {
       email: moritapoEmail = "",
@@ -219,6 +223,102 @@ class Setup extends Component<Props> {
                     </View>
                   </View>
                 )}
+                <Text style={[colorStyle.black, styles.label]}>
+                  動画コンテナ
+                </Text>
+                <View
+                  style={[
+                    colorStyle.bgWhite,
+                    colorStyle.borderGray,
+                    styles.inputWrapper
+                  ]}
+                >
+                  <Picker
+                    style={styles.picker}
+                    itemStyle={styles.pickerItem}
+                    selectedValue={streamType}
+                    onValueChange={streamType => {
+                      if (streamType === "m2ts") {
+                        this.update("backend", {
+                          streamType,
+                          streamParams: "c:v=copy&c:a=copy"
+                        });
+                      } else {
+                        this.update("backend", {
+                          streamType,
+                          streamParams: "b:v=1M&b:a=128k&s=1280x720"
+                        });
+                      }
+                    }}
+                  >
+                    <Picker.Item label="MPEG2-TS" value="m2ts" />
+                    <Picker.Item label="MP4" value="mp4" />
+                    <Picker.Item label="WebM" value="webm" />
+                  </Picker>
+                </View>
+                <Text style={[colorStyle.black, styles.label]}>
+                  動画オプション
+                </Text>
+                <View
+                  style={[
+                    colorStyle.bgWhite,
+                    colorStyle.borderGray,
+                    styles.inputWrapper
+                  ]}
+                >
+                  <TextInput
+                    style={[colorStyle.black, colorStyle.bgWhite]}
+                    autoCapitalize="none"
+                    value={streamParams}
+                    onChangeText={streamParams => {
+                      this.update("backend", { streamParams });
+                    }}
+                  />
+                </View>
+                <Text style={[colorStyle.black, styles.label]}>
+                  動画コンテナ(モバイルデータ通信)
+                </Text>
+                <View
+                  style={[
+                    colorStyle.bgWhite,
+                    colorStyle.borderGray,
+                    styles.inputWrapper
+                  ]}
+                >
+                  <Picker
+                    style={styles.picker}
+                    itemStyle={styles.pickerItem}
+                    selectedValue={mobileStreamType}
+                    onValueChange={mobileStreamType => {
+                      this.update("backend", {
+                        mobileStreamType,
+                        mobileStreamParams: "b:v=1M&b:a=128k&s=1280x720"
+                      });
+                    }}
+                  >
+                    <Picker.Item label="MP4" value="mp4" />
+                    <Picker.Item label="WebM" value="webm" />
+                  </Picker>
+                </View>
+                <Text style={[colorStyle.black, styles.label]}>
+                  動画オプション(モバイルデータ通信)
+                </Text>
+                <View
+                  style={[
+                    colorStyle.bgWhite,
+                    colorStyle.borderGray,
+                    styles.inputWrapper
+                  ]}
+                >
+                  <TextInput
+                    style={[colorStyle.black, colorStyle.bgWhite]}
+                    autoCapitalize="none"
+                    value={mobileStreamParams}
+                    onChangeText={mobileStreamParams => {
+                      this.update("backend", { mobileStreamParams });
+                    }}
+                  />
+                </View>
               </View>
             )}
             {backendType === "garapon" && (

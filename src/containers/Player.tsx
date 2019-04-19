@@ -22,12 +22,14 @@ import qs from "qs";
 import { VLCPlayer } from "react-native-yz-vlcplayer";
 
 import { PlayerState, PlayerActions } from "../modules/player";
+import { NetworkState } from "../modules/network";
 import { SettingState } from "../modules/setting";
 import { ViewerState, ViewerActions } from "../modules/viewer";
 import { toastOptions } from "../config/constants";
 
 type Props = {
   dispatch: Dispatch;
+  network: NetworkState;
   player: PlayerState;
   setting: SettingState & {
     player?: {
@@ -53,21 +55,30 @@ class Player extends Component<Props, State> {
   preseek = 0;
 
   render() {
-    const { setting, player } = this.props;
+    const { network, setting, player } = this.props;
     const { backend = {}, player: playerSetting = {} } = setting;
-    const { type = "chinachu" } = backend;
+    const {
+      type = "chinachu",
+      mobileStreamType = "mp4",
+      mobileStreamParams = "b:v=1M&b:a=128k&s=1280x720"
+    } = backend;
     const { mute = false, volume = "100", speed = "1" } = playerSetting;
     const { pause } = player;
     const { ss, reset } = this.state;
 
     const recordedProgram = this.getRecorded();
-    const [uri, query] = recordedProgram.stream.split("?");
+    let [uri, query] = recordedProgram.stream.split("?");
+    if (type === "chinachu" && network.type.indexOf("cell") >= 0) {
+      uri = uri.replace(/[^.]+$/, mobileStreamType);
+      query = mobileStreamParams;
+    }
 
     if (reset) {
       return null;
     }
 
     if (type === "chinachu") {
+      uri = uri.replace(/m2ts$/, "mp4");
       return (
         <VLCPlayer
           style={styles.video}
@@ -310,14 +321,17 @@ class Player extends Component<Props, State> {
 
 export default connect(
   ({
+    network,
     player,
     setting,
     viewer
   }: {
+    network: NetworkState;
     player: PlayerState;
     setting: SettingState;
     viewer: ViewerState;
   }) => ({
+    network,
     player,
     setting,
     viewer
