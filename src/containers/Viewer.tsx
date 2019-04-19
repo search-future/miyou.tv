@@ -18,6 +18,9 @@ import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 
+import Controller from "./Controller";
+import Player from "./Player";
+import Seekbar from "./Seekbar";
 import ViewerInfo from "./ViewerInfo";
 import colorStyle, { dark, grayDark, light } from "../styles/color";
 import containerStyle from "../styles/container";
@@ -45,8 +48,9 @@ class Viewer extends Component<Props, State> {
   layoutCallbackId?: number;
 
   render() {
-    const { viewer } = this.props;
-    const { programs, index, mode } = viewer;
+    const { setting, viewer } = this.props;
+    const { viewer: viewerSetting = {} } = setting;
+    const { programs, index, mode, playing, control } = viewer;
     const {
       containerWidth,
       containerHeight,
@@ -54,11 +58,17 @@ class Viewer extends Component<Props, State> {
       selectedIndex
     } = this.state;
     const program = programs[index];
-    const maxScreenHeight = containerHeight / 2 - 40;
-    let screenHeight = (containerWidth / 16) * 9;
-    if (screenHeight > maxScreenHeight) {
-      screenHeight = maxScreenHeight;
+
+    let screenHeight = containerHeight;
+    const expand = viewerSetting.expand && viewer.playing;
+    if (!expand) {
+      screenHeight = (containerWidth / 16) * 9;
+      const maxScreenHeight = containerHeight / 2 - 40;
+      if (screenHeight > maxScreenHeight) {
+        screenHeight = maxScreenHeight;
+      }
     }
+    const tabIndex = playing ? selectedIndex : 0;
 
     return (
       <View
@@ -97,81 +107,167 @@ class Viewer extends Component<Props, State> {
                   source={{ uri: program.preview }}
                   resizeMode="contain"
                 />
+                <View
+                  style={[
+                    containerStyle.row,
+                    containerStyle.center,
+                    styles.screenContent
+                  ]}
+                >
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => {
+                      const { dispatch } = this.props;
+                      dispatch(
+                        ViewerActions.update({ playing: true, peakPlay: false })
+                      );
+                    }}
+                  >
+                    <FontAwesome5Icon
+                      name="play"
+                      solid
+                      color={light}
+                      size={24}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => {
+                      const { dispatch, viewer } = this.props;
+                      const { programs, index } = viewer;
+                      const program = programs[index];
+                      let extraIndex = 0;
+                      if (
+                        program &&
+                        program.recorded &&
+                        program.commentMaxSpeedTime
+                      ) {
+                        const peakTime = new Date(
+                          program.commentMaxSpeedTime
+                        ).getTime();
+                        for (let i = 0; i < program.recorded.length; i++) {
+                          const extraProgram = program.recorded[i];
+                          const start = new Date(extraProgram.start).getTime();
+                          const end = new Date(extraProgram.end).getTime();
+                          if (start <= peakTime && end > peakTime) {
+                            extraIndex = i;
+                            break;
+                          }
+                        }
+                      }
+                      dispatch(
+                        ViewerActions.update({
+                          playing: true,
+                          peakPlay: true,
+                          extraIndex
+                        })
+                      );
+                    }}
+                  >
+                    <FontAwesome5Icon
+                      name="star"
+                      solid
+                      color={light}
+                      size={24}
+                    />
+                  </TouchableOpacity>
+                </View>
+                {playing && (
+                  <TouchableOpacity
+                    style={styles.screenContent}
+                    activeOpacity={1}
+                    onPress={() => {
+                      const { dispatch, viewer } = this.props;
+                      const { control } = viewer;
+                      dispatch(ViewerActions.update({ control: !control }));
+                    }}
+                  >
+                    <Player />
+                  </TouchableOpacity>
+                )}
+                {playing && control && (
+                  <View style={styles.control}>
+                    <Seekbar />
+                    <Controller />
+                  </View>
+                )}
               </View>
-              <View
-                style={[
-                  containerStyle.row,
-                  containerStyle.nowrap,
-                  colorStyle.bgDark,
-                  isLandscape && styles.primaryHeaderExpand
-                ]}
-              >
-                {mode === "stack" && (
-                  <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                      this.close();
-                    }}
-                  >
-                    <FontAwesome5Icon
-                      name="chevron-circle-left"
-                      solid
-                      color={light}
-                      size={24}
-                    />
-                  </TouchableOpacity>
-                )}
-                {mode === "view" && (
-                  <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                      this.undock();
-                    }}
-                  >
-                    <FontAwesome5Icon
-                      name="external-link-alt"
-                      solid
-                      color={light}
-                      size={24}
-                    />
-                  </TouchableOpacity>
-                )}
-                {mode === "child" && (
-                  <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                      this.dock();
-                    }}
-                  >
-                    <FontAwesome5Icon
-                      name="columns"
-                      solid
-                      color={light}
-                      size={24}
-                    />
-                  </TouchableOpacity>
-                )}
-                <Text h4 style={[colorStyle.light, styles.title]}>
-                  {program.rank ? `${program.rank}. ` : ""}
-                  {program.fullTitle}
-                </Text>
-                {mode === "view" && (
-                  <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                      this.close();
-                    }}
-                  >
-                    <FontAwesome5Icon
-                      name="times"
-                      solid
-                      color={light}
-                      size={24}
-                    />
-                  </TouchableOpacity>
-                )}
-              </View>
-              {programs[index - 1] && (
+              {(!playing || control || (!expand && !isLandscape)) && (
+                <View
+                  style={[
+                    containerStyle.row,
+                    containerStyle.nowrap,
+                    colorStyle.bgDark,
+                    (expand || isLandscape) && styles.primaryHeaderExpand
+                  ]}
+                >
+                  {mode === "stack" && (
+                    <TouchableOpacity
+                      style={styles.button}
+                      onPress={() => {
+                        this.close();
+                      }}
+                    >
+                      <FontAwesome5Icon
+                        name="chevron-circle-left"
+                        solid
+                        color={light}
+                        size={24}
+                      />
+                    </TouchableOpacity>
+                  )}
+                  {mode === "view" && (
+                    <TouchableOpacity
+                      style={styles.button}
+                      onPress={() => {
+                        this.undock();
+                      }}
+                    >
+                      <FontAwesome5Icon
+                        name="external-link-alt"
+                        solid
+                        color={light}
+                        size={24}
+                      />
+                    </TouchableOpacity>
+                  )}
+                  {mode === "child" && (
+                    <TouchableOpacity
+                      style={styles.button}
+                      onPress={() => {
+                        this.dock();
+                      }}
+                    >
+                      <FontAwesome5Icon
+                        name="columns"
+                        solid
+                        color={light}
+                        size={24}
+                      />
+                    </TouchableOpacity>
+                  )}
+                  <Text h4 style={[colorStyle.light, styles.title]}>
+                    {program.rank ? `${program.rank}. ` : ""}
+                    {program.fullTitle}
+                  </Text>
+                  {mode === "view" && (
+                    <TouchableOpacity
+                      style={styles.button}
+                      onPress={() => {
+                        this.close();
+                      }}
+                    >
+                      <FontAwesome5Icon
+                        name="times"
+                        solid
+                        color={light}
+                        size={24}
+                      />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
+              {(!playing || control) && programs[index - 1] && (
                 <TouchableOpacity
                   style={[styles.button, styles.buttonPrevious]}
                   onPress={() => {
@@ -189,7 +285,7 @@ class Viewer extends Component<Props, State> {
                   />
                 </TouchableOpacity>
               )}
-              {programs[index + 1] && (
+              {(!playing || control) && programs[index + 1] && (
                 <TouchableOpacity
                   style={[styles.button, styles.buttonNext]}
                   onPress={() => {
@@ -208,29 +304,34 @@ class Viewer extends Component<Props, State> {
                 </TouchableOpacity>
               )}
             </View>
-            <View
-              style={[
-                colorStyle.bgDark,
-                isLandscape ? styles.secondaryColumn : styles.secondaryRow
-              ]}
-            >
-              <ButtonGroup
-                containerStyle={[colorStyle.bgDark, colorStyle.borderGrayDark]}
-                containerBorderRadius={0}
-                selectedButtonStyle={colorStyle.bgBlack}
-                innerBorderStyle={{ color: grayDark }}
-                buttons={[
-                  {
-                    element: () => <Text style={colorStyle.light}>情報</Text>
-                  }
+            {!expand && (
+              <View
+                style={[
+                  colorStyle.bgDark,
+                  isLandscape ? styles.secondaryColumn : styles.secondaryRow
                 ]}
-                selectedIndex={selectedIndex}
-                onPress={selectedIndex => {
-                  this.setState({ selectedIndex });
-                }}
-              />
-              {selectedIndex === 0 && <ViewerInfo />}
-            </View>
+              >
+                <ButtonGroup
+                  containerStyle={[
+                    colorStyle.bgDark,
+                    colorStyle.borderGrayDark
+                  ]}
+                  containerBorderRadius={0}
+                  selectedButtonStyle={colorStyle.bgBlack}
+                  innerBorderStyle={{ color: grayDark }}
+                  buttons={[
+                    {
+                      element: () => <Text style={colorStyle.light}>情報</Text>
+                    }
+                  ]}
+                  selectedIndex={tabIndex}
+                  onPress={selectedIndex => {
+                    this.setState({ selectedIndex });
+                  }}
+                />
+                {tabIndex === 0 && <ViewerInfo />}
+              </View>
+            )}
           </View>
         )}
       </View>
@@ -259,7 +360,7 @@ class Viewer extends Component<Props, State> {
   setIndex(value: number) {
     let index = value;
     const { dispatch, viewer } = this.props;
-    const { programs = [], index: current } = viewer;
+    const { programs = [], index: current, peakPlay } = viewer;
 
     if (index >= programs.length) {
       index = programs.length - 1;
@@ -268,7 +369,26 @@ class Viewer extends Component<Props, State> {
       index = 0;
     }
     if (index !== current) {
-      dispatch(ViewerActions.update({ index }));
+      let extraIndex = 0;
+      const program = programs[index];
+      if (
+        peakPlay &&
+        program &&
+        program.recorded &&
+        program.commentMaxSpeedTime
+      ) {
+        const peakTime = new Date(program.commentMaxSpeedTime).getTime();
+        for (let i = 0; i < program.recorded.length; i++) {
+          const extraProgram = program.recorded[i];
+          const start = new Date(extraProgram.start).getTime();
+          const end = new Date(extraProgram.end).getTime();
+          if (start <= peakTime && end > peakTime) {
+            extraIndex = i;
+            break;
+          }
+        }
+      }
+      dispatch(ViewerActions.update({ index, extraIndex }));
     }
   }
 }
@@ -322,6 +442,13 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 0,
     top: 0
+  },
+  control: {
+    backgroundColor: "#3a3a3aa8",
+    bottom: 0,
+    left: 0,
+    position: "absolute",
+    right: 0
   },
   imageContainer: {
     backgroundColor: "#000000"

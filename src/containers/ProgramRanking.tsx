@@ -480,7 +480,12 @@ class ProgramRanking extends Component<Props, State> {
 
   componentDidUpdate(prevProps: Props) {
     const { viewer, data } = this.props;
-    if (this.selected && viewer.isOpened && data !== prevProps.data) {
+    if (
+      this.selected &&
+      viewer.isOpened &&
+      !viewer.playing &&
+      data !== prevProps.data
+    ) {
       const { programs = [] } = data;
       const { index } = viewer;
       this.open(programs, index);

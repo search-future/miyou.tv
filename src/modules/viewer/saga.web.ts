@@ -77,6 +77,23 @@ function dispatchViewer(child: BrowserWindow | BrowserView, action: AnyAction) {
   }
 }
 
+let powerSaveBlockerId: number | undefined;
+
+function startPowerSaveBlocker() {
+  const { powerSaveBlocker } = remote;
+  powerSaveBlockerId = powerSaveBlocker.start("prevent-display-sleep");
+}
+
+function stopPowerSaveBlocker() {
+  const { powerSaveBlocker } = remote;
+  if (
+    powerSaveBlockerId != null &&
+    powerSaveBlocker.isStarted(powerSaveBlockerId)
+  ) {
+    powerSaveBlocker.stop(powerSaveBlockerId);
+  }
+}
+
 function* initSaga() {
   const { mode }: ViewerState = yield select(({ viewer }) => viewer);
   if (mode !== "stack") {
@@ -113,6 +130,7 @@ function* openSaga(action: AnyAction) {
     } else {
       if (viewerView) {
         viewerView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
+        dispatchViewer(viewerView, ViewerActions.update({ playing: false }));
       }
       if (!viewerWindow || viewerWindow.isDestroyed()) {
         viewerWindow = new remote.BrowserWindow({
@@ -149,10 +167,12 @@ function* closeSaga(action: AnyAction) {
     const viewerWindow = getViewerWindow();
     if (viewerView) {
       viewerView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
+      dispatchViewer(viewerView, ViewerActions.update({ playing: false }));
     }
     if (viewerWindow) {
       viewerWindow.close();
     }
+    stopPowerSaveBlocker();
   } else {
     dispatchMain(action);
   }
@@ -218,8 +238,14 @@ function* resizeSaga() {
 
 function* updateSaga(action: AnyAction) {
   const viewer: ViewerState = yield select(({ viewer }) => viewer);
-  const { mode } = viewer;
-  if (mode !== "stack") {
+  const { mode, playing } = viewer;
+  if (mode === "stack") {
+    if (playing) {
+      startPowerSaveBlocker();
+    } else {
+      stopPowerSaveBlocker();
+    }
+  } else {
     dispatchMain(action);
     if (mode === "child") {
       const { programs, index } = viewer;

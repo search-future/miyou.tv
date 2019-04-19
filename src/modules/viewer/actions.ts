@@ -90,6 +90,9 @@ function update(data: {
   index?: number;
   extraIndex?: number;
   stacking?: boolean;
+  playing?: boolean;
+  peakPlay?: boolean;
+  control?: boolean;
 }) {
   return {
     type: VIEWER_UPDATE,

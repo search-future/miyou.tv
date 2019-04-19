@@ -26,6 +26,12 @@ import CommentService from "../services/CommentService";
 import { LoadingActions } from "./loading";
 import { SettingState } from "./setting";
 import { toastOptions } from "../config/constants";
+import { Platform } from "react-native";
+
+const backendSettingBase = {
+  streamType: Platform.OS === "web" ? "m2ts" : "mp4",
+  streamParams: "c:v=copy&c:a=copy"
+};
 
 export const BACKEND_INIT = "BACKEND_INIT";
 function backendInit() {
@@ -39,9 +45,18 @@ function* backendInitSaga() {
     const { backend: backendSetting = {} }: SettingState = yield select(
       ({ setting }) => setting
     );
-    yield call(() => initBackendService(backendSetting));
+    yield call(() =>
+      initBackendService({
+        ...backendSettingBase,
+        ...backendSetting
+      })
+    );
+
     const backendService: BackendService = yield call(() =>
-      getBackendService(backendSetting)
+      getBackendService({
+        ...backendSettingBase,
+        ...backendSetting
+      })
     );
     yield put(LoadingActions.complete());
     yield put(backendReady(backendService.hasArchive));

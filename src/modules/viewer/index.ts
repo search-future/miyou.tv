@@ -47,6 +47,9 @@ export type ViewerState = {
   extraIndex: number;
   layout: LayoutRectangle;
   stacking: boolean;
+  playing: boolean;
+  peakPlay: boolean;
+  control: boolean;
 };
 const initialState: ViewerState = {
   isOpened: false,
@@ -55,7 +58,10 @@ const initialState: ViewerState = {
   index: 0,
   extraIndex: 0,
   layout: { x: 0, y: 0, width: 0, height: 0 },
-  stacking: false
+  stacking: false,
+  playing: false,
+  peakPlay: false,
+  control: true,
 };
 export default function viewerReducer(state = initialState, action: AnyAction) {
   switch (action.type) {
@@ -68,7 +74,7 @@ export default function viewerReducer(state = initialState, action: AnyAction) {
       return { ...state, programs, index, isOpened: true, extraIndex: 0 };
     }
     case VIEWER_CLOSE: {
-      return { ...state, isOpened: false };
+      return { ...state, isOpened: false, playing: false };
     }
     case VIEWER_RESIZE: {
       const { layout } = action;
