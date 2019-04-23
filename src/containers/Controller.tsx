@@ -44,6 +44,13 @@ type Props = {
       deinterlace?: boolean;
       repeat?: string;
     };
+    commentPlayer?: {
+      enabled?: boolean;
+      duration?: string;
+      delay?: string;
+      maxLines?: string;
+      maxComments?: string;
+    };
   };
   viewer: ViewerState;
   window: WindowState;
@@ -68,7 +75,11 @@ class Controller extends Component<Props> {
   render() {
     const { player, setting, window } = this.props;
     const { pause, track, trackCount, dualMonoMode } = player;
-    const { player: playerSetting = {}, viewer: viewerSetting = {} } = setting;
+    const {
+      player: playerSetting = {},
+      viewer: viewerSetting = {},
+      commentPlayer: commentPlayerSetting = {}
+    } = setting;
     const {
       speed = "1",
       mute = false,
@@ -77,6 +88,13 @@ class Controller extends Component<Props> {
       repeat = "continue"
     } = playerSetting;
     const { expand = false } = viewerSetting;
+    const {
+      enabled: comment = true,
+      maxLines = "10",
+      maxComments = "50",
+      duration = "5000",
+      delay = "0"
+    } = commentPlayerSetting;
     const { fullScreen } = window;
 
     let volumeIcon = "volume-off";
@@ -188,13 +206,32 @@ class Controller extends Component<Props> {
           </TouchableOpacity>
         </View>
         <View style={[containerStyle.row, containerStyle.right, styles.right]}>
-          <TouchableOpacity style={styles.button}>
-            <FontAwesome5Icon
-              name="comment-slash"
-              solid
-              color={light}
-              size={24}
-            />
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              const { dispatch, setting } = this.props;
+              const { commentPlayer = {} } = setting;
+              const { enabled = true } = commentPlayer;
+              dispatch(
+                SettingActions.update("commentPlayer", { enabled: !enabled })
+              );
+            }}
+          >
+            {comment ? (
+              <FontAwesome5Icon
+                name="comment-dots"
+                solid
+                color={light}
+                size={24}
+              />
+            ) : (
+              <FontAwesome5Icon
+                name="comment-slash"
+                solid
+                color={light}
+                size={24}
+              />
+            )}
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.button}
@@ -502,6 +539,238 @@ class Controller extends Component<Props> {
                   />
                 </TouchableOpacity>
               </View>
+              <View
+                style={[
+                  containerStyle.row,
+                  colorStyle.bgBlack,
+                  styles.optionRow
+                ]}
+              >
+                <Text style={[colorStyle.light, styles.optionLabel]}>
+                  コメント表示時間
+                </Text>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    const { dispatch, setting } = this.props;
+                    const { commentPlayer = {} } = setting;
+                    const duration =
+                      parseInt(commentPlayer.duration || "5000", 10) - 500;
+                    if (duration > 500) {
+                      dispatch(
+                        SettingActions.update("commentPlayer", { duration })
+                      );
+                    } else {
+                      dispatch(
+                        SettingActions.update("commentPlayer", {
+                          duration: 1000
+                        })
+                      );
+                    }
+                  }}
+                >
+                  <FontAwesome5Icon
+                    name="caret-left"
+                    solid
+                    color={light}
+                    size={24}
+                  />
+                </TouchableOpacity>
+                <Text style={[colorStyle.light, styles.optionValue]}>
+                  {(parseInt(duration, 10) / 1000).toFixed(1)}秒
+                </Text>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    const { dispatch, setting } = this.props;
+                    const { commentPlayer = {} } = setting;
+                    const duration =
+                      parseInt(commentPlayer.duration || "5000", 10) + 500;
+                    dispatch(
+                      SettingActions.update("commentPlayer", { duration })
+                    );
+                  }}
+                >
+                  <FontAwesome5Icon
+                    name="caret-right"
+                    solid
+                    color={light}
+                    size={24}
+                  />
+                </TouchableOpacity>
+              </View>
+              <View
+                style={[
+                  containerStyle.row,
+                  colorStyle.bgBlack,
+                  styles.optionRow
+                ]}
+              >
+                <Text style={[colorStyle.light, styles.optionLabel]}>
+                  コメント遅延時間
+                </Text>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    const { dispatch, setting } = this.props;
+                    const { commentPlayer = {} } = setting;
+                    const delay =
+                      parseInt(commentPlayer.delay || "0", 10) - 500;
+                    dispatch(SettingActions.update("commentPlayer", { delay }));
+                  }}
+                >
+                  <FontAwesome5Icon
+                    name="caret-left"
+                    solid
+                    color={light}
+                    size={24}
+                  />
+                </TouchableOpacity>
+                <Text style={[colorStyle.light, styles.optionValue]}>
+                  {(parseInt(delay, 10) / 1000).toFixed(1)}秒
+                </Text>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    const { dispatch, setting } = this.props;
+                    const { commentPlayer = {} } = setting;
+                    const delay =
+                      parseInt(commentPlayer.delay || "0", 10) + 500;
+                    dispatch(SettingActions.update("commentPlayer", { delay }));
+                  }}
+                >
+                  <FontAwesome5Icon
+                    name="caret-right"
+                    solid
+                    color={light}
+                    size={24}
+                  />
+                </TouchableOpacity>
+              </View>
+              <View
+                style={[
+                  containerStyle.row,
+                  colorStyle.bgBlack,
+                  styles.optionRow
+                ]}
+              >
+                <Text style={[colorStyle.light, styles.optionLabel]}>
+                  コメントライン数
+                </Text>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    const { dispatch, setting } = this.props;
+                    const { commentPlayer = {} } = setting;
+                    const maxLines =
+                      parseInt(commentPlayer.maxLines || "10", 10) - 1;
+                    if (maxLines > 5) {
+                      dispatch(
+                        SettingActions.update("commentPlayer", { maxLines })
+                      );
+                    } else {
+                      dispatch(
+                        SettingActions.update("commentPlayer", {
+                          maxLines: 5
+                        })
+                      );
+                    }
+                  }}
+                >
+                  <FontAwesome5Icon
+                    name="caret-left"
+                    solid
+                    color={light}
+                    size={24}
+                  />
+                </TouchableOpacity>
+                <Text style={[colorStyle.light, styles.optionValue]}>
+                  {parseInt(maxLines, 10)}
+                </Text>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    const { dispatch, setting } = this.props;
+                    const { commentPlayer = {} } = setting;
+                    const maxLines =
+                      parseInt(commentPlayer.maxLines || "10", 10) + 1;
+                    dispatch(
+                      SettingActions.update("commentPlayer", {
+                        maxLines
+                      })
+                    );
+                  }}
+                >
+                  <FontAwesome5Icon
+                    name="caret-right"
+                    solid
+                    color={light}
+                    size={24}
+                  />
+                </TouchableOpacity>
+              </View>
+              <View
+                style={[
+                  containerStyle.row,
+                  colorStyle.bgBlack,
+                  styles.optionRow
+                ]}
+              >
+                <Text style={[colorStyle.light, styles.optionLabel]}>
+                  コメント同時表示数
+                </Text>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    const { dispatch, setting } = this.props;
+                    const { commentPlayer = {} } = setting;
+                    const maxComments =
+                      parseInt(commentPlayer.maxComments || "50", 10) - 5;
+                    if (maxComments > 5) {
+                      dispatch(
+                        SettingActions.update("commentPlayer", { maxComments })
+                      );
+                    } else {
+                      dispatch(
+                        SettingActions.update("commentPlayer", {
+                          maxComments: 5
+                        })
+                      );
+                    }
+                  }}
+                >
+                  <FontAwesome5Icon
+                    name="caret-left"
+                    solid
+                    color={light}
+                    size={24}
+                  />
+                </TouchableOpacity>
+                <Text style={[colorStyle.light, styles.optionValue]}>
+                  {parseInt(maxComments, 10)}
+                </Text>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    const { dispatch, setting } = this.props;
+                    const { commentPlayer = {} } = setting;
+                    const maxComments =
+                      parseInt(commentPlayer.maxComments || "50", 10) + 5;
+                    dispatch(
+                      SettingActions.update("commentPlayer", {
+                        maxComments
+                      })
+                    );
+                  }}
+                >
+                  <FontAwesome5Icon
+                    name="caret-right"
+                    solid
+                    color={light}
+                    size={24}
+                  />
+                </TouchableOpacity>
+              </View>
             </MenuOptions>
           </Menu>
         </View>
@@ -511,12 +780,10 @@ class Controller extends Component<Props> {
 
   shouldComponentUpdate(nextProps: Props) {
     const { player } = this.props;
-    if (nextProps.player === player) {
-      return true;
-    }
     return (
-      nextProps.player.time === player.time &&
-      nextProps.player.position === player.position
+      nextProps.player === player ||
+      (nextProps.player.time === player.time &&
+        nextProps.player.position === player.position)
     );
   }
 

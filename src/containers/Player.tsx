@@ -167,9 +167,6 @@ class Player extends Component<Props, State> {
 
   shouldComponentUpdate(nextProps: Props) {
     const { player } = this.props;
-    if (nextProps.player === player) {
-      return true;
-    }
     return (
       nextProps.player === player ||
       nextProps.player.pause !== player.pause ||

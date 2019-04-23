@@ -18,6 +18,7 @@ import createEncryptor from "redux-persist-transform-encrypt";
 import { all, fork } from "redux-saga/effects";
 
 import { persistSecretKey } from "../config/constants";
+import commentPlayerReducer, { commentPlayerSaga } from "./commentPlayer";
 import loadingReducer from "./loading";
 import navReducer from "./nav";
 import networkReducer from "./network";
@@ -40,6 +41,7 @@ export const persistConfig: PersistConfig = {
 };
 
 const rootReducer = combineReducers({
+  commentPlayer: commentPlayerReducer,
   loading: loadingReducer,
   nav: navReducer,
   network: networkReducer,
@@ -54,6 +56,7 @@ export default rootReducer;
 
 export function* rootSaga() {
   yield all([
+    fork(commentPlayerSaga),
     fork(programSaga),
     fork(serviceSaga),
     fork(viewerSaga),

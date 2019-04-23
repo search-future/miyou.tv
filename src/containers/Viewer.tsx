@@ -18,6 +18,7 @@ import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 
+import CommentPlayer from "./CommentPlayer";
 import Controller from "./Controller";
 import Player from "./Player";
 import Seekbar from "./Seekbar";
@@ -49,7 +50,8 @@ class Viewer extends Component<Props, State> {
 
   render() {
     const { setting, viewer } = this.props;
-    const { viewer: viewerSetting = {} } = setting;
+    const { viewer: viewerSetting = {}, commentPlayer = {} } = setting;
+    const { enabled: comment = true } = commentPlayer;
     const { programs, index, mode, playing, control } = viewer;
     const {
       containerWidth,
@@ -183,6 +185,11 @@ class Viewer extends Component<Props, State> {
                     }}
                   >
                     <Player />
+                    {comment && (
+                      <View style={styles.screenContent}>
+                        <CommentPlayer />
+                      </View>
+                    )}
                   </TouchableOpacity>
                 )}
                 {playing && control && (
