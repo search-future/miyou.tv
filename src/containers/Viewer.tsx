@@ -27,6 +27,7 @@ import colorStyle, { dark, grayDark, light } from "../styles/color";
 import containerStyle from "../styles/container";
 import { SettingState } from "../modules/setting";
 import { ViewerState, ViewerActions } from "../modules/viewer";
+import CommentInfo from "./CommentInfo";
 
 type Props = {
   dispatch: Dispatch;
@@ -44,7 +45,7 @@ class Viewer extends Component<Props, State> {
     containerWidth: 0,
     containerHeight: 0,
     isLandscape: false,
-    selectedIndex: 0
+    selectedIndex: Platform.OS === "web" ? 1 : 0
   };
   layoutCallbackId?: number;
 
@@ -329,6 +330,11 @@ class Viewer extends Component<Props, State> {
                   buttons={[
                     {
                       element: () => <Text style={colorStyle.light}>情報</Text>
+                    },
+                    {
+                      element: () => (
+                        <Text style={colorStyle.light}>コメント</Text>
+                      )
                     }
                   ]}
                   selectedIndex={tabIndex}
@@ -337,6 +343,7 @@ class Viewer extends Component<Props, State> {
                   }}
                 />
                 {tabIndex === 0 && <ViewerInfo />}
+                {tabIndex === 1 && <CommentInfo />}
               </View>
             )}
           </View>

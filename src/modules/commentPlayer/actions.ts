@@ -24,6 +24,7 @@ export type CommentData = {
   text: string;
   id: string;
   time: number;
+  autoScroll: boolean;
 };
 
 export const COMMENT_PLAYER_INIT = "COMMENT_PLAYER_INIT";
@@ -76,11 +77,20 @@ function setFilters(filters: string[]) {
   };
 }
 
+export const COMMENT_PLAYER_AUTOSCROLL = "COMMENT_PLAYER_AUTOSCROLL";
+function setAutoScroll(enabled: boolean) {
+  return {
+    type: COMMENT_PLAYER_AUTOSCROLL,
+    enabled
+  };
+}
+
 export const CommentPlayerActions = {
   init,
   load,
   intervals,
   push,
   seek,
-  setFilters
+  setFilters,
+  setAutoScroll
 };

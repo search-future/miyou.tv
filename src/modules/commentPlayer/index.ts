@@ -19,6 +19,7 @@ import {
   COMMENT_PLAYER_PUSH,
   COMMENT_PLAYER_SEEK,
   COMMENT_PLAYER_FILTERS,
+  COMMENT_PLAYER_AUTOSCROLL,
   CommentInterval,
   CommentData
 } from "./actions";
@@ -30,6 +31,7 @@ export {
   COMMENT_PLAYER_PUSH,
   COMMENT_PLAYER_SEEK,
   COMMENT_PLAYER_FILTERS,
+  COMMENT_PLAYER_AUTOSCROLL,
   CommentPlayerActions,
   CommentInterval,
   CommentData
@@ -46,6 +48,7 @@ export type CommentPlayerState = {
   titles: string[];
   filters: string[];
   speed: number;
+  autoScroll: boolean;
 };
 const initialState: CommentPlayerState = {
   channel: "",
@@ -56,7 +59,8 @@ const initialState: CommentPlayerState = {
   pointer: 0,
   titles: [],
   filters: [],
-  speed: 0
+  speed: 0,
+  autoScroll: true
 };
 export default function commentPlayerReducer(
   state = initialState,
@@ -120,6 +124,10 @@ export default function commentPlayerReducer(
     case COMMENT_PLAYER_FILTERS: {
       const { filters } = action;
       return { ...state, filters };
+    }
+    case COMMENT_PLAYER_AUTOSCROLL: {
+      const { enabled } = action;
+      return { ...state, autoScroll: enabled };
     }
     default:
       return state;
