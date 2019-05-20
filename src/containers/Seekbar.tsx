@@ -18,6 +18,7 @@ import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 
+import CommentChart from "./CommentChart";
 import CustomSlider from "../components/CustomSlider";
 import colorStyle, { gray, light } from "../styles/color";
 import containerStyle from "../styles/container";
@@ -94,19 +95,22 @@ class Seekbar extends Component<Props> {
               : formatTime(time)}
           </Text>
         </TouchableOpacity>
-        <CustomSlider
-          style={styles.slider}
-          maximumValue={1}
-          minimumValue={0}
-          step={0.00001}
-          value={position}
-          maximumTrackTintColor="#ffffff20"
-          minimumTrackTintColor="#ffffffe2"
-          onValueChange={position => {
-            const { dispatch } = this.props;
-            dispatch(PlayerActions.position(position));
-          }}
-        />
+        <View style={styles.sliderContainer}>
+          <CommentChart />
+          <CustomSlider
+            style={styles.slider}
+            maximumValue={1}
+            minimumValue={0}
+            step={0.00001}
+            value={position}
+            maximumTrackTintColor="#ffffff20"
+            minimumTrackTintColor="#ffffffe2"
+            onValueChange={position => {
+              const { dispatch } = this.props;
+              dispatch(PlayerActions.position(position));
+            }}
+          />
+        </View>
         <TouchableOpacity
           onPress={() => {
             const { dispatch, player } = this.props;
@@ -209,9 +213,16 @@ const styles = StyleSheet.create({
   container: {
     minHeight: 40
   },
-  slider: {
+  sliderContainer: {
     flex: 1,
     height: 40
+  },
+  slider: {
+    bottom: 0,
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0
   },
   button: {
     alignItems: "center",

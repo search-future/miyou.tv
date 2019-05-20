@@ -62,6 +62,7 @@
 		A4A07FA722B7444900F5D8A4 /* libc++.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A4A07FA622B7444900F5D8A4 /* libc++.1.tbd */; };
 		A4A07FA922B7445500F5D8A4 /* libz.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A4A07FA822B7445500F5D8A4 /* libz.1.tbd */; };
 		A4A07FAB22B7446500F5D8A4 /* libbz2.1.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A4A07FAA22B7446500F5D8A4 /* libbz2.1.0.tbd */; };
+		A4F351A122B8E40C00F14F79 /* libART.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A4F3517422B8E40800F14F79 /* libART.a */; };
 		A8E446B77A60425CA776812F /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BCCE49C5F2DD484785DB4021 /* Ionicons.ttf */; };
 		AB39F43557324AC1B5CE098E /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E2F0114714C349699E078C52 /* EvilIcons.ttf */; };
 		ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */; };
@@ -375,6 +376,20 @@
 			remoteGlobalIDString = 0CA30C441D07E0DB003B09F9;
 			remoteInfo = RCTVLCPlayer;
 		};
+		A4F3517322B8E40800F14F79 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A4F3516E22B8E40800F14F79 /* ART.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 0CF68AC11AF0540F00FF9E5C;
+			remoteInfo = ART;
+		};
+		A4F3517522B8E40800F14F79 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A4F3516E22B8E40800F14F79 /* ART.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 323A12871E5F266B004975B8;
+			remoteInfo = "ART-tvOS";
+		};
 		ADBDB9261DFEBF0700ED6528 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */;
@@ -437,6 +452,7 @@
 		A4A07FA622B7444900F5D8A4 /* libc++.1.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.1.tbd"; path = "usr/lib/libc++.1.tbd"; sourceTree = SDKROOT; };
 		A4A07FA822B7445500F5D8A4 /* libz.1.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.tbd; path = usr/lib/libz.1.tbd; sourceTree = SDKROOT; };
 		A4A07FAA22B7446500F5D8A4 /* libbz2.1.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.1.0.tbd; path = usr/lib/libbz2.1.0.tbd; sourceTree = SDKROOT; };
+		A4F3516E22B8E40800F14F79 /* ART.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ART.xcodeproj; path = "../node_modules/react-native/Libraries/ART/ART.xcodeproj"; sourceTree = "<group>"; };
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
 		B00EBF4FFD9E4A8BB8280D18 /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
 		BCCE49C5F2DD484785DB4021 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
@@ -462,6 +478,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A4F351A122B8E40C00F14F79 /* libART.a in Frameworks */,
 				A4A07FAB22B7446500F5D8A4 /* libbz2.1.0.tbd in Frameworks */,
 				A4A07FA922B7445500F5D8A4 /* libz.1.tbd in Frameworks */,
 				A4A07FA722B7444900F5D8A4 /* libc++.1.tbd in Frameworks */,
@@ -640,6 +657,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A4F3516E22B8E40800F14F79 /* ART.xcodeproj */,
 				A4A07FAA22B7446500F5D8A4 /* libbz2.1.0.tbd */,
 				A4A07FA822B7445500F5D8A4 /* libz.1.tbd */,
 				A4A07FA622B7444900F5D8A4 /* libc++.1.tbd */,
@@ -794,6 +812,15 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		A4F3516F22B8E40800F14F79 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A4F3517422B8E40800F14F79 /* libART.a */,
+				A4F3517622B8E40800F14F79 /* libART-tvOS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		ADBDB9201DFEBF0600ED6528 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -915,6 +942,10 @@
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
 			projectDirPath = "";
 			projectReferences = (
+				{
+					ProductGroup = A4F3516F22B8E40800F14F79 /* Products */;
+					ProjectRef = A4F3516E22B8E40800F14F79 /* ART.xcodeproj */;
+				},
 				{
 					ProductGroup = 00C302A81ABCB8CE00DB3ED1 /* Products */;
 					ProjectRef = 00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */;
@@ -1272,6 +1303,20 @@
 			fileType = archive.ar;
 			path = libRCTVLCPlayer.a;
 			remoteRef = A477414A22B73F7F007E0884 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		A4F3517422B8E40800F14F79 /* libART.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libART.a;
+			remoteRef = A4F3517322B8E40800F14F79 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		A4F3517622B8E40800F14F79 /* libART-tvOS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libART-tvOS.a";
+			remoteRef = A4F3517522B8E40800F14F79 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */ = {
