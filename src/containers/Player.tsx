@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import React, { Component } from "react";
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import Video from "react-native-video";
 import KeepAwake from "react-native-keep-awake";
 import Toast from "react-native-root-toast";
@@ -21,6 +21,8 @@ import { Dispatch } from "redux";
 import qs from "qs";
 // @ts-ignore
 import { VLCPlayer } from "react-native-yz-vlcplayer";
+// @ts-ignore
+import { Immersive } from "react-native-immersive";
 
 import { PlayerState, PlayerActions } from "../modules/player";
 import { NetworkState } from "../modules/network";
@@ -165,6 +167,9 @@ class Player extends Component<Props, State> {
     const { viewer } = this.props;
     this.load(viewer.peakPlay);
 
+    if (Platform.OS === "android") {
+      Immersive.on();
+    }
     KeepAwake.activate();
   }
 
@@ -210,9 +215,15 @@ class Player extends Component<Props, State> {
     if (reset) {
       this.setState({ reset: false });
     }
+    if (Platform.OS === "android") {
+      Immersive.on();
+    }
   }
 
   componentWillUnmount() {
+    if (Platform.OS === "android") {
+      Immersive.off();
+    }
     KeepAwake.deactivate();
   }
 

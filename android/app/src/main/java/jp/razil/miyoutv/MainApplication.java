@@ -3,6 +3,7 @@ package jp.razil.miyoutv;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.rnimmersive.RNImmersivePackage;
 import com.corbt.keepawake.KCKeepAwakePackage;
 import com.brentvatne.react.ReactVideoPackage;
 import com.yuanzhou.vlc.ReactVlcPlayerPackage;
@@ -27,6 +28,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNImmersivePackage(),
             new KCKeepAwakePackage(),
             new ReactVideoPackage(),
             new ReactVlcPlayerPackage(),

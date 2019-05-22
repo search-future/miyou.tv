@@ -22,6 +22,7 @@
     "react-dom": "^16.7.0",
     "react-native": "0.58.3",
     "react-native-elements": "^1.0.0",
+    "react-native-immersive": "^2.0.0",
     "react-native-keep-awake": "^4.0.0",
     "react-native-modal-datetime-picker": "^6.0.0",
     "react-native-popup-menu": "^0.15.0",
