@@ -14,6 +14,7 @@ limitations under the License.
 import React, { Component } from "react";
 import { StyleSheet } from "react-native";
 import Video from "react-native-video";
+import KeepAwake from "react-native-keep-awake";
 import Toast from "react-native-root-toast";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
@@ -163,6 +164,8 @@ class Player extends Component<Props, State> {
   componentDidMount() {
     const { viewer } = this.props;
     this.load(viewer.peakPlay);
+
+    KeepAwake.activate();
   }
 
   shouldComponentUpdate(nextProps: Props) {
@@ -207,6 +210,10 @@ class Player extends Component<Props, State> {
     if (reset) {
       this.setState({ reset: false });
     }
+  }
+
+  componentWillUnmount() {
+    KeepAwake.deactivate();
   }
 
   getRecorded() {

@@ -64,6 +64,7 @@
 		A4A07FAB22B7446500F5D8A4 /* libbz2.1.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A4A07FAA22B7446500F5D8A4 /* libbz2.1.0.tbd */; };
 		A4F351A122B8E40C00F14F79 /* libART.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A4F3517422B8E40800F14F79 /* libART.a */; };
 		A8E446B77A60425CA776812F /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BCCE49C5F2DD484785DB4021 /* Ionicons.ttf */; };
+		A99177D4730349C48002F7CE /* libKCKeepAwake.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 20139D80F2D44633AFFAC4FB /* libKCKeepAwake.a */; };
 		AB39F43557324AC1B5CE098E /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E2F0114714C349699E078C52 /* EvilIcons.ttf */; };
 		ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */; };
 		BA3CAB1C8D504F2BBD600A07 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A663AF9B71243C1B0ED7B28 /* FontAwesome.ttf */; };
@@ -376,6 +377,13 @@
 			remoteGlobalIDString = 0CA30C441D07E0DB003B09F9;
 			remoteInfo = RCTVLCPlayer;
 		};
+		A4B7B57E22C35AE30007C7FF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 05F3423DA3644A3696A64A31 /* KCKeepAwake.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = KCKeepAwake;
+		};
 		A4F3517322B8E40800F14F79 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A4F3516E22B8E40800F14F79 /* ART.xcodeproj */;
@@ -409,6 +417,7 @@
 		00E356EE1AD99517003FC87E /* miyoutvTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = miyoutvTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* miyoutvTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = miyoutvTests.m; sourceTree = "<group>"; };
+		05F3423DA3644A3696A64A31 /* KCKeepAwake.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = KCKeepAwake.xcodeproj; path = "../node_modules/react-native-keep-awake/ios/KCKeepAwake.xcodeproj"; sourceTree = "<group>"; };
 		139105B61AF99BAD00B5F7CC /* RCTSettings.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTSettings.xcodeproj; path = "../node_modules/react-native/Libraries/Settings/RCTSettings.xcodeproj"; sourceTree = "<group>"; };
 		139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTWebSocket.xcodeproj; path = "../node_modules/react-native/Libraries/WebSocket/RCTWebSocket.xcodeproj"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* miyoutv.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = miyoutv.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -421,6 +430,7 @@
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
 		1740D6E0B7C841FE8DFE36A1 /* libRNVectorIcons-tvOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libRNVectorIcons-tvOS.a"; sourceTree = "<group>"; };
 		1B49EC4CA1BC4ECDBBF63E17 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
+		20139D80F2D44633AFFAC4FB /* libKCKeepAwake.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libKCKeepAwake.a; sourceTree = "<group>"; };
 		280B9779E24D4097B3415CF0 /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* miyoutv-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "miyoutv-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* miyoutv-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "miyoutv-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -507,6 +517,7 @@
 				075BA7D9BBA64242B6B9F53C /* libRNVectorIcons.a in Frameworks */,
 				163DE20E036D4136BE008BA2 /* libRCTVLCPlayer.a in Frameworks */,
 				F19037C484584FDD9BF438D0 /* libRCTVideo.a in Frameworks */,
+				A99177D4730349C48002F7CE /* libKCKeepAwake.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -735,6 +746,7 @@
 				69A0E07B9EBC4CDCA40BF6DF /* RNVectorIcons.xcodeproj */,
 				7500DB50780949C8BD248C6B /* RCTVLCPlayer.xcodeproj */,
 				BDE42A23728F451680445A3A /* RCTVideo.xcodeproj */,
+				05F3423DA3644A3696A64A31 /* KCKeepAwake.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -782,6 +794,7 @@
 				E9EEB0BE13E74AB284FD9E10 /* libRCTVLCPlayer.a */,
 				6BA86EB749FE45519CDE6E85 /* libRCTVideo.a */,
 				1740D6E0B7C841FE8DFE36A1 /* libRNVectorIcons-tvOS.a */,
+				20139D80F2D44633AFFAC4FB /* libKCKeepAwake.a */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -808,6 +821,14 @@
 			isa = PBXGroup;
 			children = (
 				A477414B22B73F7F007E0884 /* libRCTVLCPlayer.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A4B7B57B22C35AE30007C7FF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A4B7B57F22C35AE30007C7FF /* libKCKeepAwake.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -945,6 +966,10 @@
 				{
 					ProductGroup = A4F3516F22B8E40800F14F79 /* Products */;
 					ProjectRef = A4F3516E22B8E40800F14F79 /* ART.xcodeproj */;
+				},
+				{
+					ProductGroup = A4B7B57B22C35AE30007C7FF /* Products */;
+					ProjectRef = 05F3423DA3644A3696A64A31 /* KCKeepAwake.xcodeproj */;
 				},
 				{
 					ProductGroup = 00C302A81ABCB8CE00DB3ED1 /* Products */;
@@ -1305,6 +1330,13 @@
 			remoteRef = A477414A22B73F7F007E0884 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		A4B7B57F22C35AE30007C7FF /* libKCKeepAwake.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libKCKeepAwake.a;
+			remoteRef = A4B7B57E22C35AE30007C7FF /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		A4F3517422B8E40800F14F79 /* libART.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1484,12 +1516,14 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-yz-vlcplayer/ios/RCTVLCPlayer",
 					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
+					"$(SRCROOT)/../node_modules/neact-native-keep-awakeios",
 				);
 				INFOPLIST_FILE = miyoutvTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1515,12 +1549,14 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-yz-vlcplayer/ios/RCTVLCPlayer",
 					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
+					"$(SRCROOT)/../node_modules/neact-native-keep-awakeios",
 				);
 				INFOPLIST_FILE = miyoutvTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1550,6 +1586,7 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-yz-vlcplayer/ios/RCTVLCPlayer",
 					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
+					"$(SRCROOT)/../node_modules/neact-native-keep-awakeios",
 				);
 				INFOPLIST_FILE = miyoutv/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
@@ -1578,6 +1615,7 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-yz-vlcplayer/ios/RCTVLCPlayer",
 					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
+					"$(SRCROOT)/../node_modules/neact-native-keep-awakeios",
 				);
 				INFOPLIST_FILE = miyoutv/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
@@ -1610,11 +1648,13 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-yz-vlcplayer/ios/RCTVLCPlayer",
 					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
+					"$(SRCROOT)/../node_modules/neact-native-keep-awakeios",
 				);
 				INFOPLIST_FILE = "miyoutv-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1649,11 +1689,13 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-yz-vlcplayer/ios/RCTVLCPlayer",
 					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
+					"$(SRCROOT)/../node_modules/neact-native-keep-awakeios",
 				);
 				INFOPLIST_FILE = "miyoutv-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1687,11 +1729,13 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-yz-vlcplayer/ios/RCTVLCPlayer",
 					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
+					"$(SRCROOT)/../node_modules/neact-native-keep-awakeios",
 				);
 				INFOPLIST_FILE = "miyoutv-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1725,11 +1769,13 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-yz-vlcplayer/ios/RCTVLCPlayer",
 					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
+					"$(SRCROOT)/../node_modules/neact-native-keep-awakeios",
 				);
 				INFOPLIST_FILE = "miyoutv-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
