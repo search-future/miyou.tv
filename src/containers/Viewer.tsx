@@ -21,6 +21,7 @@ import { Dispatch } from "redux";
 import CommentPlayer from "./CommentPlayer";
 import Controller from "./Controller";
 import Player from "./Player";
+import PlayerContainer from "./PlayerContainer";
 import Seekbar from "./Seekbar";
 import ViewerInfo from "./ViewerInfo";
 import colorStyle, { dark, grayDark, light } from "../styles/color";
@@ -176,22 +177,14 @@ class Viewer extends Component<Props, State> {
                   </TouchableOpacity>
                 </View>
                 {playing && (
-                  <TouchableOpacity
-                    style={styles.screenContent}
-                    activeOpacity={1}
-                    onPress={() => {
-                      const { dispatch, viewer } = this.props;
-                      const { control } = viewer;
-                      dispatch(ViewerActions.update({ control: !control }));
-                    }}
-                  >
+                  <PlayerContainer style={styles.screenContent}>
                     <Player />
                     {comment && (
                       <View style={styles.screenContent}>
                         <CommentPlayer />
                       </View>
                     )}
-                  </TouchableOpacity>
+                  </PlayerContainer>
                 )}
                 {playing && control && (
                   <View style={styles.control}>
