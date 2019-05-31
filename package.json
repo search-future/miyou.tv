@@ -62,6 +62,7 @@
     "babel-plugin-react-native-web": "^0.10.0",
     "babel-plugin-transform-inline-environment-variables": "^0.4.3",
     "electron": "^4.0.4",
+    "electron-builder": "^20.41.0",
     "electron-reload": "^1.4.0",
     "jest": "24.0.0",
     "metro-react-native-babel-preset": "0.51.1",
