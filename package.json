@@ -64,6 +64,7 @@
     "electron": "^4.0.4",
     "electron-builder": "^20.41.0",
     "electron-reload": "^1.4.0",
+    "env-cmd": "^9.0.2",
     "jest": "24.0.0",
     "metro-react-native-babel-preset": "0.51.1",
     "prettier": "^1.16.3",
@@ -98,13 +99,14 @@
     "url": "git+https://github.com/search-future/miyou.tv.git"
   },
   "scripts": {
-    "start": "node node_modules/react-native/local-cli/cli.js start",
-    "android": "node node_modules/react-native/local-cli/cli.js run-android",
-    "ios": "node node_modules/react-native/local-cli/cli.js run-ios",
-    "electron": "electron .",
-    "start-web": "webpack -d --colors -w",
+    "start": "npm run env-cmd -- node node_modules/react-native/local-cli/cli.js start",
+    "android": "npm run env-cmd -- node node_modules/react-native/local-cli/cli.js run-android",
+    "ios": "npm run env-cmd -- node node_modules/react-native/local-cli/cli.js run-ios",
+    "electron": "npm run env-cmd -- electron .",
+    "start-web": "npm run env-cmd -- webpack -d --colors -w",
     "download-mpv": "node download-mpv.js",
-    "test": "jest",
-    "tsc": "tsc"
+    "env-cmd": "env-cmd -f .env.local --fallback",
+    "test": "npm run env-cmd -- jest",
+    "tsc": "npm run env-cmd -- tsc"
   }
 }
