@@ -70,6 +70,7 @@
     "metro-react-native-babel-preset": "0.51.1",
     "prettier": "^1.16.3",
     "react-test-renderer": "16.6.3",
+    "tar": "^4.4.10",
     "ts-node": "^8.0.2",
     "tslint": "^5.12.1",
     "tslint-config-prettier": "^1.17.0",
