@@ -255,7 +255,9 @@ function createWindow() {
   win.loadFile("index.html");
 
   // Open the DevTools.
-  win.webContents.openDevTools();
+  if (process.env.NODE_ENV === "development") {
+    win.webContents.openDevTools();
+  }
 
   // Emitted when the window is closed.
   win.on("closed", () => {
@@ -271,7 +273,9 @@ function createWindow() {
     }
   });
   view.webContents.loadFile("index.html", { hash: "view" });
-  view.webContents.openDevTools();
+  if (process.env.NODE_ENV === "development") {
+    view.webContents.openDevTools();
+  }
   win.setBrowserView(view);
 
   Menu.setApplicationMenu(buildAppMenu());
@@ -308,7 +312,7 @@ app.on("web-contents-created", (e, webContents) => {
 });
 
 const path = require("path");
-process.mainModule.paths.push(path.join(app.getPath('exe'), '../node_modules'));
+process.mainModule.paths.push(path.join(app.getPath("exe"), "../node_modules"));
 const { getPluginEntry } = require("mpv.js");
 
 try {
