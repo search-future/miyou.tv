@@ -313,7 +313,6 @@ app.on("web-contents-created", (e, webContents) => {
 
 const path = require("path");
 process.mainModule.paths.push(path.join(app.getPath("exe"), "../node_modules"));
-const { getPluginEntry } = require("mpv.js");
 
 try {
   require("electron-reload")(
@@ -328,19 +327,27 @@ try {
   );
 } catch (e) {}
 
-// Absolute path to the plugin directory.
-const pluginDir = path.join(
-  path.dirname(require.resolve("mpv.js")),
-  "build",
-  "Release"
-);
-// See pitfalls section for details.
-if (process.platform !== "linux") {
-  process.chdir(pluginDir);
+let pluginPath = "";
+try {
+  const fs = require("fs");
+  pluginPath = path.join(app.getAppPath(), "../mpv/mpvjs.node");
+  if (!fs.existsSync(pluginPath)) {
+    pluginPath = path.join(app.getAppPath(), "../mpv/mpvjs.dylib");
+  }
+  if (!fs.existsSync(pluginPath)) {
+    pluginPath = path.resolve(
+      path.dirname(require.resolve("mpv.js")) || "node_modules/mpv.js/",
+      "build/Release/mpvjs.node"
+    );
+  }
+} catch (e) {
+  pluginPath = path.resolve("node_modules/mpv.js/build/Release/mpvjs.node");
 }
-// To support a broader number of systems.
+if (process.platform !== "linux") {
+  process.chdir(path.dirname(pluginPath));
+}
 app.commandLine.appendSwitch("ignore-gpu-blacklist");
 app.commandLine.appendSwitch(
   "register-pepper-plugins",
-  getPluginEntry(pluginDir)
+  `${pluginPath};application/x-mpvjs`
 );

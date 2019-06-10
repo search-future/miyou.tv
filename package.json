@@ -107,7 +107,13 @@
     "electron": "cross-env NODE_ENV=\"development\" npm run env-cmd -- electron .",
     "start-web": "npm run env-cmd -- webpack -d --colors -w",
     "download-mpv": "node download-mpv.js",
+    "collect-mpv": "node collect-mpv.js",
     "env-cmd": "env-cmd -f .env.local --fallback",
+    "electron-builder": "npm run env-cmd -- electron-builder",
+    "prepack-electron": "npm run env-cmd -- webpack -p --colors",
+    "pack-electron": "npm run electron-builder -- --dir",
+    "predist-electron": "npm run env-cmd -- webpack -p --colors",
+    "dist-electron": "npm run electron-builder --",
     "test": "npm run env-cmd -- jest",
     "tsc": "npm run env-cmd -- tsc"
   }
