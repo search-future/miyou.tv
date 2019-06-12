@@ -114,6 +114,8 @@
     "pack-electron": "npm run electron-builder -- --dir",
     "predist-electron": "npm run env-cmd -- webpack -p --colors",
     "dist-electron": "npm run electron-builder --",
+    "pack-android": "cd android/ && env-cmd -f ../.env.local --fallback ./gradlew assembleRelease",
+    "dist-android": "cd android/ && env-cmd -f ../.env.local --fallback ./gradlew bundleRelease",
     "test": "npm run env-cmd -- jest",
     "tsc": "npm run env-cmd -- tsc"
   }
