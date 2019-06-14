@@ -97,6 +97,7 @@ class Setup extends Component<Props> {
             >
               <Picker
                 style={styles.picker}
+                itemStyle={styles.pickerItem}
                 selectedValue={backendType}
                 onValueChange={type => {
                   const { setting } = this.props;
@@ -416,6 +417,7 @@ class Setup extends Component<Props> {
             >
               <Picker
                 style={styles.picker}
+                itemStyle={styles.pickerItem}
                 selectedValue={countMode}
                 onValueChange={countMode => {
                   this.update("view", { countMode });
@@ -439,6 +441,7 @@ class Setup extends Component<Props> {
             >
               <Picker
                 style={styles.picker}
+                itemStyle={styles.pickerItem}
                 selectedValue={hourFirst}
                 onValueChange={hourFirst => {
                   this.update("view", { hourFirst });
@@ -482,6 +485,7 @@ class Setup extends Component<Props> {
             >
               <Picker
                 style={styles.picker}
+                itemStyle={styles.pickerItem}
                 selectedValue={hourFormat}
                 onValueChange={hourFormat => {
                   this.update("view", { hourFormat });
@@ -552,6 +556,12 @@ const styles = StyleSheet.create({
     maxWidth: 320
   },
   picker: {
-    borderWidth: 0
+    borderWidth: 0,
+    fontSize: 16,
+    maxHeight: 96
+  },
+  pickerItem: {
+    fontSize: 16,
+    maxHeight: 96
   }
 });
