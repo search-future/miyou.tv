@@ -27,6 +27,7 @@
     "react-native-modal-datetime-picker": "^6.0.0",
     "react-native-popup-menu": "^0.15.0",
     "react-native-root-toast": "^3.0.2",
+    "react-native-safe-area-view": "^0.14.5",
     "react-native-slider": "^0.11.0",
     "react-native-vector-icons": "^6.2.0",
     "react-native-video": "^3.2.1",

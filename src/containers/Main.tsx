@@ -12,7 +12,9 @@ limitations under the License.
 */
 
 import React, { Component } from "react";
+import { StyleSheet } from "react-native";
 import { MenuProvider } from "react-native-popup-menu";
+import SafeAreaView from "react-native-safe-area-view";
 
 import AppNavigator from "../navigators";
 
@@ -20,8 +22,16 @@ export default class Main extends Component {
   render() {
     return (
       <MenuProvider backHandler>
-        <AppNavigator />
+        <SafeAreaView style={styles.container}>
+          <AppNavigator />
+        </SafeAreaView>
       </MenuProvider>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1
+  }
+});
