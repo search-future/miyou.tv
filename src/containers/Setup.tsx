@@ -57,7 +57,8 @@ class Setup extends Component<Props> {
       streamType = "m2ts",
       streamParams = "c:v=copy&c:a=copy",
       mobileStreamType = "mp4",
-      mobileStreamParams = "b:v=1M&b:a=128k&s=1280x720"
+      mobileStreamParams = "b:v=1M&b:a=128k&s=1280x720",
+      reloadIntervalSeconds = "0"
     } = backendSetting;
     const {
       email: moritapoEmail = "",
@@ -467,6 +468,29 @@ class Setup extends Component<Props> {
                 </View>
               </View>
             )}
+            <Text style={[colorStyle.black, styles.label]}>
+              自動更新間隔(秒)
+            </Text>
+            <View
+              style={[
+                colorStyle.bgWhite,
+                colorStyle.borderGray,
+                styles.inputWrapper
+              ]}
+            >
+              <TextInput
+                style={[colorStyle.black, colorStyle.bgWhite]}
+                autoCapitalize="none"
+                keyboardType="decimal-pad"
+                textContentType="none"
+                value={reloadIntervalSeconds}
+                onChangeText={reloadIntervalSeconds => {
+                  if (!isNaN(reloadIntervalSeconds as any)) {
+                    this.update("backend", { reloadIntervalSeconds });
+                  }
+                }}
+              />
+            </View>
           </View>
           <View style={styles.group}>
             <Text style={[colorStyle.black, styles.groupTitle]}>

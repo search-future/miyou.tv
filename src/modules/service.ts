@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { all, call, put, select, takeLatest } from "redux-saga/effects";
+import { all, delay, call, put, select, takeLatest } from "redux-saga/effects";
 import { AnyAction } from "redux";
 import Toast from "react-native-root-toast";
 
@@ -60,6 +60,14 @@ function* backendInitSaga() {
     );
     yield put(LoadingActions.complete());
     yield put(backendReady(backendService.hasArchive));
+    const reloadIntervalSeconds = parseInt(
+      backendSetting.reloadIntervalSeconds || "0",
+      10
+    );
+    if (reloadIntervalSeconds > 10) {
+      yield delay(reloadIntervalSeconds * 1000);
+      yield put(backendInit());
+    }
   } catch (e) {
     yield put(LoadingActions.complete());
     Toast.show(e.message || JSON.stringify(e, null, 2), {
