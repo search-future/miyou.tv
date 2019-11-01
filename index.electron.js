@@ -351,3 +351,7 @@ app.commandLine.appendSwitch(
   "register-pepper-plugins",
   `${pluginPath};application/x-mpvjs`
 );
+app.commandLine.appendSwitch(
+  "js-flags",
+  "--max-old-space-size=512 --gc_interval=100"
+);
