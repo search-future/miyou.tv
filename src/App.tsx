@@ -20,8 +20,9 @@ import { persistReducer, persistStore } from "redux-persist";
 
 import Main from "./containers/Main";
 import Splash from "./components/Splash";
-import rootReducer, { persistConfig, rootSaga } from "./modules";
+import rootReducer, { rootSaga } from "./modules";
 import init from "./utils/init";
+import persistConfig from "./config/persist";
 
 export default class App extends Component {
   render() {
@@ -32,7 +33,7 @@ export default class App extends Component {
           onBeforeLift={() => {
             init(store);
           }}
-          persistor={persistor}
+          persistor={persistor as any}
         >
           <Main />
         </PersistGate>
@@ -42,7 +43,7 @@ export default class App extends Component {
 }
 
 const sagaMiddleware = createSagaMiddleware();
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+const persistedReducer = persistReducer(persistConfig as any, rootReducer);
 const store = createStore(persistedReducer, applyMiddleware(sagaMiddleware));
 const persistor = persistStore(store);
 sagaMiddleware.run(rootSaga);

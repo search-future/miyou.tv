@@ -12,12 +12,8 @@ limitations under the License.
 */
 
 import { combineReducers } from "redux";
-import { PersistConfig } from "redux-persist";
-import storage from "@react-native-community/async-storage";
-import createEncryptor from "redux-persist-transform-encrypt";
 import { all, fork } from "redux-saga/effects";
 
-import { persistSecretKey } from "../config/constants";
 import commentPlayerReducer, { commentPlayerSaga } from "./commentPlayer";
 import loadingReducer from "./loading";
 import navReducer from "./nav";
@@ -28,17 +24,6 @@ import serviceReducer, { serviceSaga } from "./service";
 import settingReducer from "./setting";
 import viewerReducer, { viewerSaga } from "./viewer";
 import windowReducer, { windowSaga } from "./window";
-
-const encryptor = createEncryptor({
-  secretKey: persistSecretKey
-});
-
-export const persistConfig = {
-  key: "root",
-  storage,
-  whitelist: ["nav", "setting"],
-  transforms: [encryptor]
-};
 
 const rootReducer = combineReducers({
   commentPlayer: commentPlayerReducer,
