@@ -249,7 +249,14 @@ function buildContextMenu(params) {
 
 function createWindow() {
   // Create the browser window.
-  win = new BrowserWindow({ width: 1440, height: 789, frame: false });
+  win = new BrowserWindow({
+    width: 1440,
+    height: 789,
+    frame: false,
+    webPreferences: {
+      nodeIntegration: true
+    }
+  });
 
   // and load the index.html of the app.
   win.loadFile("index.html");
@@ -269,6 +276,7 @@ function createWindow() {
 
   const view = new BrowserView({
     webPreferences: {
+      nodeIntegration: true,
       plugins: true
     }
   });

@@ -12,7 +12,8 @@ limitations under the License.
 */
 
 import React, { Component } from "react";
-import { View, StyleSheet, ART } from "react-native";
+import { View, StyleSheet } from "react-native";
+import { Svg, Path } from "react-native-svg";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 
@@ -89,13 +90,13 @@ class CommentChart extends Component<Props, State> {
         }}
       >
         {containerHeight > 0 && (
-          <ART.Surface
+          <Svg
             style={{ flex: 1 }}
             width={containerWidth}
             height={containerHeight}
           >
-            <ART.Shape stroke={active} strokeWidth={2} d={path.join(" ")} />
-          </ART.Surface>
+            <Path fill="none" stroke={active} strokeWidth={2} d={path.join(" ")}></Path>
+          </Svg>
         )}
         {containerWidth > 0 &&
           peaks.slice(-5).map(({ n_hits, start }, index) => {

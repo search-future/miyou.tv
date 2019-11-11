@@ -14,7 +14,9 @@ limitations under the License.
 import { Store } from "redux";
 import { BackHandler } from "react-native";
 import { NavigationState, StackActions } from "react-navigation";
+import NetInfo from "@react-native-community/netinfo";
 
+import { NetworkActions } from "../../modules/network";
 import common from "./common";
 
 export default function init(store: Store) {
@@ -26,6 +28,15 @@ export default function init(store: Store) {
       return true;
     }
     return false;
+  });
+
+  NetInfo.fetch().then(state => {
+    store.dispatch(NetworkActions.update(state));
+  });
+  NetInfo.addEventListener(state => {
+    if (typeof state === "object") {
+      store.dispatch(NetworkActions.update(state));
+    }
   });
 
   common(store);

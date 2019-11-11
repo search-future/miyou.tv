@@ -26,6 +26,7 @@ type Props = {
   containerStyle?: StyleProp<ViewStyle>;
   style?: StyleProp<ViewStyle>;
   itemStyle?: StyleProp<TextStyle>;
+  color?: string;
   icon?: IconObject;
   items?: { label: string; value: any }[];
   selectedValue?: any;
@@ -35,6 +36,7 @@ export default class IconSelector extends Component<Props> {
   render() {
     const {
       containerStyle,
+      color,
       style,
       itemStyle,
       icon,

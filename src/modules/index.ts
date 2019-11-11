@@ -13,7 +13,7 @@ limitations under the License.
 
 import { combineReducers } from "redux";
 import { PersistConfig } from "redux-persist";
-import storage from "redux-persist/lib/storage";
+import storage from "@react-native-community/async-storage";
 import createEncryptor from "redux-persist-transform-encrypt";
 import { all, fork } from "redux-saga/effects";
 
@@ -33,7 +33,7 @@ const encryptor = createEncryptor({
   secretKey: persistSecretKey
 });
 
-export const persistConfig: PersistConfig = {
+export const persistConfig = {
   key: "root",
   storage,
   whitelist: ["nav", "setting"],

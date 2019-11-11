@@ -139,6 +139,7 @@ function* openSaga(action: AnyAction) {
           frame: false,
           show: false,
           webPreferences: {
+            nodeIntegration: true,
             plugins: true
           }
         });

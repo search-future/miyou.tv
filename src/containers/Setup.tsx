@@ -19,7 +19,8 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  StyleSheet
+  StyleSheet,
+  Platform
 } from "react-native";
 import { Text } from "react-native-elements";
 import { StackActions } from "react-navigation";
@@ -276,50 +277,54 @@ class Setup extends Component<Props> {
                     }}
                   />
                 </View>
-                <Text style={[colorStyle.black, styles.label]}>
-                  動画コンテナ(モバイルデータ通信)
-                </Text>
-                <View
-                  style={[
-                    colorStyle.bgWhite,
-                    colorStyle.borderGray,
-                    styles.inputWrapper
-                  ]}
-                >
-                  <Picker
-                    style={styles.picker}
-                    itemStyle={styles.pickerItem}
-                    selectedValue={mobileStreamType}
-                    onValueChange={mobileStreamType => {
-                      this.update("backend", {
-                        mobileStreamType,
-                        mobileStreamParams: "b:v=1M&b:a=128k&s=1280x720"
-                      });
-                    }}
-                  >
-                    <Picker.Item label="MP4" value="mp4" />
-                    <Picker.Item label="WebM" value="webm" />
-                  </Picker>
-                </View>
-                <Text style={[colorStyle.black, styles.label]}>
-                  動画オプション(モバイルデータ通信)
-                </Text>
-                <View
-                  style={[
-                    colorStyle.bgWhite,
-                    colorStyle.borderGray,
-                    styles.inputWrapper
-                  ]}
-                >
-                  <TextInput
-                    style={[colorStyle.black, colorStyle.bgWhite]}
-                    autoCapitalize="none"
-                    value={mobileStreamParams}
-                    onChangeText={mobileStreamParams => {
-                      this.update("backend", { mobileStreamParams });
-                    }}
-                  />
-                </View>
+                {Platform.OS !== "web" && (
+                  <View>
+                    <Text style={[colorStyle.black, styles.label]}>
+                      動画コンテナ(モバイルデータ通信)
+                    </Text>
+                    <View
+                      style={[
+                        colorStyle.bgWhite,
+                        colorStyle.borderGray,
+                        styles.inputWrapper
+                      ]}
+                    >
+                      <Picker
+                        style={styles.picker}
+                        itemStyle={styles.pickerItem}
+                        selectedValue={mobileStreamType}
+                        onValueChange={mobileStreamType => {
+                          this.update("backend", {
+                            mobileStreamType,
+                            mobileStreamParams: "b:v=1M&b:a=128k&s=1280x720"
+                          });
+                        }}
+                      >
+                        <Picker.Item label="MP4" value="mp4" />
+                        <Picker.Item label="WebM" value="webm" />
+                      </Picker>
+                    </View>
+                    <Text style={[colorStyle.black, styles.label]}>
+                      動画オプション(モバイルデータ通信)
+                    </Text>
+                    <View
+                      style={[
+                        colorStyle.bgWhite,
+                        colorStyle.borderGray,
+                        styles.inputWrapper
+                      ]}
+                    >
+                      <TextInput
+                        style={[colorStyle.black, colorStyle.bgWhite]}
+                        autoCapitalize="none"
+                        value={mobileStreamParams}
+                        onChangeText={mobileStreamParams => {
+                          this.update("backend", { mobileStreamParams });
+                        }}
+                      />
+                    </View>
+                  </View>
+                )}
               </View>
             )}
             {backendType === "garapon" && (

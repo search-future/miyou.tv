@@ -17,7 +17,6 @@ import {
   Switch,
   TouchableOpacity,
   View,
-  ViewStyle,
   StyleSheet,
   Platform,
   Animated,
@@ -197,8 +196,8 @@ class ProgramRanking extends Component<Props, State> {
                     colorStyle.borderGrayDark,
                     programStyle.headerControl
                   ]}
-                  style={[colorStyle.bgDark, colorStyle.light as ViewStyle]}
-                  itemStyle={colorStyle.light}
+                  style={colorStyle.bgDark}
+                  color={light}
                   icon={
                     <FontAwesome5Icon name="database" solid color={light} />
                   }
@@ -221,8 +220,8 @@ class ProgramRanking extends Component<Props, State> {
                   programStyle.headerControl,
                   styles.targetPicker
                 ]}
-                style={[colorStyle.bgDark, colorStyle.light as ViewStyle]}
-                itemStyle={colorStyle.light}
+                style={colorStyle.bgDark}
+                color={light}
                 icon={<FontAwesome5Icon name="clock" solid color={light} />}
                 selectedValue={target}
                 onValueChange={target => {
@@ -285,8 +284,8 @@ class ProgramRanking extends Component<Props, State> {
                   colorStyle.borderGrayDark,
                   programStyle.headerControl
                 ]}
-                style={[colorStyle.bgDark, colorStyle.light as ViewStyle]}
-                itemStyle={colorStyle.light}
+                style={colorStyle.bgDark}
+                color={light}
                 selectedValue={view}
                 onValueChange={view => {
                   this.save({ view });

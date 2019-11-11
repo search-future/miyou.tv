@@ -16,7 +16,6 @@ import {
   ScrollView,
   TouchableOpacity,
   View,
-  ViewStyle,
   StyleSheet,
   Platform,
   Animated,
@@ -213,8 +212,8 @@ class ProgramTable extends Component<Props, State> {
                   icon={
                     <FontAwesome5Icon name="database" solid color={light} />
                   }
-                  style={[colorStyle.bgDark, colorStyle.light as ViewStyle]}
-                  itemStyle={colorStyle.light}
+                  style={colorStyle.bgDark}
+                  color={light}
                   selectedValue={useArchive ? 1 : 0}
                   onValueChange={value => {
                     const { dispatch } = this.props;

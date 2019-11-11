@@ -27,11 +27,15 @@ export const NetworkActions = {
 
 export type NetworkState = {
   type: string;
-  effectiveType: string;
+  details: any;
+  isConnected: boolean | null;
+  isInternetReachable: boolean | null;
 };
 const initialState: NetworkState = {
   type: "unknown",
-  effectiveType: "4g"
+  details: null,
+  isConnected: true,
+  isInternetReachable: true
 };
 export default function networkReducer(
   state = initialState,

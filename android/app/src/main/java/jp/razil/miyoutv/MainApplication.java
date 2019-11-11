@@ -1,13 +1,12 @@
 package jp.razil.miyoutv;
 
 import android.app.Application;
+import android.util.Log;
 
+import com.facebook.react.PackageList;
+import com.facebook.hermes.reactexecutor.HermesExecutorFactory;
+import com.facebook.react.bridge.JavaScriptExecutorFactory;
 import com.facebook.react.ReactApplication;
-import com.rnimmersive.RNImmersivePackage;
-import com.corbt.keepawake.KCKeepAwakePackage;
-import com.brentvatne.react.ReactVideoPackage;
-import com.yuanzhou.vlc.ReactVlcPlayerPackage;
-import com.oblador.vectoricons.VectorIconsPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -26,14 +25,9 @@ public class MainApplication extends Application implements ReactApplication {
 
     @Override
     protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(
-          new MainReactPackage(),
-            new RNImmersivePackage(),
-            new KCKeepAwakePackage(),
-            new ReactVideoPackage(),
-            new ReactVlcPlayerPackage(),
-            new VectorIconsPackage()
-      );
+      @SuppressWarnings("UnnecessaryLocalVariable")
+      List<ReactPackage> packages = new PackageList(this).getPackages();
+      return packages;
     }
 
     @Override

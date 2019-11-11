@@ -27,6 +27,7 @@ type Props = {
   containerStyle?: StyleProp<ViewStyle>;
   style?: StyleProp<ViewStyle>;
   itemStyle?: StyleProp<TextStyle>;
+  color?: string;
   icon?: IconObject;
   items?: { label: string; value: any }[];
   selectedValue?: any;
@@ -38,6 +39,7 @@ export default class IconSelector extends Component<Props> {
       containerStyle,
       style,
       itemStyle,
+      color,
       icon,
       items = [],
       selectedValue
@@ -66,7 +68,7 @@ export default class IconSelector extends Component<Props> {
             );
           }}
         >
-          <Text style={itemStyle}>
+          <Text style={[{ color }, itemStyle]}>
             {selected ? selected.label : selectedValue}
           </Text>
         </TouchableOpacity>

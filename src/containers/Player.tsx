@@ -20,7 +20,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import qs from "qs";
 // @ts-ignore
-import { VLCPlayer } from "react-native-yz-vlcplayer";
+import { VLCPlayer } from "react-native-vlcplayer2";
 // @ts-ignore
 import { Immersive } from "react-native-immersive";
 

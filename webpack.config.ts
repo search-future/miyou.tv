@@ -61,7 +61,8 @@ const config: webpack.Configuration = {
 
   resolve: {
     alias: {
-      "react-native": "react-native-web"
+      "react-native": "react-native-web",
+      "@react-native-community/async-storage": "redux-persist/lib/storage"
     },
     extensions: [
       ".webpack.js",

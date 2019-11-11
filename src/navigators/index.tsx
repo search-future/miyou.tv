@@ -15,7 +15,7 @@ import { connect } from "react-redux";
 import { NavigationState, NavigationDispatch } from "react-navigation";
 import {
   createReactNavigationReduxMiddleware,
-  reduxifyNavigator
+  createReduxContainer
 } from "react-navigation-redux-helpers";
 
 import StackNavigator from "./StackNavigator";
@@ -23,11 +23,11 @@ import StackNavigator from "./StackNavigator";
 export const RootNavigator = StackNavigator;
 
 export const navMiddleware = createReactNavigationReduxMiddleware(
-  "root",
-  ({ nav }: { nav: NavigationState }) => nav
+  ({ nav }: { nav: NavigationState }) => nav,
+  "root"
 );
 
-const ReduxNavigator = reduxifyNavigator(RootNavigator, "root");
+const ReduxNavigator = createReduxContainer(RootNavigator, "root");
 
 export const AppNavigator = connect(
   ({

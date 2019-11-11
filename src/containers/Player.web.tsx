@@ -19,7 +19,6 @@ import qs from "querystring";
 // @ts-ignore
 import { ReactMPV } from "mpv.js";
 
-import { NetworkState } from "../modules/network";
 import { PlayerState, PlayerActions } from "../modules/player";
 import { SettingState, SettingActions } from "../modules/setting";
 import { ViewerState, ViewerActions } from "../modules/viewer";
@@ -34,7 +33,6 @@ type MPV = {
 
 type Props = {
   dispatch: Dispatch;
-  network: NetworkState;
   player: PlayerState;
   setting: SettingState & {
     player?: {
@@ -252,7 +250,7 @@ class Player extends Component<Props> {
   }
 
   componentDidUpdate(prevProps: Props) {
-    const { network, player, setting, viewer } = this.props;
+    const { player, setting, viewer } = this.props;
     const {
       seekTime,
       seekPosition,
@@ -314,10 +312,6 @@ class Player extends Component<Props> {
     if (dualMonoMode !== this.dualMonoMode) {
       this.property("ad-lavc-o", `dual_mono_mode=${dualMonoMode}`);
       this.dualMonoMode = dualMonoMode;
-    }
-
-    if (network.type !== prevProps.network.type) {
-      this.load();
     }
 
     if (
@@ -532,14 +526,6 @@ class Player extends Component<Props> {
     const program = programs[index];
     const recordedProgram = this.getRecorded();
     if (program && recordedProgram) {
-      const { network, setting } = this.props;
-      const { backend = {} } = setting;
-      const {
-        type = "chinachu",
-        mobileStreamType = "mp4",
-        mobileStreamParams = "b:v=1M&b:a=128k&s=1280x720"
-      } = backend;
-
       if (peakPlay && program.commentMaxSpeedTime) {
         this.preseek =
           new Date(program.commentMaxSpeedTime).getTime() -
@@ -551,10 +537,6 @@ class Player extends Component<Props> {
       }
 
       let [uri, query] = recordedProgram.stream.split("?");
-      if (type === "chinachu" && network.type.indexOf("cell") >= 0) {
-        uri = uri.replace(/[^.]+$/, mobileStreamType);
-        query = mobileStreamParams;
-      }
       const options = [];
       for (const name in this.options) {
         options.push(`${name}=${this.options[name]}`);
@@ -661,17 +643,14 @@ class Player extends Component<Props> {
 
 export default connect(
   ({
-    network,
     player,
     setting,
     viewer
   }: {
-    network: NetworkState;
     player: PlayerState;
     setting: SettingState;
     viewer: ViewerState;
   }) => ({
-    network,
     player,
     setting,
     viewer
