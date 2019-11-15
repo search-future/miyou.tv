@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>MiyouTV</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      html {
+        height: 100%;
+      }
+
+      body {
+        height: 100%;
+        overflow: hidden;
+      }
+
+      #react-app {
+        box-sizing: border-box;
+        display: flex;
+        height: 100%;
+      }
+
+      .splash {
+        object-fit: cover;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="react-app">
+      <img
+        class="splash"
+        src="assets/splash_screen.png"
+        width="1440"
+        height="789"
+      />
+    </div>
+    <script src="dist/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-vlcplayer2/ios/RCTVLCPlayer/RCTVLCPlayer.m b/node_modules/react-native-vlcplayer2/ios/RCTVLCPlayer/RCTVLCPlayer.m
+index eaeb530..30720e7 100644
+--- a/node_modules/react-native-vlcplayer2/ios/RCTVLCPlayer/RCTVLCPlayer.m
++++ b/node_modules/react-native-vlcplayer2/ios/RCTVLCPlayer/RCTVLCPlayer.m
+@@ -239,7 +239,7 @@ -(void)updateVideoProgress
+         int remainingTime = [[_player remainingTime] intValue];
+         int duration      = [_player.media.length intValue];
+         
+-        if( currentTime >= 0 && currentTime < duration) {
++        if( currentTime >= 0 ) {
+             self.onVideoProgress(@{
+                                    @"target": self.reactTag,
+                                    @"currentTime": [NSNumber numberWithInt:currentTime],
