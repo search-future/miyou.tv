@@ -127,6 +127,9 @@
     "dist-electron": "npm run electron-builder --",
     "pack-android": "cd android/ && env-cmd -f ../.env.local --fallback ./gradlew assembleRelease",
     "dist-android": "cd android/ && env-cmd -f ../.env.local --fallback ./gradlew bundleRelease",
+    "build-agent": "webpack -p --colors --config miyoutv-agent/webpack.config.js",
+    "predist-agent": "npm run build-agent",
+    "dist-agent": "node dist-agent.js",
     "test": "npm run env-cmd -- jest",
     "tsc": "npm run env-cmd -- tsc"
   }
