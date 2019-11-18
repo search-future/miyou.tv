@@ -28,11 +28,12 @@ import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 
+import LinkText from "../components/LinkText";
 import colorStyle, { light } from "../styles/color";
 import containerStyle from "../styles/container";
 import { SettingActions, SettingState } from "../modules/setting";
 import { ServiceActions } from "../modules/service";
-import { garaponDevId } from "../config/constants";
+import { garaponDevId, garaponEntryUrl } from "../config/constants";
 
 type Props = {
   dispatch: Dispatch;
@@ -142,6 +143,11 @@ class Setup extends Component<Props> {
             </View>
             {backendType === "chinachu" && (
               <View>
+                <View style={styles.info}>
+                  <LinkText url={chinachuInfoUrl} style={colorStyle.active}>
+                    Chinachu β/γに対応しています。
+                  </LinkText>
+                </View>
                 <Text style={[colorStyle.black, styles.label]}>
                   ChinachuのURL
                 </Text>
@@ -329,6 +335,14 @@ class Setup extends Component<Props> {
             )}
             {backendType === "garapon" && (
               <View>
+                <View style={styles.info}>
+                  <Text style={colorStyle.black}>
+                    ガラポン伍/四/参号機に対応しています。
+                  </Text>
+                  <LinkText url={garaponEntryUrl} style={colorStyle.active}>
+                    ガラポンTVレンタル申込ページ
+                  </LinkText>
+                </View>
                 <Text style={[colorStyle.black, styles.label]}>
                   ガラポンTVの接続情報をAPIから取得
                 </Text>
@@ -430,6 +444,14 @@ class Setup extends Component<Props> {
             )}
             {backendType === "garaponv4" && (
               <View>
+                <View style={styles.info}>
+                  <Text style={colorStyle.black}>
+                    ガラポン六号機に対応しています。
+                  </Text>
+                  <LinkText url={garaponEntryUrl} style={colorStyle.active}>
+                    ガラポンTVレンタル申込ページ
+                  </LinkText>
+                </View>
                 <Text style={[colorStyle.black, styles.label]}>
                   ガラポンTVのユーザー
                 </Text>
@@ -501,6 +523,14 @@ class Setup extends Component<Props> {
             <Text style={[colorStyle.black, styles.groupTitle]}>
               モリタポアカウント
             </Text>
+            <View style={styles.info}>
+              <Text style={colorStyle.black}>
+                コメントを表示するにはモリタポアカウントが必要です。
+              </Text>
+              <LinkText url={moritapoEntryUrl} style={colorStyle.active}>
+                モリタポ新規入会ページ
+              </LinkText>
+            </View>
             <Text style={[colorStyle.black, styles.label]}>メールアドレス</Text>
             <View
               style={[
@@ -666,6 +696,9 @@ class Setup extends Component<Props> {
 
 export default connect(({ setting }: SettingState) => ({ setting }))(Setup);
 
+const moritapoEntryUrl = "https://find.moritapo.jp/moritapo/subscribe.php";
+const chinachuInfoUrl = "https://chinachu.moe/";
+
 const styles = StyleSheet.create({
   container: {
     flex: 1
@@ -697,6 +730,10 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16
+  },
+  info: {
+    fontSize: 16,
+    marginBottom: 8
   },
   inputWrapper: {
     borderWidth: 1,

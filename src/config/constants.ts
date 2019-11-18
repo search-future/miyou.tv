@@ -18,6 +18,8 @@ export const appName = "MiyouTV";
 export const persistSecretKey = process.env["PERSIST_KEY"] || appName;
 
 export const garaponDevId = process.env["GARAPON_DEVID"];
+export const garaponEntryUrl =
+  process.env["GARAPON_ENTRY_URL"] || "http://miyou.tv/apply-garapon/";
 
 export const categoryTable: {
   code: number;
