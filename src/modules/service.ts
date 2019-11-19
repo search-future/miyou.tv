@@ -30,7 +30,8 @@ import { Platform } from "react-native";
 
 const backendSettingBase = {
   streamType: Platform.OS === "web" ? "m2ts" : "mp4",
-  streamParams: "c:v=copy&c:a=copy"
+  streamParams: "c:v=copy&c:a=copy",
+  previewParams: "size=1280x720"
 };
 
 export const BACKEND_INIT = "BACKEND_INIT";
