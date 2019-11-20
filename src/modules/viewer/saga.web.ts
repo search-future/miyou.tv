@@ -136,6 +136,8 @@ function* openSaga(action: AnyAction) {
         viewerWindow = new remote.BrowserWindow({
           width: 800,
           height: 600,
+          minWidth: 320,
+          minHeight: 480,
           frame: false,
           show: false,
           webPreferences: {
