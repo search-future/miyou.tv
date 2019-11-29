@@ -130,7 +130,6 @@ function* openSaga(action: AnyAction) {
     } else {
       if (viewerView) {
         viewerView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
-        dispatchViewer(viewerView, ViewerActions.update({ playing: false }));
       }
       if (!viewerWindow || viewerWindow.isDestroyed()) {
         viewerWindow = new remote.BrowserWindow({
@@ -194,6 +193,10 @@ function* dockSaga(action: AnyAction) {
 function* undockSaga(action: AnyAction) {
   const { mode }: ViewerState = yield select(({ viewer }) => viewer);
   if (mode === "stack") {
+    const viewerView = getViewerView();
+    if (viewerView) {
+      dispatchViewer(viewerView, ViewerActions.update({ playing: false }));
+    }
     yield put(SettingActions.update("docking", false));
     yield openSaga(action);
   } else {
