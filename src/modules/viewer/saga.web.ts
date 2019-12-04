@@ -116,7 +116,7 @@ function* openSaga(action: AnyAction) {
     let viewerWindow = getViewerWindow();
     if (docking) {
       if (viewerWindow) {
-        viewerWindow.close();
+        viewerWindow.destroy();
       }
       if (viewerView) {
         viewerView.setBounds(layout);
@@ -143,6 +143,9 @@ function* openSaga(action: AnyAction) {
             nodeIntegration: true,
             plugins: true
           }
+        });
+        viewerWindow.on("close", () => {
+          dispatchMain(ViewerActions.close());
         });
         viewerWindow.loadURL(`${location.href}#child`);
         yield take(VIEWER_READY);
@@ -172,7 +175,7 @@ function* closeSaga(action: AnyAction) {
       dispatchViewer(viewerView, ViewerActions.update({ playing: false }));
     }
     if (viewerWindow) {
-      viewerWindow.close();
+      viewerWindow.destroy();
     }
     stopPowerSaveBlocker();
   } else {
