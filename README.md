@@ -8,7 +8,7 @@ MiyouTV のシステムは録画バックエンドと番組データを取得し
 
 ### 録画バックエンド
 
-ガラポン TV、または Chinachu と Mirakurun が導入されている Linux 環境が必須です。
+ガラポン TV、または Chinachu や EPGStation と Mirakurun が導入されている Linux 環境が必須です。
 
 ### 再生アプリケーション miyoutv が動作するクライアント PC(以降「クライアント PC」)
 
@@ -46,8 +46,9 @@ Chinachu beta での全録を支援するプログラムです。以下の機能
 
 - [ガラポン TV](http://garapon.tv/)
 - [Chinachu](https://github.com/Chinachu/Chinachu)
+- [EPGStation](https://github.com/l3tnun/EPGStation)
 
-バックエンドとして、ガラポン TV、または Chinachu(β/γ) が必要です。
+バックエンドとして、ガラポン TV、Chinachu(β/γ)、EPGStation のいずれかが必要です。
 
 ### miyoutv(Linux)
 
@@ -69,7 +70,7 @@ Chinachu *beta*と Mirakurun が導入されている環境で動作します。
 ## Installation
 
 MiyouTV のシステムは**番組再生アプリケーションの miyoutv**と**録画バックエンド**から構成されています。
-miyoutv はガラポン TV と Chinachu のクライアントとして動作します。EPG に依存しない全録システムを構築するには Chinachu beta と miyoutv-agent が必要です。
+miyoutv はガラポン TV と Chinachu と EPGStation のクライアントとして動作します。EPG に依存しない全録システムを構築するには Chinachu beta と miyoutv-agent が必要です。
 
 ### Download
 
