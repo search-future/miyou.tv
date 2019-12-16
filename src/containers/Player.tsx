@@ -56,6 +56,7 @@ class Player extends Component<Props, State> {
     reset: false
   };
   preseek = 0;
+  seekId?: number;
 
   render() {
     const { network, setting, player } = this.props;
@@ -106,17 +107,19 @@ class Player extends Component<Props, State> {
             dispatch(PlayerActions.play());
           }}
           onProgress={({ currentTime = 0 }: any) => {
-            const { dispatch } = this.props;
-            const { ss } = this.state;
-            const { duration } = this.getRecorded();
-            const time = currentTime + ss * 1000;
-            dispatch(
-              PlayerActions.progress({
-                duration,
-                time,
-                position: time / duration
-              })
-            );
+            if (this.seekId == null) {
+              const { dispatch } = this.props;
+              const { ss } = this.state;
+              const { duration } = this.getRecorded();
+              const time = currentTime + ss * 1000;
+              dispatch(
+                PlayerActions.progress({
+                  duration,
+                  time,
+                  position: time / duration
+                })
+              );
+            }
             if (this.preseek > 0) {
               this.time(this.preseek);
               this.preseek = 0;
@@ -324,9 +327,21 @@ class Player extends Component<Props, State> {
 
   time(time: number) {
     if (this.vlc) {
-      const { dispatch } = this.props;
-      this.setState({ ss: Math.floor(time / 1000) });
-      dispatch(PlayerActions.play());
+      const { dispatch, player } = this.props;
+      const { duration } = player;
+      const position = time / duration;
+      if (this.seekId != null) {
+        clearTimeout(this.seekId);
+      }
+      dispatch(PlayerActions.progress({ duration, time, position }));
+
+      const ss = Math.floor(time / 1000);
+      this.seekId = setTimeout(() => {
+        const { dispatch } = this.props;
+        this.setState({ ss });
+        dispatch(PlayerActions.play());
+        delete this.seekId;
+      }, 500);
     } else if (this.video) {
       this.video.seek(Math.floor(time / 1000));
     }

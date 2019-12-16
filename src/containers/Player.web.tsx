@@ -69,6 +69,7 @@ class Player extends Component<Props> {
   seekable = true;
   dualMonoMode = "auto";
   pcrWraparound = true;
+  seekId?: number;
 
   render() {
     return (
@@ -421,7 +422,7 @@ class Player extends Component<Props> {
         const position = value / 100;
         if (duration > 0) {
           dispatch(PlayerActions.progress({ position }));
-        } else {
+        } else if (this.seekId == null) {
           const duration = time / position;
           dispatch(PlayerActions.progress({ duration, position }));
         }
@@ -442,7 +443,7 @@ class Player extends Component<Props> {
           const duration = time / position;
           dispatch(PlayerActions.progress({ duration, time }));
         }
-      } else {
+      } else if (this.seekId == null) {
         const { duration } = player;
         time += this.ss * 1000;
         const position = time / duration;
@@ -613,24 +614,32 @@ class Player extends Component<Props> {
         this.property("time-pos", time / 1000);
       }
     } else {
-      const { dispatch, setting } = this.props;
+      const { dispatch, player, setting } = this.props;
+      const { duration } = player;
+      const position = time / duration;
       const { backend = {} } = setting;
       const { type = "chinachu" } = backend;
       if (type === "chinachu" || type === "epgstation") {
+        if (this.seekId != null) {
+          clearTimeout(this.seekId);
+        }
+        dispatch(PlayerActions.progress({ time, position }));
+
         const ss = Math.floor(time / 1000);
         const [uri, query] = this.path.split("?");
         const options = [];
         for (const name in this.options) {
           options.push(`${name}=${this.options[name]}`);
         }
-        this.command(
-          "loadfile",
-          `${uri}?${qs.stringify({ ...qs.parse(query), ss })}`,
-          "replace",
-          options.join(",")
-        );
-        this.ss = ss;
-        dispatch(PlayerActions.play());
+
+        const commandUrl = `${uri}?${qs.stringify({ ...qs.parse(query), ss })}`;
+        const commandOptions = options.join(",");
+        this.seekId = setTimeout(() => {
+          const { dispatch } = this.props;
+          this.command("loadfile", commandUrl, "replace", commandOptions);
+          this.ss = ss;
+          dispatch(PlayerActions.play());
+        }, 500);
       }
     }
   }
