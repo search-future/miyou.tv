@@ -115,18 +115,38 @@ class Setup extends Component<Props> {
                   const { backend = {} } = setting;
                   const { type: backendType = "chinachu" } = backend;
                   if (type !== backendType) {
+                    let streamType = "";
+                    let streamParams = "";
+                    let mobileStreamType = "";
+                    let mobileStreamParams = "";
+                    if (type === "chinachu") {
+                      streamType = "m2ts";
+                      streamParams = "c:v=copy&c:a=copy";
+                      mobileStreamType = "mp4";
+                      mobileStreamParams = "b:v=1M&b:a=128k&s=1280x720";
+                    } else if (type === "epgstation") {
+                      streamType = Platform.OS === "web" ? "raw" : "mp4";
+                      streamParams = Platform.OS === "web" ? "" : "0";
+                      mobileStreamType = "mp4";
+                      mobileStreamParams = "mode=0";
+                    }
                     this.update("backend", {
                       type,
                       auth: type === "garapon",
                       version: type === "garapon" ? "3" : "",
                       url: "",
                       user: "",
-                      password: ""
+                      password: "",
+                      streamType,
+                      streamParams,
+                      mobileStreamType,
+                      mobileStreamParams
                     });
                   }
                 }}
               >
                 <Picker.Item label="Chinachu" value="chinachu" />
+                <Picker.Item label="EPGStation" value="epgstation" />
                 {garaponDevId && (
                   <Picker.Item
                     label="ガラポンTV API Ver.3 (～伍号機)"
@@ -303,6 +323,213 @@ class Setup extends Component<Props> {
                           this.update("backend", {
                             mobileStreamType,
                             mobileStreamParams: "b:v=1M&b:a=128k&s=1280x720"
+                          });
+                        }}
+                      >
+                        <Picker.Item label="MP4" value="mp4" />
+                        <Picker.Item label="WebM" value="webm" />
+                      </Picker>
+                    </View>
+                    <Text style={[colorStyle.black, styles.label]}>
+                      動画オプション(モバイルデータ通信)
+                    </Text>
+                    <View
+                      style={[
+                        colorStyle.bgWhite,
+                        colorStyle.borderGray,
+                        styles.inputWrapper
+                      ]}
+                    >
+                      <TextInput
+                        style={[colorStyle.black, colorStyle.bgWhite]}
+                        autoCapitalize="none"
+                        value={mobileStreamParams}
+                        onChangeText={mobileStreamParams => {
+                          this.update("backend", { mobileStreamParams });
+                        }}
+                      />
+                    </View>
+                  </View>
+                )}
+              </View>
+            )}
+            {backendType === "epgstation" && (
+              <View>
+                <Text style={[colorStyle.black, styles.label]}>
+                  EPGStationのURL
+                </Text>
+                <View
+                  style={[
+                    colorStyle.bgWhite,
+                    colorStyle.borderGray,
+                    styles.inputWrapper
+                  ]}
+                >
+                  <TextInput
+                    style={[colorStyle.black, colorStyle.bgWhite]}
+                    autoCapitalize="none"
+                    placeholder="http://127.0.0.1:8888/"
+                    textContentType="URL"
+                    value={backendUrl}
+                    onChangeText={url => {
+                      this.update("backend", { url });
+                    }}
+                  />
+                </View>
+                <Text style={[colorStyle.black, styles.label]}>
+                  ユーザー名とパスワードを使用する
+                </Text>
+                <View style={containerStyle.row}>
+                  <Switch
+                    value={backendAuth}
+                    onValueChange={auth => {
+                      if (auth) {
+                        this.update("backend", { auth });
+                      } else {
+                        this.update("backend", {
+                          auth,
+                          user: "",
+                          password: ""
+                        });
+                      }
+                    }}
+                  />
+                </View>
+                {backendAuth && (
+                  <View>
+                    <Text style={[colorStyle.black, styles.label]}>
+                      EPGStationのユーザー
+                    </Text>
+                    <View
+                      style={[
+                        colorStyle.bgWhite,
+                        colorStyle.borderGray,
+                        styles.inputWrapper
+                      ]}
+                    >
+                      <TextInput
+                        style={[colorStyle.black, colorStyle.bgWhite]}
+                        autoCapitalize="none"
+                        textContentType="username"
+                        value={backendUser}
+                        onChangeText={user => {
+                          this.update("backend", { user });
+                        }}
+                      />
+                    </View>
+                    <Text style={colorStyle.black}>EPGStationのパスワード</Text>
+                    <View
+                      style={[
+                        colorStyle.bgWhite,
+                        colorStyle.borderGray,
+                        styles.inputWrapper
+                      ]}
+                    >
+                      <TextInput
+                        style={[colorStyle.black, colorStyle.bgWhite]}
+                        autoCapitalize="none"
+                        textContentType="password"
+                        secureTextEntry
+                        value={backendPassword}
+                        onChangeText={password => {
+                          this.update("backend", { password });
+                        }}
+                      />
+                    </View>
+                  </View>
+                )}
+                <Text style={[colorStyle.black, styles.label]}>
+                  動画コンテナ
+                </Text>
+                <View
+                  style={[
+                    colorStyle.bgWhite,
+                    colorStyle.borderGray,
+                    styles.inputWrapper
+                  ]}
+                >
+                  {Platform.OS === "web" ? (
+                    <Picker
+                      style={styles.picker}
+                      itemStyle={styles.pickerItem}
+                      selectedValue={streamType}
+                      onValueChange={streamType => {
+                        if (streamType === "raw") {
+                          this.update("backend", {
+                            streamType,
+                            streamParams: ""
+                          });
+                        } else {
+                          this.update("backend", {
+                            streamType,
+                            streamParams: "mode=0"
+                          });
+                        }
+                      }}
+                    >
+                      <Picker.Item label="無変換" value="raw" />
+                      <Picker.Item label="MP4" value="mp4" />
+                      <Picker.Item label="WebM" value="webm" />
+                      <Picker.Item label="MPEG2-TS" value="mpegts" />
+                    </Picker>
+                  ) : (
+                    <Picker
+                      style={styles.picker}
+                      itemStyle={styles.pickerItem}
+                      selectedValue={streamType}
+                      onValueChange={streamType => {
+                        this.update("backend", {
+                          streamType,
+                          streamParams: "mode=0"
+                        });
+                      }}
+                    >
+                      <Picker.Item label="MP4" value="mp4" />
+                      <Picker.Item label="WebM" value="webm" />
+                      <Picker.Item label="MPEG2-TS" value="mpegts" />
+                    </Picker>
+                  )}
+                </View>
+                <Text style={[colorStyle.black, styles.label]}>
+                  動画オプション
+                </Text>
+                <View
+                  style={[
+                    colorStyle.bgWhite,
+                    colorStyle.borderGray,
+                    styles.inputWrapper
+                  ]}
+                >
+                  <TextInput
+                    style={[colorStyle.black, colorStyle.bgWhite]}
+                    autoCapitalize="none"
+                    value={streamParams}
+                    editable={streamType !== "raw"}
+                    onChangeText={streamParams => {
+                      this.update("backend", { streamParams });
+                    }}
+                  />
+                </View>
+                {Platform.OS !== "web" && (
+                  <View>
+                    <Text style={[colorStyle.black, styles.label]}>
+                      動画コンテナ(モバイルデータ通信)
+                    </Text>
+                    <View
+                      style={[
+                        colorStyle.bgWhite,
+                        colorStyle.borderGray,
+                        styles.inputWrapper
+                      ]}
+                    >
+                      <Picker
+                        style={styles.picker}
+                        itemStyle={styles.pickerItem}
+                        selectedValue={mobileStreamType}
+                        onValueChange={mobileStreamType => {
+                          this.update("backend", {
+                            mobileStreamType,
+                            mobileStreamParams: "mode=0"
                           });
                         }}
                       >

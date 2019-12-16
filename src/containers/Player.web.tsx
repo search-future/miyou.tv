@@ -406,8 +406,13 @@ class Player extends Component<Props> {
     });
     this.observe("duration", value => {
       const { dispatch } = this.props;
-      const duration = value * 1000;
-      dispatch(PlayerActions.progress({ duration }));
+      if (value > 10) {
+        const duration = value * 1000;
+        dispatch(PlayerActions.progress({ duration }));
+      } else {
+        const { duration } = this.getRecorded();
+        dispatch(PlayerActions.progress({ duration }));
+      }
     });
     this.observe("percent-pos", value => {
       if (this.seekable) {
@@ -611,7 +616,7 @@ class Player extends Component<Props> {
       const { dispatch, setting } = this.props;
       const { backend = {} } = setting;
       const { type = "chinachu" } = backend;
-      if (type === "chinachu") {
+      if (type === "chinachu" || type === "epgstation") {
         const ss = Math.floor(time / 1000);
         const [uri, query] = this.path.split("?");
         const options = [];

@@ -16,6 +16,7 @@ import CommentService from "./CommentService";
 import ChinachuService from "./ChinachuService";
 import GaraponService from "./GaraponService";
 import GaraponV4Service from "./GaraponV4Service";
+import EPGStationService from "./EPGStationService";
 
 import { garaponDevId } from "../config/constants";
 
@@ -23,6 +24,9 @@ let backendService: BackendService | null;
 export async function initBackendService({ type, ...options }: any) {
   try {
     switch (type) {
+      case "epgstation":
+        backendService = new EPGStationService(options);
+        break;
       case "garapon":
         GaraponService.devId = garaponDevId || "";
         backendService = new GaraponService(options);

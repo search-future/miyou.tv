@@ -71,17 +71,22 @@ class Player extends Component<Props, State> {
 
     const recordedProgram = this.getRecorded();
     let [uri, query] = recordedProgram.stream.split("?");
-    if (type === "chinachu" && network.type.indexOf("cell") >= 0) {
+    if (
+      network.type.indexOf("cell") >= 0 &&
+      (type === "chinachu" || type === "epgstation")
+    ) {
       uri = uri.replace(/[^.]+$/, mobileStreamType);
       query = mobileStreamParams;
+    }
+    if (type === "chinachu") {
+      uri = uri.replace(/m2ts$/, "mp4");
     }
 
     if (reset) {
       return null;
     }
 
-    if (type === "chinachu") {
-      uri = uri.replace(/m2ts$/, "mp4");
+    if (type === "chinachu" || type === "epgstation") {
       return (
         <VLCPlayer
           style={styles.video}
