@@ -116,8 +116,11 @@ export default class EPGStationService extends BackendService {
       page = 1,
       reverse = false,
       keyword,
+      type,
       channel,
-      category
+      category,
+      start,
+      end
     } = {
       ...BackendService.parseQuery(query),
       ...options
@@ -127,9 +130,8 @@ export default class EPGStationService extends BackendService {
     );
 
     const params: EPGStationSearchParams = {};
+    params.limit = 2 ** 31 - 1;
     params.reverse = !reverse;
-    params.limit = view;
-    params.offset = (page - 1) * view;
     if (keyword) {
       params.keyword = keyword;
     }
@@ -157,48 +159,55 @@ export default class EPGStationService extends BackendService {
 
     const result: EPGStationRecordedPrograms = await this.request(
       "/api/recorded",
-      {
-        params
-      }
+      { params }
+    );
+
+    const programs = result.recorded.filter(
+      program =>
+        (type == null || program.channelType === type) &&
+        (end == null || isNaN(end) || program.startAt < end) &&
+        (start == null || isNaN(start) || program.endAt > start)
     );
 
     return {
-      hits: result.total,
-      programs: result.recorded.map(
-        ({
-          id,
-          channelType,
-          channelId,
-          name,
-          description = "",
-          genre1 = 15,
-          startAt,
-          endAt
-        }) => ({
-          id: String(id),
-          type: channelType,
-          channel: String(channelId),
-          channelName: (
-            channels.find(({ id }) => id === channelId) || { name: "" }
-          ).name,
-          title: name,
-          fullTitle: name,
-          detail: description,
-          category: categoryTable.find(({ code }) => code === genre1) || {
-            code: 15,
-            name: "etc"
-          },
-          duration: endAt - startAt,
-          start: new Date(startAt),
-          end: new Date(endAt),
-          preview: this.getUrl(`/api/recorded/${id}/thumbnail`),
-          stream: this.getUrl(
-            this.streamType === "raw"
-              ? `/api/recorded/${id}/file`
-              : `/api/streams/recorded/${id}/${this.streamType}?${this.streamParams}`
-          )
-        })
-      )
+      hits: programs.length,
+      programs: programs
+        .slice((page - 1) * view, page * view)
+        .map(
+          ({
+            id,
+            channelType,
+            channelId,
+            name,
+            description = "",
+            genre1 = 15,
+            startAt,
+            endAt
+          }) => ({
+            id: String(id),
+            type: channelType,
+            channel: String(channelId),
+            channelName: (
+              channels.find(({ id }) => id === channelId) || { name: "" }
+            ).name,
+            title: name,
+            fullTitle: name,
+            detail: description,
+            category: categoryTable.find(({ code }) => code === genre1) || {
+              code: 15,
+              name: "etc"
+            },
+            duration: endAt - startAt,
+            start: new Date(startAt),
+            end: new Date(endAt),
+            preview: this.getUrl(`/api/recorded/${id}/thumbnail`),
+            stream: this.getUrl(
+              this.streamType === "raw"
+                ? `/api/recorded/${id}/file`
+                : `/api/streams/recorded/${id}/${this.streamType}?${this.streamParams}`
+            )
+          })
+        )
     };
   }
 
