@@ -126,7 +126,7 @@ class Setup extends Component<Props> {
                       mobileStreamParams = "b:v=1M&b:a=128k&s=1280x720";
                     } else if (type === "epgstation") {
                       streamType = Platform.OS === "web" ? "raw" : "mp4";
-                      streamParams = Platform.OS === "web" ? "" : "0";
+                      streamParams = Platform.OS === "web" ? "" : "mode=0";
                       mobileStreamType = "mp4";
                       mobileStreamParams = "mode=0";
                     }
