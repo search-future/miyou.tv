@@ -69,7 +69,7 @@ class Player extends Component<Props> {
   seekable = true;
   dualMonoMode = "auto";
   pcrWraparound = true;
-  seekId?: number;
+  seekId?: number | null;
 
   render() {
     return (
@@ -638,6 +638,7 @@ class Player extends Component<Props> {
           const { dispatch } = this.props;
           this.command("loadfile", commandUrl, "replace", commandOptions);
           this.ss = ss;
+          this.seekId = null;
           dispatch(PlayerActions.play());
         }, 500);
       }
