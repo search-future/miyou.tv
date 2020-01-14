@@ -162,53 +162,58 @@ export default class EPGStationService extends BackendService {
       { params }
     );
 
-    const programs = result.recorded.filter(
+    const recorded = result.recorded.filter(
       program =>
         (type == null || program.channelType === type) &&
         (end == null || isNaN(end) || program.startAt < end) &&
         (start == null || isNaN(start) || program.endAt > start)
     );
 
-    return {
-      hits: programs.length,
-      programs: programs
-        .slice((page - 1) * view, page * view)
-        .map(
-          ({
-            id,
-            channelType,
-            channelId,
-            name,
-            description = "",
-            genre1 = 15,
-            startAt,
-            endAt
-          }) => ({
-            id: String(id),
-            type: channelType,
-            channel: String(channelId),
-            channelName: (
-              channels.find(({ id }) => id === channelId) || { name: "" }
-            ).name,
-            title: name,
-            fullTitle: name,
-            detail: description,
-            category: categoryTable.find(({ code }) => code === genre1) || {
-              code: 15,
-              name: "etc"
-            },
-            duration: endAt - startAt,
-            start: new Date(startAt),
-            end: new Date(endAt),
-            preview: this.getUrl(`/api/recorded/${id}/thumbnail`),
-            stream: this.getUrl(
-              this.streamType === "raw"
-                ? `/api/recorded/${id}/file`
-                : `/api/streams/recorded/${id}/${this.streamType}?${this.streamParams}`
-            )
-          })
+    const hits = recorded.length;
+    const programs = [];
+    const begin = (page - 1) * view;
+    let length = page * view;
+    if (length > recorded.length) {
+      length = recorded.length;
+    }
+    for (let i = begin; i < length; i++) {
+      const {
+        id,
+        channelType,
+        channelId,
+        name,
+        description = "",
+        genre1 = 15,
+        startAt,
+        endAt
+      } = recorded[i];
+      const { duration } = await this.request(`/api/recorded/${id}/duration`);
+      programs.push({
+        id: String(id),
+        type: channelType,
+        channel: String(channelId),
+        channelName: (
+          channels.find(({ id }) => id === channelId) || { name: "" }
+        ).name,
+        title: name,
+        fullTitle: name,
+        detail: description,
+        category: categoryTable.find(({ code }) => code === genre1) || {
+          code: 15,
+          name: "etc"
+        },
+        duration: duration * 1000,
+        start: new Date(startAt),
+        end: new Date(endAt),
+        preview: this.getUrl(`/api/recorded/${id}/thumbnail`),
+        stream: this.getUrl(
+          this.streamType === "raw"
+            ? `/api/recorded/${id}/file`
+            : `/api/streams/recorded/${id}/${this.streamType}?${this.streamParams}`
         )
-    };
+      });
+    }
+    return { hits, programs };
   }
 
   async getChannels({} = {}) {
