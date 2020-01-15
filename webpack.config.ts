@@ -30,7 +30,8 @@ const imageLoaderConfiguration: webpack.RuleSetRule = {
   use: {
     loader: "url-loader",
     options: {
-      name: "[name].[ext]"
+      name: "[name].[ext]",
+      esModule: false
     }
   }
 };

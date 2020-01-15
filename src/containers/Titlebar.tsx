@@ -67,6 +67,7 @@ class Titlebar extends Component<Props, State> {
               placeholderStyle={colorStyle.bgTransparent}
               style={styles.icon}
               source={require("../../assets/icon_16x16.png")}
+              resizeMode="center"
             />
           </View>
           {containerWidth > breakpoint && (
