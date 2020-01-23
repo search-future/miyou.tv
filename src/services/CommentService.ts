@@ -24,10 +24,7 @@ export default class CommentService {
 
   static normalizeChannel(channel: string) {
     return channel
-      .replace(
-        /[０-９Ａ-Ｚａ-ｚ：-？￥＄％-＊]/g,
-        (s: string): string => String.fromCharCode(s.charCodeAt(0) - 0xfee0)
-      )
+      .replace(/[！-～]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xfee0))
       .replace("　", " ")
       .replace("!", "")
       .replace(/^(NHK[^0-9 ]+[0-9 ]).*$/, "$1")
