@@ -56,7 +56,7 @@ class CommentChart extends Component<Props, State> {
       const x =
         ((interval.start - start + 60000 + delay) * containerWidth) / length;
       const y = containerHeight - (interval.n_hits * containerHeight) / max;
-      if (!isNaN(x) && !isNaN(y)) {
+      if (isFinite(x) && isFinite(y)) {
         path.push(`L ${x},${y}`);
       }
     }
@@ -95,7 +95,12 @@ class CommentChart extends Component<Props, State> {
             width={containerWidth}
             height={containerHeight}
           >
-            <Path fill="none" stroke={active} strokeWidth={2} d={path.join(" ")}></Path>
+            <Path
+              fill="none"
+              stroke={active}
+              strokeWidth={2}
+              d={path.join(" ")}
+            />
           </Svg>
         )}
         {containerWidth > 0 &&
@@ -108,27 +113,30 @@ class CommentChart extends Component<Props, State> {
             const time = start - commentPlayer.start + delay;
             const position = (time + 60000) / length;
             const left = position * containerWidth - 20;
-            return (
-              <Balloon
-                key={index}
-                wrapperStyle={[
-                  styles.balloonWrapper,
-                  {
-                    left
-                  }
-                ]}
-                containerStyle={styles.balloonContainer}
-                textStyle={styles.balloonText}
-                backgroundColor="#ffff33cc"
-                pointing="left"
-                onPress={() => {
-                  const { dispatch } = this.props;
-                  dispatch(PlayerActions.time(time));
-                }}
-              >
-                {n_hits}
-              </Balloon>
-            );
+            if (isFinite(left)) {
+              return (
+                <Balloon
+                  key={index}
+                  wrapperStyle={[
+                    styles.balloonWrapper,
+                    {
+                      left
+                    }
+                  ]}
+                  containerStyle={styles.balloonContainer}
+                  textStyle={styles.balloonText}
+                  backgroundColor="#ffff33cc"
+                  pointing="left"
+                  onPress={() => {
+                    const { dispatch } = this.props;
+                    dispatch(PlayerActions.time(time));
+                  }}
+                >
+                  {n_hits}
+                </Balloon>
+              );
+            }
+            return null;
           })}
       </View>
     );
