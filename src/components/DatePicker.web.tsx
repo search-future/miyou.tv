@@ -61,7 +61,11 @@ export default class DatePicker extends Component<Props> {
           max={maxDate && moment(maxDate).format("YYYY-MM-DD")}
           required
           onChange={({ target }) => {
-            const { value } = target;
+            const { value = new Date() } = this.props;
+            const [Y = "0", M = "0", D = "0"] = target.value.split("-");
+            value.setFullYear(parseInt(Y, 10));
+            value.setMonth(parseInt(M, 10) - 1);
+            value.setDate(parseInt(D, 10));
             onChange && onChange(new Date(value));
           }}
         />

@@ -49,13 +49,13 @@ export default class DatePicker extends Component<Props, State> {
     return (
       <View>
         <Button
-          containerStyle={[
+          containerStyle={StyleSheet.flatten([
             styles.container,
             containerStyle,
             {
               backgroundColor
             }
-          ]}
+          ])}
           buttonStyle={styles.button}
           titleStyle={[styles.title, { color }]}
           title={moment(value).format("YYYY/MM/DD")}
@@ -109,6 +109,6 @@ const styles = StyleSheet.create({
   },
   icon: {
     width: 32,
-    paddingHorizontal: 3,
+    paddingHorizontal: 3
   }
 });
