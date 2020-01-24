@@ -12,9 +12,12 @@ limitations under the License.
 */
 
 import { Store } from "redux";
-import { BackHandler } from "react-native";
+import { BackHandler, Platform } from "react-native";
 import { NavigationState, StackActions } from "react-navigation";
 import NetInfo from "@react-native-community/netinfo";
+import KeepAwake from "react-native-keep-awake";
+// @ts-ignore
+import { Immersive } from "react-native-immersive";
 
 import { NetworkActions } from "../../modules/network";
 import common from "./common";
@@ -38,6 +41,11 @@ export default function init(store: Store) {
       store.dispatch(NetworkActions.update(state));
     }
   });
+
+  if (Platform.OS === "android") {
+    Immersive.off();
+  }
+  KeepAwake.deactivate();
 
   common(store);
 }
