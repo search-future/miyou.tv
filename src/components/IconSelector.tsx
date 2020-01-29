@@ -65,6 +65,7 @@ export default class IconSelector extends Component<Props> {
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
+    backgroundColor: "#ffffff",
     flexDirection: "row"
   },
   iconWrapper: {
