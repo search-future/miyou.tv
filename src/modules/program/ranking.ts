@@ -188,7 +188,7 @@ export function* rankingSaga() {
     end.setMilliseconds(0);
     if (end.getTime() > maxDate.getTime()) {
       end.setTime(maxDate.getTime());
-      start.setDate(end.getDate() - parseInt(length, 10) + 1);
+      start.setDate(end.getDate() - parseInt(length, 10));
       if (start.getTime() < minDate.getTime()) {
         start.setTime(minDate.getTime());
       }
@@ -331,8 +331,8 @@ export function* rankingSaga() {
             commentMaxSpeedTime,
             rank
           });
+          yield put(ProgramActions.update("ranking", { programs }));
         }
-        yield put(ProgramActions.update("ranking", { programs }));
       }
     }
   } catch (e) {
