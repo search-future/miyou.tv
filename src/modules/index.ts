@@ -15,6 +15,7 @@ import { combineReducers } from "redux";
 import { all, fork } from "redux-saga/effects";
 
 import commentPlayerReducer, { commentPlayerSaga } from "./commentPlayer";
+import fileReducer, { fileSaga } from "./file";
 import loadingReducer from "./loading";
 import navReducer from "./nav";
 import networkReducer from "./network";
@@ -27,6 +28,7 @@ import windowReducer, { windowSaga } from "./window";
 
 const rootReducer = combineReducers({
   commentPlayer: commentPlayerReducer,
+  file: fileReducer,
   loading: loadingReducer,
   nav: navReducer,
   network: networkReducer,
@@ -42,6 +44,7 @@ export default rootReducer;
 export function* rootSaga() {
   yield all([
     fork(commentPlayerSaga),
+    fork(fileSaga),
     fork(programSaga),
     fork(serviceSaga),
     fork(viewerSaga),

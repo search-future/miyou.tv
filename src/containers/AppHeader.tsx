@@ -166,6 +166,13 @@ class AppHeader extends Component<Props, State> {
               style={[containerStyle.row, containerStyle.right, styles.right]}
             >
               <HeaderButton
+                title="ファイル"
+                icon={{ name: "folder-open" }}
+                onPress={() => {
+                  this.file();
+                }}
+              />
+              <HeaderButton
                 title="更新"
                 icon={{ name: "sync" }}
                 onPress={() => {
@@ -194,6 +201,19 @@ class AppHeader extends Component<Props, State> {
                   source={require("../../assets/icon_32x32.png")}
                 />
               )}
+              <TouchableOpacity
+                style={styles.iconButton}
+                onPress={() => {
+                  this.file();
+                }}
+              >
+                <FontAwesome5Icon
+                  name="folder-open"
+                  solid
+                  color={light}
+                  size={24}
+                />
+              </TouchableOpacity>
             </View>
             <View
               style={[containerStyle.row, containerStyle.center, styles.center]}
@@ -249,6 +269,14 @@ class AppHeader extends Component<Props, State> {
   setup() {
     const { dispatch } = this.props;
     dispatch(StackActions.push({ routeName: "Setup" }));
+  }
+
+  file() {
+    const { dispatch, nav } = this.props;
+    const current = searchNavRoute(nav, "File");
+    if (!current) {
+      dispatch(StackActions.push({ routeName: "File" }));
+    }
   }
 
   reload() {

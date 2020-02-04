@@ -15,6 +15,7 @@ import { createStackNavigator } from "react-navigation-stack";
 
 import MainNavigator from "./MainNavigator";
 import Setup from "../containers/Setup";
+import FileLoader from "../containers/FileLoader";
 import Viewer from "../containers/Viewer";
 
 const StackNavigator = createStackNavigator(
@@ -24,6 +25,9 @@ const StackNavigator = createStackNavigator(
     },
     Setup: {
       screen: Setup
+    },
+    File: {
+      screen: FileLoader
     },
     Viewer: {
       screen: Viewer
