@@ -187,7 +187,18 @@ export default class EPGStationService extends BackendService {
         startAt,
         endAt
       } = recorded[i];
-      const { duration } = await this.request(`/api/recorded/${id}/duration`);
+      let duration = 0;
+      try {
+        const result = await this.request(`/api/recorded/${id}/duration`, {
+          timeout: 1000,
+          cancelToken: new Axios.CancelToken(cancel => {
+            setTimeout(cancel, 1000);
+          })
+        });
+        duration = result.duration * 1000;
+      } catch (e) {
+        duration = endAt - startAt;
+      }
       programs.push({
         id: String(id),
         type: channelType,
@@ -202,7 +213,7 @@ export default class EPGStationService extends BackendService {
           code: 15,
           name: "etc"
         },
-        duration: duration * 1000,
+        duration,
         start: new Date(startAt),
         end: new Date(endAt),
         preview: this.getUrl(`/api/recorded/${id}/thumbnail`),
