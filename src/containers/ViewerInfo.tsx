@@ -55,14 +55,69 @@ class ProgramInfo extends Component<Props> {
 
     return (
       <ScrollView style={styles.container}>
-        {program && (
-          <Card
-            containerStyle={[colorStyle.bgDark, colorStyle.borderGrayDark]}
-            dividerStyle={colorStyle.bgGrayDark}
-            titleStyle={colorStyle.light}
-            title="番組情報"
-          >
-            <View>
+        {program &&
+          (program.type === "file" ? (
+            <Card
+              containerStyle={[colorStyle.bgDark, colorStyle.borderGrayDark]}
+              dividerStyle={colorStyle.bgGrayDark}
+              titleStyle={colorStyle.light}
+              title="ファイル情報"
+            >
+              <View style={[containerStyle.row, styles.cardRow]}>
+                <View style={styles.cardLabel}>
+                  <Text style={colorStyle.light}>ID</Text>
+                </View>
+                <View style={[containerStyle.row, styles.cardContent]}>
+                  <Text style={colorStyle.light}>{program.id}</Text>
+                </View>
+              </View>
+              <View style={[containerStyle.row, styles.cardRow]}>
+                <View style={styles.cardLabel}>
+                  <Text style={colorStyle.light}>ファイル名</Text>
+                </View>
+                <View style={[containerStyle.row, styles.cardContent]}>
+                  <Text style={colorStyle.light}>{program.fullTitle}</Text>
+                </View>
+              </View>
+              <View style={[containerStyle.row, styles.cardRow]}>
+                <View style={styles.cardLabel}>
+                  <Text style={colorStyle.light}>日時</Text>
+                </View>
+                <View style={[containerStyle.row, styles.cardContent]}>
+                  <Text style={colorStyle.light}>
+                    {dateFormatter.format(
+                      program.start,
+                      "YYYY/MM/DD A HHHH:mm"
+                    )}
+                  </Text>
+                </View>
+              </View>
+              <View style={[containerStyle.row, styles.cardRow]}>
+                <View style={styles.cardLabel}>
+                  <Text style={colorStyle.light}>チャンネル</Text>
+                </View>
+                <View style={[containerStyle.row, styles.cardContent]}>
+                  <Text style={colorStyle.light}>
+                    {program.channelName || "未設定"}
+                  </Text>
+                </View>
+              </View>
+              <View style={[containerStyle.row, styles.cardRow]}>
+                <View style={styles.cardLabel}>
+                  <Text style={colorStyle.light}>URI</Text>
+                </View>
+                <View style={[containerStyle.row, styles.cardContent]}>
+                  <Text style={colorStyle.light}>{program.stream}</Text>
+                </View>
+              </View>
+            </Card>
+          ) : (
+            <Card
+              containerStyle={[colorStyle.bgDark, colorStyle.borderGrayDark]}
+              dividerStyle={colorStyle.bgGrayDark}
+              titleStyle={colorStyle.light}
+              title="番組情報"
+            >
               <View style={[containerStyle.row, styles.cardRow]}>
                 <View style={[containerStyle.row, styles.cardContent]}>
                   <Text style={[textStyle.bold, colorStyle.light]}>
@@ -207,9 +262,8 @@ class ProgramInfo extends Component<Props> {
                   </View>
                 </View>
               )}
-            </View>
-          </Card>
-        )}
+            </Card>
+          ))}
         {extraProgram && (
           <Card
             containerStyle={[colorStyle.bgDark, colorStyle.borderGrayDark]}
@@ -217,58 +271,54 @@ class ProgramInfo extends Component<Props> {
             titleStyle={colorStyle.light}
             title="録画情報"
           >
-            <View>
-              <View style={[containerStyle.row, styles.cardRow]}>
-                <View style={styles.cardLabel}>
-                  <Text style={colorStyle.light}>ID</Text>
-                </View>
-                <View style={[containerStyle.row, styles.cardContent]}>
-                  <Text style={colorStyle.light}>{extraProgram.id}</Text>
-                </View>
+            <View style={[containerStyle.row, styles.cardRow]}>
+              <View style={styles.cardLabel}>
+                <Text style={colorStyle.light}>ID</Text>
               </View>
-              <View style={[containerStyle.row, styles.cardRow]}>
-                <View style={styles.cardLabel}>
-                  <Text style={colorStyle.light}>タイトル</Text>
-                </View>
-                <View style={[containerStyle.row, styles.cardContent]}>
-                  <Text style={colorStyle.light}>{extraProgram.fullTitle}</Text>
-                </View>
+              <View style={[containerStyle.row, styles.cardContent]}>
+                <Text style={colorStyle.light}>{extraProgram.id}</Text>
               </View>
-              <View style={[containerStyle.row, styles.cardRow]}>
-                <View style={styles.cardLabel}>
-                  <Text style={colorStyle.light}>チャンネル</Text>
-                </View>
-                <View style={[containerStyle.row, styles.cardContent]}>
-                  <Text style={colorStyle.light}>
-                    {extraProgram.channelName}
-                  </Text>
-                </View>
+            </View>
+            <View style={[containerStyle.row, styles.cardRow]}>
+              <View style={styles.cardLabel}>
+                <Text style={colorStyle.light}>タイトル</Text>
               </View>
-              <View style={[containerStyle.row, styles.cardRow]}>
-                <View style={styles.cardLabel}>
-                  <Text style={colorStyle.light}>開始日時</Text>
-                </View>
-                <View style={[containerStyle.row, styles.cardContent]}>
-                  <Text style={colorStyle.light}>
-                    {dateFormatter.format(
-                      new Date(extraProgram.start),
-                      "YYYY/MM/DD A HHHH:mm"
-                    )}
-                  </Text>
-                </View>
+              <View style={[containerStyle.row, styles.cardContent]}>
+                <Text style={colorStyle.light}>{extraProgram.fullTitle}</Text>
               </View>
-              <View style={[containerStyle.row, styles.cardRow]}>
-                <View style={styles.cardLabel}>
-                  <Text style={colorStyle.light}>終了日時</Text>
-                </View>
-                <View style={[containerStyle.row, styles.cardContent]}>
-                  <Text style={colorStyle.light}>
-                    {dateFormatter.format(
-                      new Date(extraProgram.end),
-                      "YYYY/MM/DD A HHHH:mm"
-                    )}
-                  </Text>
-                </View>
+            </View>
+            <View style={[containerStyle.row, styles.cardRow]}>
+              <View style={styles.cardLabel}>
+                <Text style={colorStyle.light}>チャンネル</Text>
+              </View>
+              <View style={[containerStyle.row, styles.cardContent]}>
+                <Text style={colorStyle.light}>{extraProgram.channelName}</Text>
+              </View>
+            </View>
+            <View style={[containerStyle.row, styles.cardRow]}>
+              <View style={styles.cardLabel}>
+                <Text style={colorStyle.light}>開始日時</Text>
+              </View>
+              <View style={[containerStyle.row, styles.cardContent]}>
+                <Text style={colorStyle.light}>
+                  {dateFormatter.format(
+                    new Date(extraProgram.start),
+                    "YYYY/MM/DD A HHHH:mm"
+                  )}
+                </Text>
+              </View>
+            </View>
+            <View style={[containerStyle.row, styles.cardRow]}>
+              <View style={styles.cardLabel}>
+                <Text style={colorStyle.light}>終了日時</Text>
+              </View>
+              <View style={[containerStyle.row, styles.cardContent]}>
+                <Text style={colorStyle.light}>
+                  {dateFormatter.format(
+                    new Date(extraProgram.end),
+                    "YYYY/MM/DD A HHHH:mm"
+                  )}
+                </Text>
               </View>
             </View>
           </Card>
