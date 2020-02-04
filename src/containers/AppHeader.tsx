@@ -267,8 +267,11 @@ class AppHeader extends Component<Props, State> {
   }
 
   setup() {
-    const { dispatch } = this.props;
-    dispatch(StackActions.push({ routeName: "Setup" }));
+    const { dispatch, nav } = this.props;
+    const current = searchNavRoute(nav, "Setup");
+    if (!current) {
+      dispatch(StackActions.push({ routeName: "Setup" }));
+    }
   }
 
   file() {
