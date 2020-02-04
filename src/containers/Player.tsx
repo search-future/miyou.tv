@@ -56,6 +56,7 @@ class Player extends Component<Props, State> {
     reset: false
   };
   preseek = 0;
+  seekable = false;
   seekId?: number;
 
   render() {
@@ -70,24 +71,33 @@ class Player extends Component<Props, State> {
     const { pause } = player;
     const { ss, reset } = this.state;
 
-    const recordedProgram = this.getRecorded();
-    let [uri, query] = recordedProgram.stream.split("?");
-    if (
-      network.type.indexOf("cell") >= 0 &&
-      (type === "chinachu" || type === "epgstation")
-    ) {
-      uri = uri.replace(/[^.]+$/, mobileStreamType);
-      query = mobileStreamParams;
-    }
-    if (type === "chinachu") {
-      uri = uri.replace(/m2ts$/, "mp4");
-    }
-
     if (reset) {
       return null;
     }
 
-    if (type === "chinachu" || type === "epgstation") {
+    const recordedProgram = this.getRecorded();
+    let [uri, query] = recordedProgram.stream.split("?");
+    if (recordedProgram.type !== "file") {
+      if (
+        network.type.indexOf("cell") >= 0 &&
+        (type === "chinachu" || type === "epgstation")
+      ) {
+        uri = uri.replace(/[^.]+$/, mobileStreamType);
+        query = mobileStreamParams;
+      }
+      if (type === "chinachu") {
+        uri = uri.replace(/m2ts$/, "mp4");
+      }
+    }
+
+    if (
+      type === "chinachu" ||
+      type === "epgstation" ||
+      recordedProgram.type === "file"
+    ) {
+      if (query || ss > 0) {
+        uri += `?${qs.stringify({ ...qs.parse(query), ss })}`;
+      }
       return (
         <VLCPlayer
           style={styles.video}
@@ -95,9 +105,7 @@ class Player extends Component<Props, State> {
           muted={mute}
           volume={parseInt(volume, 10)}
           initOptions={["--deinterlace=1", "--deinterlace-mode=discard"]}
-          source={{
-            uri: `${uri}?${qs.stringify({ ...qs.parse(query), ss })}`
-          }}
+          source={{ uri }}
           rate={parseFloat(speed)}
           ref={(vlc: VLCPlayer) => {
             this.vlc = vlc;
@@ -106,19 +114,37 @@ class Player extends Component<Props, State> {
             const { dispatch } = this.props;
             dispatch(PlayerActions.play());
           }}
-          onProgress={({ currentTime = 0 }: any) => {
+          onProgress={({
+            currentTime = 0,
+            duration = 0
+          }: {
+            currentTime: number;
+            duration: number;
+          }) => {
             if (this.seekId == null) {
               const { dispatch } = this.props;
-              const { ss } = this.state;
-              const { duration } = this.getRecorded();
-              const time = currentTime + ss * 1000;
-              dispatch(
-                PlayerActions.progress({
-                  duration,
-                  time,
-                  position: time / duration
-                })
-              );
+              if (duration > 0) {
+                this.seekable = true;
+                dispatch(
+                  PlayerActions.progress({
+                    duration,
+                    time: currentTime,
+                    position: currentTime / duration
+                  })
+                );
+              } else {
+                const { ss } = this.state;
+                const { duration } = this.getRecorded();
+                const time = currentTime + ss * 1000;
+                this.seekable = false;
+                dispatch(
+                  PlayerActions.progress({
+                    duration,
+                    time,
+                    position: time / duration
+                  })
+                );
+              }
             }
             if (this.preseek > 0) {
               this.time(this.preseek);
@@ -138,6 +164,9 @@ class Player extends Component<Props, State> {
         />
       );
     }
+    if (query) {
+      uri += `?${query}`;
+    }
     return (
       <Video
         style={styles.video}
@@ -146,12 +175,13 @@ class Player extends Component<Props, State> {
         rate={parseFloat(speed)}
         muted={mute}
         volume={parseInt(volume, 10) / 100}
-        source={{ uri: `${uri}?${query}`, type: "m3u8" } as any}
+        source={{ uri, type: "m3u8" } as any}
         ref={ref => {
           this.video = ref;
         }}
         onProgress={({ currentTime, seekableDuration }) => {
           const { dispatch } = this.props;
+          this.seekable = true;
           dispatch(
             PlayerActions.progress({
               duration: seekableDuration * 1000,
@@ -326,7 +356,13 @@ class Player extends Component<Props, State> {
   }
 
   time(time: number) {
-    if (this.vlc) {
+    if (this.seekable) {
+      if (this.vlc) {
+        this.vlc.seek(Math.floor(time / 1000));
+      } else if (this.video) {
+        this.video.seek(Math.floor(time / 1000));
+      }
+    } else {
       const { dispatch, player } = this.props;
       const { duration } = player;
       const position = time / duration;
@@ -342,8 +378,6 @@ class Player extends Component<Props, State> {
         dispatch(PlayerActions.play());
         delete this.seekId;
       }, 500);
-    } else if (this.video) {
-      this.video.seek(Math.floor(time / 1000));
     }
   }
 

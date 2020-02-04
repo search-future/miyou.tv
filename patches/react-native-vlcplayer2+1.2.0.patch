@@ -18,6 +18,29 @@ index f798a43..2dbbe91 100644
          versionCode 1
          versionName "1.0"
          ndk {
+diff --git a/node_modules/react-native-vlcplayer2/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerView.java b/node_modules/react-native-vlcplayer2/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerView.java
+index b40dfda..ce40b97 100644
+--- a/node_modules/react-native-vlcplayer2/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerView.java
++++ b/node_modules/react-native-vlcplayer2/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerView.java
+@@ -257,12 +257,12 @@ class ReactVlcPlayerView extends TextureView implements
+ 		*/
+             DisplayMetrics dm = getResources().getDisplayMetrics();
+             Media m = null;
+-            if(netStrTag){
+-                Uri uri = Uri.parse(this.src);
+-                m = new Media(libvlc, uri);
+-            }else{
+-                m = new Media(libvlc, this.src);
+-            }
++            // if(netStrTag){
++            Uri uri = Uri.parse(this.src);
++            m = new Media(libvlc, uri);
++            // }else{
++            //    m = new Media(libvlc, this.src);
++            // }
+             m.setEventListener(mMediaListener);
+
+             m.addOption(":rtsp-tcp");
 diff --git a/node_modules/react-native-vlcplayer2/ios/RCTVLCPlayer/RCTVLCPlayer.m b/node_modules/react-native-vlcplayer2/ios/RCTVLCPlayer/RCTVLCPlayer.m
 index eaeb530..30720e7 100644
 --- a/node_modules/react-native-vlcplayer2/ios/RCTVLCPlayer/RCTVLCPlayer.m

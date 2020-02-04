@@ -547,7 +547,11 @@ class Player extends Component<Props> {
       for (const name in this.options) {
         options.push(`${name}=${this.options[name]}`);
       }
-      this.command("loadfile", `${uri}?${query}`, "replace", options.join(","));
+
+      if (query) {
+        uri += `?${query}`;
+      }
+      this.command("loadfile", uri, "replace", options.join(","));
       this.ss = 0;
       dispatch(PlayerActions.play());
     }
@@ -587,7 +591,7 @@ class Player extends Component<Props> {
   }
 
   end() {
-    const { dispatch, setting } = this.props;
+    const { setting } = this.props;
     const { player = {} } = setting;
     const { repeat = "continue" } = player;
     switch (repeat) {
