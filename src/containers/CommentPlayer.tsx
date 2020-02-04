@@ -217,7 +217,17 @@ class CommentPlayer extends Component<Props, State> {
     let { pointer } = commentPlayer;
     let hasUpdate = false;
 
-    if (player.time < this.time) {
+    if (commentPlayer.start === commentPlayer.end) {
+      if (player.duration > 0) {
+        dispatch(
+          CommentPlayerActions.init(
+            commentPlayer.channel,
+            commentPlayer.start,
+            commentPlayer.end + player.duration
+          )
+        );
+      }
+    } else if (player.time < this.time) {
       this.time = player.time;
       for (const comment of comments) {
         comment.active = false;
