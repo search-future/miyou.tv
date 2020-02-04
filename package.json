@@ -26,6 +26,7 @@
     "react-native": "^0.61.5",
     "react-native-document-picker": "^3.2.4",
     "react-native-elements": "^1.2.7",
+    "react-native-file-picker": "^0.0.19",
     "react-native-gesture-handler": "^1.5.3",
     "react-native-immersive": "^2.0.0",
     "react-native-keep-awake": "^4.0.0",
