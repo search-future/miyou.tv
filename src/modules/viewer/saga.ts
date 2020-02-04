@@ -32,7 +32,7 @@ function* openSaga() {
 }
 
 function* closeSaga() {
-  yield put(StackActions.popToTop({}));
+  yield put(StackActions.pop({}));
 }
 
 function* searchSaga(action: AnyAction) {
