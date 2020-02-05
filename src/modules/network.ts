@@ -12,9 +12,10 @@ limitations under the License.
 */
 
 import { AnyAction } from "redux";
+import { NetInfoState } from "@react-native-community/netinfo";
 
 export const NETWORK_UPDATE = "NETWORK_UPDATE";
-function update(info: NetworkState) {
+function update(info: NetInfoState) {
   return {
     type: NETWORK_UPDATE,
     info

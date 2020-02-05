@@ -15,11 +15,7 @@ import { all, put, select, takeLatest } from "redux-saga/effects";
 import { AnyAction } from "redux";
 import { NavigationActions, StackActions } from "react-navigation";
 
-import {
-  VIEWER_OPEN,
-  VIEWER_CLOSE,
-  VIEWER_SEARCH
-} from "./actions";
+import { VIEWER_OPEN, VIEWER_CLOSE, VIEWER_SEARCH } from "./actions";
 import { ProgramActions } from "../program";
 import searchNavRoute from "../../utils/searchNavRoute";
 

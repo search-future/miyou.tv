@@ -31,7 +31,6 @@ export {
   VIEWER_DOCK,
   VIEWER_UNDOCK,
   VIEWER_SEARCH,
-  VIEWER_SETTING,
   VIEWER_RESIZE,
   VIEWER_UPDATE,
   ViewerProgram,
@@ -61,7 +60,7 @@ const initialState: ViewerState = {
   stacking: false,
   playing: false,
   peakPlay: false,
-  control: true,
+  control: true
 };
 export default function viewerReducer(state = initialState, action: AnyAction) {
   switch (action.type) {

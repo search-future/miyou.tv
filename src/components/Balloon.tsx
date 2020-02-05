@@ -19,7 +19,7 @@ import {
   ViewStyle,
   StyleSheet,
   StyleProp,
-  TextStyle,
+  TextStyle
 } from "react-native";
 import { Text } from "react-native-elements";
 
@@ -65,7 +65,7 @@ export default class Balloon extends Component<Props> {
       >
         <View style={[styles.container, { backgroundColor }, containerStyle]}>
           <Text
-            style={[styles.text, { color }, textStyle]}
+            style={StyleSheet.flatten([styles.text, { color }, textStyle])}
             children={children}
           />
         </View>

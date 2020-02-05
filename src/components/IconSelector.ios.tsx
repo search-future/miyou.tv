@@ -68,7 +68,7 @@ export default class IconSelector extends Component<Props> {
             );
           }}
         >
-          <Text style={[{ color }, itemStyle]}>
+          <Text style={StyleSheet.flatten([{ color }, itemStyle])}>
             {selected ? selected.label : selectedValue}
           </Text>
         </TouchableOpacity>
