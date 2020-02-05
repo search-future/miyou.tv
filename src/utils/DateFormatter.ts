@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import moment from "moment";
+import moment from "../utils/moment-with-locale";
 
 export default class DateFormatter {
   hourFirst: number;

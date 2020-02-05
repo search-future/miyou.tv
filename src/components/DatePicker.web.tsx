@@ -14,7 +14,8 @@ limitations under the License.
 import React, { Component, CSSProperties } from "react";
 import { View, ViewStyle, StyleSheet, StyleProp } from "react-native";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
-import moment from "moment";
+
+import moment from "../utils/moment-with-locale";
 
 type Props = {
   value?: Date;

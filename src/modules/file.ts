@@ -23,12 +23,12 @@ import {
 } from "redux-saga/effects";
 import { Platform } from "react-native";
 import { NavigationState, StackActions } from "react-navigation";
-import moment from "moment";
 
 import { SettingState } from "./setting";
 import { ServiceState, COMMENT_READY } from "./service";
 import { Program } from "../services/BackendService";
 import searchNavRoute from "../utils/searchNavRoute";
+import moment from "../utils/moment-with-locale";
 
 export const FILE_ADD = "FILE_ADD";
 function add(uris: string[]) {

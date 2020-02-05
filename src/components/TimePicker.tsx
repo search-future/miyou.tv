@@ -16,7 +16,8 @@ import { View, ViewStyle, StyleSheet, StyleProp } from "react-native";
 import { Button } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import DateTimePicker from "react-native-modal-datetime-picker";
-import moment from "moment";
+
+import moment from "../utils/moment-with-locale";
 
 type Props = {
   value?: Date;
