@@ -278,12 +278,15 @@ export function* rankingSaga() {
               useArchive
             })
           );
+
           program = programs.find(
             ({ start, end }) =>
               start.getTime() <= interval.start + 60000 &&
               end.getTime() > interval.start
           );
           if (program != null) {
+            const minutes =
+              (program.end.getTime() - program.start.getTime()) / 60000;
             let commentCount = 0;
             try {
               const {
@@ -314,7 +317,7 @@ export function* rankingSaga() {
               commentCount = 0;
             }
             program.commentCount = commentCount;
-            program.commentSpeed = (commentCount * 60000) / program.duration;
+            program.commentSpeed = commentCount / minutes;
           }
         }
         if (program != null) {
@@ -331,7 +334,9 @@ export function* rankingSaga() {
             commentMaxSpeedTime,
             rank
           });
-          yield put(ProgramActions.update("ranking", { programs }));
+          yield put(
+            ProgramActions.update("ranking", { programs: [...programs] })
+          );
         }
       }
     }

@@ -80,7 +80,7 @@ export function* listSaga() {
     );
     const { hits } = result;
     const programs: ProgramListProgram[] = result.programs;
-    yield put(ProgramActions.update("list", { hits, programs }));
+    yield put(ProgramActions.update("list", { hits, programs: [...programs] }));
 
     const { commentActive }: ServiceState = yield select(
       ({ service }) => service
@@ -122,15 +122,17 @@ export function* listSaga() {
         const { n_hits, intervals } = result;
         program.commentCount = n_hits;
         if (n_hits > 0) {
+          const minutes =
+            (program.end.getTime() - program.start.getTime()) / 60000;
           intervals.sort((a, b) => b.n_hits - a.n_hits);
           const [maxInterval] = intervals;
-          program.commentSpeed = (n_hits * 60000) / program.duration;
+          program.commentSpeed = program.commentCount / minutes;
           program.commentMaxSpeed = maxInterval && maxInterval.n_hits;
           program.commentMaxSpeedTime =
             maxInterval && new Date(maxInterval.start);
         }
       }
-      yield put(ProgramActions.update("list", { programs }));
+      yield put(ProgramActions.update("list", { programs: [...programs] }));
     }
   } catch (e) {
     Toast.show(e.message || JSON.stringify(e, null, 2), {

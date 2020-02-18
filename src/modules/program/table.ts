@@ -199,7 +199,7 @@ export function* tableSaga() {
         );
       }
     }
-    yield put(ProgramActions.update("table", { columns }));
+    yield put(ProgramActions.update("table", { columns: [...columns] }));
 
     const { commentActive }: ServiceState = yield select(
       ({ service }) => service
@@ -239,9 +239,9 @@ export function* tableSaga() {
         );
         if (result.n_hits > 0) {
           column.programs = column.programs.map(program => {
-            const minutes = program.duration / 60000;
             const start = program.start.getTime();
             const end = program.end.getTime();
+            const minutes = (end - start) / 60000;
             const intervals = result.intervals.filter(
               a => a.start >= start && a.start < end
             );
@@ -251,6 +251,7 @@ export function* tableSaga() {
               .map(({ n_hits }) => n_hits)
               .reduce((a, b) => a + b, 0);
             const commentSpeed = commentCount / minutes;
+
             const commentMaxSpeed = maxInterval && maxInterval.n_hits;
             const commentMaxSpeedTime =
               maxInterval && new Date(maxInterval.start);
@@ -265,7 +266,10 @@ export function* tableSaga() {
         }
       }
       yield put(
-        ProgramActions.update("table", { columns, start: new Date(start) })
+        ProgramActions.update("table", {
+          columns: [...columns],
+          start: new Date(start)
+        })
       );
     }
   } catch (e) {
