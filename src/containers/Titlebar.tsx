@@ -11,175 +11,152 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
-import { TouchableOpacity, View, StyleSheet, Platform } from "react-native";
+import React, { memo, useState, useEffect, useCallback, useRef } from "react";
+import {
+  TouchableOpacity,
+  View,
+  StyleSheet,
+  LayoutChangeEvent
+} from "react-native";
 import { Image, Text } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import colorStyle, { active, black, dark, light } from "../styles/color";
 import containerStyle from "../styles/container";
-import { WindowActions, WindowState } from "../modules/window";
+import { RootState } from "../modules";
+import { WindowActions } from "../modules/window";
 import { appName } from "../config/constants";
 
-type Props = {
-  dispatch: Dispatch;
-  window: WindowState;
-};
-type State = {
-  containerWidth: number;
-};
-class Titlebar extends Component<Props, State> {
-  state = {
-    containerWidth: 0
-  };
-  layoutCallbackId?: number;
+const Titlebar = memo(() => {
+  const layoutCallbackId = useRef<number>();
 
-  render() {
-    const { window } = this.props;
-    const { containerWidth } = this.state;
-    const { alwaysOnTop, fullScreen, maximized, title } = window;
-    if (Platform.OS !== "web" || fullScreen) {
-      return null;
+  const dispatch = useDispatch();
+  const alwaysOnTop = useSelector<RootState, boolean>(
+    ({ window }) => window.alwaysOnTop
+  );
+  const fullScreen = useSelector<RootState, boolean>(
+    ({ window }) => window.fullScreen
+  );
+  const maximized = useSelector<RootState, boolean>(
+    ({ window }) => window.maximized
+  );
+  const title = useSelector<RootState, string>(({ window }) => window.title);
+
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  useEffect(
+    () => () => {
+      clearTimeout(layoutCallbackId.current);
+    },
+    []
+  );
+
+  const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
+    if (layoutCallbackId.current != null) {
+      clearTimeout(layoutCallbackId.current);
     }
-    return (
-      <div className="titlebar">
-        <style>{cssStyles}</style>
+    const { layout } = nativeEvent;
+    const containerWidth = layout.width;
+    layoutCallbackId.current = setTimeout(() => {
+      setContainerWidth(containerWidth);
+    }, 200);
+  }, []);
+  const toggleAlwaysOnTop = useCallback(() => {
+    dispatch(WindowActions.setAlwaysOnTop(!alwaysOnTop));
+  }, [alwaysOnTop]);
+  const minimize = useCallback(() => {
+    dispatch(WindowActions.minimize());
+  }, []);
+  const restore = useCallback(() => {
+    dispatch(WindowActions.restore());
+  }, []);
+  const maximize = useCallback(() => {
+    dispatch(WindowActions.maximize());
+  }, []);
+  const toggleFullScreen = useCallback(() => {
+    dispatch(WindowActions.setFullScreen(!fullScreen));
+  }, [fullScreen]);
+  const close = useCallback(() => {
+    dispatch(WindowActions.close());
+  }, []);
+
+  if (fullScreen) {
+    return null;
+  }
+  return (
+    <div className="titlebar">
+      <style>{cssStyles}</style>
+      <View
+        style={[containerStyle.row, colorStyle.bgBlack]}
+        onLayout={onLayout}
+      >
         <View
-          style={[containerStyle.row, colorStyle.bgBlack]}
-          onLayout={({ nativeEvent }) => {
-            if (this.layoutCallbackId != null) {
-              clearTimeout(this.layoutCallbackId);
-            }
-            const { layout } = nativeEvent;
-            const containerWidth = layout.width;
-            this.layoutCallbackId = setTimeout(() => {
-              this.setState({ containerWidth });
-            }, 200);
-          }}
+          style={[styles.contents, containerStyle.row, containerStyle.left]}
         >
-          <View
-            style={[styles.contents, containerStyle.row, containerStyle.left]}
-          >
-            <Image
-              containerStyle={styles.iconContainer}
-              placeholderStyle={colorStyle.bgTransparent}
-              style={styles.icon}
-              source={require("../../assets/icon_16x16.png")}
-              resizeMode="center"
-            />
-          </View>
-          {containerWidth > breakpoint && (
-            <View
-              style={[
-                styles.contents,
-                containerStyle.row,
-                containerStyle.center
-              ]}
-            >
-              <Text style={[colorStyle.light, styles.title]}>
-                {title || appName}
-              </Text>
-            </View>
-          )}
-          <View
-            style={[styles.contents, containerStyle.row, containerStyle.right]}
-          >
-            <div className="button">
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => {
-                  const { dispatch, window } = this.props;
-                  const { alwaysOnTop } = window;
-                  dispatch(WindowActions.setAlwaysOnTop(!alwaysOnTop));
-                }}
-              >
-                <FontAwesome5Icon
-                  name="thumbtack"
-                  solid
-                  color={alwaysOnTop ? active : light}
-                />
-              </TouchableOpacity>
-            </div>
-            <div className="button">
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => {
-                  const { dispatch } = this.props;
-                  dispatch(WindowActions.minimize());
-                }}
-              >
-                <FontAwesome5Icon name="window-minimize" solid color={light} />
-              </TouchableOpacity>
-            </div>
-
-            {maximized ? (
-              <div className="button">
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    const { dispatch } = this.props;
-                    dispatch(WindowActions.restore());
-                  }}
-                >
-                  <FontAwesome5Icon name="window-restore" solid color={light} />
-                </TouchableOpacity>
-              </div>
-            ) : (
-              <div className="button">
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    const { dispatch } = this.props;
-                    dispatch(WindowActions.maximize());
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name="window-maximize"
-                    solid
-                    color={light}
-                  />
-                </TouchableOpacity>
-              </div>
-            )}
-            <div className="button">
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => {
-                  const { dispatch, window } = this.props;
-                  const { fullScreen } = window;
-                  dispatch(WindowActions.setFullScreen(!fullScreen));
-                }}
-              >
-                <FontAwesome5Icon name="square-full" solid color={light} />
-              </TouchableOpacity>
-            </div>
-            <div className="button close">
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => {
-                  const { dispatch } = this.props;
-                  dispatch(WindowActions.close());
-                }}
-              >
-                <FontAwesome5Icon name="times" solid color={light} />
-              </TouchableOpacity>
-            </div>
-          </View>
+          <Image
+            containerStyle={styles.iconContainer}
+            placeholderStyle={colorStyle.bgTransparent}
+            style={styles.icon}
+            source={require("../../assets/icon_16x16.png")}
+            resizeMode="center"
+          />
         </View>
-      </div>
-    );
-  }
-
-  componentWillUnmount() {
-    clearTimeout(this.layoutCallbackId);
-  }
-}
-
-export default connect(({ window }: { window: WindowState }) => ({ window }))(
-  Titlebar
-);
+        {containerWidth > breakpoint && (
+          <View
+            style={[styles.contents, containerStyle.row, containerStyle.center]}
+          >
+            <Text style={[colorStyle.light, styles.title]}>
+              {title || appName}
+            </Text>
+          </View>
+        )}
+        <View
+          style={[styles.contents, containerStyle.row, containerStyle.right]}
+        >
+          <div className="button">
+            <TouchableOpacity style={styles.button} onPress={toggleAlwaysOnTop}>
+              <FontAwesome5Icon
+                name="thumbtack"
+                solid
+                color={alwaysOnTop ? active : light}
+              />
+            </TouchableOpacity>
+          </div>
+          <div className="button">
+            <TouchableOpacity style={styles.button} onPress={minimize}>
+              <FontAwesome5Icon name="window-minimize" solid color={light} />
+            </TouchableOpacity>
+          </div>
+          {maximized ? (
+            <div className="button">
+              <TouchableOpacity style={styles.button} onPress={restore}>
+                <FontAwesome5Icon name="window-restore" solid color={light} />
+              </TouchableOpacity>
+            </div>
+          ) : (
+            <div className="button">
+              <TouchableOpacity style={styles.button} onPress={maximize}>
+                <FontAwesome5Icon name="window-maximize" solid color={light} />
+              </TouchableOpacity>
+            </div>
+          )}
+          <div className="button">
+            <TouchableOpacity style={styles.button} onPress={toggleFullScreen}>
+              <FontAwesome5Icon name="square-full" solid color={light} />
+            </TouchableOpacity>
+          </div>
+          <div className="button close">
+            <TouchableOpacity style={styles.button} onPress={close}>
+              <FontAwesome5Icon name="times" solid color={light} />
+            </TouchableOpacity>
+          </div>
+        </View>
+      </View>
+    </div>
+  );
+});
+export default Titlebar;
 
 const breakpoint = 768;
 const styles = StyleSheet.create({
