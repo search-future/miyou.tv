@@ -11,22 +11,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
+import React from "react";
 import { StyleSheet } from "react-native";
 import { Image } from "react-native-elements";
 
-type Props = {};
-export default class Splash extends Component<Props> {
-  render() {
-    return (
-      <Image
-        style={styles.image}
-        source={require("../../assets/splash_screen.png")}
-        resizeMode="cover"
-      />
-    );
-  }
-}
+const Splash = () => (
+  <Image
+    style={styles.image}
+    source={require("../../assets/splash_screen.png")}
+    resizeMode="cover"
+  />
+);
+export default Splash;
 
 const styles = StyleSheet.create({
   image: {

@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
+import React from "react";
 import {
   Picker,
   View,
@@ -28,39 +28,38 @@ type Props = {
   itemStyle?: StyleProp<TextStyle>;
   color?: string;
   icon?: IconObject;
-  items?: { label: string; value: any }[];
-  selectedValue?: any;
+  items?: { label: string; value: number | string }[];
+  selectedValue?: number | string;
   onValueChange?: (value: number | string) => void;
 };
-export default class IconSelector extends Component<Props> {
-  render() {
-    const {
-      containerStyle,
-      color,
-      style,
-      itemStyle,
-      icon,
-      items = [],
-      selectedValue,
-      onValueChange
-    } = this.props;
-    return (
-      <View style={[styles.container, containerStyle]}>
-        <View style={styles.iconWrapper}>{icon}</View>
-        <Picker
-          style={[{ color } as ViewStyle, styles.picker, style]}
-          itemStyle={itemStyle}
-          selectedValue={selectedValue}
-          onValueChange={onValueChange}
-        >
-          {items.map(({ label, value }, index) => (
-            <Picker.Item key={index} label={label} value={value} />
-          ))}
-        </Picker>
-      </View>
-    );
-  }
-}
+const IconSelector = ({
+  containerStyle,
+  color,
+  style,
+  itemStyle,
+  icon,
+  items = [],
+  selectedValue,
+  onValueChange
+}: Props) => (
+  <View style={[styles.container, containerStyle]}>
+    <View style={styles.iconWrapper}>{icon}</View>
+    <Picker
+      style={[{ color }, styles.picker, style]}
+      itemStyle={itemStyle}
+      selectedValue={selectedValue}
+      onValueChange={onValueChange}
+    >
+      {items.map(itemRenderer)}
+    </Picker>
+  </View>
+);
+export default IconSelector;
+
+const itemRenderer = (
+  { label, value }: { label: string; value: number | string },
+  index: number
+) => <Picker.Item key={index} label={label} value={value} />;
 
 const styles = StyleSheet.create({
   container: {

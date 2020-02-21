@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component, CSSProperties } from "react";
+import React, { CSSProperties, ChangeEvent, useCallback, useMemo } from "react";
 import { View, ViewStyle, StyleSheet, StyleProp } from "react-native";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 
@@ -26,55 +26,64 @@ type Props = {
   color?: string;
   backgroundColor?: string;
 };
-export default class TimePicker extends Component<Props> {
-  render() {
-    const {
-      containerStyle,
-      color = "#000000",
-      backgroundColor = "#ffffff",
-      value = new Date(),
-      minDate,
-      maxDate,
-      onChange
-    } = this.props;
-    return (
-      <View
-        style={[
-          styles.container,
-          containerStyle,
-          {
-            backgroundColor
-          }
-        ]}
-      >
-        <View style={styles.iconWrapper}>
-          <FontAwesome5Icon name="clock" solid color={color} />
-        </View>
+const TimePicker = ({
+  containerStyle,
+  color = "#000000",
+  backgroundColor = "#ffffff",
+  value = new Date(),
+  minDate,
+  maxDate,
+  onChange
+}: Props) => {
+  const inputValue = useMemo(() => moment(value).format("HH:mm"), [value]);
+  const inputMin = useMemo(() => minDate && moment(minDate).format("HH:mm"), [
+    minDate
+  ]);
+  const inputMax = useMemo(() => maxDate && moment(maxDate).format("HH:mm"), [
+    maxDate
+  ]);
+  const onInputChange = useCallback(
+    ({ target }: ChangeEvent<HTMLInputElement>) => {
+      if (onChange) {
+        const [h = "0", m = "0", s = "0"] = target.value.split(":");
+        value.setHours(parseInt(h, 10));
+        value.setMinutes(parseInt(m, 10));
+        value.setSeconds(parseInt(s, 10));
+        onChange(new Date(value));
+      }
+    },
+    [onChange]
+  );
 
-        <input
-          style={{
-            ...inputStyle,
-            color
-          }}
-          type="time"
-          step=""
-          value={moment(value).format("HH:mm")}
-          min={minDate && moment(minDate).format("HH:mm")}
-          max={maxDate && moment(maxDate).format("HH:mm")}
-          required
-          onChange={({ target }) => {
-            const { value = new Date() } = this.props;
-            const [h = "0", m = "0", s = "0"] = target.value.split(":");
-            value.setHours(parseInt(h, 10));
-            value.setMinutes(parseInt(m, 10));
-            value.setSeconds(parseInt(s, 10));
-            onChange && onChange(value);
-          }}
-        />
+  return (
+    <View
+      style={[
+        styles.container,
+        containerStyle,
+        {
+          backgroundColor
+        }
+      ]}
+    >
+      <View style={styles.iconWrapper}>
+        <FontAwesome5Icon name="clock" solid color={color} />
       </View>
-    );
-  }
-}
+      <input
+        style={{
+          ...inputStyle,
+          color
+        }}
+        type="time"
+        value={inputValue}
+        min={inputMin}
+        max={inputMax}
+        required
+        onChange={onInputChange}
+      />
+    </View>
+  );
+};
+export default TimePicker;
 
 const styles = StyleSheet.create({
   container: {

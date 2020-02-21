@@ -11,11 +11,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
+import React, { useMemo, PropsWithChildren } from "react";
 import {
   TouchableOpacity,
   TouchableOpacityProps,
   View,
+  ViewProps,
   ViewStyle,
   StyleSheet,
   StyleProp,
@@ -23,29 +24,30 @@ import {
 } from "react-native";
 import { Text } from "react-native-elements";
 
-type Props = {
-  color?: string;
-  backgroundColor?: string;
-  pointing?: "left" | "right" | "center";
-  wrapperStyle?: StyleProp<ViewStyle>;
-  containerStyle?: StyleProp<ViewStyle>;
-  triangleStyle?: StyleProp<ViewStyle>;
-  textStyle?: StyleProp<TextStyle>;
-} & TouchableOpacityProps;
-export default class Balloon extends Component<Props> {
-  render() {
-    const {
-      children,
-      color = "#000000",
-      backgroundColor = "#ffff00",
-      pointing,
-      wrapperStyle,
-      containerStyle,
-      triangleStyle,
-      textStyle,
-      onPress,
-      onLongPress
-    } = this.props;
+type Props = PropsWithChildren<
+  {
+    color?: string;
+    backgroundColor?: string;
+    pointing?: "left" | "right" | "center";
+    wrapperStyle?: StyleProp<ViewStyle>;
+    containerStyle?: StyleProp<ViewStyle>;
+    triangleStyle?: StyleProp<ViewStyle>;
+    textStyle?: StyleProp<TextStyle>;
+  } & TouchableOpacityProps
+>;
+const Balloon = ({
+  children,
+  color = "#000000",
+  backgroundColor = "#ffff00",
+  pointing,
+  wrapperStyle,
+  containerStyle,
+  triangleStyle,
+  textStyle,
+  onPress,
+  onLongPress
+}: Props) => {
+  const pointingStyle = useMemo(() => {
     const pointingStyle: StyleProp<ViewStyle> = {
       borderTopColor: backgroundColor
     };
@@ -56,24 +58,41 @@ export default class Balloon extends Component<Props> {
       pointingStyle.borderLeftWidth = 8;
       pointingStyle.borderRightWidth = 0;
     }
-    const Wrapper: any = onPress || onLongPress ? TouchableOpacity : View;
-    return (
-      <Wrapper
-        style={[styles.wrapper, wrapperStyle]}
-        onPress={onPress}
-        onLongPress={onLongPress}
-      >
-        <View style={[styles.container, { backgroundColor }, containerStyle]}>
-          <Text
-            style={StyleSheet.flatten([styles.text, { color }, textStyle])}
-            children={children}
-          />
-        </View>
-        <View style={[styles.triangle, pointingStyle, triangleStyle]} />
-      </Wrapper>
-    );
-  }
-}
+    return pointingStyle;
+  }, [pointing]);
+  const Wrapper = useMemo(
+    () => (props: PropsWithChildren<TouchableOpacityProps | ViewProps>) =>
+      onPress || onLongPress ? (
+        <TouchableOpacity {...props} />
+      ) : (
+        <View {...props} />
+      ),
+    [onPress, onLongPress]
+  );
+
+  return (
+    <Wrapper
+      style={[styles.wrapper, wrapperStyle]}
+      onPress={onPress}
+      onLongPress={onLongPress}
+    >
+      <View style={[styles.container, { backgroundColor }, containerStyle]}>
+        <Text
+          style={StyleSheet.flatten([styles.text, { color }, textStyle])}
+          children={children}
+        />
+      </View>
+      <View
+        style={StyleSheet.flatten([
+          styles.triangle,
+          pointingStyle,
+          triangleStyle
+        ])}
+      />
+    </Wrapper>
+  );
+};
+export default Balloon;
 
 const styles = StyleSheet.create({
   wrapper: {

@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
+import React, { useCallback } from "react";
 import {
   View,
   ViewStyle,
@@ -29,53 +29,51 @@ type Props = {
   itemStyle?: StyleProp<TextStyle>;
   color?: string;
   icon?: IconObject;
-  items?: { label: string; value: any }[];
-  selectedValue?: any;
+  items?: { label: string; value: number | string }[];
+  selectedValue?: number | string;
   onValueChange?: (value: number | string) => void;
 };
-export default class IconSelector extends Component<Props> {
-  render() {
-    const {
-      containerStyle,
-      style,
-      itemStyle,
-      color,
-      icon,
-      items = [],
-      selectedValue
-    } = this.props;
-    const selected = items.find(({ value }) => value === selectedValue);
-    return (
-      <View style={[styles.container, containerStyle]}>
-        <View style={styles.iconWrapper}>{icon}</View>
-        <TouchableOpacity
-          style={[styles.button, style]}
-          onPress={() => {
-            const { items = [] } = this.props;
-            const options = items.map(({ label }) => label);
-            options.push("キャンセル");
-            ActionSheetIOS.showActionSheetWithOptions(
-              {
-                options,
-                cancelButtonIndex: options.length - 1
-              },
-              index => {
-                const { items = [], onValueChange } = this.props;
-                if (onValueChange && items[index]) {
-                  onValueChange(items[index].value);
-                }
-              }
-            );
-          }}
-        >
-          <Text style={StyleSheet.flatten([{ color }, itemStyle])}>
-            {selected ? selected.label : selectedValue}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-}
+const IconSelector = ({
+  containerStyle,
+  style,
+  itemStyle,
+  color,
+  icon,
+  items = [],
+  selectedValue,
+  onValueChange
+}: Props) => {
+  const selected = items.find(({ value }) => value === selectedValue);
+  const onPress = useCallback(() => {
+    if (onValueChange) {
+      const options = items.map(({ label }) => label);
+      options.push("キャンセル");
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options,
+          cancelButtonIndex: options.length - 1
+        },
+        (index: number) => {
+          if (items[index]) {
+            onValueChange(items[index].value);
+          }
+        }
+      );
+    }
+  }, [items, onValueChange]);
+
+  return (
+    <View style={[styles.container, containerStyle]}>
+      <View style={styles.iconWrapper}>{icon}</View>
+      <TouchableOpacity style={[styles.button, style]} onPress={onPress}>
+        <Text style={StyleSheet.flatten([{ color }, itemStyle])}>
+          {selected ? selected.label : selectedValue}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+export default IconSelector;
 
 const styles = StyleSheet.create({
   container: {

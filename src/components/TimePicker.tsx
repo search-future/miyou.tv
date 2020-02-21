@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { View, ViewStyle, StyleSheet, StyleProp } from "react-native";
 import { Button } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
@@ -28,72 +28,67 @@ type Props = {
   color?: string;
   backgroundColor?: string;
 };
-type State = {
-  isVisible: boolean;
-};
-export default class TimePicker extends Component<Props, State> {
-  state = {
-    isVisible: false
-  };
+const TimePicker = ({
+  containerStyle = StyleSheet.create({}),
+  color = "#000000",
+  backgroundColor = "#ffffff",
+  value = new Date(),
+  minDate,
+  maxDate,
+  onChange
+}: Props) => {
+  const [visible, setVisible] = useState(false);
+  const title = useMemo(() => moment(value).format("HH:mm"), [value]);
+  const onPress = useCallback(() => {
+    setVisible(true);
+  }, []);
+  const onConfirm = useCallback(
+    (date: Date) => {
+      setVisible(false);
+      onChange && onChange(date);
+    },
+    [setVisible, onChange]
+  );
+  const onCancel = useCallback(() => {
+    setVisible(false);
+  }, [setVisible]);
 
-  render() {
-    const {
-      containerStyle = StyleSheet.create({}),
-      color = "#000000",
-      backgroundColor = "#ffffff",
-      value = new Date(),
-      minDate,
-      maxDate,
-      onChange
-    } = this.props;
-    const { isVisible } = this.state;
-    return (
-      <View>
-        <Button
-          containerStyle={[
-            styles.container,
-            containerStyle,
-            {
-              backgroundColor
-            }
-          ]}
-          buttonStyle={styles.button}
-          titleStyle={[styles.title, { color }]}
-          title={moment(value).format("HH:mm")}
-          icon={
-            <FontAwesome5Icon
-              name="clock"
-              solid
-              color={color}
-              style={styles.icon}
-            />
+  return (
+    <View>
+      <Button
+        containerStyle={StyleSheet.flatten([
+          styles.container,
+          containerStyle,
+          {
+            backgroundColor
           }
-          onPress={() => {
-            this.setState({ isVisible: true });
-          }}
-        />
-        <DateTimePicker
-          isVisible={isVisible}
-          mode="time"
-          date={value}
-          minimumDate={minDate}
-          maximumDate={maxDate}
-          onConfirm={date => {
-            onChange && onChange(date);
-            this.setState({
-              isVisible: false
-            });
-          }}
-          onCancel={() => {
-            this.setState({
-              isVisible: false
-            });
-          }}
-        />
-      </View>
-    );
-  }
-}
+        ])}
+        buttonStyle={styles.button}
+        titleStyle={[styles.title, { color }]}
+        title={title}
+        icon={
+          <FontAwesome5Icon
+            name="clock"
+            solid
+            color={color}
+            style={styles.icon}
+          />
+        }
+        onPress={onPress}
+      />
+      <DateTimePicker
+        isVisible={visible}
+        mode="time"
+        date={value}
+        minimumDate={minDate}
+        maximumDate={maxDate}
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+      />
+    </View>
+  );
+};
+export default TimePicker;
 
 const styles = StyleSheet.create({
   container: {

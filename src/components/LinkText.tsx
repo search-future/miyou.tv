@@ -11,33 +11,31 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
+import React, { useCallback, PropsWithChildren } from "react";
 import { TouchableOpacity, StyleProp, ViewStyle, Linking } from "react-native";
 import { Text, TextProps } from "react-native-elements";
 
-type Props = {
-  activeOpacity?: number;
-  containerStyle?: StyleProp<ViewStyle>;
-  url: string;
-} & TextProps;
-export default class LinkText extends Component<Props> {
-  render() {
-    const { activeOpacity, containerStyle, url, ...props } = this.props;
-    return (
-      <TouchableOpacity
-        activeOpacity={activeOpacity}
-        style={containerStyle}
-        onPress={() => {
-          const { url } = this.props;
-          this.openUrl(url);
-        }}
-      >
-        <Text {...props} />
-      </TouchableOpacity>
-    );
-  }
-
-  openUrl(url: string) {
+type Props = PropsWithChildren<
+  {
+    activeOpacity?: number;
+    containerStyle?: StyleProp<ViewStyle>;
+    url: string;
+  } & TextProps
+>;
+const LinkText = ({ activeOpacity, containerStyle, url, ...props }: Props) => {
+  const openUrl = useCallback(() => {
     Linking.openURL(url);
-  }
-}
+  }, [url]);
+
+  return (
+    <TouchableOpacity
+      activeOpacity={activeOpacity}
+      style={containerStyle}
+      onPress={openUrl}
+    >
+      <Text {...props} />
+    </TouchableOpacity>
+  );
+};
+
+export default LinkText;

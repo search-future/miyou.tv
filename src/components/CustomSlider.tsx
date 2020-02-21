@@ -11,30 +11,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
+import React from "react";
 import { Slider, SliderProps } from "react-native-elements";
 import { StyleSheet } from "react-native";
 
 type Props = SliderProps & {
   thumbRound?: boolean;
 };
-export default class CustomSlider extends Component<Props> {
-  render() {
-    const {
-      thumbTintColor = "#9991ff",
-      thumbStyle,
-      thumbRound,
-      ...props
-    } = this.props;
-    return (
-      <Slider
-        thumbTintColor={thumbTintColor}
-        thumbStyle={thumbRound ? thumbStyle : [styles.thumbSquare, thumbStyle]}
-        {...props}
-      />
-    );
-  }
-}
+const CustomSlider = ({
+  thumbTintColor = "#9991ff",
+  thumbStyle,
+  thumbRound,
+  ...props
+}: Props) => (
+  <Slider
+    thumbTintColor={thumbTintColor}
+    thumbStyle={thumbRound ? thumbStyle : [styles.thumbSquare, thumbStyle]}
+    {...props}
+  />
+);
+export default CustomSlider;
 
 const styles = StyleSheet.create({
   thumbSquare: {

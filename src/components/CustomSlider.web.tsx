@@ -11,82 +11,83 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
+import React, { useCallback, ChangeEvent } from "react";
 import { View } from "react-native";
 import { SliderProps } from "react-native-elements";
 
 type Props = SliderProps & {
   thumbRound?: boolean;
 };
-export default class CustomSlider extends Component<Props> {
-  render() {
-    const {
-      disabled,
-      maximumValue,
-      minimumValue,
-      step,
-      style,
-      thumbTintColor = "#9991ff",
-      value,
-      onValueChange,
-      thumbRound = false
-    } = this.props;
+const CustomSlider = ({
+  disabled,
+  maximumValue,
+  minimumValue,
+  step,
+  style,
+  thumbTintColor = "#9991ff",
+  value,
+  onValueChange,
+  thumbRound = false
+}: Props) => {
+  const cssStyles = `
+    .slider {
+      padding: 0;
+      flex: 1;
+      min-width: 0;
+      outline: none;
+      border-color: transparent;
+      background-color: transparent;
 
-    return (
-      <View style={style}>
-        <style>{`
-          .slider {
-            padding: 0;
-            flex: 1;
-            min-width: 0;
-            outline: none;
-            border-color: transparent;
-            background-color: transparent;
+      -webkit-appearance: none;
+    }
+    .slider:focus {
+      outline: none;
+    }
+    .slider::-webkit-slider-runnable-track {
+      height: 1px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+    }
+    .slider::-webkit-slider-thumb {
+      background: ${thumbTintColor};
+      position: relative;
+      top: -8px;
+      width: 8px;
+      height: 16px;
+      cursor: pointer;
 
-            -webkit-appearance: none;
-          }
-          .slider:focus {
-            outline: none;
-          }
-          .slider::-webkit-slider-runnable-track {
-            height: 1px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.2);
-            cursor: pointer;
-          }
-          .slider::-webkit-slider-thumb {
-            position: relative;
-            top: -8px;
-            width: 8px;
-            height: 16px;
-            background: ${thumbTintColor};
-            cursor: pointer;
+      -webkit-appearance: none;
+    }
 
-            -webkit-appearance: none;
-          }
+    .slider.slider-round::-webkit-slider-thumb {
+      width: 16px;
+      border-radius: 16px;
+    }
+  `;
+  const onChange = useCallback(
+    ({ currentTarget }: ChangeEvent<HTMLInputElement>) => {
+      const { value } = currentTarget;
+      onValueChange && onValueChange(parseFloat(value));
+    },
+    [onValueChange]
+  );
 
-          .slider.slider-round::-webkit-slider-thumb {
-            width: 16px;
-            border-radius: 16px;
-          }
-        `}</style>
-        <input
-          type="range"
-          className={thumbRound ? "slider slider-round" : "slider"}
-          disabled={disabled}
-          max={maximumValue}
-          min={minimumValue}
-          step={step}
-          value={value}
-          onChange={({ currentTarget }) => {
-            if (onValueChange) {
-              const { value } = currentTarget;
-              onValueChange(parseFloat(value));
-            }
-          }}
-        />
-      </View>
-    );
-  }
-}
+  return (
+    <View style={style}>
+      <style>{cssStyles}</style>
+      <input
+        type="range"
+        className={thumbRound ? "slider slider-round" : "slider"}
+        disabled={disabled}
+        max={maximumValue}
+        min={minimumValue}
+        step={step}
+        value={value}
+        onChange={onChange}
+      />
+    </View>
+  );
+};
+export default CustomSlider;

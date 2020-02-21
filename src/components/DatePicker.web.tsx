@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component, CSSProperties } from "react";
+import React, { useCallback, useMemo, CSSProperties, ChangeEvent } from "react";
 import { View, ViewStyle, StyleSheet, StyleProp } from "react-native";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 
@@ -26,54 +26,67 @@ type Props = {
   color?: string;
   backgroundColor?: string;
 };
-export default class DatePicker extends Component<Props> {
-  render() {
-    const {
-      containerStyle,
-      color = "#000000",
-      backgroundColor = "#ffffff",
-      value = new Date(),
-      minDate,
-      maxDate,
-      onChange
-    } = this.props;
-    return (
-      <View
-        style={[
-          styles.container,
-          containerStyle,
-          {
-            backgroundColor
-          }
-        ]}
-      >
-        <View style={styles.iconWrapper}>
-          <FontAwesome5Icon name="calendar" solid color={color} />
-        </View>
+const DatePicker = ({
+  containerStyle,
+  color = "#000000",
+  backgroundColor = "#ffffff",
+  value = new Date(),
+  minDate,
+  maxDate,
+  onChange
+}: Props) => {
+  const inputValue = useMemo(() => moment(value).format("YYYY-MM-DD"), [value]);
+  const inputMin = useMemo(
+    () => minDate && moment(minDate).format("YYYY-MM-DD"),
+    [minDate]
+  );
+  const inputMax = useMemo(
+    () => maxDate && moment(maxDate).format("YYYY-MM-DD"),
+    [maxDate]
+  );
+  const onInputChange = useCallback(
+    ({ target }: ChangeEvent<HTMLInputElement>) => {
+      if (onChange) {
+        const [Y = "0", M = "0", D = "0"] = target.value.split("-");
+        value.setFullYear(parseInt(Y, 10));
+        value.setMonth(parseInt(M, 10) - 1);
+        value.setDate(parseInt(D, 10));
+        onChange(new Date(value));
+      }
+    },
+    [onChange]
+  );
 
-        <input
-          style={{
-            ...inputStyle,
-            color
-          }}
-          type="date"
-          value={moment(value).format("YYYY-MM-DD")}
-          min={minDate && moment(minDate).format("YYYY-MM-DD")}
-          max={maxDate && moment(maxDate).format("YYYY-MM-DD")}
-          required
-          onChange={({ target }) => {
-            const { value = new Date() } = this.props;
-            const [Y = "0", M = "0", D = "0"] = target.value.split("-");
-            value.setFullYear(parseInt(Y, 10));
-            value.setMonth(parseInt(M, 10) - 1);
-            value.setDate(parseInt(D, 10));
-            onChange && onChange(new Date(value));
-          }}
-        />
+  return (
+    <View
+      style={[
+        styles.container,
+        containerStyle,
+        {
+          backgroundColor
+        }
+      ]}
+    >
+      <View style={styles.iconWrapper}>
+        <FontAwesome5Icon name="calendar" solid color={color} />
       </View>
-    );
-  }
-}
+      <input
+        style={{
+          ...inputStyle,
+          color
+        }}
+        type="date"
+        value={inputValue}
+        min={inputMin}
+        max={inputMax}
+        required
+        onChange={onInputChange}
+      />
+    </View>
+  );
+};
+
+export default DatePicker;
 
 const styles = StyleSheet.create({
   container: {
