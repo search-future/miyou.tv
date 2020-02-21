@@ -41,6 +41,8 @@ const rootReducer = combineReducers({
 });
 export default rootReducer;
 
+export type RootState = ReturnType<typeof rootReducer>;
+
 export function* rootSaga() {
   yield all([
     fork(commentPlayerSaga),
