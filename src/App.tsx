@@ -11,39 +11,43 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
+import React from "react";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { createStore, applyMiddleware } from "redux";
 import createSagaMiddleware from "redux-saga";
-import { persistReducer, persistStore } from "redux-persist";
+import { persistReducer, persistStore, PersistConfig } from "redux-persist";
 
 import Main from "./containers/Main";
 import Splash from "./components/Splash";
-import rootReducer, { rootSaga } from "./modules";
+import rootReducer, { rootSaga, RootState } from "./modules";
 import init from "./utils/init";
 import persistConfig from "./config/persist";
 
-export default class App extends Component {
-  render() {
-    return (
-      <Provider store={store}>
-        <PersistGate
-          loading={<Splash />}
-          onBeforeLift={() => {
-            init(store);
-          }}
-          persistor={persistor as any}
-        >
-          <Main />
-        </PersistGate>
-      </Provider>
-    );
-  }
-}
+const App = () => {
+  return (
+    <Provider store={store}>
+      <PersistGate
+        loading={<Splash />}
+        onBeforeLift={onBeforeLift}
+        persistor={persistor as any}
+      >
+        <Main />
+      </PersistGate>
+    </Provider>
+  );
+};
+export default App;
 
 const sagaMiddleware = createSagaMiddleware();
-const persistedReducer = persistReducer(persistConfig as any, rootReducer);
+const persistedReducer = persistReducer(
+  persistConfig as PersistConfig<RootState>,
+  rootReducer
+);
 const store = createStore(persistedReducer, applyMiddleware(sagaMiddleware));
 const persistor = persistStore(store);
 sagaMiddleware.run(rootSaga);
+
+const onBeforeLift = () => {
+  init(store);
+};
