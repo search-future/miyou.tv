@@ -18,10 +18,13 @@ const moment = m;
 switch (Platform.OS) {
   case "android":
     moment.locale(NativeModules.I18nManager.localeIdentifier);
+    break;
   case "ios":
     moment.locale(NativeModules.SettingsManager.settings.AppleLocale);
+    break;
   case "web":
     moment.locale(window.navigator.language);
+    break;
   default:
     moment.locale("ja");
 }
