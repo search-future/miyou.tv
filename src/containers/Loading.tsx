@@ -11,35 +11,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
+import React, { memo } from "react";
 import { ActivityIndicator, StyleSheet } from "react-native";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
+import { useSelector } from "react-redux";
 
 import { active } from "../styles/color";
-import { LoadingState } from "../modules/loading";
+import { RootState } from "../modules";
 
-type Props = {
-  dispatch: Dispatch;
-  loading: LoadingState;
-};
-class Loading extends Component<Props> {
-  render() {
-    const { loading } = this.props;
-    const { blocking, enabled } = loading;
-    return (
-      <ActivityIndicator
-        style={[styles.container, enabled && blocking && styles.blocker]}
-        color={active}
-        animating={enabled}
-      />
-    );
-  }
-}
+const Loading = memo(() => {
+  const enabled = useSelector<RootState, boolean>(
+    ({ loading }) => loading.enabled
+  );
+  const blocking = useSelector<RootState, boolean>(
+    ({ loading }) => loading.blocking
+  );
 
-export default connect(({ loading }: { loading: LoadingState }) => ({
-  loading
-}))(Loading);
+  return (
+    <ActivityIndicator
+      style={[styles.container, enabled && blocking && styles.blocker]}
+      color={active}
+      animating={enabled}
+    />
+  );
+});
+export default Loading;
 
 const styles = StyleSheet.create({
   container: {
