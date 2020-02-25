@@ -11,211 +11,213 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import React, {
+  memo,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo
+} from "react";
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  LayoutChangeEvent
+} from "react-native";
 import { ButtonGroup, SearchBar } from "react-native-elements";
-import { NavigationActions, NavigationState } from "react-navigation";
+import {
+  NavigationActions,
+  NavigationRoute,
+  NavigationParams
+} from "react-navigation";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
+import { useSelector, useDispatch, shallowEqual } from "react-redux";
 
 import colorStyle, { active, gray, light } from "../styles/color";
 import containerStyle from "../styles/container";
 import textStyle from "../styles/text";
-import {
-  ProgramActions,
-  ProgramState,
-  ProgramListData
-} from "../modules/program";
+import { RootState } from "../modules";
+import { ProgramActions, ProgramState } from "../modules/program";
 import searchNavRoute from "../utils/searchNavRoute";
 
-type Props = {
-  dispatch: Dispatch;
-  nav: NavigationState;
-  list: ProgramListData;
-};
-type State = {
-  containerWidth: number;
-  searchBarVisible: boolean;
-  query: string;
-};
-class AppFooter extends Component<Props, State> {
-  state = {
-    containerWidth: 0,
-    searchBarVisible: false,
-    query: ""
-  };
-  layoutCallbackId?: number;
+const AppFooter = memo(() => {
+  const layoutCallbackId = useRef<number>();
 
-  render() {
-    const { nav } = this.props;
-    const { containerWidth, searchBarVisible, query } = this.state;
-    const route = searchNavRoute(nav, "MainNavigator");
-    const { index: selectedIndex = 0 } = route || {};
+  const [containerWidth, setContainerWidth] = useState(0);
+  const [searchBarVisible, setSearchBarVisible] = useState(false);
 
-    return (
-      <View
-        style={colorStyle.bgDark}
-        onLayout={({ nativeEvent }) => {
-          if (this.layoutCallbackId != null) {
-            clearTimeout(this.layoutCallbackId);
-          }
-          const { layout } = nativeEvent;
-          const containerWidth = layout.width;
-          this.layoutCallbackId = setTimeout(() => {
-            this.setState({ containerWidth });
-          }, 200);
-        }}
-      >
-        {containerWidth <= breakpoint && (
-          <View style={[containerStyle.row, colorStyle.bgDark]}>
-            <ButtonGroup
-              containerStyle={[colorStyle.bgDark, styles.groupContainer]}
-              containerBorderRadius={0}
-              selectedButtonStyle={colorStyle.bgBlack}
-              buttons={[
-                {
-                  element: () => (
-                    <FontAwesome5Icon
-                      name="th"
-                      solid
-                      size={24}
-                      color={selectedIndex === 0 ? active : light}
-                    />
-                  )
-                },
-                {
-                  element: () => (
-                    <FontAwesome5Icon
-                      name="list"
-                      solid
-                      size={24}
-                      color={selectedIndex === 1 ? active : light}
-                    />
-                  )
-                },
-                {
-                  element: () => (
-                    <FontAwesome5Icon
-                      name="list-ol"
-                      solid
-                      size={24}
-                      color={selectedIndex === 2 ? active : light}
-                    />
-                  )
-                }
-              ]}
-              selectedIndex={selectedIndex}
-              onPress={index => {
-                const { dispatch, nav } = this.props;
-                const route = searchNavRoute(nav, "MainNavigator");
-                const { routes = [] } = route || {};
-                const { routeName = "" } = routes[index];
-                if (routeName === "List") {
-                  dispatch(ProgramActions.update("list", { query: "" }));
-                }
-                dispatch(NavigationActions.navigate({ routeName }));
-              }}
-            />
-            <TouchableOpacity
-              style={styles.searchButton}
-              onPress={() => {
-                this.setState({ searchBarVisible: true });
-              }}
-            >
-              <FontAwesome5Icon name="search" solid size={24} color={light} />
-            </TouchableOpacity>
-            {searchBarVisible && (
-              <View
-                style={[
-                  containerStyle.row,
-                  colorStyle.bgDark,
-                  styles.searchBox
-                ]}
-              >
-                <SearchBar
-                  containerStyle={[colorStyle.bgDark, styles.searchContainer]}
-                  inputContainerStyle={[
-                    colorStyle.bgGrayDark,
-                    styles.searchInputContainer
-                  ]}
-                  inputStyle={[
-                    textStyle.center,
-                    colorStyle.light,
-                    styles.searchInput
-                  ]}
-                  round
-                  searchIcon={
-                    <FontAwesome5Icon
-                      name="search"
-                      solid
-                      size={16}
-                      color={gray}
-                    />
-                  }
-                  placeholder="Search"
-                  value={query}
-                  onChangeText={query => {
-                    this.setState({ query });
-                  }}
-                  onSubmitEditing={() => {
-                    const { dispatch } = this.props;
-                    const { query } = this.state;
-                    dispatch(ProgramActions.update("list", { query }));
-                    dispatch(NavigationActions.navigate({ routeName: "List" }));
-                  }}
-                  onClear={() => {
-                    const { dispatch } = this.props;
-                    dispatch(ProgramActions.update("list", { query: "" }));
-                  }}
-                />
-                <TouchableOpacity
-                  style={styles.searchButton}
-                  onPress={() => {
-                    this.setState({ searchBarVisible: false });
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name="caret-down"
-                    solid
-                    size={24}
-                    color={light}
-                  />
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
-        )}
-      </View>
-    );
-  }
+  useEffect(
+    () => () => {
+      clearTimeout(layoutCallbackId.current);
+    },
+    []
+  );
 
-  componentDidUpdate(prevProps: Props) {
-    const { list } = this.props;
-    const { query = "" } = list;
-    const { query: prevQuery = "" } = prevProps.list;
-    if (query !== prevQuery) {
-      this.setState({ query });
+  const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
+    if (layoutCallbackId.current != null) {
+      clearTimeout(layoutCallbackId.current);
     }
-  }
+    const { layout } = nativeEvent;
+    const containerWidth = layout.width;
+    layoutCallbackId.current = setTimeout(() => {
+      setContainerWidth(containerWidth);
+    }, 200);
+  }, []);
+  const openSearchBar = useCallback(() => {
+    setSearchBarVisible(true);
+  }, []);
+  const closeSearchBar = useCallback(() => {
+    setSearchBarVisible(false);
+  }, []);
 
-  componentWillUnmount() {
-    clearTimeout(this.layoutCallbackId);
-  }
-}
+  return (
+    <View style={colorStyle.bgDark} onLayout={onLayout}>
+      {containerWidth <= breakpoint && (
+        <View style={[containerStyle.row, colorStyle.bgDark]}>
+          <FooterButtons />
+          <TouchableOpacity style={styles.searchButton} onPress={openSearchBar}>
+            <FontAwesome5Icon name="search" solid size={24} color={light} />
+          </TouchableOpacity>
+          {searchBarVisible && (
+            <View
+              style={[containerStyle.row, colorStyle.bgDark, styles.searchBox]}
+            >
+              <FooterSearchBar />
+              <TouchableOpacity
+                style={styles.searchButton}
+                onPress={closeSearchBar}
+              >
+                <FontAwesome5Icon
+                  name="caret-down"
+                  solid
+                  size={24}
+                  color={light}
+                />
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      )}
+    </View>
+  );
+});
+export default AppFooter;
 
-export default connect(
-  ({
-    nav,
-    program: { list = {} }
-  }: {
-    nav: NavigationState;
-    program: ProgramState;
-  }) => ({
-    nav,
-    list
-  })
-)(AppFooter);
+const FooterButtons = memo(() => {
+  const dispatch = useDispatch();
+
+  const selectedIndex = useSelector<RootState, number>(
+    ({ nav }) => searchNavRoute(nav, "MainNavigator")?.index || 0
+  );
+  const routes = useSelector<RootState, NavigationRoute<NavigationParams>[]>(
+    ({ nav }) => {
+      const route = searchNavRoute(nav, "MainNavigator");
+      const { routes = [] } = route || {};
+      return routes;
+    },
+    shallowEqual
+  );
+
+  const buttons = useMemo(
+    () => [
+      {
+        element: () => (
+          <FontAwesome5Icon
+            name="th"
+            solid
+            size={24}
+            color={selectedIndex === 0 ? active : light}
+          />
+        )
+      },
+      {
+        element: () => (
+          <FontAwesome5Icon
+            name="list"
+            solid
+            size={24}
+            color={selectedIndex === 1 ? active : light}
+          />
+        )
+      },
+      {
+        element: () => (
+          <FontAwesome5Icon
+            name="list-ol"
+            solid
+            size={24}
+            color={selectedIndex === 2 ? active : light}
+          />
+        )
+      }
+    ],
+    [selectedIndex]
+  );
+
+  const navigate = useCallback(
+    (index: number) => {
+      const { routeName = "" } = routes[index];
+      if (routeName === "List") {
+        dispatch(ProgramActions.update("list", { query: "" }));
+      }
+      dispatch(NavigationActions.navigate({ routeName }));
+    },
+    [routes]
+  );
+
+  return (
+    <ButtonGroup
+      containerStyle={[colorStyle.bgDark, styles.groupContainer]}
+      containerBorderRadius={0}
+      selectedButtonStyle={colorStyle.bgBlack}
+      buttons={buttons}
+      selectedIndex={selectedIndex}
+      onPress={navigate}
+    />
+  );
+});
+
+const FooterSearchBar = memo(() => {
+  const dispatch = useDispatch();
+  const listQuery = useSelector<{ program: ProgramState }, string>(
+    ({ program }) => program?.list?.query || ""
+  );
+
+  const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    setQuery(listQuery);
+  }, [listQuery]);
+
+  const onChangeQuery = useCallback((query: string) => {
+    setQuery(query);
+  }, []);
+  const onSubmitQuery = useCallback(() => {
+    dispatch(ProgramActions.update("list", { query }));
+    dispatch(NavigationActions.navigate({ routeName: "List" }));
+  }, [query]);
+  const onClearQuery = useCallback(() => {
+    dispatch(ProgramActions.update("list", { query: "" }));
+  }, []);
+
+  return (
+    <SearchBar
+      containerStyle={[colorStyle.bgDark, styles.searchContainer]}
+      inputContainerStyle={[colorStyle.bgGrayDark, styles.searchInputContainer]}
+      inputStyle={[textStyle.center, colorStyle.light, styles.searchInput]}
+      round
+      searchIcon={
+        <FontAwesome5Icon name="search" solid size={16} color={gray} />
+      }
+      placeholder="Search"
+      value={query}
+      onChangeText={onChangeQuery}
+      onSubmitEditing={onSubmitQuery}
+      onClear={onClearQuery}
+    />
+  );
+});
 
 const breakpoint = 768;
 
