@@ -11,8 +11,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
-import { TouchableOpacity, View, StyleSheet, Platform } from "react-native";
+import React, { memo, useState, useEffect, useCallback, useRef } from "react";
+import {
+  TouchableOpacity,
+  View,
+  StyleSheet,
+  Platform,
+  LayoutChangeEvent
+} from "react-native";
 import {
   Button,
   ButtonProps,
@@ -20,298 +26,198 @@ import {
   SearchBar,
   Text
 } from "react-native-elements";
-import {
-  NavigationActions,
-  NavigationState,
-  StackActions
-} from "react-navigation";
+import { NavigationActions, StackActions } from "react-navigation";
 import FontAwesome5Icon, {
   FontAwesome5IconProps
 } from "react-native-vector-icons/FontAwesome5";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
+import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
 import colorStyle, { active, gray, light } from "../styles/color";
 import containerStyle from "../styles/container";
 import textStyle from "../styles/text";
+import { RootState } from "../modules";
 import { ServiceActions } from "../modules/service";
-import {
-  ProgramActions,
-  ProgramState,
-  ProgramListData
-} from "../modules/program";
+import { ProgramActions, ProgramState } from "../modules/program";
 import searchNavRoute from "../utils/searchNavRoute";
 import { appName } from "../config/constants";
 
-type Props = {
-  dispatch: Dispatch;
-  nav: NavigationState;
-  list: ProgramListData;
-};
-type State = {
-  containerWidth: number;
-  query: string;
-};
-class AppHeader extends Component<Props, State> {
-  state = {
-    containerWidth: 0,
-    query: ""
-  };
-  layoutCallbackId?: number;
+const AppHeader = memo(() => {
+  const layoutCallbackId = useRef<number>();
 
-  render() {
-    const { nav } = this.props;
-    const { containerWidth, query } = this.state;
-    return (
-      <View
-        style={colorStyle.bgDark}
-        onLayout={({ nativeEvent }) => {
-          if (this.layoutCallbackId != null) {
-            clearTimeout(this.layoutCallbackId);
-          }
-          const { layout } = nativeEvent;
-          const containerWidth = layout.width;
-          this.layoutCallbackId = setTimeout(() => {
-            this.setState({ containerWidth });
-          }, 200);
-        }}
-      >
-        {containerWidth > breakpoint ? (
-          <View style={containerStyle.row}>
-            <View
-              style={[containerStyle.row, containerStyle.left, styles.left]}
-            >
-              {Platform.OS !== "web" && (
-                <Image
-                  containerStyle={styles.iconContainer}
-                  placeholderStyle={colorStyle.bgTransparent}
-                  style={styles.icon}
-                  source={require("../../assets/icon_32x32.png")}
-                />
-              )}
-              <HeaderButton
-                title="番組表"
-                nav={nav}
-                routeName="Table"
-                icon={{ name: "th" }}
-                onPress={() => {
-                  this.navigate("Table");
-                }}
-              />
-              <HeaderButton
-                title="番組一覧"
-                nav={nav}
-                routeName="List"
-                icon={{ name: "list" }}
-                onPress={() => {
-                  const { dispatch } = this.props;
-                  dispatch(ProgramActions.update("list", { query: "" }));
-                  this.navigate("List");
-                }}
-              />
-              <HeaderButton
-                title="ランキング"
-                nav={nav}
-                routeName="Ranking"
-                icon={{ name: "list-ol" }}
-                onPress={() => {
-                  this.navigate("Ranking");
-                }}
-              />
-            </View>
-            <View
-              style={[containerStyle.row, containerStyle.center, styles.center]}
-            >
-              <SearchBar
-                containerStyle={[
-                  colorStyle.bgTransparent,
-                  styles.searchContainer
-                ]}
-                inputContainerStyle={[
-                  colorStyle.bgGrayDark,
-                  styles.searchInputContainer
-                ]}
-                inputStyle={[
-                  textStyle.center,
-                  colorStyle.light,
-                  styles.searchInput
-                ]}
-                round
-                searchIcon={
-                  <FontAwesome5Icon
-                    name="search"
-                    solid
-                    color={gray}
-                    size={16}
-                  />
-                }
-                placeholder="Search"
-                value={query}
-                onChangeText={query => {
-                  this.setState({ query });
-                }}
-                onSubmitEditing={() => {
-                  const { dispatch } = this.props;
-                  const { query } = this.state;
-                  dispatch(ProgramActions.update("list", { query }));
-                  this.navigate("List");
-                }}
-                onClear={() => {
-                  const { dispatch } = this.props;
-                  dispatch(ProgramActions.update("list", { query: "" }));
-                }}
-              />
-            </View>
-            <View
-              style={[containerStyle.row, containerStyle.right, styles.right]}
-            >
-              <HeaderButton
-                title="ファイル"
-                icon={{ name: "folder-open" }}
-                onPress={() => {
-                  this.file();
-                }}
-              />
-              <HeaderButton
-                title="更新"
-                icon={{ name: "sync" }}
-                onPress={() => {
-                  this.reload();
-                }}
-              />
-              <HeaderButton
-                title="設定"
-                icon={{ name: "cog" }}
-                onPress={() => {
-                  this.setup();
-                }}
-              />
-            </View>
-          </View>
-        ) : (
-          <View style={containerStyle.row}>
-            <View
-              style={[containerStyle.row, containerStyle.left, styles.left]}
-            >
-              {Platform.OS !== "web" && (
-                <Image
-                  containerStyle={styles.iconContainer}
-                  placeholderStyle={colorStyle.bgTransparent}
-                  style={styles.icon}
-                  source={require("../../assets/icon_32x32.png")}
-                />
-              )}
-              <TouchableOpacity
-                style={styles.iconButton}
-                onPress={() => {
-                  this.file();
-                }}
-              >
-                <FontAwesome5Icon
-                  name="folder-open"
-                  solid
-                  color={light}
-                  size={24}
-                />
-              </TouchableOpacity>
-            </View>
-            <View
-              style={[containerStyle.row, containerStyle.center, styles.center]}
-            >
-              <Text h4 style={colorStyle.light}>
-                {appName}
-              </Text>
-            </View>
-            <View
-              style={[containerStyle.row, containerStyle.right, styles.right]}
-            >
-              <TouchableOpacity
-                style={styles.iconButton}
-                onPress={() => {
-                  this.reload();
-                }}
-              >
-                <FontAwesome5Icon name="sync" solid size={24} color={light} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.iconButton}
-                onPress={() => {
-                  this.setup();
-                }}
-              >
-                <FontAwesome5Icon name="cog" solid size={24} color={light} />
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
-      </View>
-    );
-  }
+  const [containerWidth, setContainerWidth] = useState(0);
 
-  componentDidUpdate(prevProps: Props) {
-    const { list } = this.props;
-    const { query = "" } = list;
-    const { query: prevQuery = "" } = prevProps.list;
-    if (query !== prevQuery) {
-      this.setState({ query });
+  useEffect(
+    () => () => {
+      clearTimeout(layoutCallbackId.current);
+    },
+    []
+  );
+
+  const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
+    if (layoutCallbackId.current != null) {
+      clearTimeout(layoutCallbackId.current);
     }
-  }
+    const { layout } = nativeEvent;
+    const containerWidth = layout.width;
+    layoutCallbackId.current = setTimeout(() => {
+      setContainerWidth(containerWidth);
+    }, 200);
+  }, []);
+  return (
+    <View style={colorStyle.bgDark} onLayout={onLayout}>
+      {containerWidth > breakpoint ? <WideHeader /> : <NarrowHeader />}
+    </View>
+  );
+});
+export default AppHeader;
 
-  componentWillUnmount() {
-    clearTimeout(this.layoutCallbackId);
-  }
+const WideHeader = memo(() => {
+  const dispatch = useDispatch();
+  const routeName = useSelector<RootState, string | undefined>(
+    ({ nav }) => searchNavRoute(nav)?.routeName
+  );
 
-  navigate(routeName: string) {
-    const { dispatch } = this.props;
-    dispatch(NavigationActions.navigate({ routeName }));
-  }
-
-  setup() {
-    const { dispatch, nav } = this.props;
-    const current = searchNavRoute(nav, "Setup");
-    if (!current) {
+  const showTable = useCallback(() => {
+    dispatch(NavigationActions.navigate({ routeName: "Table" }));
+  }, []);
+  const showList = useCallback(() => {
+    dispatch(ProgramActions.update("list", { query: "" }));
+    dispatch(NavigationActions.navigate({ routeName: "List" }));
+  }, []);
+  const showRanking = useCallback(() => {
+    dispatch(NavigationActions.navigate({ routeName: "Ranking" }));
+  }, []);
+  const openSetup = useCallback(() => {
+    if (routeName !== "Setup") {
       dispatch(StackActions.push({ routeName: "Setup" }));
     }
-  }
-
-  file() {
-    const { dispatch, nav } = this.props;
-    const current = searchNavRoute(nav, "File");
-    if (!current) {
+  }, [routeName]);
+  const openFile = useCallback(() => {
+    if (routeName !== "File") {
       dispatch(StackActions.push({ routeName: "File" }));
     }
-  }
-
-  reload() {
-    const { dispatch } = this.props;
+  }, [routeName]);
+  const reload = useCallback(() => {
     dispatch(ServiceActions.backendInit());
     dispatch(ServiceActions.commentInit());
-  }
-}
+  }, []);
 
-export default connect(
+  return (
+    <View style={containerStyle.row}>
+      <View style={[containerStyle.row, containerStyle.left, styles.left]}>
+        {Platform.OS !== "web" && (
+          <Image
+            containerStyle={styles.iconContainer}
+            placeholderStyle={colorStyle.bgTransparent}
+            style={styles.icon}
+            source={require("../../assets/icon_32x32.png")}
+          />
+        )}
+        <HeaderButton
+          title="番組表"
+          routeName="Table"
+          icon={{ name: "th" }}
+          onPress={showTable}
+        />
+        <HeaderButton
+          title="番組一覧"
+          routeName="List"
+          icon={{ name: "list" }}
+          onPress={showList}
+        />
+        <HeaderButton
+          title="ランキング"
+          routeName="Ranking"
+          icon={{ name: "list-ol" }}
+          onPress={showRanking}
+        />
+      </View>
+      <View style={[containerStyle.row, containerStyle.center, styles.center]}>
+        <HeaderSearchBar />
+      </View>
+      <View style={[containerStyle.row, containerStyle.right, styles.right]}>
+        <HeaderButton
+          title="ファイル"
+          icon={{ name: "folder-open" }}
+          onPress={openFile}
+        />
+        <HeaderButton title="更新" icon={{ name: "sync" }} onPress={reload} />
+        <HeaderButton title="設定" icon={{ name: "cog" }} onPress={openSetup} />
+      </View>
+    </View>
+  );
+});
+
+const NarrowHeader = memo(() => {
+  const dispatch = useDispatch();
+  const routeName = useSelector<RootState, string>(({ nav }) => {
+    const route = searchNavRoute(nav);
+    if (route) {
+      return route.routeName || "";
+    }
+    return "";
+  });
+
+  const openSetup = useCallback(() => {
+    if (routeName !== "Setup") {
+      dispatch(StackActions.push({ routeName: "Setup" }));
+    }
+  }, [routeName]);
+  const openFile = useCallback(() => {
+    if (routeName !== "File") {
+      dispatch(StackActions.push({ routeName: "File" }));
+    }
+  }, [routeName]);
+  const reload = useCallback(() => {
+    dispatch(ServiceActions.backendInit());
+    dispatch(ServiceActions.commentInit());
+  }, []);
+
+  return (
+    <View style={containerStyle.row}>
+      <View style={[containerStyle.row, containerStyle.left, styles.left]}>
+        {Platform.OS !== "web" && (
+          <Image
+            containerStyle={styles.iconContainer}
+            placeholderStyle={colorStyle.bgTransparent}
+            style={styles.icon}
+            source={require("../../assets/icon_32x32.png")}
+          />
+        )}
+        <TouchableOpacity style={styles.iconButton} onPress={openFile}>
+          <FontAwesome5Icon name="folder-open" solid color={light} size={24} />
+        </TouchableOpacity>
+      </View>
+      <View style={[containerStyle.row, containerStyle.center, styles.center]}>
+        <Text h4 style={colorStyle.light}>
+          {appName}
+        </Text>
+      </View>
+      <View style={[containerStyle.row, containerStyle.right, styles.right]}>
+        <TouchableOpacity style={styles.iconButton} onPress={reload}>
+          <FontAwesome5Icon name="sync" solid size={24} color={light} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.iconButton} onPress={openSetup}>
+          <FontAwesome5Icon name="cog" solid size={24} color={light} />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+});
+
+const HeaderButton = memo(
   ({
-    nav,
-    program: { list = {} }
-  }: {
-    nav: NavigationState;
-    program: ProgramState;
-  }) => ({
-    nav,
-    list
-  })
-)(AppHeader);
-
-class HeaderButton extends Component<
-  ButtonProps & {
-    nav?: NavigationState;
+    routeName,
+    icon,
+    ...props
+  }: ButtonProps & {
     routeName?: string;
     icon?: FontAwesome5IconProps;
-  }
-> {
-  render() {
-    const { nav, routeName, icon, ...props } = this.props;
-    const isActive = nav && routeName && searchNavRoute(nav, routeName);
+  }) => {
+    const isActive = useSelector<RootState, boolean>(
+      ({ nav }) => !!(nav && routeName && searchNavRoute(nav, routeName))
+    );
+
     return (
       <Button
         buttonStyle={[
@@ -336,8 +242,51 @@ class HeaderButton extends Component<
         {...props}
       />
     );
-  }
-}
+  },
+  ({ icon: prevIcon, ...prevProps }, { icon: nextIcon, ...nextProps }) =>
+    shallowEqual(prevProps, nextProps) && shallowEqual(prevIcon, nextIcon)
+);
+
+const HeaderSearchBar = memo(() => {
+  const dispatch = useDispatch();
+  const listQuery = useSelector<{ program: ProgramState }, string>(
+    ({ program }) => program?.list?.query || ""
+  );
+
+  const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    setQuery(listQuery);
+  }, [listQuery]);
+
+  const onChangeQuery = useCallback((query: string) => {
+    setQuery(query);
+  }, []);
+  const onSubmitQuery = useCallback(() => {
+    dispatch(ProgramActions.update("list", { query }));
+    dispatch(NavigationActions.navigate({ routeName: "List" }));
+  }, [query]);
+  const onClearQuery = useCallback(() => {
+    dispatch(ProgramActions.update("list", { query: "" }));
+  }, []);
+
+  return (
+    <SearchBar
+      containerStyle={[colorStyle.bgTransparent, styles.searchContainer]}
+      inputContainerStyle={[colorStyle.bgGrayDark, styles.searchInputContainer]}
+      inputStyle={[textStyle.center, colorStyle.light, styles.searchInput]}
+      round
+      searchIcon={
+        <FontAwesome5Icon name="search" solid color={gray} size={16} />
+      }
+      placeholder="Search"
+      value={query}
+      onChangeText={onChangeQuery}
+      onSubmitEditing={onSubmitQuery}
+      onClear={onClearQuery}
+    />
+  );
+});
 
 const breakpoint = 768;
 
