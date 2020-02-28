@@ -41,6 +41,7 @@ export type ProgramListData = {
 export function* listSaga() {
   try {
     yield put(LoadingActions.start(true));
+    yield put(ProgramActions.update("list", { programs: [] }));
 
     const {
       backend: backendSetting = {},

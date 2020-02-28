@@ -11,7 +11,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
+import React, {
+  memo,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef
+} from "react";
 import {
   FlatList,
   Picker,
@@ -22,12 +29,14 @@ import {
   Platform,
   Animated,
   PanResponder,
-  PanResponderInstance
+  ListRenderItem,
+  LayoutChangeEvent,
+  NativeSyntheticEvent,
+  NativeScrollEvent
 } from "react-native";
 import { Badge, ListItem, Text } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import Balloon from "../components/Balloon";
 import IconSelector from "../components/IconSelector";
@@ -35,232 +44,380 @@ import colorStyle, { active, black, light } from "../styles/color";
 import containerStyle from "../styles/container";
 import textStyle from "../styles/text";
 import programStyle from "../styles/program";
+import { RootState } from "../modules";
 import {
   ProgramActions,
   ProgramState,
   ProgramListData,
   ProgramListProgram
 } from "../modules/program";
-import { ServiceState } from "../modules/service";
 import { SettingActions, SettingState } from "../modules/setting";
-import { ViewerActions, ViewerState } from "../modules/viewer";
+import { ViewerActions } from "../modules/viewer";
 import DateFormatter from "../utils/DateFormatter";
 
-type Props = {
-  dispatch: Dispatch;
-  data: ProgramListData;
-  service: ServiceState;
-  setting: SettingState & {
-    listOptions?: {
-      view?: string;
-      reverse?: boolean;
-    };
-    useArchive?: boolean;
-    view?: {
-      countMode?: string;
-      hourFirst?: string;
-      hourFormat?: string;
-    };
-  };
-  viewer: ViewerState;
+type Options = {
+  view?: string;
+  reverse?: boolean;
 };
-type State = {
-  containerWidth: number;
-  headerHeight: Animated.AnimatedValue;
-  viewX: Animated.AnimatedValue;
-};
-class ProgramList extends Component<Props, State> {
-  list: FlatList<ProgramListProgram> | null = null;
-  panResponder: PanResponderInstance;
-  state = {
-    containerWidth: 0,
-    headerHeight: new Animated.Value(256),
-    viewX: new Animated.Value(0)
+type Setting = SettingState & {
+  listOptions?: Options;
+  useArchive?: boolean;
+  view?: {
+    countMode?: string;
+    hourFirst?: string;
+    hourFormat?: string;
   };
-  bindKeys: (string | string[])[] = [];
-  layoutCallbackId?: number;
-  scrollPos = 0;
-  headerHeight = 256;
+};
+type State = RootState & {
+  program: ProgramState & {
+    list: ProgramListData;
+  };
+  setting: Setting;
+};
 
-  constructor(props: Props) {
-    super(props);
-    this.panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: ({}, { dx }) => Math.abs(dx) > 10,
-      onPanResponderMove: Animated.event([null, { dx: this.state.viewX }]),
-      onPanResponderEnd: ({}, { dx }) => {
-        const { containerWidth, viewX } = this.state;
-        if (Math.abs(dx) > 64) {
-          const page = this.getPage() - Math.sign(dx);
-          if (page < 1) {
-            viewX.setValue(0);
-          } else {
-            const { data, setting } = this.props;
-            const { hits = 0 } = data;
-            const { listOptions = {} } = setting;
-            const { view = "25" } = listOptions;
-            const max = Math.ceil(hits / parseInt(view, 10));
-            if (page > max) {
+function save(options: Options) {
+  return SettingActions.update("listOptions", options);
+}
+function setPage(page: number) {
+  return ProgramActions.update("list", { page });
+}
+function open(programs: ProgramListProgram[], index: number) {
+  return ViewerActions.open(programs, index);
+}
+
+const ProgramList = memo(() => {
+  const listRef = useRef<FlatList>(null);
+  const layoutCallbackId = useRef<number>();
+  const scrollPos = useRef(0);
+  const headerHeightRef = useRef(256);
+  const headerHeight = useRef(new Animated.Value(headerHeightRef.current))
+    .current;
+  const viewX = useRef(new Animated.Value(0)).current;
+
+  const dispatch = useDispatch();
+  const useArchive = useSelector<State, boolean>(
+    ({ setting }) => setting.useArchive == null || setting.useArchive
+  );
+  const countMode = useSelector<State, string>(
+    ({ setting }) => setting.view?.countMode || "speed"
+  );
+  const hourFirst = useSelector<State, number>(({ setting }) =>
+    parseInt(setting.view?.hourFirst || "4", 10)
+  );
+  const hourFormat = useSelector<State, string>(
+    ({ setting }) => setting.view?.hourFormat || ""
+  );
+  const view = useSelector<State, number>(({ setting }) =>
+    parseInt(setting.listOptions?.view || "25", 10)
+  );
+  const reverse = useSelector<State, number>(
+    ({ setting }) =>
+      setting.listOptions?.reverse == null || setting.listOptions?.reverse
+  );
+  const hits = useSelector<State, number>(
+    ({ program }) => program.list?.hits || 0
+  );
+  const page = useSelector<State, number>(
+    ({ program }) => program.list?.page || 1
+  );
+  const programs = useSelector<State, ProgramListProgram[]>(
+    ({ program }) => program.list?.programs || []
+  );
+  const query = useSelector<State, string>(
+    ({ program }) => program.list?.query || ""
+  );
+  const archiveActive = useSelector<State, SettingState>(
+    ({ service }) => service.archiveActive
+  );
+  const selectedId = useSelector<State, string | undefined>(
+    ({ viewer }) => viewer.programs[viewer.index]?.id
+  );
+
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  const panResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
+        onMoveShouldSetPanResponder: ({}, { dx }) => Math.abs(dx) > 10,
+        onPanResponderMove: Animated.event([null, { dx: viewX }]),
+        onPanResponderEnd: ({}, { dx }) => {
+          if (Math.abs(dx) > 64) {
+            const p = page - Math.sign(dx);
+            if (p < 1) {
               viewX.setValue(0);
             } else {
-              Animated.timing(viewX, {
-                toValue: dx > 0 ? containerWidth : -containerWidth
-              }).start(() => {
-                const { viewX } = this.state;
+              const max = Math.ceil(hits / view);
+              if (p > max) {
                 viewX.setValue(0);
-              });
+              } else {
+                Animated.timing(viewX, {
+                  toValue: Math.sign(dx) * containerWidth
+                }).start(() => {
+                  dispatch(setPage(p));
+                });
+              }
             }
+          } else {
+            viewX.setValue(0);
           }
-          this.setPage(page);
-        } else {
-          viewX.setValue(0);
         }
-      }
-    });
-  }
-
-  render() {
-    const { data, service, setting, viewer } = this.props;
-    const { hits = 0, page = 1, programs = [], query = "" } = data;
-    const { archiveActive } = service;
-    const {
-      listOptions = {},
-      useArchive = true,
-      view: viewSetting = {}
-    } = setting;
-    const { hourFirst = "4", hourFormat = "" } = viewSetting;
-    const { view = "25", reverse = true } = listOptions;
-    const { programs: viewerPrograms, index: viewerIndex } = viewer;
-    const viewerProgram = viewerPrograms[viewerIndex] || {};
-    const { containerWidth, headerHeight, viewX } = this.state;
-
-    const dateFormatter = new DateFormatter(
-      parseInt(hourFirst, 10),
-      hourFormat
-    );
-
-    const viewNum = parseInt(view, 10);
-    const startIndex = (page - 1) * viewNum + 1;
-    let endIndex = page * viewNum;
+      }),
+    [hits, page, view, containerWidth]
+  );
+  const dateFormatter = useMemo(
+    () => new DateFormatter(hourFirst, hourFormat),
+    [hourFirst, hourFormat]
+  );
+  const startIndex = useMemo(() => (page - 1) * view + 1, [page, view]);
+  const endIndex = useMemo(() => {
+    let endIndex = page * view;
     if (endIndex > hits) {
       endIndex = hits;
     }
+    return endIndex;
+  }, [hits, page, view]);
+  const pageCount = useMemo(() => Math.ceil(hits / view), [hits, view]);
+  const pages = useMemo(() => {
     const pages = [];
-    const max = Math.ceil(hits / viewNum);
-    for (let i = 0; i < max; i++) {
+    for (let i = 0; i < pageCount; i++) {
       pages.push(i + 1);
     }
+    return pages;
+  }, [view, reverse, hits]);
 
-    return (
-      <View
-        style={[colorStyle.bgLight, styles.container]}
-        onLayout={({ nativeEvent }) => {
-          if (this.layoutCallbackId != null) {
-            clearTimeout(this.layoutCallbackId);
+  useEffect(
+    () => () => {
+      clearTimeout(layoutCallbackId.current);
+    },
+    []
+  );
+  useEffect(() => {
+    dispatch(ProgramActions.load("list"));
+    viewX.setValue(0);
+  }, [useArchive, view, reverse, page, query]);
+  useEffect(() => {
+    dispatch(setPage(1));
+  }, [useArchive, view, reverse, query]);
+  useEffect(() => {
+    if (Platform.OS === "web") {
+      const Mousetrap = require("mousetrap");
+      const key = "up";
+      Mousetrap.bind(key, () => {
+        if (selectedId) {
+          const index = programs.findIndex(({ id }) => id === selectedId);
+          if (index >= 0) {
+            if (programs[index - 1]) {
+              dispatch(open(programs, index - 1));
+            }
+            return false;
           }
-          const { layout } = nativeEvent;
-          const containerWidth = layout.width;
-          this.layoutCallbackId = setTimeout(() => {
-            this.setState({ containerWidth });
-          }, 200);
-        }}
-      >
-        {containerWidth > 0 && (
-          <Animated.View
-            style={[
+        }
+        if (programs[0]) {
+          dispatch(open(programs, 0));
+          return false;
+        }
+        return true;
+      });
+      return () => {
+        Mousetrap.unbind(key);
+      };
+    }
+  }, [programs, selectedId]);
+  useEffect(() => {
+    if (Platform.OS === "web") {
+      const Mousetrap = require("mousetrap");
+      const key = "down";
+      Mousetrap.bind(key, () => {
+        if (selectedId) {
+          const index = programs.findIndex(({ id }) => id === selectedId);
+          if (index >= 0) {
+            if (programs[index + 1]) {
+              dispatch(open(programs, index + 1));
+            }
+            return false;
+          }
+        }
+        if (programs[0]) {
+          dispatch(open(programs, 0));
+          return false;
+        }
+        return true;
+      });
+      return () => {
+        Mousetrap.unbind(key);
+      };
+    }
+  }, [programs, selectedId]);
+  useEffect(() => {
+    if (Platform.OS === "web") {
+      const Mousetrap = require("mousetrap");
+      const key = "left";
+      Mousetrap.bind(key, () => {
+        const p = page - 1;
+        if (p > 0) {
+          dispatch(setPage(p));
+          return false;
+        }
+        return true;
+      });
+      return () => {
+        Mousetrap.unbind(key);
+      };
+    }
+  }, [page]);
+  useEffect(() => {
+    if (Platform.OS === "web") {
+      const Mousetrap = require("mousetrap");
+      const key = "right";
+      Mousetrap.bind(key, () => {
+        const p = page + 1;
+        if (p <= pageCount) {
+          dispatch(setPage(p));
+          return false;
+        }
+        return true;
+      });
+      return () => {
+        Mousetrap.unbind(key);
+      };
+    }
+  }, [page, pageCount]);
+  useEffect(() => {
+    listRef.current?.scrollToOffset({ offset: 0, animated: false });
+  }, [page]);
+  useEffect(() => {
+    if (selectedId && listRef.current) {
+      const index = programs.findIndex(({ id }) => id === selectedId);
+      if (index >= 0) {
+        listRef.current.scrollToIndex({ index, viewPosition: 0.5 });
+      }
+    }
+  }, [selectedId]);
+
+  const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
+    if (layoutCallbackId.current != null) {
+      clearTimeout(layoutCallbackId.current);
+    }
+    const { layout } = nativeEvent;
+    const containerWidth = layout.width;
+    layoutCallbackId.current = setTimeout(() => {
+      setContainerWidth(containerWidth);
+    }, 200);
+  }, []);
+  const onScroll = useCallback(
+    ({ nativeEvent }: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { contentOffset } = nativeEvent;
+      headerHeightRef.current += scrollPos.current - contentOffset.y;
+      if (headerHeightRef.current > 256) {
+        headerHeightRef.current = 256;
+      } else if (headerHeightRef.current < 0) {
+        headerHeightRef.current = 0;
+      }
+      headerHeight.setValue(headerHeightRef.current);
+      scrollPos.current = contentOffset.y;
+    },
+    []
+  );
+  const useArchiveChange = useCallback((value: string | number) => {
+    dispatch(SettingActions.update("useArchive", value > 0));
+  }, []);
+  const reverseChange = useCallback((value: string | number) => {
+    dispatch(save({ reverse: value > 0 }));
+  }, []);
+  const viewChange = useCallback((view: string | number) => {
+    dispatch(save({ view: String(view) }));
+  }, []);
+  const pageChange = useCallback(
+    (value: string) => {
+      const p = parseInt(value, 10);
+      if (p !== page && p > 0 && p <= pageCount) {
+        dispatch(setPage(p));
+      }
+    },
+    [page, pageCount]
+  );
+  const previousPage = useCallback(() => {
+    const p = page - 1;
+    if (p > 0) {
+      dispatch(setPage(p));
+    }
+  }, [page]);
+  const nextPage = useCallback(() => {
+    const p = page + 1;
+    if (p <= pageCount) {
+      dispatch(setPage(p));
+    }
+  }, [page, pageCount]);
+  const firstPage = useCallback(() => {
+    if (page !== 1) {
+      dispatch(setPage(1));
+    }
+  }, [page]);
+  const lastPage = useCallback(() => {
+    if (page !== pageCount) {
+      dispatch(setPage(pageCount));
+    }
+  }, [page, pageCount]);
+  const onItemPress = useCallback(
+    ({ id }: ProgramListProgram) => {
+      const index = programs.findIndex(a => a.id === id);
+      dispatch(open(programs, index));
+    },
+    [programs]
+  );
+  const keyExtractor = useCallback(({ id }: ProgramListProgram) => id, []);
+  const listDateFormatter = useCallback(
+    (date: Date) => dateFormatter.format(date, "YYYY/MM/DD A HHHH:mm"),
+    [dateFormatter]
+  );
+  const listRenderer = useCallback<ListRenderItem<ProgramListProgram>>(
+    ({ item }) => (
+      <ListProgram
+        selected={item.id === selectedId}
+        countMode={countMode}
+        dateFormatter={listDateFormatter}
+        onPress={onItemPress}
+        {...item}
+      />
+    ),
+    [countMode, selectedId, listDateFormatter, onItemPress]
+  );
+  const pagePickerRenderer = useCallback(
+    (page: number) => (
+      <Picker.Item key={page} label={String(page)} value={String(page)} />
+    ),
+    []
+  );
+
+  return (
+    <View style={[colorStyle.bgLight, styles.container]} onLayout={onLayout}>
+      {containerWidth > 0 && (
+        <Animated.View
+          style={[
+            containerWidth > breakpoint
+              ? containerStyle.row
+              : containerStyle.column,
+            colorStyle.bgBlack,
+            styles.header,
+            {
+              maxHeight: headerHeight
+            }
+          ]}
+        >
+          <View
+            style={
               containerWidth > breakpoint
-                ? containerStyle.row
-                : containerStyle.column,
-              colorStyle.bgBlack,
-              styles.header,
-              {
-                maxHeight: headerHeight
-              }
-            ]}
+                ? [
+                    containerStyle.row,
+                    containerStyle.wrap,
+                    containerStyle.left,
+                    programStyle.headerColumn
+                  ]
+                : programStyle.headerRow
+            }
           >
-            <View
-              style={
-                containerWidth > breakpoint
-                  ? [
-                      containerStyle.row,
-                      containerStyle.wrap,
-                      containerStyle.left,
-                      programStyle.headerColumn
-                    ]
-                  : programStyle.headerRow
-              }
-            >
-              {archiveActive && (
-                <IconSelector
-                  containerStyle={[
-                    colorStyle.bgDark,
-                    colorStyle.borderGrayDark,
-                    programStyle.headerControl
-                  ]}
-                  style={colorStyle.bgDark}
-                  color={light}
-                  icon={
-                    <FontAwesome5Icon name="database" solid color={light} />
-                  }
-                  selectedValue={useArchive ? 1 : 0}
-                  onValueChange={value => {
-                    const { dispatch } = this.props;
-                    dispatch(SettingActions.update("useArchive", value > 0));
-                    this.load();
-                  }}
-                  items={[
-                    { label: "番組表", value: 1 },
-                    { label: "録画情報", value: 0 }
-                  ]}
-                />
-              )}
-              <IconSelector
-                containerStyle={[
-                  colorStyle.bgDark,
-                  colorStyle.borderGrayDark,
-                  programStyle.headerControl,
-                  styles.sortPicker
-                ]}
-                style={colorStyle.bgDark}
-                color={light}
-                icon={<FontAwesome5Icon name="sort" solid color={light} />}
-                selectedValue={reverse ? 1 : 0}
-                onValueChange={value => {
-                  this.save({ reverse: value > 0 });
-                  this.load();
-                }}
-                items={[
-                  { label: "放送日時(新しい順)", value: 1 },
-                  { label: "放送日時(古い順)", value: 0 }
-                ]}
-              />
-            </View>
-            <View
-              style={
-                containerWidth > breakpoint
-                  ? [
-                      containerStyle.row,
-                      containerStyle.wrap,
-                      containerStyle.right,
-                      programStyle.headerColumn,
-                      programStyle.headerColumnReverse
-                    ]
-                  : [programStyle.headerRow, programStyle.headerRowRevese]
-              }
-            >
-              <View
-                style={[
-                  containerStyle.row,
-                  containerStyle.right,
-                  programStyle.headerContent
-                ]}
-              >
-                {hits > 0 && (
-                  <Text style={[textStyle.right, colorStyle.light]}>
-                    {startIndex}-{endIndex}/{hits}
-                  </Text>
-                )}
-              </View>
+            {archiveActive && (
               <IconSelector
                 containerStyle={[
                   colorStyle.bgDark,
@@ -269,402 +426,276 @@ class ProgramList extends Component<Props, State> {
                 ]}
                 style={colorStyle.bgDark}
                 color={light}
-                icon={
-                  <FontAwesome5Icon name="arrows-alt-v" solid color={light} />
-                }
-                selectedValue={view}
-                onValueChange={view => {
-                  this.save({ view });
-                  this.load();
-                }}
+                icon={<FontAwesome5Icon name="database" solid color={light} />}
+                selectedValue={useArchive ? 1 : 0}
+                onValueChange={useArchiveChange}
                 items={[
-                  { label: "10件表示", value: "10" },
-                  { label: "25件表示", value: "25" },
-                  { label: "50件表示", value: "50" },
-                  { label: "100件表示", value: "100" }
+                  { label: "番組表", value: 1 },
+                  { label: "録画情報", value: 0 }
                 ]}
               />
-            </View>
-          </Animated.View>
-        )}
-        {containerWidth > 0 && (
-          <Animated.View
-            style={[styles.view, { left: viewX }]}
-            {...this.panResponder.panHandlers}
-          >
-            <FlatList
-              style={programStyle.list}
-              contentContainerStyle={[
-                colorStyle.bgWhite,
-                programStyle.listContents
-              ]}
-              data={programs}
-              extraData={data}
-              ref={list => {
-                this.list = list;
-              }}
-              keyExtractor={({}, index) => String(index)}
-              renderItem={({
-                item: {
-                  id,
-                  channelName,
-                  fullTitle,
-                  category,
-                  duration,
-                  start,
-                  commentCount = 0,
-                  commentMaxSpeed = 0,
-                  commentSpeed = 0
-                },
-                index
-              }) => {
-                const {
-                  setting: { view: { countMode = "speed" } = {} }
-                } = this.props;
-
-                let count;
-                switch (countMode) {
-                  case "none":
-                    count = null;
-                    break;
-                  case "comment":
-                    count = commentCount;
-                    break;
-                  case "maxspeed":
-                    count = commentMaxSpeed;
-                    break;
-                  case "speed":
-                  default:
-                    count = Math.ceil(commentSpeed * 10) / 10;
-                }
-
-                let balloonColor = "hsl(70, 100%, 50%)";
-                if (commentSpeed > 200) {
-                  balloonColor = "hsl(45, 100%, 50%)";
-                } else if (commentSpeed > 100) {
-                  balloonColor = "hsl(50, 100%, 50%)";
-                } else if (commentSpeed > 50) {
-                  balloonColor = "hsl(55, 100%, 50%)";
-                } else if (commentSpeed > 25) {
-                  balloonColor = "hsl(60, 100%, 50%)";
-                } else if (commentSpeed > 10) {
-                  balloonColor = "hsl(65, 100%, 50%)";
-                }
-                return (
-                  <ListItem
-                    containerStyle={
-                      id === viewerProgram.id && programStyle.selected
-                    }
-                    titleStyle={[textStyle.bold, colorStyle.black]}
-                    title={fullTitle}
-                    bottomDivider
-                    chevron
-                    Component={TouchableOpacity}
-                    subtitle={
-                      <View style={[containerStyle.row, containerStyle.wrap]}>
-                        <Badge
-                          badgeStyle={[
-                            colorStyle.borderLight,
-                            { backgroundColor: category.color }
-                          ]}
-                          value={category.name}
-                        />
-                        <Text style={colorStyle.black}> {channelName} </Text>
-                        <Text style={colorStyle.black}>
-                          {dateFormatter.format(start, "YYYY/MM/DD A HHHH:mm")}(
-                          {Math.round(duration / 60000)}分)
-                        </Text>
-                      </View>
-                    }
-                    leftElement={
-                      commentCount > 0 ? (
-                        <Balloon
-                          wrapperStyle={programStyle.listItemLeft}
-                          color={black}
-                          backgroundColor={balloonColor}
-                          pointing="right"
-                        >
-                          {count}
-                        </Balloon>
-                      ) : (
-                        <View style={programStyle.listItemLeft} />
-                      )
-                    }
-                    onPress={() => {
-                      this.open(programs, index);
-                    }}
-                  />
-                );
-              }}
-              ListHeaderComponent={
-                query ? (
-                  <View style={programStyle.listHeader}>
-                    <Text h4 style={colorStyle.black}>
-                      "{query}"の検索結果 ({hits}件)
-                    </Text>
-                  </View>
-                ) : null
-              }
-              onScroll={({ nativeEvent }) => {
-                const { contentOffset } = nativeEvent;
-                const { headerHeight } = this.state;
-                this.headerHeight += this.scrollPos - contentOffset.y;
-                if (this.headerHeight > 256) {
-                  this.headerHeight = 256;
-                } else if (this.headerHeight < 0) {
-                  this.headerHeight = 0;
-                }
-                headerHeight.setValue(this.headerHeight);
-                this.scrollPos = contentOffset.y;
-              }}
-            />
-            {pages.length > 1 && (
-              <View
-                style={[
-                  containerStyle.row,
-                  containerStyle.center,
-                  styles.pager
-                ]}
-              >
-                <TouchableOpacity
-                  onPress={() => {
-                    this.setPage(1);
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name="angle-double-left"
-                    solid
-                    style={styles.pageButton}
-                    color={active}
-                    size={16}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    this.setPage(this.getPage() - 1);
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name="angle-left"
-                    solid
-                    style={styles.pageButton}
-                    color={active}
-                    size={16}
-                  />
-                </TouchableOpacity>
-                <View
-                  style={[
-                    colorStyle.bgWhite,
-                    colorStyle.borderLight,
-                    styles.pagePickerWrapper
-                  ]}
-                >
-                  <Picker
-                    style={styles.pagePicker}
-                    itemStyle={[
-                      styles.pagePickerItem,
-                      colorStyle.black as ViewStyle
-                    ]}
-                    selectedValue={String(page)}
-                    onValueChange={page => {
-                      this.setPage(parseInt(page, 10));
-                    }}
-                  >
-                    {pages.map(page => (
-                      <Picker.Item
-                        key={page}
-                        label={String(page)}
-                        value={String(page)}
-                      />
-                    ))}
-                  </Picker>
-                </View>
-                <TouchableOpacity
-                  onPress={() => {
-                    this.setPage(this.getPage() + 1);
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name="angle-right"
-                    solid
-                    style={styles.pageButton}
-                    color={active}
-                    size={16}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    this.setPage(Infinity);
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name="angle-double-right"
-                    solid
-                    style={styles.pageButton}
-                    color={active}
-                    size={16}
-                  />
-                </TouchableOpacity>
-              </View>
             )}
-          </Animated.View>
-        )}
-      </View>
+            <IconSelector
+              containerStyle={[
+                colorStyle.bgDark,
+                colorStyle.borderGrayDark,
+                programStyle.headerControl,
+                styles.sortPicker
+              ]}
+              style={colorStyle.bgDark}
+              color={light}
+              icon={<FontAwesome5Icon name="sort" solid color={light} />}
+              selectedValue={reverse ? 1 : 0}
+              onValueChange={reverseChange}
+              items={[
+                { label: "放送日時(新しい順)", value: 1 },
+                { label: "放送日時(古い順)", value: 0 }
+              ]}
+            />
+          </View>
+          <View
+            style={
+              containerWidth > breakpoint
+                ? [
+                    containerStyle.row,
+                    containerStyle.wrap,
+                    containerStyle.right,
+                    programStyle.headerColumn,
+                    programStyle.headerColumnReverse
+                  ]
+                : [programStyle.headerRow, programStyle.headerRowRevese]
+            }
+          >
+            <View
+              style={[
+                containerStyle.row,
+                containerStyle.right,
+                programStyle.headerContent
+              ]}
+            >
+              {hits > 0 && (
+                <Text style={[textStyle.right, colorStyle.light]}>
+                  {startIndex}-{endIndex}/{hits}
+                </Text>
+              )}
+            </View>
+            <IconSelector
+              containerStyle={[
+                colorStyle.bgDark,
+                colorStyle.borderGrayDark,
+                programStyle.headerControl
+              ]}
+              style={colorStyle.bgDark}
+              color={light}
+              icon={
+                <FontAwesome5Icon name="arrows-alt-v" solid color={light} />
+              }
+              selectedValue={view}
+              onValueChange={viewChange}
+              items={[
+                { label: "10件表示", value: 10 },
+                { label: "25件表示", value: 25 },
+                { label: "50件表示", value: 50 },
+                { label: "100件表示", value: 100 }
+              ]}
+            />
+          </View>
+        </Animated.View>
+      )}
+      {containerWidth > 0 && (
+        <Animated.View
+          style={[styles.view, { left: viewX }]}
+          {...panResponder.panHandlers}
+        >
+          <FlatList
+            style={programStyle.list}
+            contentContainerStyle={[
+              colorStyle.bgWhite,
+              programStyle.listContents
+            ]}
+            data={programs}
+            ref={listRef}
+            keyExtractor={keyExtractor}
+            renderItem={listRenderer}
+            ListHeaderComponent={<ListHeader query={query} hits={hits} />}
+            onScroll={onScroll}
+          />
+        </Animated.View>
+      )}
+      {containerWidth > 0 && pages.length > 1 && (
+        <View style={[containerStyle.row, containerStyle.center, styles.pager]}>
+          <TouchableOpacity onPress={firstPage}>
+            <FontAwesome5Icon
+              name="angle-double-left"
+              solid
+              style={styles.pageButton}
+              color={active}
+              size={16}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={previousPage}>
+            <FontAwesome5Icon
+              name="angle-left"
+              solid
+              style={styles.pageButton}
+              color={active}
+              size={16}
+            />
+          </TouchableOpacity>
+          <View
+            style={[
+              colorStyle.bgWhite,
+              colorStyle.borderLight,
+              styles.pagePickerWrapper
+            ]}
+          >
+            <Picker
+              style={styles.pagePicker}
+              itemStyle={[styles.pagePickerItem, colorStyle.black as ViewStyle]}
+              selectedValue={String(page)}
+              onValueChange={pageChange}
+            >
+              {pages.map(pagePickerRenderer)}
+            </Picker>
+          </View>
+          <TouchableOpacity onPress={nextPage}>
+            <FontAwesome5Icon
+              name="angle-right"
+              solid
+              style={styles.pageButton}
+              color={active}
+              size={16}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={lastPage}>
+            <FontAwesome5Icon
+              name="angle-double-right"
+              solid
+              style={styles.pageButton}
+              color={active}
+              size={16}
+            />
+          </TouchableOpacity>
+        </View>
+      )}
+    </View>
+  );
+});
+export default ProgramList;
+
+const ListHeader = memo(({ query, hits }: { query?: string; hits: number }) =>
+  query ? (
+    <View style={programStyle.listHeader}>
+      <Text h4 style={colorStyle.black}>
+        "{query}"の検索結果 ({hits}件)
+      </Text>
+    </View>
+  ) : null
+);
+const ListProgram = memo(
+  ({
+    selected = false,
+    countMode = "speed",
+    dateFormatter = date => date.toString(),
+    onPress,
+    ...props
+  }: ProgramListProgram & {
+    selected?: boolean;
+    countMode?: string;
+    dateFormatter?: (date: Date) => string;
+    onPress?: (program: ProgramListProgram) => void;
+  }) => {
+    const {
+      channelName,
+      fullTitle,
+      category,
+      duration,
+      start,
+      commentCount = 0,
+      commentMaxSpeed = 0,
+      commentSpeed = 0
+    } = props;
+
+    const count = useMemo(() => {
+      switch (countMode) {
+        case "none":
+          return 0;
+        case "comment":
+          return commentCount;
+        case "maxspeed":
+          return commentMaxSpeed;
+        case "speed":
+        default:
+          return Math.ceil(commentSpeed * 10) / 10;
+      }
+    }, [countMode, commentCount, commentMaxSpeed, commentSpeed]);
+    const balloonColor = useMemo(() => {
+      if (commentSpeed > 200) {
+        return "hsl(45, 100%, 50%)";
+      }
+      if (commentSpeed > 100) {
+        return "hsl(50, 100%, 50%)";
+      }
+      if (commentSpeed > 50) {
+        return "hsl(55, 100%, 50%)";
+      }
+      if (commentSpeed > 25) {
+        return "hsl(60, 100%, 50%)";
+      }
+      if (commentSpeed > 10) {
+        return "hsl(65, 100%, 50%)";
+      }
+      return "hsl(70, 100%, 50%)";
+    }, [commentSpeed]);
+
+    const onPressWithProps = useCallback(() => {
+      if (onPress) {
+        onPress(props);
+      }
+    }, [props, onPress]);
+
+    return (
+      <ListItem
+        containerStyle={selected && programStyle.selected}
+        titleStyle={[textStyle.bold, colorStyle.black]}
+        title={fullTitle}
+        bottomDivider
+        chevron
+        Component={TouchableOpacity}
+        subtitle={
+          <View style={[containerStyle.row, containerStyle.wrap]}>
+            <Badge
+              badgeStyle={[
+                colorStyle.borderLight,
+                { backgroundColor: category.color }
+              ]}
+              value={category.name}
+            />
+            <Text style={colorStyle.black}> {channelName} </Text>
+            <Text style={colorStyle.black}>
+              {dateFormatter(start)}({Math.round(duration / 60000)}分)
+            </Text>
+          </View>
+        }
+        leftElement={
+          count > 0 ? (
+            <Balloon
+              wrapperStyle={programStyle.listItemLeft}
+              color={black}
+              backgroundColor={balloonColor}
+              pointing="right"
+            >
+              {count}
+            </Balloon>
+          ) : (
+            <View style={programStyle.listItemLeft} />
+          )
+        }
+        onPress={onPressWithProps}
+      />
     );
   }
-
-  componentDidMount() {
-    this.update({ page: 1 });
-    this.load();
-
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      this.bindKeys.push("up");
-      Mousetrap.bind("up", () => {
-        const { data, viewer } = this.props;
-        const { programs = [] } = data;
-        const viewerProgram = viewer.programs[viewer.index];
-        if (viewerProgram) {
-          const { id } = viewerProgram;
-          const index = programs.findIndex(a => a.id === id);
-          if (programs[index - 1]) {
-            this.open(programs, index - 1);
-          }
-        }
-      });
-      this.bindKeys.push("down");
-      Mousetrap.bind("down", () => {
-        const { data, viewer } = this.props;
-        const { programs = [] } = data;
-        const viewerProgram = viewer.programs[viewer.index];
-        if (viewerProgram) {
-          const { id } = viewerProgram;
-          const index = programs.findIndex(a => a.id === id);
-          if (programs[index + 1]) {
-            this.open(programs, index + 1);
-          }
-        }
-      });
-      this.bindKeys.push("left");
-      Mousetrap.bind("left", () => {
-        this.setPage(this.getPage() - 1);
-      });
-      this.bindKeys.push("right");
-      Mousetrap.bind("right", () => {
-        this.setPage(this.getPage() + 1);
-      });
-    }
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    const { data, viewer } = this.props;
-    if (this.list && data !== prevProps.data) {
-      this.list.scrollToOffset({ offset: 0, animated: false });
-    }
-    if (data.query !== prevProps.data.query) {
-      this.update({ page: 1 });
-      this.load();
-    }
-    if (
-      viewer !== prevProps.viewer &&
-      viewer.index !== prevProps.viewer.index
-    ) {
-      const { programs, index } = viewer;
-      const program = programs[index];
-      if (program) {
-        this.scrollToProgram(program);
-      }
-    }
-  }
-
-  componentWillUnmount() {
-    clearTimeout(this.layoutCallbackId);
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      for (const key of this.bindKeys) {
-        Mousetrap.unbind(key);
-      }
-    }
-  }
-
-  save(options = {}) {
-    const { dispatch } = this.props;
-    dispatch(SettingActions.update("listOptions", options));
-  }
-
-  update(data = {}) {
-    const { dispatch } = this.props;
-    dispatch(ProgramActions.update("list", data));
-  }
-
-  load() {
-    const { dispatch } = this.props;
-    dispatch(ProgramActions.load("list"));
-  }
-
-  getPage() {
-    const { data } = this.props;
-    const { page = 1 } = data;
-    return page;
-  }
-
-  setPage(value: number) {
-    let page = value;
-    const { data = {}, setting } = this.props;
-    const { hits = 0 } = data;
-    const { listOptions = {} } = setting;
-    const { view = "25" } = listOptions;
-
-    const max = Math.ceil(hits / parseInt(view, 10));
-    if (page > max) {
-      page = max;
-    }
-    if (page < 1) {
-      page = 1;
-    }
-    const current = this.getPage();
-    if (page !== current) {
-      this.update({ page });
-      this.load();
-    }
-  }
-
-  open(programs: ProgramListProgram[], index: number) {
-    const { dispatch } = this.props;
-    dispatch(ViewerActions.open(programs, index));
-  }
-
-  scrollToProgram(program: ProgramListProgram) {
-    if (this.list) {
-      const { data } = this.props;
-      const { programs = [] } = data;
-      const { id: itemId } = program;
-      const item = programs.find(({ id }) => id === itemId);
-      if (item) {
-        this.list.scrollToItem({ item, viewPosition: 0.5 });
-      }
-    }
-  }
-}
-
-export default connect(
-  ({
-    program: { list: data = {} },
-    service,
-    setting,
-    viewer
-  }: {
-    program: ProgramState;
-    service: ServiceState;
-    setting: SettingState;
-    viewer: ViewerState;
-  }) => ({
-    data,
-    service,
-    setting,
-    viewer
-  })
-)(ProgramList);
+);
 
 const breakpoint = 540;
 
