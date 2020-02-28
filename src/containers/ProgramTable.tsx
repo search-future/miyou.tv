@@ -11,7 +11,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
+import React, {
+  memo,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef
+} from "react";
 import {
   ScrollView,
   TouchableOpacity,
@@ -20,14 +27,15 @@ import {
   Platform,
   Animated,
   PanResponder,
-  PanResponderInstance
+  LayoutChangeEvent,
+  NativeScrollEvent,
+  NativeSyntheticEvent
 } from "react-native";
 import { Text, CheckBox, Badge } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { NavigationActions } from "react-navigation";
 import { Menu, MenuTrigger, MenuOptions } from "react-native-popup-menu";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
+import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
 import Balloon from "../components/Balloon";
 import DatePicker from "../components/DatePicker";
@@ -42,840 +50,1035 @@ import colorStyle, {
 import containerStyle from "../styles/container";
 import textStyle from "../styles/text";
 import programStyle from "../styles/program";
+import { RootState } from "../modules";
 import {
   ProgramActions,
   ProgramState,
   ProgramTableData,
-  ProgramTableProgram
+  ProgramTableProgram,
+  ProgramTableColumn
 } from "../modules/program";
-import { ServiceState } from "../modules/service";
 import { SettingActions, SettingState } from "../modules/setting";
-import { ViewerActions, ViewerState } from "../modules/viewer";
+import { ViewerActions, ViewerProgram } from "../modules/viewer";
 import DateFormatter from "../utils/DateFormatter";
 import { categoryTable } from "../config/constants";
 
-type Props = {
-  dispatch: Dispatch;
-  data: ProgramTableData;
-  service: ServiceState;
-  setting: SettingState & {
-    tableOptions?: {
-      categories?: string[];
-    };
-    view?: {
-      countMode?: string;
-      hourFirst?: string;
-      hourFormat?: string;
-    };
-    useArchive?: boolean;
-  };
-  viewer: ViewerState;
+type Options = {
+  categories?: string[];
 };
-type State = {
-  containerWidth: number;
-  headerHeight: Animated.AnimatedValue;
-  viewX: Animated.AnimatedValue;
-};
-class ProgramTable extends Component<Props, State> {
-  view: ScrollView | null = null;
-  panResponder: PanResponderInstance;
-  state = {
-    containerWidth: 0,
-    headerHeight: new Animated.Value(256),
-    viewX: new Animated.Value(0)
+type Setting = SettingState & {
+  tableOptions?: Options;
+  view?: {
+    countMode?: string;
+    hourFirst?: string;
+    hourFormat?: string;
   };
-  bindKeys: (string | string[])[] = [];
-  layoutCallbackId?: number;
-  scrollPos = 0;
-  headerHeight = 256;
+  useArchive?: boolean;
+};
+type State = RootState & {
+  program: ProgramState & { table: ProgramTableData };
+  setting: Setting;
+};
 
-  constructor(props: Props) {
-    super(props);
-    this.panResponder = PanResponder.create({
+function save(options: Options = {}) {
+  return SettingActions.update("tableOptions", options);
+}
+function setOffset(offset: number) {
+  return ProgramActions.update("table", { offset });
+}
+function setStart(start: Date) {
+  return ProgramActions.update("table", { start });
+}
+function open(programs: ProgramTableProgram[], index: number) {
+  return ViewerActions.open(programs, index);
+}
+function roundOffset(offset: number, max: number) {
+  return ((offset % max) + max) % max;
+  2;
+}
+
+const ProgramTable = memo(() => {
+  const viewRef = useRef<ScrollView>(null);
+  const layoutCallbackId = useRef<number>();
+  const scrollPos = useRef(0);
+  const headerHeightRef = useRef(256);
+  const headerHeight = useRef(new Animated.Value(headerHeightRef.current))
+    .current;
+  const viewX = useRef(new Animated.Value(0)).current;
+
+  const dispatch = useDispatch();
+  const useArchive = useSelector<State, boolean>(
+    ({ setting }) => setting.useArchive == null || setting.useArchive
+  );
+  const countMode = useSelector<State, string>(
+    ({ setting }) => setting.view?.countMode || "speed"
+  );
+  const hourFirst = useSelector<State, number>(({ setting }) =>
+    parseInt(setting.view?.hourFirst || "4", 10)
+  );
+  const hourFormat = useSelector<State, string>(
+    ({ setting }) => setting.view?.hourFormat || ""
+  );
+  const categories = useSelector<State, string[]>(
+    ({ setting }) => setting.tableOptions?.categories || [],
+    shallowEqual
+  );
+  const columns = useSelector<State, ProgramTableColumn[]>(
+    ({ program }) => program.table?.columns || [],
+    shallowEqual
+  );
+  const maxDate = useSelector<State, Date | undefined>(
+    ({ program }) => program.table?.maxDate
+  );
+  const minDate = useSelector<State, Date | undefined>(
+    ({ program }) => program.table?.minDate
+  );
+  const offset = useSelector<State, number>(
+    ({ program }) => program.table?.offset || 0
+  );
+  const start = useSelector<State, Date>(
+    ({ program }) => program.table?.start || new Date()
+  );
+  const archiveActive = useSelector<State, boolean>(
+    ({ service }) => service.archiveActive
+  );
+  const viewerProgram = useSelector<State, ViewerProgram | undefined>(
+    ({ viewer }) => viewer.programs[viewer.index],
+    shallowEqual
+  );
+
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  const selectedId = viewerProgram?.id;
+
+  const panResponder = useMemo(() => {
+    const columnWidth =
+      containerWidth /
+      Math.floor((containerWidth - hourWidth - scrollbarWidth) / 200);
+    return PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: ({}, { dx }) => Math.abs(dx) > 10,
-      onPanResponderMove: Animated.event([null, { dx: this.state.viewX }], {}),
+      onPanResponderMove: Animated.event([null, { dx: viewX }], {}),
       onPanResponderEnd: ({}, { dx }) => {
-        const { viewX } = this.state;
-        const { data = {} } = this.props;
-        const { columns = [], offset = 0 } = data;
-        viewX.setValue(0);
-        if (Math.abs(dx) > 200) {
-          this.update({
-            offset:
-              (columns.length + offset - Math.floor(dx / 200)) % columns.length
+        if (Math.abs(dx) > columnWidth) {
+          const length = Math.round(dx / columnWidth);
+          const nextOffset = Math.floor(offset - length);
+          Animated.timing(viewX, {
+            toValue: length * columnWidth - Math.sign(dx) * scrollbarWidth
+          }).start(() => {
+            dispatch(setOffset(roundOffset(nextOffset, columns.length)));
+            viewX.setValue(0);
           });
+        } else if (Math.abs(dx) > 64) {
+          Animated.timing(viewX, {
+            toValue:
+              Math.sign(dx) * columnWidth - Math.sign(dx) * scrollbarWidth
+          }).start(() => {
+            dispatch(
+              setOffset(roundOffset(offset - Math.sign(dx), columns.length))
+            );
+            viewX.setValue(0);
+          });
+        } else {
+          viewX.setValue(0);
         }
       }
     });
-  }
-
-  render() {
-    const { data, service, setting, viewer } = this.props;
-    const {
-      columns = [],
-      maxDate,
-      minDate,
-      offset = 0,
-      start = new Date()
-    } = data;
-    const { archiveActive } = service;
-    const {
-      tableOptions = {},
-      view: viewSetting = {},
-      useArchive = true
-    } = setting;
-    const { categories = [] } = tableOptions;
-    const {
-      countMode = "speed",
-      hourFirst = "4",
-      hourFormat = ""
-    } = viewSetting;
-    const { programs: viewerPrograms, index: viewerIndex } = viewer;
-    const viewerProgram = viewerPrograms[viewerIndex] || {};
-    const { containerWidth, headerHeight, viewX } = this.state;
-
-    const dateFormatter = new DateFormatter(
-      parseInt(hourFirst, 10),
-      hourFormat
+  }, [offset, containerWidth, columns.length]);
+  const dateFormatter = useMemo(
+    () => new DateFormatter(hourFirst, hourFormat),
+    [hourFirst, hourFormat]
+  );
+  const tableColumns = useMemo(() => {
+    const columnCount = Math.floor(
+      (containerWidth - hourWidth - scrollbarWidth) / 200
     );
-
-    const hours = [];
-    for (let i = 0; i < 24; i++) {
-      const hour = new Date(maxDate || Date.now());
-      hour.setHours(parseInt(hourFirst, 10) + i);
-      hours.push(hour);
-    }
-
-    const length =
-      Platform.OS === "web"
-        ? Math.floor((containerWidth - 49) / 200)
-        : Math.floor((containerWidth - 32) / 200);
     const tableColumns = [];
     for (let i = 0; i < columns.length; i++) {
-      let index = (i + offset) % columns.length;
-      if (index < 0) {
-        index += columns.length;
-      }
-      tableColumns.push(columns[index]);
-      if (tableColumns.length >= length) {
+      const column = columns[roundOffset(offset + i, columns.length)];
+      tableColumns.push({
+        ...column,
+        programs: column.programs.filter(
+          ({ category }: ProgramTableProgram) =>
+            categories.length < 1 ||
+            categories.indexOf(String(category.code)) >= 0
+        )
+      });
+      if (tableColumns.length >= columnCount) {
         break;
       }
     }
+    return tableColumns;
+  }, [categories, columns, offset, containerWidth]);
+  const useTopButton = useMemo(
+    () =>
+      !minDate ||
+      start.getFullYear() > minDate.getFullYear() ||
+      start.getMonth() > minDate.getMonth() ||
+      start.getDate() > minDate.getDate(),
+    [minDate, start.toDateString()]
+  );
+  const useBottomButton = useMemo(
+    () =>
+      !maxDate ||
+      start.getFullYear() < maxDate.getFullYear() ||
+      start.getMonth() < maxDate.getMonth() ||
+      start.getDate() < maxDate.getDate(),
+    [maxDate, start.toDateString()]
+  );
 
-    return (
-      <View
-        style={[colorStyle.bgLight, styles.container]}
-        onLayout={({ nativeEvent }) => {
-          if (this.layoutCallbackId != null) {
-            clearTimeout(this.layoutCallbackId);
-          }
-          const { layout } = nativeEvent;
-          const containerWidth = layout.width;
-          this.layoutCallbackId = setTimeout(() => {
-            this.setState({ containerWidth });
-          }, 200);
-        }}
-      >
-        {containerWidth > 0 && (
-          <Animated.View
-            style={[
-              containerWidth > breakpoint
-                ? containerStyle.row
-                : containerStyle.column,
-              colorStyle.bgBlack,
-              styles.header,
-              {
-                maxHeight: headerHeight
-              }
-            ]}
-          >
-            <View
-              style={
-                containerWidth > breakpoint
-                  ? [
-                      containerStyle.row,
-                      containerStyle.wrap,
-                      containerStyle.left,
-                      programStyle.headerColumn
-                    ]
-                  : [programStyle.headerRow]
-              }
-            >
-              {archiveActive && (
-                <IconSelector
-                  containerStyle={[
-                    colorStyle.bgDark,
-                    colorStyle.borderGrayDark,
-                    programStyle.headerControl
-                  ]}
-                  icon={
-                    <FontAwesome5Icon name="database" solid color={light} />
-                  }
-                  style={colorStyle.bgDark}
-                  color={light}
-                  selectedValue={useArchive ? 1 : 0}
-                  onValueChange={value => {
-                    const { dispatch } = this.props;
-                    dispatch(SettingActions.update("useArchive", value > 0));
-                    this.load();
-                  }}
-                  items={[
-                    { label: "番組表", value: 1 },
-                    { label: "録画情報", value: 0 }
-                  ]}
-                />
-              )}
-            </View>
-            <View
-              style={
-                containerWidth > breakpoint
-                  ? [
-                      containerStyle.row,
-                      containerStyle.wrap,
-                      containerStyle.center,
-                      programStyle.headerColumn
-                    ]
-                  : [programStyle.headerRow]
-              }
-            >
-              <DatePicker
-                containerStyle={[
-                  colorStyle.borderGrayDark,
-                  programStyle.headerControl
-                ]}
-                color={light}
-                backgroundColor={dark}
-                maxDate={maxDate}
-                minDate={minDate}
-                value={new Date(start)}
-                onChange={start => {
-                  this.update({ start });
-                  this.load();
-                }}
-              />
-            </View>
-            <View
-              style={
-                containerWidth > breakpoint
-                  ? [
-                      containerStyle.row,
-                      containerStyle.wrap,
-                      containerStyle.right,
-                      programStyle.headerColumn
-                    ]
-                  : [programStyle.headerRow]
-              }
-            >
-              <Menu>
-                <MenuTrigger
-                  customStyles={{
-                    triggerOuterWrapper: [
-                      colorStyle.bgDark,
-                      colorStyle.borderGrayDark,
-                      programStyle.headerControl
-                    ],
-                    triggerWrapper: [
-                      containerStyle.row,
-                      colorStyle.bgDark,
-                      styles.menuButton
-                    ]
-                  }}
-                >
-                  <View style={styles.menuButtonIcon}>
-                    <FontAwesome5Icon
-                      name="filter"
-                      solid
-                      color={categories.length > 0 ? active : light}
-                    />
-                  </View>
-                  <Text style={[colorStyle.light, styles.menuButtonText]}>
-                    カテゴリ選択
-                  </Text>
-                </MenuTrigger>
-                <MenuOptions
-                  customStyles={{
-                    optionsWrapper: colorStyle.bgBlack
-                  }}
-                >
-                  <ScrollView style={styles.menuView}>
-                    {categoryTable.map(({ code, name }) => (
-                      <CheckBox
-                        key={code}
-                        containerStyle={[
-                          colorStyle.bgDark,
-                          colorStyle.borderGrayDark,
-                          styles.menuCheckbox
-                        ]}
-                        textStyle={colorStyle.light}
-                        title={name}
-                        checked={categories.indexOf(String(code)) >= 0}
-                        onPress={() => {
-                          if (categories.indexOf(String(code)) >= 0) {
-                            this.save({
-                              categories: categories.filter(
-                                a => a !== String(code)
-                              )
-                            });
-                          } else {
-                            this.save({
-                              categories: [...categories, String(code)]
-                            });
-                          }
-                        }}
-                      />
-                    ))}
-                  </ScrollView>
-                </MenuOptions>
-              </Menu>
-            </View>
-          </Animated.View>
-        )}
-        {containerWidth > 0 && (
-          <Animated.View
-            style={[styles.view, { left: viewX }]}
-            {...this.panResponder.panHandlers}
-          >
-            <View
-              style={[
-                containerStyle.row,
-                containerStyle.center,
-                colorStyle.bgDark,
-                styles.channelHeader
-              ]}
-            >
-              {tableColumns.map(({ type, channel, channelName }, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={[colorStyle.borderGrayDark, styles.channelCell]}
-                  onPress={() => {
-                    const { dispatch } = this.props;
-                    dispatch(
-                      ProgramActions.update("list", {
-                        query: `type:${type} channel:${channel}`
-                      })
-                    );
-                    dispatch(NavigationActions.navigate({ routeName: "List" }));
-                  }}
-                >
-                  <Text style={[textStyle.center, colorStyle.light]}>
-                    {channelName}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-              <TouchableOpacity
-                style={styles.buttonLeft}
-                onPress={() => {
-                  const { data = {} } = this.props;
-                  const { columns = [], offset = 0 } = data;
-                  this.update({
-                    offset: (columns.length + offset - 1) % columns.length
-                  });
-                }}
-              >
-                <FontAwesome5Icon
-                  name="chevron-left"
-                  solid
-                  style={styles.icon}
-                  color={light}
-                  size={16}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.buttonRight}
-                onPress={() => {
-                  const { data = {} } = this.props;
-                  const { columns = [], offset = 0 } = data;
-                  this.update({
-                    offset: (offset + 1) % columns.length
-                  });
-                }}
-              >
-                <FontAwesome5Icon
-                  name="chevron-right"
-                  solid
-                  style={styles.icon}
-                  color={light}
-                  size={16}
-                />
-              </TouchableOpacity>
-            </View>
-            <ScrollView
-              style={styles.tableView}
-              contentContainerStyle={containerStyle.row}
-              scrollEventThrottle={16}
-              ref={view => {
-                this.view = view;
-              }}
-              onScroll={({ nativeEvent }) => {
-                const { contentOffset } = nativeEvent;
-                const { headerHeight } = this.state;
-                this.headerHeight += this.scrollPos - contentOffset.y;
-                if (this.headerHeight > 256) {
-                  this.headerHeight = 256;
-                } else if (this.headerHeight < 0) {
-                  this.headerHeight = 0;
-                }
-                headerHeight.setValue(this.headerHeight);
-                this.scrollPos = contentOffset.y;
-              }}
-            >
-              <View style={[colorStyle.bgDark, styles.hourHeader]}>
-                {hours.map((hour, index) => (
-                  <View key={index} style={styles.hourCell}>
-                    <Text
-                      key={index}
-                      style={[textStyle.center, colorStyle.light]}
-                    >
-                      {dateFormatter.getHour(hour)}
-                    </Text>
-                  </View>
-                ))}
-                {(!minDate ||
-                  start.getFullYear() > minDate.getFullYear() ||
-                  start.getMonth() > minDate.getMonth() ||
-                  start.getDate() > minDate.getDate()) && (
-                  <TouchableOpacity
-                    style={styles.buttonTop}
-                    onPress={() => {
-                      this.previous();
-                    }}
-                  >
-                    <FontAwesome5Icon
-                      name="chevron-up"
-                      solid
-                      style={styles.icon}
-                      color={light}
-                      size={16}
-                    />
-                  </TouchableOpacity>
-                )}
-                {(!maxDate ||
-                  start.getFullYear() < maxDate.getFullYear() ||
-                  start.getMonth() < maxDate.getMonth() ||
-                  start.getDate() < maxDate.getDate()) && (
-                  <TouchableOpacity
-                    style={styles.buttonBottom}
-                    onPress={() => {
-                      this.next();
-                    }}
-                  >
-                    <FontAwesome5Icon
-                      name="chevron-down"
-                      solid
-                      style={styles.icon}
-                      color={light}
-                      size={16}
-                    />
-                  </TouchableOpacity>
-                )}
-              </View>
-              {tableColumns.map(({ programs = [] }, index) => (
-                <View key={index} style={styles.tableColumn}>
-                  {programs
-                    .filter(
-                      ({ category }) =>
-                        categories.length < 1 ||
-                        categories.indexOf(String(category.code)) >= 0
-                    )
-                    .map(
-                      (
-                        {
-                          id,
-                          start,
-                          fullTitle,
-                          detail,
-                          category,
-                          position = 0,
-                          size = 0
-                        },
-                        index
-                      ) => (
-                        <View
-                          key={index}
-                          style={[
-                            colorStyle.bgWhite,
-                            colorStyle.borderLight,
-                            index === viewerIndex &&
-                              id === viewerProgram.id &&
-                              programStyle.selected,
-                            styles.tableCellWrapper,
-                            {
-                              top: position * hourSize,
-                              height: size * hourSize
-                            }
-                          ]}
-                        >
-                          <TouchableOpacity
-                            style={styles.tableCell}
-                            onPress={() => {
-                              this.open(programs, index);
-                            }}
-                          >
-                            <View
-                              style={[containerStyle.row, containerStyle.wrap]}
-                            >
-                              <Text style={[textStyle.bold, colorStyle.black]}>
-                                <Text style={colorStyle.active}>
-                                  {dateFormatter.format(start, "HHHH:mm")}
-                                </Text>{" "}
-                                {fullTitle}
-                              </Text>
-                              <Badge
-                                badgeStyle={[
-                                  colorStyle.borderLight,
-                                  { backgroundColor: category.color }
-                                ]}
-                                value={category.name}
-                              />
-                            </View>
-                            <Text style={colorStyle.black}>{detail}</Text>
-                          </TouchableOpacity>
-                        </View>
-                      )
-                    )}
-                  {countMode !== "none" &&
-                    programs
-                      .filter(
-                        ({ category }) =>
-                          !categories ||
-                          categories.length <= 0 ||
-                          categories.indexOf(String(category.code)) >= 0
-                      )
-                      .map(
-                        (
-                          {
-                            commentCount = 0,
-                            commentSpeed = 0,
-                            commentMaxSpeed = 0,
-                            position = 0
-                          },
-                          index: number
-                        ) => {
-                          let count;
-                          if (!commentCount) {
-                            return null;
-                          }
-                          switch (countMode) {
-                            case "comment":
-                              count = commentCount;
-                              break;
-                            case "maxspeed":
-                              count = commentMaxSpeed;
-                              break;
-                            case "speed":
-                            default:
-                              count = Math.ceil(commentSpeed * 10) / 10;
-                          }
-                          let balloonColor = "hsl(70, 100%, 50%)";
-                          if (commentSpeed > 200) {
-                            balloonColor = "hsl(45, 100%, 50%)";
-                          } else if (commentSpeed > 100) {
-                            balloonColor = "hsl(50, 100%, 50%)";
-                          } else if (commentSpeed > 50) {
-                            balloonColor = "hsl(55, 100%, 50%)";
-                          } else if (commentSpeed > 25) {
-                            balloonColor = "hsl(60, 100%, 50%)";
-                          } else if (commentSpeed > 10) {
-                            balloonColor = "hsl(65, 100%, 50%)";
-                          }
-                          let top = position * hourSize - 16;
-                          if (top < 0) {
-                            top = 0;
-                          }
-                          return (
-                            <Balloon
-                              key={index}
-                              wrapperStyle={{
-                                position: "absolute",
-                                right: 0,
-                                top
-                              }}
-                              color={black}
-                              backgroundColor={balloonColor}
-                              pointing="left"
-                              onPress={() => {
-                                this.open(programs, index);
-                              }}
-                            >
-                              {count}
-                            </Balloon>
-                          );
-                        }
-                      )}
-                </View>
-              ))}
-            </ScrollView>
-          </Animated.View>
-        )}
-      </View>
-    );
-  }
-
-  componentDidMount() {
-    this.load();
-
+  useEffect(
+    () => () => {
+      clearTimeout(layoutCallbackId.current);
+    },
+    []
+  );
+  useEffect(() => {
+    dispatch(ProgramActions.load("table"));
+  }, [useArchive, start.toDateString()]);
+  useEffect(() => {
     if (Platform.OS === "web") {
       const Mousetrap = require("mousetrap");
-      this.bindKeys.push("up");
-      Mousetrap.bind("up", () => {
-        const { data, viewer } = this.props;
-        const { columns = [] } = data;
-        const { programs, index } = viewer;
-        const program = programs[index];
-        if (program) {
-          const { type, channel } = program;
-          const column = columns.find(
+      const key = "up";
+      Mousetrap.bind(key, () => {
+        if (viewerProgram) {
+          const { type, channel } = viewerProgram;
+          const column = tableColumns.find(
             a => a.type === type && a.channel === channel
           );
           if (column) {
-            const { id } = program;
+            const { id } = viewerProgram;
             const index = column.programs.findIndex(a => a.id === id);
             if (index >= 0) {
               const prevIndex = index - 1;
               if (column.programs[prevIndex]) {
-                this.open(column.programs, prevIndex);
-              } else {
-                this.previous();
+                dispatch(open(column.programs, prevIndex));
+                return false;
+              }
+              const date = new Date(start);
+              date.setDate(date.getDate() - 1);
+              if (!minDate || date.getTime() > new Date(minDate).getTime()) {
+                dispatch(setStart(date));
+                viewRef.current?.scrollToEnd({ animated: false });
               }
               return false;
             }
           }
         }
-        if (columns[0] && columns[0].programs[0]) {
-          this.open(columns[0].programs, 0);
-          return false;
+        for (const column of tableColumns) {
+          if (column.programs[column.programs.length - 1]) {
+            dispatch(open(column.programs, column.programs.length - 1));
+            return false;
+          }
         }
         return true;
       });
-      this.bindKeys.push("down");
-      Mousetrap.bind("down", () => {
-        const { data, viewer } = this.props;
-        const { columns = [] } = data;
-        const { programs, index } = viewer;
-        const program = programs[index];
-        if (program) {
-          const { type, channel } = program;
-          const column = columns.find(
+      return () => {
+        Mousetrap.unbind(key);
+      };
+    }
+  }, [
+    tableColumns,
+    minDate,
+    tableColumns,
+    viewerProgram,
+    start.toDateString()
+  ]);
+  useEffect(() => {
+    if (Platform.OS === "web") {
+      const Mousetrap = require("mousetrap");
+      const key = "down";
+      Mousetrap.bind(key, () => {
+        if (viewerProgram) {
+          const { type, channel } = viewerProgram;
+          const column = tableColumns.find(
             a => a.type === type && a.channel === channel
           );
           if (column) {
-            const { id } = program;
+            const { id } = viewerProgram;
             const index = column.programs.findIndex(a => a.id === id);
             if (index >= 0) {
               const nextIndex = index + 1;
               if (column.programs[nextIndex]) {
-                this.open(column.programs, nextIndex);
-              } else {
-                this.next();
+                dispatch(open(column.programs, nextIndex));
+                return false;
+              }
+              const date = new Date(start);
+              date.setDate(date.getDate() + 1);
+              if (!maxDate || date.getTime() < new Date(maxDate).getTime()) {
+                dispatch(setStart(date));
+                viewRef.current?.scrollTo({ y: 0, animated: false });
               }
               return false;
             }
           }
         }
-        if (columns[0] && columns[0].programs[0]) {
-          this.open(columns[0].programs, 0);
-          return false;
+        for (const column of tableColumns) {
+          if (column.programs[0]) {
+            dispatch(open(column.programs, 0));
+            return false;
+          }
         }
         return true;
       });
-      this.bindKeys.push("left");
-      Mousetrap.bind("left", () => {
-        const { data, viewer } = this.props;
-        const { columns = [], offset = 0 } = data;
-        const { programs, index } = viewer;
-        const program = programs[index];
-        if (program) {
-          const { type, channel } = program;
-          const columnIndex = columns.findIndex(
-            a => a.type === type && a.channel === channel
-          );
-          const prevColumnIndex =
-            (columns.length + columnIndex - 1) % columns.length;
-          const outerIndex = (offset + columns.length - 1) % columns.length;
-          if (prevColumnIndex === outerIndex) {
-            this.update({
-              offset: (columns.length + offset - 1) % columns.length
-            });
-          }
-          const prevColumn = columns[prevColumnIndex];
-          if (prevColumn) {
-            const { start } = program;
-            const nextIndex = prevColumn.programs.findIndex(
-              a => new Date(a.end).getTime() > new Date(start).getTime()
-            );
-            if (prevColumn.programs[nextIndex]) {
-              this.open(prevColumn.programs, nextIndex);
-              return false;
-            }
-          }
-        }
-        if (columns[0] && columns[0].programs[0]) {
-          this.open(columns[0].programs, 0);
-          return false;
-        }
-        return true;
-      });
-      this.bindKeys.push("right");
-      Mousetrap.bind("right", () => {
-        const { data, viewer } = this.props;
-        const { containerWidth } = this.state;
-        const { columns = [], offset = 0 } = data;
-        const { programs, index } = viewer;
-        const program = programs[index];
-        if (program) {
-          const { type, channel } = program;
-          const columnIndex = columns.findIndex(
-            a => a.type === type && a.channel === channel
-          );
-          const length =
-            Platform.OS === "web"
-              ? Math.floor((containerWidth - 49) / 200)
-              : Math.floor((containerWidth - 32) / 200);
-
-          const nextColumnIndex = (columnIndex + 1) % columns.length;
-          const outerIndex = (offset + length) % columns.length;
-          if (nextColumnIndex === outerIndex) {
-            this.update({
-              offset: (columns.length + offset + 1) % columns.length
-            });
-          }
-          const nextColumn = columns[nextColumnIndex];
-          if (nextColumn) {
-            const { start } = program;
-            const nextIndex = nextColumn.programs.findIndex(
-              a => new Date(a.end).getTime() > new Date(start).getTime()
-            );
-            if (nextColumn.programs[nextIndex]) {
-              this.open(nextColumn.programs, nextIndex);
-              return false;
-            }
-          }
-        }
-        if (columns[0] && columns[0].programs[0]) {
-          this.open(columns[0].programs, 0);
-          return false;
-        }
-        return true;
-      });
+      return () => {
+        Mousetrap.unbind(key);
+      };
     }
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    const { viewer } = this.props;
-    if (viewer !== prevProps.viewer) {
-      const { programs, index } = viewer;
-      const program = programs[index];
-      if (program) {
-        this.scrollToProgram(program, index);
-      }
-    }
-  }
-
-  componentWillUnmount() {
-    clearTimeout(this.layoutCallbackId);
+  }, [
+    tableColumns,
+    maxDate,
+    tableColumns,
+    viewerProgram,
+    start.toDateString()
+  ]);
+  useEffect(() => {
     if (Platform.OS === "web") {
       const Mousetrap = require("mousetrap");
-      for (const key of this.bindKeys) {
+      const key = "left";
+      Mousetrap.bind(key, () => {
+        if (viewerProgram) {
+          const { type, channel } = viewerProgram;
+          const columnIndex = tableColumns.findIndex(
+            a => a.type === type && a.channel === channel
+          );
+          if (columnIndex >= 0) {
+            const prevColumn = tableColumns[columnIndex - 1];
+            if (prevColumn?.programs?.length > 0) {
+              const startTime = new Date(viewerProgram.start).getTime();
+              const nextIndex = prevColumn.programs.findIndex(
+                a => new Date(a.end).getTime() > startTime
+              );
+              if (prevColumn.programs[nextIndex]) {
+                dispatch(open(prevColumn.programs, nextIndex));
+                return false;
+              }
+            }
+            dispatch(setOffset(roundOffset(offset - 1, columns.length)));
+            return false;
+          }
+        }
+        for (const column of tableColumns) {
+          if (column.programs[0]) {
+            dispatch(open(column.programs, 0));
+            return false;
+          }
+        }
+        dispatch(setOffset(roundOffset(offset - 1, columns.length)));
+        return false;
+      });
+      return () => {
         Mousetrap.unbind(key);
+      };
+    }
+  }, [offset, tableColumns, viewerProgram, columns.length]);
+  useEffect(() => {
+    if (Platform.OS === "web") {
+      const Mousetrap = require("mousetrap");
+      const key = "right";
+      Mousetrap.bind(key, () => {
+        if (viewerProgram) {
+          const { type, channel } = viewerProgram;
+          const columnIndex = tableColumns.findIndex(
+            a => a.type === type && a.channel === channel
+          );
+          if (columnIndex >= 0) {
+            const nextColumn = tableColumns[columnIndex + 1];
+            if (nextColumn?.programs?.length > 0) {
+              const startTime = new Date(viewerProgram.start).getTime();
+              const nextIndex = nextColumn.programs.findIndex(
+                a => new Date(a.end).getTime() > startTime
+              );
+              if (nextColumn.programs[nextIndex]) {
+                dispatch(open(nextColumn.programs, nextIndex));
+                return false;
+              }
+            }
+            dispatch(setOffset(roundOffset(offset + 1, columns.length)));
+            return false;
+          }
+        }
+        for (const column of tableColumns) {
+          if (column.programs[0]) {
+            dispatch(open(column.programs, 0));
+            return false;
+          }
+        }
+        dispatch(setOffset(roundOffset(offset + 1, columns.length)));
+        return false;
+      });
+      return () => {
+        Mousetrap.unbind(key);
+      };
+    }
+  }, [offset, tableColumns, viewerProgram, columns.length]);
+  useEffect(() => {
+    if (viewerProgram && viewRef.current) {
+      const { type, channel } = viewerProgram;
+      const columnIndex = tableColumns.findIndex(
+        a => a.type === type && a.channel === channel
+      );
+      if (columnIndex >= 0) {
+        const { id } = viewerProgram;
+        const column = tableColumns[columnIndex];
+        const program = column.programs.find(a => a.id === id);
+        if (program?.position) {
+          const y = (program.position - 0.5) * hourHeight;
+          viewRef.current.scrollTo({ y });
+        }
       }
     }
-  }
+  }, [tableColumns, viewerProgram]);
 
-  save(options = {}) {
-    const { dispatch } = this.props;
-    dispatch(SettingActions.update("tableOptions", options));
-  }
-
-  update(data = {}) {
-    const { dispatch } = this.props;
-    dispatch(ProgramActions.update("table", data));
-  }
-
-  load() {
-    const { dispatch } = this.props;
-    dispatch(ProgramActions.load("table"));
-  }
-
-  previous() {
-    const { data = {} } = this.props;
-    const { minDate, start = new Date() } = data;
+  const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
+    if (layoutCallbackId.current != null) {
+      clearTimeout(layoutCallbackId.current);
+    }
+    const { layout } = nativeEvent;
+    const containerWidth = layout.width;
+    layoutCallbackId.current = setTimeout(() => {
+      setContainerWidth(containerWidth);
+    }, 200);
+  }, []);
+  const onScroll = useCallback(
+    ({ nativeEvent }: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { contentOffset } = nativeEvent;
+      headerHeightRef.current += scrollPos.current - contentOffset.y;
+      if (headerHeightRef.current > 256) {
+        headerHeightRef.current = 256;
+      } else if (headerHeightRef.current < 0) {
+        headerHeightRef.current = 0;
+      }
+      headerHeight.setValue(headerHeightRef.current);
+      scrollPos.current = contentOffset.y;
+    },
+    []
+  );
+  const onChannelPress = useCallback(
+    ({ type, channel }: ProgramTableColumn) => {
+      dispatch(
+        ProgramActions.update("list", {
+          query: `type:${type} channel:${channel}`
+        })
+      );
+      dispatch(NavigationActions.navigate({ routeName: "List" }));
+    },
+    []
+  );
+  const onLeftPress = useCallback(() => {
+    dispatch(setOffset(roundOffset(offset - 1, columns.length)));
+  }, [offset, columns.length]);
+  const onRightPress = useCallback(() => {
+    dispatch(setOffset(roundOffset(offset + 1, columns.length)));
+  }, [offset, columns.length]);
+  const onTopPress = useCallback(() => {
     const date = new Date(start);
     date.setDate(date.getDate() - 1);
     if (!minDate || date.getTime() > new Date(minDate).getTime()) {
-      this.update({
-        start: date
-      });
-      this.load();
-      if (this.view) {
-        this.view.scrollToEnd({ animated: false });
-      }
+      dispatch(setStart(date));
+      viewRef.current?.scrollToEnd({ animated: false });
     }
-  }
-
-  next() {
-    const { data = {} } = this.props;
-    const { maxDate, start = new Date() } = data;
+  }, [minDate, start.toDateString()]);
+  const onBottomPress = useCallback(() => {
     const date = new Date(start);
     date.setDate(date.getDate() + 1);
     if (!maxDate || date.getTime() < new Date(maxDate).getTime()) {
-      this.update({
-        start: date
-      });
-      this.load();
-      if (this.view) {
-        this.view.scrollTo({ y: 0, animated: false });
-      }
+      dispatch(setStart(date));
+      viewRef.current?.scrollTo({ y: 0, animated: false });
     }
-  }
-
-  open(programs: ProgramTableProgram[], index: number) {
-    const { dispatch } = this.props;
-    dispatch(ViewerActions.open(programs, index));
-  }
-
-  scrollToProgram(item: ProgramTableProgram, index?: number) {
-    if (this.view) {
-      const { data } = this.props;
-      const { columns = [] } = data;
-      const { id: itemId, type: itemType, channel: itemChannel } = item;
-      const column = columns.find(
-        ({ type, channel }) => type === itemType && channel === itemChannel
-      );
-      if (column) {
-        const program = column.programs.find(
-          ({ id }, i) => id === itemId && (index == null || i === index)
-        );
-        if (program && program.position) {
-          const y = (program.position - 0.5) * hourSize;
-          this.view.scrollTo({ y });
+  }, [maxDate, start.toDateString()]);
+  const onItemPress = useCallback(
+    ({ programs }: ProgramTableColumn, { id }: ProgramTableProgram) => {
+      if (programs) {
+        const index = programs.findIndex(a => a.id === id);
+        if (index >= 0) {
+          dispatch(open(programs, index));
         }
       }
-    }
-  }
-}
+    },
+    []
+  );
+  const useArchiveChange = useCallback((value: string | number) => {
+    dispatch(SettingActions.update("useArchive", value > 0));
+  }, []);
+  const startChange = useCallback((start: Date) => {
+    dispatch(setStart(start));
+  }, []);
+  const cellDateFormatter = useCallback(
+    (date: Date) => dateFormatter.format(date, "HHHH:mm"),
+    [dateFormatter]
+  );
+  const categoryCheckRenderer = useCallback(
+    ({ code, name }: { code: number; name: string }) => {
+      const onPress = () => {
+        if (categories.indexOf(String(code)) >= 0) {
+          dispatch(
+            save({
+              categories: categories.filter((a: string) => a !== String(code))
+            })
+          );
+        } else {
+          dispatch(
+            save({
+              categories: [...categories, String(code)]
+            })
+          );
+        }
+      };
+      return (
+        <CheckBox
+          key={code}
+          containerStyle={[
+            colorStyle.bgDark,
+            colorStyle.borderGrayDark,
+            styles.menuCheckbox
+          ]}
+          textStyle={colorStyle.light}
+          title={name}
+          checked={categories.indexOf(String(code)) >= 0}
+          onPress={onPress}
+        />
+      );
+    },
+    [categories]
+  );
+  const columnRenderer = useCallback(
+    (column: ProgramTableColumn) => (
+      <TableColumn
+        key={`${column.type}/${column.channel}`}
+        countMode={countMode}
+        selectedId={selectedId}
+        dateFormatter={cellDateFormatter}
+        onItemPress={onItemPress}
+        {...column}
+      />
+    ),
+    [countMode, selectedId, cellDateFormatter]
+  );
 
-export default connect(
+  return (
+    <View style={[colorStyle.bgLight, styles.container]} onLayout={onLayout}>
+      {containerWidth > 0 && (
+        <Animated.View
+          style={[
+            containerWidth > breakpoint
+              ? containerStyle.row
+              : containerStyle.column,
+            colorStyle.bgBlack,
+            styles.header,
+            {
+              maxHeight: headerHeight
+            }
+          ]}
+        >
+          <View
+            style={
+              containerWidth > breakpoint
+                ? [
+                    containerStyle.row,
+                    containerStyle.wrap,
+                    containerStyle.left,
+                    programStyle.headerColumn
+                  ]
+                : [programStyle.headerRow]
+            }
+          >
+            {archiveActive && (
+              <IconSelector
+                containerStyle={[
+                  colorStyle.bgDark,
+                  colorStyle.borderGrayDark,
+                  programStyle.headerControl
+                ]}
+                icon={<FontAwesome5Icon name="database" solid color={light} />}
+                style={colorStyle.bgDark}
+                color={light}
+                selectedValue={useArchive ? 1 : 0}
+                onValueChange={useArchiveChange}
+                items={[
+                  { label: "番組表", value: 1 },
+                  { label: "録画情報", value: 0 }
+                ]}
+              />
+            )}
+          </View>
+          <View
+            style={
+              containerWidth > breakpoint
+                ? [
+                    containerStyle.row,
+                    containerStyle.wrap,
+                    containerStyle.center,
+                    programStyle.headerColumn
+                  ]
+                : [programStyle.headerRow]
+            }
+          >
+            <DatePicker
+              containerStyle={[
+                colorStyle.borderGrayDark,
+                programStyle.headerControl
+              ]}
+              color={light}
+              backgroundColor={dark}
+              maxDate={maxDate}
+              minDate={minDate}
+              value={start}
+              onChange={startChange}
+            />
+          </View>
+          <View
+            style={
+              containerWidth > breakpoint
+                ? [
+                    containerStyle.row,
+                    containerStyle.wrap,
+                    containerStyle.right,
+                    programStyle.headerColumn
+                  ]
+                : [programStyle.headerRow]
+            }
+          >
+            <Menu>
+              <MenuTrigger
+                customStyles={{
+                  triggerOuterWrapper: [
+                    colorStyle.bgDark,
+                    colorStyle.borderGrayDark,
+                    programStyle.headerControl
+                  ],
+                  triggerWrapper: [
+                    containerStyle.row,
+                    colorStyle.bgDark,
+                    styles.menuButton
+                  ]
+                }}
+              >
+                <View style={styles.menuButtonIcon}>
+                  <FontAwesome5Icon
+                    name="filter"
+                    solid
+                    color={categories.length > 0 ? active : light}
+                  />
+                </View>
+                <Text style={[colorStyle.light, styles.menuButtonText]}>
+                  カテゴリ選択
+                </Text>
+              </MenuTrigger>
+              <MenuOptions
+                customStyles={{
+                  optionsWrapper: colorStyle.bgBlack
+                }}
+              >
+                <ScrollView style={styles.menuView}>
+                  {categoryTable.map(categoryCheckRenderer)}
+                </ScrollView>
+              </MenuOptions>
+            </Menu>
+          </View>
+        </Animated.View>
+      )}
+      {containerWidth > 0 && (
+        <Animated.View
+          style={[styles.view, { left: viewX }]}
+          {...panResponder.panHandlers}
+        >
+          <ChannelHeader
+            channels={tableColumns}
+            onChannelPress={onChannelPress}
+            onLeftPress={onLeftPress}
+            onRightPress={onRightPress}
+          />
+          <ScrollView
+            style={styles.tableView}
+            contentContainerStyle={containerStyle.row}
+            scrollEventThrottle={16}
+            ref={viewRef}
+            onScroll={onScroll}
+          >
+            <HourHeader
+              useTopButton={useTopButton}
+              useBottomButton={useBottomButton}
+              onTopPress={onTopPress}
+              onBottomPress={onBottomPress}
+            />
+            {tableColumns.map(columnRenderer)}
+          </ScrollView>
+        </Animated.View>
+      )}
+    </View>
+  );
+});
+export default ProgramTable;
+
+const ChannelHeader = memo(
   ({
-    program: { table: data = {} },
-    service,
-    setting,
-    viewer
+    channels,
+    useLeftButton = true,
+    useRightButton = true,
+    onChannelPress,
+    onLeftPress,
+    onRightPress
   }: {
-    program: ProgramState;
-    service: ServiceState;
-    setting: SettingState;
-    viewer: ViewerState;
-  }) => ({
-    data,
-    service,
-    setting,
-    viewer
-  })
-)(ProgramTable);
+    channels: ProgramTableColumn[];
+    useLeftButton?: boolean;
+    useRightButton?: boolean;
+    onChannelPress?: (column: ProgramTableColumn) => void;
+    onLeftPress?: () => void;
+    onRightPress?: () => void;
+  }) => {
+    const channelRenderer = useCallback(
+      (column: ProgramTableColumn) => (
+        <ChannelCell
+          key={`${column.type}/${column.channel}`}
+          onPress={onChannelPress}
+          {...column}
+        />
+      ),
+      [onChannelPress]
+    );
+
+    return (
+      <View
+        style={[
+          containerStyle.row,
+          containerStyle.center,
+          colorStyle.bgDark,
+          styles.channelHeader
+        ]}
+      >
+        {channels.map(channelRenderer)}
+        {useLeftButton && onLeftPress && (
+          <TouchableOpacity style={styles.buttonLeft} onPress={onLeftPress}>
+            <FontAwesome5Icon
+              name="chevron-left"
+              solid
+              style={styles.icon}
+              color={light}
+              size={16}
+            />
+          </TouchableOpacity>
+        )}
+        {useRightButton && onRightPress && (
+          <TouchableOpacity style={styles.buttonRight} onPress={onRightPress}>
+            <FontAwesome5Icon
+              name="chevron-right"
+              solid
+              style={styles.icon}
+              color={light}
+              size={16}
+            />
+          </TouchableOpacity>
+        )}
+      </View>
+    );
+  }
+);
+
+const ChannelCell = memo(
+  ({
+    onPress,
+    ...props
+  }: ProgramTableColumn & {
+    onPress?: (channel: ProgramTableColumn) => void;
+  }) => {
+    const { channelName } = props;
+
+    const onPressWithProps = useCallback(() => {
+      if (onPress) {
+        onPress(props);
+      }
+    }, [props, onPress]);
+
+    return (
+      <TouchableOpacity
+        style={[colorStyle.borderGrayDark, styles.channelCell]}
+        onPress={onPressWithProps}
+      >
+        <Text style={[textStyle.center, colorStyle.light]}>{channelName}</Text>
+      </TouchableOpacity>
+    );
+  }
+);
+
+const HourHeader = memo(
+  ({
+    useTopButton = true,
+    useBottomButton = true,
+    onTopPress,
+    onBottomPress
+  }: {
+    useTopButton?: boolean;
+    useBottomButton?: boolean;
+    onTopPress?: () => void;
+    onBottomPress?: () => void;
+  }) => {
+    const hourFirst = useSelector<State, number>(({ setting }) =>
+      parseInt(setting.view?.hourFirst || "4", 10)
+    );
+    const hourFormat = useSelector<State, string>(
+      ({ setting }) => setting.view?.hourFormat || ""
+    );
+    const dateFormatter = useMemo(
+      () => new DateFormatter(hourFirst, hourFormat),
+      [hourFirst, hourFormat]
+    );
+    const hours = useMemo(() => {
+      const hours = [];
+      for (let i = 0; i < 24; i++) {
+        const hour = new Date();
+        hour.setHours(hourFirst + i);
+        hours.push(dateFormatter.getHour(hour));
+      }
+      return hours;
+    }, [hourFirst]);
+
+    const hourRenderer = useCallback(
+      (hour: number) => (
+        <View key={hour} style={styles.hourCell}>
+          <Text style={[textStyle.center, colorStyle.light]}>{hour}</Text>
+        </View>
+      ),
+      [dateFormatter]
+    );
+
+    return (
+      <View style={[colorStyle.bgDark, styles.hourHeader]}>
+        {hours.map(hourRenderer)}
+        {useTopButton && onTopPress && (
+          <TouchableOpacity style={styles.buttonTop} onPress={onTopPress}>
+            <FontAwesome5Icon
+              name="chevron-up"
+              solid
+              style={styles.icon}
+              color={light}
+              size={16}
+            />
+          </TouchableOpacity>
+        )}
+        {useBottomButton && onBottomPress && (
+          <TouchableOpacity style={styles.buttonBottom} onPress={onBottomPress}>
+            <FontAwesome5Icon
+              name="chevron-down"
+              solid
+              style={styles.icon}
+              color={light}
+              size={16}
+            />
+          </TouchableOpacity>
+        )}
+      </View>
+    );
+  }
+);
+
+const TableColumn = memo(
+  ({
+    selectedId,
+    countMode = "speed",
+    dateFormatter = (date: Date) => `${date.getHours()}:${date.getMinutes()}`,
+    onItemPress,
+    ...props
+  }: ProgramTableColumn & {
+    selectedId?: string;
+    countMode?: string;
+    dateFormatter?: (date: Date) => string;
+    onItemPress?: (
+      column: ProgramTableColumn,
+      program: ProgramTableProgram
+    ) => void;
+  }) => {
+    const { programs = [] } = props;
+
+    const onPress = useCallback(
+      (program: ProgramTableProgram) => {
+        if (onItemPress) {
+          onItemPress(props, program);
+        }
+      },
+      [props]
+    );
+    const cellRenderer = useCallback(
+      (program: ProgramTableProgram) => (
+        <TableCell
+          key={program.id}
+          selected={program.id === selectedId}
+          dateFormatter={dateFormatter}
+          onPress={onPress}
+          {...program}
+        />
+      ),
+      [selectedId, onPress]
+    );
+    const balloonRenderer = useCallback(
+      (program: ProgramTableProgram) => (
+        <ProgramTableBalloon
+          key={program.id}
+          countMode={countMode}
+          onPress={onPress}
+          {...program}
+        />
+      ),
+      [countMode, onPress]
+    );
+
+    return (
+      <View style={styles.tableColumn}>
+        {programs.map(cellRenderer)}
+        {countMode !== "none" && programs.map(balloonRenderer)}
+      </View>
+    );
+  }
+);
+
+const TableCell = memo(
+  ({
+    selected = false,
+    dateFormatter = date => `${date.getHours()}:${date.getMinutes()}`,
+    onPress,
+    ...props
+  }: ProgramTableProgram & {
+    selected?: boolean;
+    dateFormatter?: (date: Date) => string;
+    onPress?: (column: ProgramTableProgram) => void;
+  }) => {
+    const {
+      start,
+      fullTitle,
+      detail,
+      category,
+      position = 0,
+      size = 0
+    } = props;
+
+    const onPressWithProps = useCallback(() => {
+      if (onPress) {
+        onPress(props);
+      }
+    }, [props, onPress]);
+
+    return (
+      <View
+        style={[
+          colorStyle.bgWhite,
+          colorStyle.borderLight,
+          selected && programStyle.selected,
+          styles.tableCellWrapper,
+          {
+            top: position * hourHeight,
+            height: size * hourHeight
+          }
+        ]}
+      >
+        <TouchableOpacity style={styles.tableCell} onPress={onPressWithProps}>
+          <View style={[containerStyle.row, containerStyle.wrap]}>
+            <Text style={[textStyle.bold, colorStyle.black]}>
+              <Text style={colorStyle.active}>{dateFormatter(start)}</Text>{" "}
+              {fullTitle}
+            </Text>
+            <Badge
+              badgeStyle={[
+                colorStyle.borderLight,
+                { backgroundColor: category.color }
+              ]}
+              value={category.name}
+            />
+          </View>
+          <Text style={colorStyle.black}>{detail}</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+);
+
+const ProgramTableBalloon = memo(
+  ({
+    countMode = "speed",
+    onPress,
+    ...props
+  }: ProgramTableProgram & {
+    countMode?: string;
+    onPress?: (program: ProgramTableProgram) => void;
+  }) => {
+    const {
+      commentCount = 0,
+      commentSpeed = 0,
+      commentMaxSpeed = 0,
+      position = 0
+    } = props;
+
+    if (!commentCount) {
+      return null;
+    }
+
+    const count = useMemo(() => {
+      switch (countMode) {
+        case "comment":
+          return commentCount;
+        case "maxspeed":
+          return commentMaxSpeed;
+        case "speed":
+        default:
+          return Math.ceil(commentSpeed * 10) / 10;
+      }
+    }, [countMode]);
+    const balloonColor = useMemo(() => {
+      if (commentSpeed > 200) {
+        return "hsl(45, 100%, 50%)";
+      }
+      if (commentSpeed > 100) {
+        return "hsl(50, 100%, 50%)";
+      }
+      if (commentSpeed > 50) {
+        return "hsl(55, 100%, 50%)";
+      }
+      if (commentSpeed > 25) {
+        return "hsl(60, 100%, 50%)";
+      }
+      if (commentSpeed > 10) {
+        return "hsl(65, 100%, 50%)";
+      }
+      return "hsl(70, 100%, 50%)";
+    }, [commentMaxSpeed]);
+    const top = useMemo(() => {
+      let top = position * hourHeight - 16;
+      if (top < 0) {
+        top = 0;
+      }
+      return top;
+    }, [position]);
+
+    const onPressWithProps = useCallback(() => {
+      if (onPress) {
+        onPress(props);
+      }
+    }, [props, onPress]);
+
+    if (!count) {
+      return null;
+    }
+    return (
+      <Balloon
+        wrapperStyle={{
+          position: "absolute",
+          right: 0,
+          top
+        }}
+        color={black}
+        backgroundColor={balloonColor}
+        pointing="left"
+        onPress={onPressWithProps}
+      >
+        {count}
+      </Balloon>
+    );
+  }
+);
 
 const breakpoint = 540;
-const hourSize = 240;
+const hourWidth = 32;
+const hourHeight = 240;
+const scrollbarWidth = Platform.OS === "web" ? 20 : 0;
 
 const styles = StyleSheet.create({
   container: {
@@ -896,7 +1099,7 @@ const styles = StyleSheet.create({
     paddingLeft: 8
   },
   menuView: {
-    maxHeight: hourSize
+    maxHeight: hourHeight
   },
   menuCheckbox: {
     borderRadius: 0,
@@ -910,8 +1113,8 @@ const styles = StyleSheet.create({
   channelHeader: {
     alignItems: "stretch",
     height: 32,
-    paddingLeft: 32,
-    paddingRight: Platform.OS === "web" ? 17 : 0
+    paddingLeft: hourWidth,
+    paddingRight: scrollbarWidth
   },
   channelCell: {
     borderLeftWidth: 1,
@@ -921,8 +1124,8 @@ const styles = StyleSheet.create({
     overflow: "hidden"
   },
   hourHeader: {
-    width: 32,
-    height: hourSize * 24
+    width: hourWidth,
+    height: hourHeight * 24
   },
   hourCell: {
     alignItems: "center",
@@ -939,7 +1142,7 @@ const styles = StyleSheet.create({
   },
   tableColumn: {
     flex: 1,
-    height: hourSize * 24
+    height: hourHeight * 24
   },
   tableCellWrapper: {
     borderWidth: 1,
@@ -960,11 +1163,11 @@ const styles = StyleSheet.create({
   buttonLeft: {
     position: "absolute",
     top: 0,
-    left: 32
+    left: hourWidth
   },
   buttonRight: {
     position: "absolute",
-    right: Platform.OS === "web" ? 17 : 0,
+    right: scrollbarWidth,
     top: 0
   },
   buttonTop: {

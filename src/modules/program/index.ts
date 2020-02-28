@@ -33,7 +33,11 @@ import { tableSaga } from "./table";
 import { listSaga } from "./list";
 import { rankingSaga } from "./ranking";
 
-export { ProgramTableData, ProgramTableProgram } from "./table";
+export {
+  ProgramTableData,
+  ProgramTableProgram,
+  ProgramTableColumn,
+} from "./table";
 export { ProgramListData, ProgramListProgram } from "./list";
 export { ProgramRankingData, ProgramRankingProgram } from "./ranking";
 

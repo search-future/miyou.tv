@@ -35,10 +35,12 @@ export type ProgramTableProgram = Program & {
   commentMaxSpeedTime?: Date;
 };
 
+export type ProgramTableColumn = Channel & {
+  programs: ProgramTableProgram[];
+};
+
 export type ProgramTableData = {
-  columns?: (Channel & {
-    programs: ProgramTableProgram[];
-  })[];
+  columns?: ProgramTableColumn[];
   maxDate?: Date;
   minDate?: Date;
   offset?: number;
