@@ -127,6 +127,7 @@ export function* init() {
 export function* rankingSaga() {
   try {
     yield put(LoadingActions.start(true));
+    yield put(ProgramActions.update("ranking", { programs: [] }));
 
     const { initilized }: { initilized: boolean } = yield select(
       ({ program = {} }) => program
