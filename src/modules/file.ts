@@ -43,6 +43,7 @@ function* addSaga(action: AnyAction & { uris: string[] }) {
     ({ service }) => service
   );
   const { file = {} }: SettingState = yield select(({ setting }) => setting);
+  let { count }: SettingState = yield select(({ file }) => file);
   const dateFormat = file.dateFormat || "YYMMDDHHmm";
   const programs: FileProgram[] = [];
   for (const uri of uris) {
@@ -62,11 +63,11 @@ function* addSaga(action: AnyAction & { uris: string[] }) {
       time = moment(normalizedName, dateFormat);
     }
     programs.push({
-      id: normalizedName,
+      id: String(count),
       type: "file",
       channel: channel.type,
       channelName: channel.id,
-      title: basename,
+      title: normalizedName,
       fullTitle: basename,
       detail: uri,
       category: { code: 15, name: "etc" },
@@ -76,6 +77,7 @@ function* addSaga(action: AnyAction & { uris: string[] }) {
       preview: Platform.OS === "web" ? "" : uri,
       stream: uri
     });
+    count++;
   }
   if (programs.length > 0) {
     yield put(append(programs));
@@ -99,19 +101,19 @@ function* appendSaga() {
 }
 
 export const FILE_UPDATE = "FILE_UPDATE";
-function update(index: number, data: any) {
+function update(id: string, data: any) {
   return {
     type: FILE_UPDATE,
-    index,
+    id,
     data
   };
 }
 
 export const FILE_REMOVE = "FILE_REMOVE";
-function remove(index: number) {
+function remove(id: string) {
   return {
     type: FILE_REMOVE,
-    index
+    id
   };
 }
 
@@ -125,25 +127,29 @@ export const FileActions = {
 export type FileProgram = Program;
 export type FileState = {
   programs: FileProgram[];
+  count: number;
 };
 const initilalState: FileState = {
-  programs: []
+  programs: [],
+  count: 0
 };
 export default function fileReducer(state = initilalState, action: AnyAction) {
   switch (action.type) {
     case FILE_APPEND: {
       const programs = [...state.programs, ...action.programs];
-      return { ...state, programs };
+      const count = state.count + action.programs.length;
+      return { ...state, programs, count };
     }
     case FILE_UPDATE: {
       const programs = [...state.programs];
-      const { index, data } = action;
+      const { id, data } = action;
+      const index = programs.findIndex(a => a.id === id);
       programs[index] = { ...programs[index], ...data };
       return { ...state, programs };
     }
     case FILE_REMOVE: {
-      const { index } = action;
-      const programs = state.programs.filter(({}, i) => i !== index);
+      const { id } = action;
+      const programs = state.programs.filter(a => a.id !== id);
       return { ...state, programs };
     }
     default:
@@ -165,16 +171,15 @@ export function* fileSaga() {
       ({ service }) => service
     );
     const { programs }: FileState = yield select(({ file }) => file);
-    for (let i = 0; i < programs.length; i++) {
-      const program = programs[i];
+    for (const program of programs) {
       if (!program.channelName) {
-        const { id: normalizedName } = program;
+        const { title } = program;
         const channel = commentChannels
-          .filter(({ id }) => normalizedName.indexOf(id) >= 0)
+          .filter(({ id }) => title.indexOf(id) >= 0)
           .pop();
         if (channel) {
           yield put(
-            FileActions.update(i, {
+            FileActions.update(program.id, {
               channel: channel.type,
               channelName: channel.id
             })
