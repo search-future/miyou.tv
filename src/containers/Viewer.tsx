@@ -11,12 +11,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
-import { TouchableOpacity, View, StyleSheet, Platform } from "react-native";
+import React, {
+  memo,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef
+} from "react";
+import {
+  TouchableOpacity,
+  View,
+  StyleSheet,
+  Platform,
+  LayoutChangeEvent
+} from "react-native";
 import { ButtonGroup, Image, Text } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
+import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
 import CommentPlayer from "./CommentPlayer";
 import Controller from "./Controller";
@@ -26,45 +38,60 @@ import Seekbar from "./Seekbar";
 import ViewerInfo from "./ViewerInfo";
 import colorStyle, { dark, grayDark, light } from "../styles/color";
 import containerStyle from "../styles/container";
+import { RootState } from "../modules";
 import { SettingState } from "../modules/setting";
-import { ViewerState, ViewerActions } from "../modules/viewer";
+import { ViewerActions, ViewerProgram } from "../modules/viewer";
 import CommentInfo from "./CommentInfo";
 
-type Props = {
-  dispatch: Dispatch;
-  setting: SettingState;
-  viewer: ViewerState;
-};
-type State = {
-  containerWidth: number;
-  containerHeight: number;
-  isLandscape: boolean;
-  selectedIndex: number;
-};
-class Viewer extends Component<Props, State> {
-  state = {
-    containerWidth: 0,
-    containerHeight: 0,
-    isLandscape: false,
-    selectedIndex: Platform.OS === "web" ? 1 : 0
+type Setting = SettingState & {
+  commentPlayer?: {
+    enabled?: boolean;
   };
-  layoutCallbackId?: number;
+  viewer?: {
+    expand?: boolean;
+  };
+};
+type State = RootState & {
+  setting: Setting;
+};
 
-  render() {
-    const { setting, viewer } = this.props;
-    const { viewer: viewerSetting = {}, commentPlayer = {} } = setting;
-    const { enabled: comment = true } = commentPlayer;
-    const { programs, index, mode, playing, control } = viewer;
-    const {
-      containerWidth,
-      containerHeight,
-      isLandscape,
-      selectedIndex
-    } = this.state;
-    const program = programs[index];
+const Viewer = memo(() => {
+  const layoutCallbackId = useRef<number>();
 
+  const dispatch = useDispatch();
+  const expand = useSelector<State, boolean>(
+    ({ setting }) => setting.viewer?.expand
+  );
+  const commentEnabled = useSelector<State, boolean>(
+    ({ setting }) =>
+      setting.commentPlayer?.enabled == null || setting.commentPlayer?.enabled
+  );
+  const programs = useSelector<State, ViewerProgram[]>(
+    ({ viewer }) => viewer.programs,
+    shallowEqual
+  );
+  const index = useSelector<State, number>(({ viewer }) => viewer.index);
+  const mode = useSelector<State, string>(({ viewer }) => viewer.mode);
+  const playing = useSelector<State, boolean>(({ viewer }) => viewer.playing);
+  const peakPlayEnabled = useSelector<State, boolean>(
+    ({ viewer }) => viewer.peakPlay
+  );
+  const controlEnabled = useSelector<State, boolean>(
+    ({ viewer }) => viewer.control
+  );
+
+  const [containerWidth, setContainerWidth] = useState(0);
+  const [containerHeight, setContainerHeight] = useState(0);
+  const [isLandscape, setLandscape] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(
+    Platform.OS === "web" ? 1 : 0
+  );
+
+  const program = programs[index];
+  const tabIndex = playing ? selectedIndex : 0;
+
+  const screenHeight = useMemo(() => {
     let screenHeight = containerHeight;
-    const expand = viewerSetting.expand && viewer.playing;
     if (!expand) {
       screenHeight = (containerWidth / 16) * 9;
       const maxScreenHeight = containerHeight / 2 - 40;
@@ -72,340 +99,278 @@ class Viewer extends Component<Props, State> {
         screenHeight = maxScreenHeight;
       }
     }
-    const tabIndex = playing ? selectedIndex : 0;
+    return screenHeight;
+  }, [expand, containerWidth, containerHeight]);
+  const tabButtons = useMemo(
+    () => [
+      {
+        element: () => <Text style={colorStyle.light}>情報</Text>
+      },
+      {
+        element: () => <Text style={colorStyle.light}>コメント</Text>
+      }
+    ],
+    []
+  );
 
-    return (
-      <View
-        style={[colorStyle.bgLight, styles.container]}
-        onLayout={({ nativeEvent }) => {
-          if (this.layoutCallbackId != null) {
-            clearTimeout(this.layoutCallbackId);
-          }
-          const { layout } = nativeEvent;
-          const containerWidth = layout.width;
-          const containerHeight = layout.height;
-          const isLandscape =
-            Platform.OS === "web"
-              ? layout.width > breakpoint
-              : layout.width > layout.height;
-          this.layoutCallbackId = setTimeout(() => {
-            this.setState({ containerWidth, containerHeight, isLandscape });
-          }, 200);
-        }}
-      >
-        {program && containerWidth > 0 && (
-          <View
-            style={
-              isLandscape ? [containerStyle.row, styles.view] : styles.view
-            }
-          >
-            <View
-              style={[isLandscape ? styles.primaryColumn : styles.primaryRow]}
-            >
-              <View
-                style={[isLandscape ? { flex: 1 } : { height: screenHeight }]}
-              >
-                <Image
-                  containerStyle={[styles.screenContent, styles.imageContainer]}
-                  style={styles.image}
-                  source={{ uri: program.preview }}
-                  resizeMode="contain"
-                />
-                <View
-                  style={[
-                    containerStyle.row,
-                    containerStyle.center,
-                    styles.screenContent
-                  ]}
-                >
-                  <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                      const { dispatch } = this.props;
-                      dispatch(
-                        ViewerActions.update({ playing: true, peakPlay: false })
-                      );
-                    }}
-                  >
-                    <FontAwesome5Icon
-                      name="play"
-                      solid
-                      color={light}
-                      size={24}
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                      const { dispatch, viewer } = this.props;
-                      const { programs, index } = viewer;
-                      const program = programs[index];
-                      let extraIndex = 0;
-                      if (
-                        program &&
-                        program.recorded &&
-                        program.commentMaxSpeedTime
-                      ) {
-                        const peakTime = new Date(
-                          program.commentMaxSpeedTime
-                        ).getTime();
-                        for (let i = 0; i < program.recorded.length; i++) {
-                          const extraProgram = program.recorded[i];
-                          const start = new Date(extraProgram.start).getTime();
-                          const end = new Date(extraProgram.end).getTime();
-                          if (start <= peakTime && end > peakTime) {
-                            extraIndex = i;
-                            break;
-                          }
-                        }
-                      }
-                      dispatch(
-                        ViewerActions.update({
-                          playing: true,
-                          peakPlay: true,
-                          extraIndex
-                        })
-                      );
-                    }}
-                  >
-                    <FontAwesome5Icon
-                      name="star"
-                      solid
-                      color={light}
-                      size={24}
-                    />
-                  </TouchableOpacity>
-                </View>
-                {playing && (
-                  <PlayerContainer style={styles.screenContent}>
-                    <Player />
-                    {comment && (
-                      <View style={styles.screenContent}>
-                        <CommentPlayer />
-                      </View>
-                    )}
-                  </PlayerContainer>
-                )}
-                {playing && control && (
-                  <View style={styles.control}>
-                    <Seekbar />
-                    <Controller />
-                  </View>
-                )}
-              </View>
-              {(!playing || control || (!expand && !isLandscape)) && (
-                <View
-                  style={[
-                    containerStyle.row,
-                    containerStyle.nowrap,
-                    colorStyle.bgDark,
-                    (expand || isLandscape) && styles.primaryHeaderExpand
-                  ]}
-                >
-                  {mode === "stack" && (
-                    <TouchableOpacity
-                      style={styles.button}
-                      onPress={() => {
-                        this.close();
-                      }}
-                    >
-                      <FontAwesome5Icon
-                        name="chevron-circle-left"
-                        solid
-                        color={light}
-                        size={24}
-                      />
-                    </TouchableOpacity>
-                  )}
-                  {mode === "view" && (
-                    <TouchableOpacity
-                      style={styles.button}
-                      onPress={() => {
-                        this.undock();
-                      }}
-                    >
-                      <FontAwesome5Icon
-                        name="external-link-alt"
-                        solid
-                        color={light}
-                        size={24}
-                      />
-                    </TouchableOpacity>
-                  )}
-                  {mode === "child" && (
-                    <TouchableOpacity
-                      style={styles.button}
-                      onPress={() => {
-                        this.dock();
-                      }}
-                    >
-                      <FontAwesome5Icon
-                        name="columns"
-                        solid
-                        color={light}
-                        size={24}
-                      />
-                    </TouchableOpacity>
-                  )}
-                  <Text h4 style={[colorStyle.light, styles.title]}>
-                    {program.rank ? `${program.rank}. ` : ""}
-                    {program.fullTitle}
-                  </Text>
-                  {mode === "view" && (
-                    <TouchableOpacity
-                      style={styles.button}
-                      onPress={() => {
-                        this.close();
-                      }}
-                    >
-                      <FontAwesome5Icon
-                        name="times"
-                        solid
-                        color={light}
-                        size={24}
-                      />
-                    </TouchableOpacity>
-                  )}
-                </View>
-              )}
-              {(!playing || control) && programs[index - 1] && (
-                <TouchableOpacity
-                  style={[styles.button, styles.buttonPrevious]}
-                  onPress={() => {
-                    const { viewer } = this.props;
-                    const { index = 0 } = viewer;
-                    this.setIndex(index - 1);
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name="chevron-left"
-                    solid
-                    style={styles.iconShadow}
-                    size={24}
-                    color={light}
-                  />
-                </TouchableOpacity>
-              )}
-              {(!playing || control) && programs[index + 1] && (
-                <TouchableOpacity
-                  style={[styles.button, styles.buttonNext]}
-                  onPress={() => {
-                    const { viewer } = this.props;
-                    const { index = 0 } = viewer;
-                    this.setIndex(index + 1);
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name="chevron-right"
-                    solid
-                    style={styles.iconShadow}
-                    color={light}
-                    size={24}
-                  />
-                </TouchableOpacity>
-              )}
-            </View>
-            {!expand && (
-              <View
-                style={[
-                  colorStyle.bgDark,
-                  isLandscape ? styles.secondaryColumn : styles.secondaryRow
-                ]}
-              >
-                <ButtonGroup
-                  containerStyle={[
-                    colorStyle.bgDark,
-                    colorStyle.borderGrayDark
-                  ]}
-                  containerBorderRadius={0}
-                  selectedButtonStyle={colorStyle.bgBlack}
-                  innerBorderStyle={{ color: grayDark }}
-                  buttons={[
-                    {
-                      element: () => <Text style={colorStyle.light}>情報</Text>
-                    },
-                    {
-                      element: () => (
-                        <Text style={colorStyle.light}>コメント</Text>
-                      )
-                    }
-                  ]}
-                  selectedIndex={tabIndex}
-                  onPress={selectedIndex => {
-                    this.setState({ selectedIndex });
-                  }}
-                />
-                {tabIndex === 0 && <ViewerInfo />}
-                {tabIndex === 1 && <CommentInfo />}
-              </View>
-            )}
-          </View>
-        )}
-      </View>
+  useEffect(
+    () => () => {
+      clearTimeout(layoutCallbackId.current);
+    },
+    []
+  );
+
+  const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
+    if (layoutCallbackId.current != null) {
+      clearTimeout(layoutCallbackId.current);
+    }
+    const { layout } = nativeEvent;
+    const containerWidth = layout.width;
+    const containerHeight = layout.height;
+    const isLandscape =
+      Platform.OS === "web"
+        ? layout.width > breakpoint
+        : layout.width > layout.height;
+    layoutCallbackId.current = setTimeout(() => {
+      setContainerWidth(containerWidth);
+      setContainerHeight(containerHeight);
+      setLandscape(isLandscape);
+    }, 200);
+  }, []);
+  const selectedIndexChange = useCallback((selectedIndex: number) => {
+    setSelectedIndex(selectedIndex);
+  }, []);
+  const play = useCallback(() => {
+    dispatch(ViewerActions.update({ playing: true, peakPlay: false }));
+  }, []);
+  const peakPlay = useCallback(() => {
+    let extraIndex = 0;
+    if (program.recorded && program.commentMaxSpeedTime) {
+      const peakTime = new Date(program.commentMaxSpeedTime).getTime();
+      extraIndex = program.recorded.findIndex(
+        ({ start, end }) =>
+          new Date(start).getTime() < peakTime &&
+          new Date(end).getTime() > peakTime
+      );
+      if (extraIndex < 0) {
+        extraIndex = 0;
+      }
+    }
+    dispatch(
+      ViewerActions.update({
+        playing: true,
+        peakPlay: true,
+        extraIndex
+      })
     );
-  }
-
-  componentWillUnmount() {
-    clearTimeout(this.layoutCallbackId);
-  }
-
-  close() {
-    const { dispatch } = this.props;
+  }, [program]);
+  const close = useCallback(() => {
     dispatch(ViewerActions.close());
-  }
-
-  dock() {
-    const { dispatch } = this.props;
+  }, []);
+  const dock = useCallback(() => {
     dispatch(ViewerActions.dock());
-  }
-
-  undock() {
-    const { dispatch } = this.props;
+  }, []);
+  const undock = useCallback(() => {
     dispatch(ViewerActions.undock());
-  }
-
-  setIndex(value: number) {
-    let index = value;
-    const { dispatch, viewer } = this.props;
-    const { programs = [], index: current, peakPlay } = viewer;
-
-    if (index >= programs.length) {
-      index = programs.length - 1;
-    }
-    if (index < 0) {
-      index = 0;
-    }
-    if (index !== current) {
+  }, []);
+  const previous = useCallback(() => {
+    const previousIndex = index - 1;
+    const program = programs[previousIndex];
+    if (program) {
       let extraIndex = 0;
-      const program = programs[index];
-      if (
-        peakPlay &&
-        program &&
-        program.recorded &&
-        program.commentMaxSpeedTime
-      ) {
+      if (peakPlayEnabled && program.recorded && program.commentMaxSpeedTime) {
         const peakTime = new Date(program.commentMaxSpeedTime).getTime();
-        for (let i = 0; i < program.recorded.length; i++) {
-          const extraProgram = program.recorded[i];
-          const start = new Date(extraProgram.start).getTime();
-          const end = new Date(extraProgram.end).getTime();
-          if (start <= peakTime && end > peakTime) {
-            extraIndex = i;
-            break;
-          }
+        extraIndex = program.recorded.findIndex(
+          ({ start, end }) =>
+            new Date(start).getTime() < peakTime &&
+            new Date(end).getTime() > peakTime
+        );
+        if (extraIndex < 0) {
+          extraIndex = 0;
         }
       }
-      dispatch(ViewerActions.update({ index, extraIndex }));
+      dispatch(ViewerActions.update({ index: previousIndex, extraIndex }));
     }
-  }
-}
+  }, [programs, index, peakPlayEnabled]);
+  const next = useCallback(() => {
+    const nextIndex = index + 1;
+    const program = programs[nextIndex];
+    if (program) {
+      let extraIndex = 0;
+      if (peakPlayEnabled && program.recorded && program.commentMaxSpeedTime) {
+        const peakTime = new Date(program.commentMaxSpeedTime).getTime();
+        extraIndex = programs.findIndex(
+          ({ start, end }) =>
+            new Date(start).getTime() < peakTime &&
+            new Date(end).getTime() > peakTime
+        );
+        if (extraIndex < 0) {
+          extraIndex = 0;
+        }
+      }
+      dispatch(ViewerActions.update({ index: nextIndex, extraIndex }));
+    }
+  }, [programs, index, peakPlayEnabled]);
 
-export default connect(
-  ({ setting, viewer }: { setting: SettingState; viewer: ViewerState }) => ({
-    setting,
-    viewer
-  })
-)(Viewer);
+  return (
+    <View style={[colorStyle.bgLight, styles.container]} onLayout={onLayout}>
+      {program && containerWidth > 0 && (
+        <View
+          style={isLandscape ? [containerStyle.row, styles.view] : styles.view}
+        >
+          <View
+            style={[isLandscape ? styles.primaryColumn : styles.primaryRow]}
+          >
+            <View
+              style={[isLandscape ? { flex: 1 } : { height: screenHeight }]}
+            >
+              <Image
+                containerStyle={[styles.screenContent, styles.imageContainer]}
+                style={styles.image}
+                source={{ uri: program.preview }}
+                resizeMode="contain"
+              />
+              <View
+                style={[
+                  containerStyle.row,
+                  containerStyle.center,
+                  styles.screenContent
+                ]}
+              >
+                <TouchableOpacity style={styles.button} onPress={play}>
+                  <FontAwesome5Icon name="play" solid color={light} size={24} />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={peakPlay}>
+                  <FontAwesome5Icon name="star" solid color={light} size={24} />
+                </TouchableOpacity>
+              </View>
+              {playing && (
+                <PlayerContainer style={styles.screenContent}>
+                  <Player />
+                  {commentEnabled && (
+                    <View style={styles.screenContent}>
+                      <CommentPlayer />
+                    </View>
+                  )}
+                </PlayerContainer>
+              )}
+              {playing && controlEnabled && (
+                <View style={styles.control}>
+                  <Seekbar />
+                  <Controller />
+                </View>
+              )}
+            </View>
+            {(!playing || controlEnabled || (!expand && !isLandscape)) && (
+              <View
+                style={[
+                  containerStyle.row,
+                  containerStyle.nowrap,
+                  colorStyle.bgDark,
+                  (expand || isLandscape) && styles.primaryHeaderExpand
+                ]}
+              >
+                {mode === "stack" && (
+                  <TouchableOpacity style={styles.button} onPress={close}>
+                    <FontAwesome5Icon
+                      name="chevron-circle-left"
+                      solid
+                      color={light}
+                      size={24}
+                    />
+                  </TouchableOpacity>
+                )}
+                {mode === "view" && (
+                  <TouchableOpacity style={styles.button} onPress={undock}>
+                    <FontAwesome5Icon
+                      name="external-link-alt"
+                      solid
+                      color={light}
+                      size={24}
+                    />
+                  </TouchableOpacity>
+                )}
+                {mode === "child" && (
+                  <TouchableOpacity style={styles.button} onPress={dock}>
+                    <FontAwesome5Icon
+                      name="columns"
+                      solid
+                      color={light}
+                      size={24}
+                    />
+                  </TouchableOpacity>
+                )}
+                <Text h4 style={[colorStyle.light, styles.title]}>
+                  {program.rank ? `${program.rank}. ` : ""}
+                  {program.fullTitle}
+                </Text>
+                {mode === "view" && (
+                  <TouchableOpacity style={styles.button} onPress={close}>
+                    <FontAwesome5Icon
+                      name="times"
+                      solid
+                      color={light}
+                      size={24}
+                    />
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
+            {(!playing || controlEnabled) && programs[index - 1] && (
+              <TouchableOpacity
+                style={[styles.button, styles.buttonPrevious]}
+                onPress={previous}
+              >
+                <FontAwesome5Icon
+                  name="chevron-left"
+                  solid
+                  style={styles.iconShadow}
+                  size={24}
+                  color={light}
+                />
+              </TouchableOpacity>
+            )}
+            {(!playing || controlEnabled) && programs[index + 1] && (
+              <TouchableOpacity
+                style={[styles.button, styles.buttonNext]}
+                onPress={next}
+              >
+                <FontAwesome5Icon
+                  name="chevron-right"
+                  solid
+                  style={styles.iconShadow}
+                  color={light}
+                  size={24}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
+          {!expand && (
+            <View
+              style={[
+                colorStyle.bgDark,
+                isLandscape ? styles.secondaryColumn : styles.secondaryRow
+              ]}
+            >
+              <ButtonGroup
+                containerStyle={[colorStyle.bgDark, colorStyle.borderGrayDark]}
+                containerBorderRadius={0}
+                selectedButtonStyle={colorStyle.bgBlack}
+                innerBorderStyle={{ color: grayDark }}
+                buttons={tabButtons}
+                selectedIndex={tabIndex}
+                onPress={selectedIndexChange}
+              />
+              {tabIndex === 0 && <ViewerInfo />}
+              {tabIndex === 1 && <CommentInfo />}
+            </View>
+          )}
+        </View>
+      )}
+    </View>
+  );
+});
+export default Viewer;
 
 const breakpoint = 640;
 
