@@ -11,203 +11,260 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
+import React, { memo, useCallback, useMemo } from "react";
 import { TouchableOpacity, View, StyleSheet } from "react-native";
 import { Text } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
+import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
 import CommentChart from "./CommentChart";
 import CustomSlider from "../components/CustomSlider";
 import colorStyle, { gray, light } from "../styles/color";
 import containerStyle from "../styles/container";
-import { PlayerState, PlayerActions } from "../modules/player";
+import { RootState } from "../modules";
+import { PlayerActions } from "../modules/player";
 import { SettingState } from "../modules/setting";
-import { ViewerState, ViewerActions } from "../modules/viewer";
+import { ViewerActions, ViewerProgram } from "../modules/viewer";
 import DateFormatter from "../utils/DateFormatter";
 import formatTime from "../utils/formatTime";
 
-type Props = {
-  dispatch: Dispatch;
-  player: PlayerState;
-  setting: SettingState & {
-    view?: {
-      hourFirst?: string;
-      hourFormat?: string;
-    };
+type Setting = SettingState & {
+  view?: {
+    hourFirst?: string;
+    hourFormat?: string;
   };
-  viewer: ViewerState;
 };
-class Seekbar extends Component<Props> {
-  options: { [key: string]: string } = {
-    "ad-lavc-o": "dual_mono_mode=auto"
-  };
-  observers: { [name: string]: (value: any) => void } = {};
+type State = RootState & {
+  setting: Setting;
+};
 
-  render() {
-    const { player, setting, viewer } = this.props;
-    const { duration, time, position, useClock } = player;
-    const { view = {} } = setting;
-    const { hourFirst = "4", hourFormat = "" } = view;
-    const { programs, index, extraIndex } = viewer;
+const Seekbar = () => {
+  const dispatch = useDispatch();
+  const useClock = useSelector<State, boolean>(({ player }) => player.useClock);
+  const hourFirst = useSelector<State, number>(({ setting }) =>
+    parseInt(setting.view?.hourFirst || "4", 10)
+  );
+  const hourFormat = useSelector<State, string>(
+    ({ setting }) => setting.view?.hourFormat || ""
+  );
+  const program = useSelector<State, ViewerProgram>(
+    ({ viewer }) => viewer.programs[viewer.index],
+    shallowEqual
+  );
+  const extraIndex = useSelector<State, number>(
+    ({ viewer }) => viewer.extraIndex
+  );
 
-    const program = programs[index];
-    const recordedProgram = this.getRecorded();
-    const date = new Date(recordedProgram.start);
-
-    const dateFormatter = new DateFormatter(
-      parseInt(hourFirst, 10),
-      hourFormat
-    );
-
-    return (
-      <View style={[containerStyle.row, styles.container]}>
-        {program.recorded && (
-          <TouchableOpacity
-            style={styles.button}
-            disabled={!program.recorded[extraIndex - 1]}
-            onPress={() => {
-              this.prev();
-            }}
-          >
-            <FontAwesome5Icon
-              name="step-backward"
-              solid
-              color={program.recorded[extraIndex - 1] ? light : gray}
-              size={24}
-            />
-          </TouchableOpacity>
-        )}
-        <TouchableOpacity
-          onPress={() => {
-            const { dispatch, player } = this.props;
-            const { useClock } = player;
-            dispatch(PlayerActions.useClock(!useClock));
-          }}
-        >
-          <Text style={colorStyle.light}>
-            {useClock
-              ? dateFormatter.format(
-                  new Date(date.getTime() + time),
-                  "HHHH:mm:ss"
-                )
-              : formatTime(time)}
-          </Text>
-        </TouchableOpacity>
-        <View style={styles.sliderContainer}>
-          <CommentChart />
-          <CustomSlider
-            style={styles.slider}
-            maximumValue={1}
-            minimumValue={0}
-            step={0.00001}
-            value={position}
-            maximumTrackTintColor="#ffffff20"
-            minimumTrackTintColor="#ffffffe2"
-            onValueChange={position => {
-              const { dispatch } = this.props;
-              dispatch(PlayerActions.position(position));
-            }}
-          />
-        </View>
-        <TouchableOpacity
-          onPress={() => {
-            const { dispatch, player } = this.props;
-            const { useClock } = player;
-            dispatch(PlayerActions.useClock(!useClock));
-          }}
-        >
-          <Text style={colorStyle.light}>
-            {useClock
-              ? dateFormatter.format(
-                  new Date(date.getTime() + duration),
-                  "HHHH:mm:ss"
-                )
-              : formatTime(duration)}
-          </Text>
-        </TouchableOpacity>
-        {program.recorded && (
-          <TouchableOpacity
-            style={styles.button}
-            disabled={!program.recorded[extraIndex + 1]}
-            onPress={() => {
-              this.next();
-            }}
-          >
-            <FontAwesome5Icon
-              name="step-forward"
-              solid
-              color={program.recorded[extraIndex + 1] ? light : gray}
-              size={24}
-            />
-          </TouchableOpacity>
-        )}
-      </View>
-    );
-  }
-
-  shouldComponentUpdate(nextProps: Props) {
-    const { player } = this.props;
-    return (
-      nextProps.player === player ||
-      (nextProps.player.time === player.time &&
-        nextProps.player.position === player.position) ||
-      Math.floor(nextProps.player.time / 1000) !==
-        Math.floor(player.time / 1000)
-    );
-  }
-
-  getRecorded() {
-    const { viewer } = this.props;
-    const { programs, index, extraIndex } = viewer;
-    const program = programs[index];
-    if (program.recorded && program.recorded[extraIndex]) {
-      return program.recorded[extraIndex];
+  const dateFormatter = useMemo(
+    () => new DateFormatter(hourFirst, hourFormat),
+    [hourFirst, hourFormat]
+  );
+  const date = useMemo(() => {
+    if (program.recorded?.[extraIndex]) {
+      return new Date(program.recorded[extraIndex].start);
     }
-    return program;
-  }
+    return new Date(program.start);
+  }, [program, extraIndex]);
 
-  next() {
-    const { dispatch, viewer } = this.props;
-    const { programs, index, extraIndex } = viewer;
-    const program = programs[index];
+  const formatter = useCallback(
+    (date: Date) => dateFormatter.format(date, "HHHH:mm:ss"),
+    [dateFormatter]
+  );
+  const timePress = useCallback(() => {
+    dispatch(PlayerActions.useClock(!useClock));
+  }, [useClock]);
+  const positionChange = useCallback(position => {
+    dispatch(PlayerActions.position(position));
+  }, []);
+  const next = useCallback(() => {
     const nextExtraIndex = extraIndex + 1;
-    if (program.recorded && program.recorded[nextExtraIndex]) {
+    if (program.recorded?.[nextExtraIndex]) {
       dispatch(
         ViewerActions.update({ extraIndex: nextExtraIndex, peakPlay: false })
       );
     }
-  }
-
-  prev() {
-    const { dispatch, viewer } = this.props;
-    const { programs, index, extraIndex } = viewer;
-    const program = programs[index];
+  }, [program, extraIndex]);
+  const prev = useCallback(() => {
     const prevExtraIndex = extraIndex - 1;
-    if (program.recorded && program.recorded[prevExtraIndex]) {
+    if (program.recorded?.[prevExtraIndex]) {
       dispatch(
         ViewerActions.update({ extraIndex: prevExtraIndex, peakPlay: false })
       );
     }
-  }
-}
+  }, [program, extraIndex]);
 
-export default connect(
+  return (
+    <View style={[containerStyle.row, styles.container]}>
+      {program.recorded && (
+        <TouchableOpacity
+          style={styles.button}
+          disabled={!program.recorded[extraIndex - 1]}
+          onPress={prev}
+        >
+          <FontAwesome5Icon
+            name="step-backward"
+            solid
+            color={program.recorded[extraIndex - 1] ? light : gray}
+            size={24}
+          />
+        </TouchableOpacity>
+      )}
+      <StartText
+        useClock={useClock}
+        date={date}
+        formatter={formatter}
+        onPress={timePress}
+      />
+      <View style={styles.sliderContainer}>
+        <CommentChart />
+        <SeekSlider onChange={positionChange} />
+      </View>
+      <EndText
+        useClock={useClock}
+        date={date}
+        formatter={formatter}
+        onPress={timePress}
+      />
+      {program.recorded && (
+        <TouchableOpacity
+          style={styles.button}
+          disabled={!program.recorded[extraIndex + 1]}
+          onPress={next}
+        >
+          <FontAwesome5Icon
+            name="step-forward"
+            solid
+            color={program.recorded[extraIndex + 1] ? light : gray}
+            size={24}
+          />
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+};
+export default Seekbar;
+
+const TimeText = memo(
   ({
-    player,
-    setting,
-    viewer
+    time,
+    useClock = false,
+    date,
+    formatter = date => date.toTimeString(),
+    onPress
   }: {
-    player: PlayerState;
-    setting: SettingState;
-    viewer: ViewerState;
-  }) => ({
-    player,
-    setting,
-    viewer
-  })
-)(Seekbar);
+    time: number;
+    useClock?: boolean;
+    date?: Date;
+    formatter: (date: Date) => string;
+    onPress?: () => void;
+  }) => {
+    const timeText = useMemo(
+      () =>
+        useClock && date
+          ? formatter(new Date(date.getTime() + time))
+          : formatTime(time),
+      [useClock, date, formatter, time]
+    );
+
+    const onPressHandler = useCallback(() => {
+      if (onPress) {
+        onPress();
+      }
+    }, [onPress]);
+
+    return (
+      <TouchableOpacity onPress={onPressHandler}>
+        <Text style={colorStyle.light}>{timeText}</Text>
+      </TouchableOpacity>
+    );
+  }
+);
+
+const StartText = memo(
+  ({
+    useClock = false,
+    date,
+    formatter = date => date.toTimeString(),
+    onPress
+  }: {
+    useClock?: boolean;
+    date?: Date;
+    formatter?: (date: Date) => string;
+    onPress?: () => void;
+  }) => {
+    const time = useSelector<State, number>(
+      ({ player }) => Math.floor(player.time / 1000) * 1000
+    );
+
+    return (
+      <TimeText
+        time={time}
+        useClock={useClock}
+        date={date}
+        formatter={formatter}
+        onPress={onPress}
+      />
+    );
+  }
+);
+
+const EndText = memo(
+  ({
+    useClock = false,
+    date,
+    formatter = date => date.toTimeString(),
+    onPress
+  }: {
+    useClock?: boolean;
+    date?: Date;
+    formatter?: (date: Date) => string;
+    onPress?: () => void;
+  }) => {
+    const duration = useSelector<State, number>(
+      ({ player }) => player.duration
+    );
+
+    return (
+      <TimeText
+        time={duration}
+        useClock={useClock}
+        date={date}
+        formatter={formatter}
+        onPress={onPress}
+      />
+    );
+  }
+);
+
+const SeekSlider = memo(
+  ({ onChange }: { onChange?: (position: number) => void }) => {
+    const position = useSelector<State, number>(
+      ({ player }) => player.position
+    );
+
+    const onChangeHandler = useCallback(
+      (position: number) => {
+        if (onChange) {
+          onChange(position);
+        }
+      },
+      [onChange]
+    );
+
+    return (
+      <CustomSlider
+        style={styles.slider}
+        maximumValue={1}
+        minimumValue={0}
+        step={0.00001}
+        value={position}
+        maximumTrackTintColor="#ffffff20"
+        minimumTrackTintColor="#ffffffe2"
+        onValueChange={onChangeHandler}
+      />
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   container: {
