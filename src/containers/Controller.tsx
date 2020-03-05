@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
+import React, { useCallback, useMemo, memo } from "react";
 import {
   Switch,
   TouchableOpacity,
@@ -22,800 +22,642 @@ import {
 import { Text } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { Menu, MenuTrigger, MenuOptions } from "react-native-popup-menu";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import CustomSlider from "../components/CustomSlider";
 import colorStyle, { light } from "../styles/color";
 import containerStyle from "../styles/container";
+import { RootState } from "../modules";
 import { SettingState, SettingActions } from "../modules/setting";
-import { PlayerState, PlayerActions } from "../modules/player";
-import { ViewerState } from "../modules/viewer";
-import { WindowState, WindowActions } from "../modules/window";
+import { PlayerActions } from "../modules/player";
+import { WindowActions } from "../modules/window";
 
-type Props = {
-  dispatch: Dispatch;
-  player: PlayerState;
-  setting: SettingState & {
-    player?: {
-      speed?: string;
-      mute?: boolean;
-      volume?: string;
-      deinterlace?: boolean;
-      repeat?: string;
-    };
-    commentPlayer?: {
-      enabled?: boolean;
-      duration?: string;
-      delay?: string;
-      maxLines?: string;
-      maxComments?: string;
-    };
+type Setting = SettingState & {
+  player?: {
+    speed?: string;
+    mute?: boolean;
+    volume?: string;
+    deinterlace?: boolean;
+    repeat?: string;
   };
-  viewer: ViewerState;
-  window: WindowState;
+  commentPlayer?: {
+    enabled?: boolean;
+    duration?: string;
+    delay?: string;
+    maxLines?: string;
+    maxComments?: string;
+  };
+  viewer?: {
+    expand: boolean;
+  };
 };
-class Controller extends Component<Props> {
-  options: { [key: string]: string } = {
-    "ad-lavc-o": "dual_mono_mode=auto"
-  };
-  observers: { [name: string]: (value: any) => void } = {};
-  dualMonoTable: { [key: string]: string } = {
-    auto: "自動",
-    both: "主/副",
-    main: "主音声",
-    sub: "副音声"
-  };
-  repeatTable: { [key: string]: string } = {
-    stop: "停止",
-    continue: "連続再生",
-    repeat: "リピート"
-  };
+type State = RootState & {
+  setting: Setting;
+};
 
-  render() {
-    const { player, setting, window } = this.props;
-    const { pause, track, trackCount, dualMonoMode } = player;
-    const {
-      player: playerSetting = {},
-      viewer: viewerSetting = {},
-      commentPlayer: commentPlayerSetting = {}
-    } = setting;
-    const {
-      speed = "1",
-      mute = false,
-      volume = "100",
-      deinterlace = true,
-      repeat = "continue"
-    } = playerSetting;
-    const { expand = false } = viewerSetting;
-    const {
-      enabled: comment = true,
-      maxLines = "10",
-      maxComments = "50",
-      duration = "5000",
-      delay = "0"
-    } = commentPlayerSetting;
-    const { fullScreen } = window;
+const Controller = memo(() => {
+  const audioTrackCount = useSelector<State, number>(
+    ({ player }) => player.trackCount.audio
+  );
 
-    let volumeIcon = "volume-off";
-    if (mute) {
-      volumeIcon = "volume-mute";
-    } else if (parseInt(volume, 10) > 50) {
-      volumeIcon = "volume-up";
-    } else if (parseInt(volume, 10) > 0) {
-      volumeIcon = "volume-down";
-    }
-
-    return (
-      <View style={[containerStyle.row, styles.container]}>
-        <View style={[containerStyle.row, containerStyle.left, styles.left]}>
-          <Menu>
-            <MenuTrigger customStyles={{ triggerWrapper: styles.button }}>
-              <FontAwesome5Icon
-                name={volumeIcon}
-                solid
-                color={light}
-                size={24}
-              />
-            </MenuTrigger>
-            <MenuOptions>
-              <View
-                style={[
-                  containerStyle.row,
-                  colorStyle.bgBlack,
-                  styles.optionRow
-                ]}
-              >
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    const { dispatch, setting } = this.props;
-                    const { player = {} } = setting;
-                    const { mute = false } = player;
-                    dispatch(SettingActions.update("player", { mute: !mute }));
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name={volumeIcon}
-                    solid
-                    color={light}
-                    size={24}
-                  />
-                </TouchableOpacity>
-                <CustomSlider
-                  style={styles.slider}
-                  maximumValue={100}
-                  minimumValue={0}
-                  step={1}
-                  value={parseInt(volume, 10)}
-                  maximumTrackTintColor="#ffffff20"
-                  minimumTrackTintColor="#ffffffe2"
-                  thumbRound
-                  onValueChange={volume => {
-                    const { dispatch } = this.props;
-                    dispatch(SettingActions.update("player", { volume }));
-                  }}
-                />
-              </View>
-            </MenuOptions>
-          </Menu>
-        </View>
-        <View
-          style={[containerStyle.row, containerStyle.center, styles.center]}
-        >
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              const { dispatch, player } = this.props;
-              const { time } = player;
-              dispatch(PlayerActions.time(time - 10000));
-            }}
-          >
-            <FontAwesome5Icon name="caret-left" solid color={light} size={24} />
-            <Text style={colorStyle.light}> 10</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              const { dispatch } = this.props;
-              dispatch(PlayerActions.toggle());
-            }}
-          >
-            <FontAwesome5Icon
-              name={pause ? "play" : "pause"}
-              solid
-              color={light}
-              size={24}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              const { dispatch, player } = this.props;
-              const { time } = player;
-              dispatch(PlayerActions.time(time + 30000));
-            }}
-          >
-            <Text style={colorStyle.light}>30 </Text>
-            <FontAwesome5Icon
-              name="caret-right"
-              solid
-              color={light}
-              size={24}
-            />
-          </TouchableOpacity>
-        </View>
-        <View style={[containerStyle.row, containerStyle.right, styles.right]}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              const { dispatch, setting } = this.props;
-              const { commentPlayer = {} } = setting;
-              const { enabled = true } = commentPlayer;
-              dispatch(
-                SettingActions.update("commentPlayer", { enabled: !enabled })
-              );
-            }}
-          >
-            {comment ? (
-              <FontAwesome5Icon
-                name="comment-dots"
-                solid
-                color={light}
-                size={24}
-              />
-            ) : (
-              <FontAwesome5Icon
-                name="comment-slash"
-                solid
-                color={light}
-                size={24}
-              />
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              const { dispatch, setting } = this.props;
-              const { viewer = {} } = setting;
-              const { expand = false } = viewer;
-              dispatch(SettingActions.update("viewer", { expand: !expand }));
-            }}
-          >
-            <FontAwesome5Icon
-              name={expand ? "bars" : "arrows-alt"}
-              solid
-              color={light}
-              size={24}
-            />
-          </TouchableOpacity>
-          {Platform.OS === "web" && (
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => {
-                const { dispatch, window } = this.props;
-                const { fullScreen } = window;
-                dispatch(WindowActions.setFullScreen(!fullScreen));
-              }}
-            >
-              <FontAwesome5Icon
-                name={fullScreen ? "compress" : "expand"}
-                color={light}
-                size={24}
-              />
-            </TouchableOpacity>
-          )}
-          <Menu>
-            <MenuTrigger customStyles={{ triggerWrapper: styles.button }}>
-              <FontAwesome5Icon name="cog" solid color={light} size={24} />
-            </MenuTrigger>
-            <MenuOptions
-              customStyles={{ optionsContainer: styles.optionContainer }}
-            >
-              <View
-                style={[
-                  containerStyle.row,
-                  colorStyle.bgBlack,
-                  styles.optionRow
-                ]}
-              >
-                <Text style={[colorStyle.light, styles.optionLabel]}>
-                  再生速度
-                </Text>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    const { dispatch, setting } = this.props;
-                    const { player = {} } = setting;
-                    const { speed: current = "1" } = player;
-                    const speed = parseFloat(current) - 0.1;
-                    if (speed > 0) {
-                      dispatch(SettingActions.update("player", { speed }));
-                    }
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name="caret-left"
-                    solid
-                    color={light}
-                    size={24}
-                  />
-                </TouchableOpacity>
-                <Text style={[colorStyle.light, styles.optionValue]}>
-                  {parseFloat(speed).toFixed(1)}
-                </Text>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    const { dispatch, setting } = this.props;
-                    const { player = {} } = setting;
-                    const { speed: current = "1" } = player;
-                    const speed = parseFloat(current) + 0.1;
-                    if (speed <= 8) {
-                      dispatch(SettingActions.update("player", { speed }));
-                    }
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name="caret-right"
-                    solid
-                    color={light}
-                    size={24}
-                  />
-                </TouchableOpacity>
-              </View>
-              {Platform.OS === "web" && (
-                <View
-                  style={[
-                    containerStyle.row,
-                    colorStyle.bgBlack,
-                    styles.optionRow
-                  ]}
-                >
-                  <Text style={[colorStyle.light, styles.optionLabel]}>
-                    インターレース解除
-                  </Text>
-                  <Switch
-                    style={styles.optionValue}
-                    value={deinterlace}
-                    onValueChange={deinterlace => {
-                      const { dispatch } = this.props;
-                      dispatch(
-                        SettingActions.update("player", { deinterlace })
-                      );
-                    }}
-                  />
-                </View>
-              )}
-              {trackCount.audio > 1 && (
-                <View
-                  style={[
-                    containerStyle.row,
-                    colorStyle.bgBlack,
-                    styles.optionRow
-                  ]}
-                >
-                  <Text style={[colorStyle.light, styles.optionLabel]}>
-                    音声トラック
-                  </Text>
-                  <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                      const { dispatch, player } = this.props;
-                      const { track, trackCount } = player;
-                      const audiotrack = track.audio - 1;
-                      if (audiotrack > 0) {
-                        dispatch(PlayerActions.track({ audio: audiotrack }));
-                      } else {
-                        dispatch(
-                          PlayerActions.track({ audio: trackCount.audio })
-                        );
-                      }
-                    }}
-                  >
-                    <FontAwesome5Icon
-                      name="caret-left"
-                      solid
-                      color={light}
-                      size={24}
-                    />
-                  </TouchableOpacity>
-                  <Text style={[colorStyle.light, styles.optionValue]}>
-                    {track.audio}
-                  </Text>
-                  <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                      const { dispatch, player } = this.props;
-                      const { track, trackCount } = player;
-                      const audiotrack = track.audio + 1;
-                      if (audiotrack <= trackCount.audio) {
-                        dispatch(PlayerActions.track({ audio: audiotrack }));
-                      } else {
-                        dispatch(PlayerActions.track({ audio: 1 }));
-                      }
-                    }}
-                  >
-                    <FontAwesome5Icon
-                      name="caret-right"
-                      solid
-                      color={light}
-                      size={24}
-                    />
-                  </TouchableOpacity>
-                </View>
-              )}
-              {Platform.OS === "web" && (
-                <View
-                  style={[
-                    containerStyle.row,
-                    colorStyle.bgBlack,
-                    styles.optionRow
-                  ]}
-                >
-                  <Text style={[colorStyle.light, styles.optionLabel]}>
-                    デュアルモノラル
-                  </Text>
-                  <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                      const { dispatch, player } = this.props;
-                      const { dualMonoMode } = player;
-                      const keys = Object.keys(this.dualMonoTable);
-                      const index = keys.indexOf(dualMonoMode) + 1;
-                      if (keys[index]) {
-                        dispatch(PlayerActions.dualMonoMode(keys[index]));
-                      } else {
-                        dispatch(
-                          PlayerActions.dualMonoMode(keys[keys.length - 1])
-                        );
-                      }
-                    }}
-                  >
-                    <FontAwesome5Icon
-                      name="caret-left"
-                      solid
-                      color={light}
-                      size={24}
-                    />
-                  </TouchableOpacity>
-                  <Text style={[colorStyle.light, styles.optionValue]}>
-                    {this.dualMonoTable[dualMonoMode]}
-                  </Text>
-                  <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                      const { dispatch, player } = this.props;
-                      const { dualMonoMode } = player;
-                      const keys = Object.keys(this.dualMonoTable);
-                      const index = keys.indexOf(dualMonoMode) + 1;
-                      if (keys[index]) {
-                        dispatch(PlayerActions.dualMonoMode(keys[index]));
-                      } else {
-                        dispatch(PlayerActions.dualMonoMode(keys[0]));
-                      }
-                    }}
-                  >
-                    <FontAwesome5Icon
-                      name="caret-right"
-                      solid
-                      color={light}
-                      size={24}
-                    />
-                  </TouchableOpacity>
-                </View>
-              )}
-              <View
-                style={[
-                  containerStyle.row,
-                  colorStyle.bgBlack,
-                  styles.optionRow
-                ]}
-              >
-                <Text style={[colorStyle.light, styles.optionLabel]}>
-                  連続再生
-                </Text>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    const { dispatch, setting } = this.props;
-                    const { player = {} } = setting;
-                    const { repeat = "continue" } = player;
-                    const keys = Object.keys(this.repeatTable);
-                    const index = keys.indexOf(repeat) - 1;
-                    if (keys[index]) {
-                      dispatch(
-                        SettingActions.update("player", {
-                          repeat: keys[index]
-                        })
-                      );
-                    } else {
-                      dispatch(
-                        SettingActions.update("player", {
-                          repeat: keys[keys.length - 1]
-                        })
-                      );
-                    }
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name="caret-left"
-                    solid
-                    color={light}
-                    size={24}
-                  />
-                </TouchableOpacity>
-                <Text style={[colorStyle.light, styles.optionValue]}>
-                  {this.repeatTable[repeat]}
-                </Text>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    const { dispatch, setting } = this.props;
-                    const { player = {} } = setting;
-                    const { repeat = "continue" } = player;
-                    const keys = Object.keys(this.repeatTable);
-                    const index = keys.indexOf(repeat) + 1;
-                    if (keys[index]) {
-                      dispatch(
-                        SettingActions.update("player", {
-                          repeat: keys[index]
-                        })
-                      );
-                    } else {
-                      dispatch(
-                        SettingActions.update("player", {
-                          repeat: keys[0]
-                        })
-                      );
-                    }
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name="caret-right"
-                    solid
-                    color={light}
-                    size={24}
-                  />
-                </TouchableOpacity>
-              </View>
-              <View
-                style={[
-                  containerStyle.row,
-                  colorStyle.bgBlack,
-                  styles.optionRow
-                ]}
-              >
-                <Text style={[colorStyle.light, styles.optionLabel]}>
-                  コメント表示時間
-                </Text>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    const { dispatch, setting } = this.props;
-                    const { commentPlayer = {} } = setting;
-                    const duration =
-                      parseInt(commentPlayer.duration || "5000", 10) - 500;
-                    if (duration > 500) {
-                      dispatch(
-                        SettingActions.update("commentPlayer", { duration })
-                      );
-                    } else {
-                      dispatch(
-                        SettingActions.update("commentPlayer", {
-                          duration: 1000
-                        })
-                      );
-                    }
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name="caret-left"
-                    solid
-                    color={light}
-                    size={24}
-                  />
-                </TouchableOpacity>
-                <Text style={[colorStyle.light, styles.optionValue]}>
-                  {(parseInt(duration, 10) / 1000).toFixed(1)}秒
-                </Text>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    const { dispatch, setting } = this.props;
-                    const { commentPlayer = {} } = setting;
-                    const duration =
-                      parseInt(commentPlayer.duration || "5000", 10) + 500;
-                    dispatch(
-                      SettingActions.update("commentPlayer", { duration })
-                    );
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name="caret-right"
-                    solid
-                    color={light}
-                    size={24}
-                  />
-                </TouchableOpacity>
-              </View>
-              <View
-                style={[
-                  containerStyle.row,
-                  colorStyle.bgBlack,
-                  styles.optionRow
-                ]}
-              >
-                <Text style={[colorStyle.light, styles.optionLabel]}>
-                  コメント遅延時間
-                </Text>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    const { dispatch, setting } = this.props;
-                    const { commentPlayer = {} } = setting;
-                    const delay =
-                      parseInt(commentPlayer.delay || "0", 10) - 500;
-                    dispatch(SettingActions.update("commentPlayer", { delay }));
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name="caret-left"
-                    solid
-                    color={light}
-                    size={24}
-                  />
-                </TouchableOpacity>
-                <Text style={[colorStyle.light, styles.optionValue]}>
-                  {(parseInt(delay, 10) / 1000).toFixed(1)}秒
-                </Text>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    const { dispatch, setting } = this.props;
-                    const { commentPlayer = {} } = setting;
-                    const delay =
-                      parseInt(commentPlayer.delay || "0", 10) + 500;
-                    dispatch(SettingActions.update("commentPlayer", { delay }));
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name="caret-right"
-                    solid
-                    color={light}
-                    size={24}
-                  />
-                </TouchableOpacity>
-              </View>
-              <View
-                style={[
-                  containerStyle.row,
-                  colorStyle.bgBlack,
-                  styles.optionRow
-                ]}
-              >
-                <Text style={[colorStyle.light, styles.optionLabel]}>
-                  コメントライン数
-                </Text>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    const { dispatch, setting } = this.props;
-                    const { commentPlayer = {} } = setting;
-                    const maxLines =
-                      parseInt(commentPlayer.maxLines || "10", 10) - 1;
-                    if (maxLines > 5) {
-                      dispatch(
-                        SettingActions.update("commentPlayer", { maxLines })
-                      );
-                    } else {
-                      dispatch(
-                        SettingActions.update("commentPlayer", {
-                          maxLines: 5
-                        })
-                      );
-                    }
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name="caret-left"
-                    solid
-                    color={light}
-                    size={24}
-                  />
-                </TouchableOpacity>
-                <Text style={[colorStyle.light, styles.optionValue]}>
-                  {parseInt(maxLines, 10)}
-                </Text>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    const { dispatch, setting } = this.props;
-                    const { commentPlayer = {} } = setting;
-                    const maxLines =
-                      parseInt(commentPlayer.maxLines || "10", 10) + 1;
-                    dispatch(
-                      SettingActions.update("commentPlayer", {
-                        maxLines
-                      })
-                    );
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name="caret-right"
-                    solid
-                    color={light}
-                    size={24}
-                  />
-                </TouchableOpacity>
-              </View>
-              <View
-                style={[
-                  containerStyle.row,
-                  colorStyle.bgBlack,
-                  styles.optionRow
-                ]}
-              >
-                <Text style={[colorStyle.light, styles.optionLabel]}>
-                  コメント同時表示数
-                </Text>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    const { dispatch, setting } = this.props;
-                    const { commentPlayer = {} } = setting;
-                    const maxComments =
-                      parseInt(commentPlayer.maxComments || "50", 10) - 5;
-                    if (maxComments > 5) {
-                      dispatch(
-                        SettingActions.update("commentPlayer", { maxComments })
-                      );
-                    } else {
-                      dispatch(
-                        SettingActions.update("commentPlayer", {
-                          maxComments: 5
-                        })
-                      );
-                    }
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name="caret-left"
-                    solid
-                    color={light}
-                    size={24}
-                  />
-                </TouchableOpacity>
-                <Text style={[colorStyle.light, styles.optionValue]}>
-                  {parseInt(maxComments, 10)}
-                </Text>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    const { dispatch, setting } = this.props;
-                    const { commentPlayer = {} } = setting;
-                    const maxComments =
-                      parseInt(commentPlayer.maxComments || "50", 10) + 5;
-                    dispatch(
-                      SettingActions.update("commentPlayer", {
-                        maxComments
-                      })
-                    );
-                  }}
-                >
-                  <FontAwesome5Icon
-                    name="caret-right"
-                    solid
-                    color={light}
-                    size={24}
-                  />
-                </TouchableOpacity>
-              </View>
-            </MenuOptions>
-          </Menu>
-        </View>
+  return (
+    <View style={[containerStyle.row, styles.container]}>
+      <View style={[containerStyle.row, containerStyle.left, styles.left]}>
+        <VolumeController />
       </View>
-    );
-  }
+      <View style={[containerStyle.row, containerStyle.center, styles.center]}>
+        <JumpButton seconds={jumpBackwardSeconds} />
+        <TogglePlayButton />
+        <JumpButton seconds={jumpForwardSeconds} />
+      </View>
+      <View style={[containerStyle.row, containerStyle.right, styles.right]}>
+        <ToggleCommentButton />
+        <ToggleExpandButton />
+        {Platform.OS === "web" && <ToggleFullScreenButton />}
+        <Menu>
+          <MenuTrigger customStyles={{ triggerWrapper: styles.button }}>
+            <FontAwesome5Icon name="cog" solid color={light} size={24} />
+          </MenuTrigger>
+          <MenuOptions
+            customStyles={{ optionsContainer: styles.optionContainer }}
+          >
+            <View
+              style={[containerStyle.row, colorStyle.bgBlack, styles.optionRow]}
+            >
+              <Text style={[colorStyle.light, styles.optionLabel]}>
+                再生速度
+              </Text>
+              <SpeedSwitch />
+            </View>
+            {Platform.OS === "web" && (
+              <View
+                style={[
+                  containerStyle.row,
+                  colorStyle.bgBlack,
+                  styles.optionRow
+                ]}
+              >
+                <Text style={[colorStyle.light, styles.optionLabel]}>
+                  インターレース解除
+                </Text>
+                <DeinterlaceSwitch />
+              </View>
+            )}
+            {audioTrackCount > 1 && (
+              <View
+                style={[
+                  containerStyle.row,
+                  colorStyle.bgBlack,
+                  styles.optionRow
+                ]}
+              >
+                <Text style={[colorStyle.light, styles.optionLabel]}>
+                  音声トラック
+                </Text>
+                <AudioTrackSwitch />
+              </View>
+            )}
+            {Platform.OS === "web" && (
+              <View
+                style={[
+                  containerStyle.row,
+                  colorStyle.bgBlack,
+                  styles.optionRow
+                ]}
+              >
+                <Text style={[colorStyle.light, styles.optionLabel]}>
+                  デュアルモノラル
+                </Text>
+                <DualMonoModeSwitch />
+              </View>
+            )}
+            <View
+              style={[containerStyle.row, colorStyle.bgBlack, styles.optionRow]}
+            >
+              <Text style={[colorStyle.light, styles.optionLabel]}>
+                連続再生
+              </Text>
+              <RepeatSwitch />
+            </View>
+            <View
+              style={[containerStyle.row, colorStyle.bgBlack, styles.optionRow]}
+            >
+              <Text style={[colorStyle.light, styles.optionLabel]}>
+                コメント表示時間
+              </Text>
+              <CommentDurationSwitch />
+            </View>
+            <View
+              style={[containerStyle.row, colorStyle.bgBlack, styles.optionRow]}
+            >
+              <Text style={[colorStyle.light, styles.optionLabel]}>
+                コメント遅延時間
+              </Text>
+              <CommentDelaySwitch />
+            </View>
+            <View
+              style={[containerStyle.row, colorStyle.bgBlack, styles.optionRow]}
+            >
+              <Text style={[colorStyle.light, styles.optionLabel]}>
+                コメントライン数
+              </Text>
+              <CommentMaxLinesSwitch />
+            </View>
+            <View
+              style={[containerStyle.row, colorStyle.bgBlack, styles.optionRow]}
+            >
+              <Text style={[colorStyle.light, styles.optionLabel]}>
+                コメント同時表示数
+              </Text>
+              <MaxCommentsSwitch />
+            </View>
+          </MenuOptions>
+        </Menu>
+      </View>
+    </View>
+  );
+});
+export default Controller;
 
-  shouldComponentUpdate(nextProps: Props) {
-    const { player } = this.props;
-    return (
-      nextProps.player === player ||
-      (nextProps.player.time === player.time &&
-        nextProps.player.position === player.position)
-    );
-  }
+const TogglePlayButton = memo(() => {
+  const dispatch = useDispatch();
+  const pause = useSelector<State, boolean>(({ player }) => player.pause);
 
-  getRecorded() {
-    const { viewer } = this.props;
-    const { programs, index, extraIndex } = viewer;
-    const program = programs[index];
-    if (program.recorded && program.recorded[extraIndex]) {
-      return program.recorded[extraIndex];
+  const onPress = useCallback(() => {
+    dispatch(PlayerActions.toggle());
+  }, []);
+
+  return (
+    <TouchableOpacity style={styles.button} onPress={onPress}>
+      <FontAwesome5Icon
+        name={pause ? "play" : "pause"}
+        solid
+        color={light}
+        size={24}
+      />
+    </TouchableOpacity>
+  );
+});
+
+const JumpButton = memo(({ seconds }: { seconds: number }) => {
+  const dispatch = useDispatch();
+  const time = useSelector<State, number>(({ player }) => player.time);
+
+  const onPress = useCallback(() => {
+    dispatch(PlayerActions.time(time + seconds * 1000));
+  }, [time, seconds]);
+
+  return (
+    <TouchableOpacity style={styles.button} onPress={onPress}>
+      {seconds < 0 && (
+        <FontAwesome5Icon name="caret-left" solid color={light} size={24} />
+      )}
+      <Text style={colorStyle.light}>{Math.abs(seconds)}</Text>
+      {seconds > 0 && (
+        <FontAwesome5Icon name="caret-right" solid color={light} size={24} />
+      )}
+    </TouchableOpacity>
+  );
+});
+
+const VolumeController = memo(() => {
+  const dispatch = useDispatch();
+  const mute = useSelector<State, boolean>(
+    ({ setting }) => setting.player?.mute
+  );
+  const volume = useSelector<State, number>(({ setting }) =>
+    parseInt(
+      setting.player?.volume != null ? setting.player?.volume : "100",
+      10
+    )
+  );
+
+  const volumeIcon = useMemo(() => {
+    if (mute) {
+      return "volume-mute";
     }
-    return program;
-  }
-}
+    if (volume > 50) {
+      return "volume-up";
+    }
+    if (volume > 0) {
+      return "volume-down";
+    }
+    return "volume-off";
+  }, [mute, volume]);
 
-export default connect(
+  const toggleMute = useCallback(() => {
+    dispatch(SettingActions.update("player", { mute: !mute }));
+  }, [mute]);
+  const volumeChange = useCallback(volume => {
+    dispatch(SettingActions.update("player", { volume }));
+  }, []);
+
+  return (
+    <Menu>
+      <MenuTrigger customStyles={{ triggerWrapper: styles.button }}>
+        <FontAwesome5Icon name={volumeIcon} solid color={light} size={24} />
+      </MenuTrigger>
+      <MenuOptions>
+        <View
+          style={[containerStyle.row, colorStyle.bgBlack, styles.optionRow]}
+        >
+          <TouchableOpacity style={styles.button} onPress={toggleMute}>
+            <FontAwesome5Icon name={volumeIcon} solid color={light} size={24} />
+          </TouchableOpacity>
+          <CustomSlider
+            style={styles.slider}
+            maximumValue={100}
+            minimumValue={0}
+            step={1}
+            value={volume}
+            maximumTrackTintColor="#ffffff20"
+            minimumTrackTintColor="#ffffffe2"
+            thumbRound
+            onValueChange={volumeChange}
+          />
+        </View>
+      </MenuOptions>
+    </Menu>
+  );
+});
+
+const ToggleCommentButton = memo(() => {
+  const dispatch = useDispatch();
+  const enabled = useSelector<State, boolean>(
+    ({ setting }) =>
+      setting.commentPlayer?.enabled == null || setting.commentPlayer?.enabled
+  );
+
+  const onPress = useCallback(() => {
+    dispatch(SettingActions.update("commentPlayer", { enabled: !enabled }));
+  }, [enabled]);
+
+  return (
+    <TouchableOpacity style={styles.button} onPress={onPress}>
+      <FontAwesome5Icon
+        name={enabled ? "comment-dots" : "comment-slash"}
+        solid
+        color={light}
+        size={24}
+      />
+    </TouchableOpacity>
+  );
+});
+
+const ToggleExpandButton = memo(() => {
+  const dispatch = useDispatch();
+  const expand = useSelector<State, boolean>(
+    ({ setting }) => setting.viewer?.expand
+  );
+
+  const onPress = useCallback(() => {
+    dispatch(SettingActions.update("viewer", { expand: !expand }));
+  }, [expand]);
+
+  return (
+    <TouchableOpacity style={styles.button} onPress={onPress}>
+      <FontAwesome5Icon
+        name={expand ? "bars" : "arrows-alt"}
+        solid
+        color={light}
+        size={24}
+      />
+    </TouchableOpacity>
+  );
+});
+
+const ToggleFullScreenButton = memo(() => {
+  const dispatch = useDispatch();
+  const fullScreen = useSelector<State, boolean>(
+    ({ window }) => window.fullScreen
+  );
+
+  const onPress = useCallback(() => {
+    dispatch(WindowActions.setFullScreen(!fullScreen));
+  }, [fullScreen]);
+
+  return (
+    <TouchableOpacity style={styles.button} onPress={onPress}>
+      <FontAwesome5Icon
+        name={fullScreen ? "compress" : "expand"}
+        color={light}
+        size={24}
+      />
+    </TouchableOpacity>
+  );
+});
+
+const PropertySwitch = memo(
   ({
-    player,
-    setting,
-    viewer,
-    window
+    value,
+    onPrevious,
+    onNext
   }: {
-    player: PlayerState;
-    setting: SettingState;
-    viewer: ViewerState;
-    window: WindowState;
-  }) => ({
-    player,
-    setting,
-    viewer,
-    window
-  })
-)(Controller);
+    value: string | number;
+    onPrevious: () => void;
+    onNext: () => void;
+  }) => (
+    <View style={[containerStyle.row, containerStyle.center]}>
+      <TouchableOpacity style={styles.button} onPress={onPrevious}>
+        <FontAwesome5Icon name="caret-left" solid color={light} size={24} />
+      </TouchableOpacity>
+      <Text style={[colorStyle.light, styles.optionValue]}>{value}</Text>
+      <TouchableOpacity style={styles.button} onPress={onNext}>
+        <FontAwesome5Icon name="caret-right" solid color={light} size={24} />
+      </TouchableOpacity>
+    </View>
+  )
+);
+
+const SpeedSwitch = memo(() => {
+  const dispatch = useDispatch();
+  const value = useSelector<State, number>(({ setting }) =>
+    parseFloat(setting.player?.speed || "1")
+  );
+
+  const onPrevious = useCallback(() => {
+    const speed = value - 0.1;
+    if (value > 0) {
+      dispatch(SettingActions.update("player", { speed }));
+    }
+  }, [value]);
+  const onNext = useCallback(() => {
+    const speed = value + 0.1;
+    if (value <= 8) {
+      dispatch(SettingActions.update("player", { speed }));
+    }
+  }, [value]);
+
+  return (
+    <PropertySwitch
+      value={value.toFixed(1)}
+      onPrevious={onPrevious}
+      onNext={onNext}
+    />
+  );
+});
+
+const AudioTrackSwitch = memo(() => {
+  const dispatch = useDispatch();
+  const value = useSelector<State, number>(({ player }) => player.track.audio);
+  const track = useSelector<State, number>(
+    ({ player }) => player.trackCount.audio
+  );
+
+  const onPrevious = useCallback(() => {
+    const audio = value - 1;
+    if (audio > 0) {
+      dispatch(PlayerActions.track({ audio }));
+    } else {
+      dispatch(PlayerActions.track({ audio: track }));
+    }
+  }, [value, track]);
+  const onNext = useCallback(() => {
+    const audio = value + 1;
+    if (audio <= track) {
+      dispatch(PlayerActions.track({ audio }));
+    } else {
+      dispatch(PlayerActions.track({ audio: 1 }));
+    }
+  }, [value, track]);
+
+  return (
+    <PropertySwitch value={value} onPrevious={onPrevious} onNext={onNext} />
+  );
+});
+
+const DeinterlaceSwitch = memo(() => {
+  const dispatch = useDispatch();
+  const value = useSelector<State, boolean>(
+    ({ setting }) =>
+      setting.player?.deinterlace == null || setting.player?.deinterlace
+  );
+
+  const onChange = useCallback(deinterlace => {
+    dispatch(SettingActions.update("player", { deinterlace }));
+  }, []);
+
+  return (
+    <Switch style={styles.optionValue} value={value} onValueChange={onChange} />
+  );
+});
+
+const DualMonoModeSwitch = memo(() => {
+  const dispatch = useDispatch();
+  const value = useSelector<State, string>(({ player }) => player.dualMonoMode);
+
+  const onPrevious = useCallback(() => {
+    const keys = Object.keys(dualMonoTable);
+    const index = keys.indexOf(value) - 1;
+    if (keys[index]) {
+      dispatch(PlayerActions.dualMonoMode(keys[index]));
+    } else {
+      dispatch(PlayerActions.dualMonoMode(keys[keys.length - 1]));
+    }
+  }, [value]);
+  const onNext = useCallback(() => {
+    const keys = Object.keys(dualMonoTable);
+    const index = keys.indexOf(value) + 1;
+    if (keys[index]) {
+      dispatch(PlayerActions.dualMonoMode(keys[index]));
+    } else {
+      dispatch(PlayerActions.dualMonoMode(keys[0]));
+    }
+  }, [value]);
+
+  return (
+    <PropertySwitch
+      value={dualMonoTable[value]}
+      onPrevious={onPrevious}
+      onNext={onNext}
+    />
+  );
+});
+
+const RepeatSwitch = memo(() => {
+  const dispatch = useDispatch();
+  const value = useSelector<State, string>(
+    ({ setting }) => setting.player?.repeat || "continue"
+  );
+
+  const onPrevious = useCallback(() => {
+    const keys = Object.keys(repeatTable);
+    const index = keys.indexOf(value) - 1;
+    if (keys[index]) {
+      dispatch(
+        SettingActions.update("player", {
+          repeat: keys[index]
+        })
+      );
+    } else {
+      dispatch(
+        SettingActions.update("player", {
+          repeat: keys[keys.length - 1]
+        })
+      );
+    }
+  }, [value]);
+
+  const onNext = useCallback(() => {
+    const keys = Object.keys(repeatTable);
+    const index = keys.indexOf(value) + 1;
+    if (keys[index]) {
+      dispatch(
+        SettingActions.update("player", {
+          repeat: keys[index]
+        })
+      );
+    } else {
+      dispatch(
+        SettingActions.update("player", {
+          repeat: keys[0]
+        })
+      );
+    }
+  }, [value]);
+
+  return (
+    <PropertySwitch
+      value={repeatTable[value]}
+      onPrevious={onPrevious}
+      onNext={onNext}
+    />
+  );
+});
+
+const CommentDurationSwitch = memo(() => {
+  const dispatch = useDispatch();
+  const value = useSelector<State, number>(({ setting }) =>
+    parseInt(setting.commentPlayer?.duration || "5000", 10)
+  );
+
+  const onPrevious = useCallback(() => {
+    const duration = value - 500;
+    if (duration > 500) {
+      dispatch(SettingActions.update("commentPlayer", { duration }));
+    } else {
+      dispatch(
+        SettingActions.update("commentPlayer", {
+          duration: 1000
+        })
+      );
+    }
+  }, [value]);
+  const onNext = useCallback(() => {
+    const duration = value + 500;
+    dispatch(SettingActions.update("commentPlayer", { duration }));
+  }, [value]);
+
+  return (
+    <PropertySwitch
+      value={`${(value / 1000).toFixed(1)}秒`}
+      onPrevious={onPrevious}
+      onNext={onNext}
+    />
+  );
+});
+
+const CommentDelaySwitch = memo(() => {
+  const dispatch = useDispatch();
+  const value = useSelector<State, number>(({ setting }) =>
+    parseInt(setting.commentPlayer?.delay || "0", 10)
+  );
+
+  const onPrevious = useCallback(() => {
+    dispatch(SettingActions.update("commentPlayer", { delay: value - 500 }));
+  }, [value]);
+  const onNext = useCallback(() => {
+    dispatch(SettingActions.update("commentPlayer", { delay: value + 500 }));
+  }, [value]);
+
+  return (
+    <PropertySwitch
+      value={`${(value / 1000).toFixed(1)}秒`}
+      onPrevious={onPrevious}
+      onNext={onNext}
+    />
+  );
+});
+
+const CommentMaxLinesSwitch = memo(() => {
+  const dispatch = useDispatch();
+  const value = useSelector<State, number>(({ setting }) =>
+    parseInt(setting.commentPlayer?.maxLines || "10", 10)
+  );
+
+  const onPrevious = useCallback(() => {
+    const maxLines = value - 1;
+    if (maxLines > 5) {
+      dispatch(SettingActions.update("commentPlayer", { maxLines }));
+    } else {
+      dispatch(
+        SettingActions.update("commentPlayer", {
+          maxLines: 5
+        })
+      );
+    }
+  }, [value]);
+  const onNext = useCallback(() => {
+    const maxLines = value + 1;
+    dispatch(
+      SettingActions.update("commentPlayer", {
+        maxLines
+      })
+    );
+  }, [value]);
+
+  return (
+    <PropertySwitch value={value} onPrevious={onPrevious} onNext={onNext} />
+  );
+});
+
+const MaxCommentsSwitch = memo(() => {
+  const dispatch = useDispatch();
+  const value = useSelector<State, number>(({ setting }) =>
+    parseInt(setting.commentPlayer?.maxComments || "50", 10)
+  );
+
+  const onPrevious = useCallback(() => {
+    const maxComments = value - 5;
+    if (maxComments > 5) {
+      dispatch(
+        SettingActions.update("commentPlayer", { maxComments: maxComments })
+      );
+    } else {
+      dispatch(
+        SettingActions.update("commentPlayer", {
+          maxComments: 5
+        })
+      );
+    }
+  }, [value]);
+  const onNext = useCallback(() => {
+    const maxComments = value + 5;
+    dispatch(
+      SettingActions.update("commentPlayer", {
+        maxComments: maxComments
+      })
+    );
+  }, [value]);
+
+  return (
+    <PropertySwitch value={value} onPrevious={onPrevious} onNext={onNext} />
+  );
+});
+
+const jumpForwardSeconds = 30;
+const jumpBackwardSeconds = -10;
+const dualMonoTable: { [key: string]: string } = {
+  auto: "自動",
+  both: "主/副",
+  main: "主音声",
+  sub: "副音声"
+};
+const repeatTable: { [key: string]: string } = {
+  stop: "停止",
+  continue: "連続再生",
+  repeat: "リピート"
+};
 
 const styles = StyleSheet.create({
   container: {
