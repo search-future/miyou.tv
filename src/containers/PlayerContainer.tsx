@@ -11,135 +11,322 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
+import React, {
+  memo,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+  PropsWithChildren
+} from "react";
 import {
   TouchableOpacity,
   View,
   ViewProps,
   StyleSheet,
   Animated,
-  PanResponder,
-  PanResponderInstance
+  PanResponder
 } from "react-native";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import containerStyle from "../styles/container";
-import { PlayerState, PlayerActions } from "../modules/player";
-import { ViewerState, ViewerActions } from "../modules/viewer";
+import { RootState } from "../modules";
+import { PlayerActions } from "../modules/player";
 import { SettingState, SettingActions } from "../modules/setting";
+import { ViewerActions } from "../modules/viewer";
 import DateFormatter from "../utils/DateFormatter";
 import formatTime from "../utils/formatTime";
 
-type Props = ViewProps & {
-  children: React.ReactNode;
-  dispatch: Dispatch;
-  player: PlayerState;
-  setting: SettingState & {
-    commentPlayer?: {
-      duration?: string;
-      delay?: string;
-      maxLines?: string;
-      maxComments?: string;
-    };
-    player?: {
-      mute?: boolean;
-      volume?: string;
-      speed?: string;
-      deinterlace?: boolean;
-      repeat?: string;
-    };
+type Setting = SettingState & {
+  commentPlayer?: {
+    duration?: string;
+    delay?: string;
+    maxLines?: string;
+    maxComments?: string;
   };
-  viewer: ViewerState;
-};
-type State = {
-  text: string;
-  textOpacity: Animated.AnimatedValue;
-};
-class PlayerContainer extends Component<Props, State> {
-  panResponder: PanResponderInstance;
-  state = {
-    text: "",
-    textOpacity: new Animated.Value(0)
+  player?: {
+    mute?: boolean;
+    volume?: string;
+    speed?: string;
+    deinterlace?: boolean;
+    repeat?: string;
   };
+  view?: {
+    hourFirst?: string;
+    hourFormat?: string;
+  };
+};
+type State = RootState & {
+  setting: Setting;
+};
 
-  constructor(props: Props) {
-    super(props);
-    this.panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: ({}, { dx, dy }) =>
-        Math.abs(dx) > 10 || Math.abs(dy) > 10,
-      onPanResponderMove: ({}, { dx, dy }) => {
-        if (Math.abs(dx) > Math.abs(dy)) {
-          const { player } = this.props;
-          let { time } = player;
-          time += (dx - Math.sign(dx) * 10) * 5000;
-          if (time < 0) {
-            time = 0;
-          } else if (time > player.duration) {
-            time = player.duration;
+function showText(animetedValue: Animated.Value) {
+  animetedValue.setValue(1);
+  Animated.timing(animetedValue, {
+    toValue: 0,
+    duration: 1000,
+    useNativeDriver: true
+  }).start();
+}
+
+const PlayerContainer = memo(
+  ({ children, onLayout, ...props }: PropsWithChildren<ViewProps>) => {
+    const textOpacity = useRef(new Animated.Value(0)).current;
+    const timeRef = useRef(0);
+
+    const dispatch = useDispatch();
+    const time = useSelector<State, number>(
+      ({ player }) => player.time,
+      (left, right) => Math.floor(left / 1000) === Math.floor(right / 1000)
+    );
+    const duration = useSelector<State, number>(
+      ({ player }) => player.duration
+    );
+    const dualMonoMode = useSelector<State, string>(
+      ({ player }) => player.dualMonoMode
+    );
+    const seekTime = useSelector<State, number>(
+      ({ player }) => player.seekTime
+    );
+    const seekPosition = useSelector<State, number>(
+      ({ player }) => player.seekPosition
+    );
+    const commentDelay = useSelector<State, number>(({ setting }) =>
+      parseInt(setting.commentPlayer?.delay || "0", 10)
+    );
+    const commentDuration = useSelector<State, number>(({ setting }) =>
+      parseInt(setting.commentPlayer?.duration || "5000", 10)
+    );
+    const maxComments = useSelector<State, number>(({ setting }) =>
+      parseInt(setting.commentPlayer?.maxComments || "50", 10)
+    );
+    const maxLines = useSelector<State, number>(({ setting }) =>
+      parseInt(setting.commentPlayer?.maxLines || "10", 10)
+    );
+    const mute = useSelector<State, boolean>(
+      ({ setting }) => setting.player?.mute
+    );
+    const repeat = useSelector<State, string>(
+      ({ setting }) => setting.player?.repeat || "repeat"
+    );
+    const speed = useSelector<State, number>(({ setting }) =>
+      parseFloat(setting.player?.speed || "1")
+    );
+    const volume = useSelector<State, number>(({ setting }) =>
+      parseInt(
+        setting.player?.volume != null ? setting.player?.volume : "100",
+        10
+      )
+    );
+    const hourFirst = useSelector<State, number>(({ setting }) =>
+      parseInt(setting.view?.hourFirst || "4", 10)
+    );
+    const hourFormat = useSelector<State, string>(
+      ({ setting }) => setting.view?.hourFormat || ""
+    );
+    const start = useSelector<State, Date>(
+      ({ viewer }) =>
+        viewer.programs[viewer.index]?.recorded?.[viewer.extraIndex]?.start ||
+        viewer.programs[viewer.index]?.start
+    );
+    const control = useSelector<State, boolean>(({ viewer }) => viewer.control);
+
+    const [text, setText] = useState("");
+
+    const dateFormatter = useMemo(
+      () => new DateFormatter(hourFirst, hourFormat),
+      [hourFirst, hourFormat]
+    );
+    const panResponder = useMemo(
+      () =>
+        PanResponder.create({
+          onStartShouldSetPanResponder: () => true,
+          onMoveShouldSetPanResponder: ({}, { dx, dy }) =>
+            Math.abs(dx) > 10 || Math.abs(dy) > 10,
+          onPanResponderMove: ({}, { dx, dy }) => {
+            if (Math.abs(dx) > Math.abs(dy)) {
+              let time = timeRef.current;
+              time += (dx - Math.sign(dx) * 10) * 5000;
+              if (time < 0) {
+                time = 0;
+              } else if (time > duration) {
+                time = duration;
+              }
+              const clock = new Date(start);
+              clock.setTime(clock.getTime() + time);
+              setText(
+                `${formatTime(time)}(${dateFormatter.format(
+                  clock,
+                  "HHHH:mm:ss"
+                )})`
+              );
+              showText(textOpacity);
+            } else if (Math.abs(dy) > Math.abs(dx)) {
+              let value = volume;
+              value -= Math.floor((dy - Math.sign(dy) * 10) / 2);
+              if (value < 0) {
+                value = 0;
+              } else if (value > 100) {
+                value = 100;
+              }
+              setText(`音量 ${value}`);
+              showText(textOpacity);
+            }
+          },
+          onPanResponderEnd: ({}, { dx, dy }) => {
+            if (Math.abs(dx) > Math.abs(dy)) {
+              let time = timeRef.current;
+              time += (dx - Math.sign(dx) * 10) * 5000;
+              if (time < 0) {
+                time = 0;
+              }
+              dispatch(PlayerActions.time(time));
+            } else if (Math.abs(dy) > Math.abs(dx)) {
+              let value = volume;
+              value -= Math.floor((dy - Math.sign(dy) * 10) / 2);
+              if (value > 100) {
+                value = 100;
+              } else if (value < 0) {
+                value = 0;
+              }
+              dispatch(
+                SettingActions.update("player", {
+                  volume: String(value)
+                })
+              );
+            }
           }
-          const clock = new Date(this.getRecorded().start);
-          clock.setTime(clock.getTime() + time);
-          this.showText(
-            `${formatTime(time)}(${this.dateFormat(clock, "HHHH:mm:ss")})`
-          );
-        } else if (Math.abs(dy) > Math.abs(dx)) {
-          const { setting } = this.props;
-          const { player: playerSetting = {} } = setting;
-          const { volume = "100" } = playerSetting;
-          let value = parseInt(volume, 10);
-          value -= Math.floor((dy - Math.sign(dy) * 10) / 2);
-          if (value < 0) {
-            value = 0;
-          } else if (value > 100) {
-            value = 100;
-          }
-          this.showText(`音量 ${value}`);
-        }
-      },
-      onPanResponderEnd: ({}, { dx, dy }) => {
-        const { dispatch, player, setting } = this.props;
-        const { player: playerSetting = {} } = setting;
-        if (Math.abs(dx) > Math.abs(dy)) {
-          let { time } = player;
-          time += (dx - Math.sign(dx) * 10) * 5000;
-          if (time < 0) {
-            time = 0;
-          }
-          dispatch(PlayerActions.time(time));
-        } else if (Math.abs(dy) > Math.abs(dx)) {
-          const { volume = "100" } = playerSetting;
-          let value = parseInt(volume, 10);
-          value -= Math.floor((dy - Math.sign(dy) * 10) / 2);
-          if (value > 100) {
-            value = 100;
-          } else if (value < 0) {
-            value = 0;
-          }
-          dispatch(
-            SettingActions.update("player", {
-              volume: String(value)
-            })
-          );
-        }
+        }),
+      [duration, volume, dateFormatter]
+    );
+
+    useEffect(() => {
+      timeRef.current = time;
+    }, [time]);
+    useEffect(() => {
+      switch (dualMonoMode) {
+        case "auto":
+          setText("デュアルモノラル 自動");
+          showText(textOpacity);
+          break;
+        case "both":
+          setText("デュアルモノラル 主/副");
+          showText(textOpacity);
+          break;
+        case "main":
+          setText("デュアルモノラル 主音声");
+          showText(textOpacity);
+          break;
+        case "sub":
+          setText("デュアルモノラル 副音声");
+          showText(textOpacity);
+          break;
       }
-    });
-  }
+    }, [dualMonoMode]);
+    useEffect(() => {
+      if (seekTime != null) {
+        let time = seekTime;
+        if (time < 0) {
+          time = 0;
+        } else if (time > duration) {
+          time = duration;
+        }
+        const clock = new Date(start);
+        clock.setTime(clock.getTime() + time);
+        setText(
+          `${formatTime(time)}(${dateFormatter.format(clock, "HHHH:mm:ss")})`
+        );
+        showText(textOpacity);
+      }
+    }, [seekTime]);
+    useEffect(() => {
+      if (seekPosition != null) {
+        let time = seekPosition * duration;
+        if (time < 0) {
+          time = 0;
+        } else if (time > duration) {
+          time = duration;
+        }
+        const clock = new Date(start);
+        clock.setTime(clock.getTime() + time);
+        setText(
+          `${formatTime(time)}(${dateFormatter.format(clock, "HHHH:mm:ss")})`
+        );
+        showText(textOpacity);
+      }
+    }, [seekPosition]);
+    useEffect(() => {
+      const delay = commentDelay;
+      setText(`コメント遅延時間 ${(delay / 1000).toFixed(1)}秒`);
+      showText(textOpacity);
+    }, [commentDelay]);
+    useEffect(() => {
+      const duration = commentDuration;
+      setText(`コメント表示時間 ${(duration / 1000).toFixed(1)}秒`);
+      showText(textOpacity);
+    }, [commentDuration]);
+    useEffect(() => {
+      setText(`コメント同時表示数 ${maxComments}`);
+      showText(textOpacity);
+    }, [maxComments]);
+    useEffect(() => {
+      setText(`コメントライン数 ${maxLines}`);
+      showText(textOpacity);
+    }, [maxLines]);
+    useEffect(() => {
+      setText(mute ? "ミュート" : "ミュート解除");
+      showText(textOpacity);
+    }, [mute]);
+    useEffect(() => {
+      switch (repeat) {
+        case "stop":
+          setText("停止");
+          showText(textOpacity);
+          break;
+        case "continue":
+          setText("連続再生");
+          showText(textOpacity);
+          break;
+        case "repeat":
+          setText("リピート");
+          showText(textOpacity);
+          break;
+      }
+    }, [repeat]);
+    useEffect(() => {
+      if (speed) {
+        const speedNum = speed;
+        setText(`再生速度 x${speedNum.toFixed(1)}`);
+        showText(textOpacity);
+      }
+    }, [speed]);
+    useEffect(() => {
+      if (volume) {
+        let volumeNum = volume;
+        if (volumeNum < 0) {
+          volumeNum = 0;
+        } else if (volumeNum > 100) {
+          volumeNum = 100;
+        }
+        setText(`音量 ${volumeNum}`);
+        showText(textOpacity);
+      }
+    }, [volume]);
+    useEffect(() => {
+      setText("");
+    }, []);
 
-  render() {
-    const { children, player, viewer, onLayout, ...props } = this.props;
-    const { text, textOpacity } = this.state;
+    const onPress = useCallback(() => {
+      dispatch(ViewerActions.update({ control: !control }));
+    }, [control]);
+
     return (
-      <View {...props} {...this.panResponder.panHandlers}>
+      <View {...props} {...panResponder.panHandlers}>
         <TouchableOpacity
           style={styles.touchable}
           activeOpacity={1}
-          onPress={() => {
-            const { dispatch, viewer } = this.props;
-            const { control } = viewer;
-            dispatch(ViewerActions.update({ control: !control }));
-          }}
+          onPress={onPress}
         >
           {children}
           <View
@@ -158,183 +345,8 @@ class PlayerContainer extends Component<Props, State> {
       </View>
     );
   }
-
-  shouldComponentUpdate(nextProps: Props) {
-    const { player } = this.props;
-    return (
-      nextProps.player === player ||
-      (nextProps.player.time === player.time &&
-        nextProps.player.position === player.position)
-    );
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    const { player, setting } = this.props;
-
-    if (player.dualMonoMode !== prevProps.player.dualMonoMode) {
-      switch (player.dualMonoMode) {
-        case "auto":
-          this.showText("デュアルモノラル 自動");
-          break;
-        case "both":
-          this.showText("デュアルモノラル 主/副");
-          break;
-        case "main":
-          this.showText("デュアルモノラル 主音声");
-          break;
-        case "sub":
-          this.showText("デュアルモノラル 副音声");
-          break;
-      }
-    }
-    if (player.seekTime != null || player.seekPosition != null) {
-      let time;
-      if (
-        player.seekTime != null &&
-        prevProps.player.seekTime !== player.seekTime
-      ) {
-        time = player.seekTime;
-      } else if (
-        player.seekPosition != null &&
-        prevProps.player.seekPosition !== player.seekPosition
-      ) {
-        time = player.seekPosition * player.duration;
-      }
-      if (time != null) {
-        if (time < 0) {
-          time = 0;
-        } else if (time > player.duration) {
-          time = player.duration;
-        }
-        const clock = new Date(this.getRecorded().start);
-        clock.setTime(clock.getTime() + time);
-        this.showText(
-          `${formatTime(time)}(${this.dateFormat(clock, "HHHH:mm:ss")})`
-        );
-      }
-    }
-
-    const { commentPlayer: commentPlayerSetting = {} } = setting;
-    const { commentPlayer: prevCommentPlayerSetting = {} } = prevProps.setting;
-    if (
-      commentPlayerSetting.delay !== prevCommentPlayerSetting.delay &&
-      commentPlayerSetting.delay
-    ) {
-      const delay = parseInt(commentPlayerSetting.delay, 10);
-      this.showText(`コメント遅延時間 ${(delay / 1000).toFixed(1)}秒`);
-    }
-    if (
-      commentPlayerSetting.duration !== prevCommentPlayerSetting.duration &&
-      commentPlayerSetting.duration
-    ) {
-      const duration = parseInt(commentPlayerSetting.duration, 10);
-      this.showText(`コメント表示時間 ${(duration / 1000).toFixed(1)}秒`);
-    }
-    if (
-      commentPlayerSetting.maxComments !==
-        prevCommentPlayerSetting.maxComments &&
-      commentPlayerSetting.maxComments
-    ) {
-      const maxComments = parseInt(commentPlayerSetting.maxComments, 10);
-      this.showText(`コメント同時表示数 ${maxComments}`);
-    }
-    if (
-      commentPlayerSetting.maxLines !== prevCommentPlayerSetting.maxLines &&
-      commentPlayerSetting.maxLines
-    ) {
-      const maxLines = parseInt(commentPlayerSetting.maxLines, 10);
-      this.showText(`コメントライン数 ${maxLines}`);
-    }
-
-    const { player: playerSetting = {} } = setting;
-    const { player: prevPlayerSetting = {} } = prevProps.setting;
-    if (playerSetting.mute !== prevPlayerSetting.mute) {
-      this.showText(playerSetting.mute ? "ミュート" : "ミュート解除");
-    }
-    if (playerSetting.repeat !== prevPlayerSetting.repeat) {
-      switch (playerSetting.repeat) {
-        case "stop":
-          this.showText("停止");
-          break;
-        case "continue":
-          this.showText("連続再生");
-          break;
-        case "repeat":
-          this.showText("リピート");
-          break;
-      }
-    }
-    if (
-      playerSetting.speed !== prevPlayerSetting.speed &&
-      playerSetting.speed
-    ) {
-      const speed = parseFloat(playerSetting.speed);
-      this.showText(`再生速度 x${speed.toFixed(1)}`);
-    }
-    if (
-      playerSetting.volume !== prevPlayerSetting.volume &&
-      playerSetting.volume
-    ) {
-      let volume = parseInt(playerSetting.volume, 10);
-      if (volume < 0) {
-        volume = 0;
-      } else if (volume > 100) {
-        volume = 100;
-      }
-      this.showText(`音量 ${volume}`);
-    }
-  }
-
-  getRecorded() {
-    const { viewer } = this.props;
-    const { programs, index, extraIndex } = viewer;
-    const program = programs[index];
-    if (program.recorded && program.recorded[extraIndex]) {
-      return program.recorded[extraIndex];
-    }
-    return program;
-  }
-
-  dateFormat(value: Date, format: string) {
-    const { setting } = this.props;
-    const { view = {} } = setting;
-    const { hourFirst = "4", hourFormat = "" } = view;
-
-    const dateFormatter = new DateFormatter(
-      parseInt(hourFirst, 10),
-      hourFormat
-    );
-
-    return dateFormatter.format(value, format);
-  }
-
-  showText(text: string) {
-    const { textOpacity } = this.state;
-    this.setState({ text });
-    textOpacity.setValue(1);
-    Animated.timing(textOpacity, {
-      toValue: 0,
-      duration: 1000,
-      useNativeDriver: true
-    }).start();
-  }
-}
-
-export default connect(
-  ({
-    player,
-    setting,
-    viewer
-  }: {
-    player: PlayerState;
-    setting: SettingState;
-    viewer: ViewerState;
-  }) => ({
-    player,
-    setting,
-    viewer
-  })
-)(PlayerContainer);
+);
+export default PlayerContainer;
 
 const styles = StyleSheet.create({
   touchable: {
