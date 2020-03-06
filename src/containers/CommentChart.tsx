@@ -11,167 +11,190 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
+import React, {
+  memo,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo
+} from "react";
 import { View, StyleSheet } from "react-native";
 import { Svg, Path } from "react-native-svg";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
+import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
 import Balloon from "../components/Balloon";
-import { CommentPlayerState } from "../modules/commentPlayer";
+import { CommentInterval } from "../modules/commentPlayer";
 import { PlayerActions } from "../modules/player";
 import { active } from "../styles/color";
+import { RootState } from "../modules";
 import { SettingState } from "../modules/setting";
 
-type Props = {
-  dispatch: Dispatch;
-  commentPlayer: CommentPlayerState;
-  setting: SettingState & {
-    commentPlayer?: {
-      delay?: string;
-    };
+type Setting = SettingState & {
+  commentPlayer?: {
+    delay?: string;
   };
 };
-type State = {
-  containerWidth: number;
-  containerHeight: number;
+type State = RootState & {
+  setting: Setting;
 };
-class CommentChart extends Component<Props, State> {
-  state = {
-    containerWidth: 0,
-    containerHeight: 0
-  };
-  layoutCallbackId?: number;
 
-  render() {
-    const { commentPlayer, setting } = this.props;
-    const { start, end, intervals } = commentPlayer;
-    const { commentPlayer: commentPlayerSetting = {} } = setting;
-    const { containerWidth, containerHeight } = this.state;
-    const delay = parseInt(commentPlayerSetting.delay || "0", 10);
-    const length = end - start;
+const CommentChart = memo(() => {
+  const layoutCallbackId = useRef<number>();
+
+  const dispatch = useDispatch();
+  const start = useSelector<State, number>(
+    ({ commentPlayer }) => commentPlayer.start
+  );
+  const end = useSelector<State, number>(
+    ({ commentPlayer }) => commentPlayer.end
+  );
+  const intervals = useSelector<State, CommentInterval[]>(
+    ({ commentPlayer }) => commentPlayer.intervals,
+    shallowEqual
+  );
+  const delay = useSelector<State, number>(({ setting }) =>
+    parseInt(setting.commentPlayer?.delay || "0", 10)
+  );
+
+  const [containerWidth, setContainerWidth] = useState(0);
+  const [containerHeight, setContainerHeight] = useState(0);
+
+  const offset = useMemo(() => start - delay, [delay, start]);
+  const length = useMemo(() => end - start, [start, end]);
+  const path = useMemo(() => {
     const max = Math.max(...intervals.map(({ n_hits }) => n_hits));
     const path = [`M -1,${containerHeight}`];
     for (const interval of intervals) {
-      const x =
-        ((interval.start - start + 60000 + delay) * containerWidth) / length;
+      const x = ((interval.start - offset + 60000) * containerWidth) / length;
       const y = containerHeight - (interval.n_hits * containerHeight) / max;
       if (isFinite(x) && isFinite(y)) {
         path.push(`L ${x},${y}`);
       }
     }
+    return path.join(" ");
+  }, [intervals, containerWidth, containerHeight, offset, length]);
+  const peaks = useMemo(() => {
     let threshold = Math.max(...intervals.map(({ n_hits }) => n_hits)) / 2;
     if (threshold < 10) {
-      threshold = 10;
+      threshold = minPeakThreshold;
     }
     const peaks = intervals.filter(
-      ({ n_hits, start }, i, array) =>
-        n_hits >= threshold &&
-        start >= start &&
-        start < end &&
-        (!array[i - 1] || n_hits >= array[i - 1].n_hits) &&
-        (!array[i + 1] || n_hits >= array[i + 1].n_hits)
+      (interval, i, array) =>
+        interval.n_hits >= threshold &&
+        interval.start >= start &&
+        interval.start < end &&
+        (!array[i - 1] || interval.n_hits >= array[i - 1].n_hits) &&
+        (!array[i + 1] || interval.n_hits >= array[i + 1].n_hits)
     );
     peaks.sort((a, b) => a.n_hits - b.n_hits);
-    return (
-      <View
-        style={styles.container}
-        onLayout={({ nativeEvent }) => {
-          if (this.layoutCallbackId != null) {
-            clearTimeout(this.layoutCallbackId);
-          }
-          const { layout } = nativeEvent;
-          const containerWidth = layout.width;
-          const containerHeight = layout.height;
-          this.layoutCallbackId = setTimeout(() => {
-            this.setState({ containerWidth: 0, containerHeight: 0 });
-            this.setState({ containerWidth, containerHeight });
-          }, 200);
-        }}
-      >
-        {containerHeight > 0 && (
-          <Svg
-            style={{ flex: 1 }}
-            width={containerWidth}
-            height={containerHeight}
-          >
-            <Path
-              fill="none"
-              stroke={active}
-              strokeWidth={2}
-              d={path.join(" ")}
-            />
-          </Svg>
-        )}
-        {containerWidth > 0 &&
-          peaks.slice(-5).map(({ n_hits, start }, index) => {
-            const { commentPlayer, setting } = this.props;
-            const { commentPlayer: commentPlayerSetting = {} } = setting;
-            const delay = parseInt(commentPlayerSetting.delay || "0", 10);
-            const { containerWidth } = this.state;
-            const length = commentPlayer.end - commentPlayer.start;
-            const time = start - commentPlayer.start + delay;
-            const position = (time + 60000) / length;
-            const left = position * containerWidth - 20;
-            if (isFinite(left)) {
-              return (
-                <Balloon
-                  key={index}
-                  wrapperStyle={[
-                    styles.balloonWrapper,
-                    {
-                      left
-                    }
-                  ]}
-                  containerStyle={styles.balloonContainer}
-                  textStyle={styles.balloonText}
-                  backgroundColor="#ffff33cc"
-                  pointing="left"
-                  onPress={() => {
-                    const { dispatch } = this.props;
-                    dispatch(PlayerActions.time(time));
-                  }}
-                >
-                  {n_hits}
-                </Balloon>
-              );
-            }
-            return null;
-          })}
-      </View>
-    );
-  }
+    return peaks.slice(-displayPeaks);
+  }, [start, end, intervals]);
 
-  shouldComponentUpdate(nextProps: Props) {
-    const { commentPlayer } = this.props;
-    return (
-      nextProps.commentPlayer === commentPlayer ||
-      nextProps.commentPlayer.pointer === commentPlayer.pointer
-    );
-  }
+  useEffect(
+    () => () => {
+      clearTimeout(layoutCallbackId.current);
+    },
+    []
+  );
 
-  componentWillUnmount() {
-    clearTimeout(this.layoutCallbackId);
-  }
-}
+  const onLayout = useCallback(({ nativeEvent }) => {
+    if (layoutCallbackId.current != null) {
+      clearTimeout(layoutCallbackId.current);
+    }
+    const { layout } = nativeEvent;
+    const containerWidth = layout.width;
+    const containerHeight = layout.height;
+    layoutCallbackId.current = setTimeout(() => {
+      setContainerWidth(containerWidth);
+      setContainerHeight(containerHeight);
+    }, 200);
+  }, []);
+  const onBalloonPress = useCallback((time: number) => {
+    dispatch(PlayerActions.time(time));
+  }, []);
+  const peakRenderer = useCallback(
+    ({ n_hits, start }: CommentInterval) => {
+      const time = start - offset;
+      const position = (time + 30000) / length;
+      const left = position * containerWidth - 20;
+      if (isFinite(left)) {
+        return (
+          <PeakBalloon
+            key={start}
+            count={n_hits}
+            time={time}
+            left={left}
+            onPress={onBalloonPress}
+          />
+        );
+      }
+      return null;
+    },
+    [offset, length, containerWidth, onBalloonPress]
+  );
 
-export default connect(
+  return (
+    <View style={styles.container} onLayout={onLayout}>
+      {containerHeight > 0 && (
+        <Svg style={styles.svg} width={containerWidth} height={containerHeight}>
+          <Path fill="none" stroke={active} strokeWidth={2} d={path} />
+        </Svg>
+      )}
+      {containerWidth > 0 && peaks.map(peakRenderer)}
+    </View>
+  );
+});
+export default CommentChart;
+
+const displayPeaks = 5;
+const minPeakThreshold = 10;
+
+const PeakBalloon = memo(
   ({
-    commentPlayer,
-    setting
+    count,
+    time,
+    left,
+    onPress
   }: {
-    commentPlayer: CommentPlayerState;
-    setting: SettingState;
-  }) => ({
-    commentPlayer,
-    setting
-  })
-)(CommentChart);
+    count: number;
+    time: number;
+    left: string | number;
+    onPress?: (time: number) => void;
+  }) => {
+    const onPressHandler = useCallback(() => {
+      if (onPress) {
+        onPress(time);
+      }
+    }, [time, onPress]);
+
+    return (
+      <Balloon
+        wrapperStyle={[
+          styles.balloonWrapper,
+          {
+            left
+          }
+        ]}
+        containerStyle={styles.balloonContainer}
+        textStyle={styles.balloonText}
+        backgroundColor="#ffff33cc"
+        pointing="left"
+        onPress={onPressHandler}
+      >
+        {count}
+      </Balloon>
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginHorizontal: 4
+  },
+  svg: {
+    flex: 1
   },
   balloonWrapper: {
     position: "absolute",
