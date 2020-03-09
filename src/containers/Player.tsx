@@ -11,75 +11,108 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo
+} from "react";
 import { Platform, StyleSheet } from "react-native";
-import Video from "react-native-video";
+import Video, { OnProgressData } from "react-native-video";
 import KeepAwake from "react-native-keep-awake";
 import Toast from "react-native-root-toast";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
+import { useDispatch, useSelector } from "react-redux";
 import qs from "qs";
 // @ts-ignore
 import { VLCPlayer } from "react-native-vlcplayer2";
 // @ts-ignore
 import { Immersive } from "react-native-immersive";
 
-import { PlayerState, PlayerActions } from "../modules/player";
-import { NetworkState } from "../modules/network";
+import { RootState } from "../modules";
+import { PlayerActions } from "../modules/player";
 import { SettingState } from "../modules/setting";
-import { ViewerState, ViewerActions } from "../modules/viewer";
+import { ViewerActions, ViewerProgram } from "../modules/viewer";
 import { toastOptions } from "../config/constants";
 
-type Props = {
-  dispatch: Dispatch;
-  network: NetworkState;
-  player: PlayerState;
-  setting: SettingState & {
-    player?: {
-      mute?: boolean;
-      volume?: string;
-      speed?: string;
-      repeat?: string;
-    };
+type Setting = SettingState & {
+  backend?: {
+    type?: string;
+    mobileStreamType?: string;
+    mobileStreamParams?: string;
   };
-  viewer: ViewerState;
-};
-type State = {
-  ss: number;
-  reset: boolean;
-};
-class Player extends Component<Props, State> {
-  video: Video | null = null;
-  vlc: VLCPlayer | null = null;
-  state: State = {
-    ss: 0,
-    reset: false
+  player?: {
+    mute?: boolean;
+    volume?: string;
+    speed?: string;
+    repeat?: string;
   };
-  preseek = 0;
-  seekable = false;
-  seekId?: number;
+};
+type State = RootState & {
+  setting: Setting;
+};
+const Player = () => {
+  const videoRef = useRef<Video>(null);
+  const vlcRef = useRef<VLCPlayer>(null);
+  const preseek = useRef(0);
+  const seekable = useRef(true);
+  const seekId = useRef<number | null>(null);
+  const initializing = useRef(true);
 
-  render() {
-    const { network, setting, player } = this.props;
-    const { backend = {}, player: playerSetting = {} } = setting;
-    const {
-      type = "chinachu",
-      mobileStreamType = "mp4",
-      mobileStreamParams = "b:v=1M&b:a=128k&s=1280x720"
-    } = backend;
-    const { mute = false, volume = "100", speed = "1" } = playerSetting;
-    const { pause } = player;
-    const { ss, reset } = this.state;
+  const dispatch = useDispatch();
+  const type = useSelector<State, string>(
+    ({ setting }) => setting.backend?.type || "chinachu"
+  );
+  const mobileStreamType = useSelector<State, string>(
+    ({ setting }) => setting.backend?.mobileStreamType || "mp4"
+  );
+  const mobileStreamParams = useSelector<State, string>(
+    ({ setting }) =>
+      setting.backend?.mobileStreamParams || "b:v=1M&b:a=128k&s=1280x720"
+  );
+  const mute = useSelector<State, boolean>(
+    ({ setting }) => setting.player?.mute
+  );
+  const volume = useSelector<State, number>(({ setting }) =>
+    parseInt(
+      setting.player?.volume != null ? setting.player?.volume : "100",
+      10
+    )
+  );
+  const speed = useSelector<State, number>(({ setting }) =>
+    parseFloat(setting.player?.speed || "1")
+  );
+  const repeat = useSelector<State, string>(
+    ({ setting }) => setting.player?.repeat || "continue"
+  );
+  const networkType = useSelector<State, string>(({ network }) => network.type);
+  const pause = useSelector<State, boolean>(({ player }) => player.pause);
+  const duration = useSelector<State, number>(({ player }) => player.duration);
+  const seekTime = useSelector<State, number>(({ player }) => player.seekTime);
+  const seekPosition = useSelector<State, number>(
+    ({ player }) => player.seekPosition
+  );
+  const programs = useSelector<State, ViewerProgram[]>(
+    ({ viewer }) => viewer.programs
+  );
+  const index = useSelector<State, number>(({ viewer }) => viewer.index);
+  const extraIndex = useSelector<State, number>(
+    ({ viewer: { extraIndex } }) => extraIndex
+  );
+  const peakPlay = useSelector<State, boolean>(({ viewer }) => viewer.peakPlay);
 
-    if (reset) {
-      return null;
-    }
+  const [bootstrap, setBootstrap] = useState(false);
+  const [ss, setStartSeconds] = useState(0);
 
-    const recordedProgram = this.getRecorded();
+  const recordedProgram = useMemo(
+    () => programs[index].recorded?.[extraIndex] || programs[index],
+    [programs, index, extraIndex]
+  );
+  const uri = useMemo(() => {
     let [uri, query] = recordedProgram.stream.split("?");
     if (recordedProgram.type !== "file") {
       if (
-        network.type.indexOf("cell") >= 0 &&
+        networkType.indexOf("cell") >= 0 &&
         (type === "chinachu" || type === "epgstation")
       ) {
         uri = uri.replace(/[^.]+$/, mobileStreamType);
@@ -89,323 +122,244 @@ class Player extends Component<Props, State> {
         uri = uri.replace(/m2ts$/, "mp4");
       }
     }
-
-    if (
-      type === "chinachu" ||
-      type === "epgstation" ||
-      recordedProgram.type === "file"
-    ) {
-      if (query || ss > 0) {
-        uri += `?${qs.stringify({ ...qs.parse(query), ss })}`;
-      }
-      return (
-        <VLCPlayer
-          style={styles.video}
-          paused={pause}
-          muted={mute}
-          volume={parseInt(volume, 10)}
-          initOptions={["--deinterlace=1", "--deinterlace-mode=discard"]}
-          source={{ uri }}
-          rate={parseFloat(speed)}
-          ref={(vlc: VLCPlayer) => {
-            this.vlc = vlc;
-          }}
-          onOpen={() => {
-            const { dispatch } = this.props;
-            dispatch(PlayerActions.play());
-          }}
-          onProgress={({
-            currentTime = 0,
-            duration = 0
-          }: {
-            currentTime: number;
-            duration: number;
-          }) => {
-            if (this.seekId == null) {
-              const { dispatch } = this.props;
-              if (duration > 0) {
-                this.seekable = true;
-                dispatch(
-                  PlayerActions.progress({
-                    duration,
-                    time: currentTime,
-                    position: currentTime / duration
-                  })
-                );
-              } else {
-                const { ss } = this.state;
-                const { duration } = this.getRecorded();
-                const time = currentTime + ss * 1000;
-                this.seekable = false;
-                dispatch(
-                  PlayerActions.progress({
-                    duration,
-                    time,
-                    position: time / duration
-                  })
-                );
-              }
-            }
-            if (this.preseek > 0) {
-              this.time(this.preseek);
-              this.preseek = 0;
-            }
-          }}
-          onError={() => {
-            Toast.show("Playback error", {
-              ...toastOptions,
-              duration: Toast.durations.LONG
-            });
-            this.end();
-          }}
-          onEnd={() => {
-            this.end();
-          }}
-        />
-      );
+    if (query || ss > 0) {
+      uri += `?${qs.stringify({ ...qs.parse(query), ss })}`;
     }
-    if (query) {
-      uri += `?${query}`;
-    }
-    return (
-      <Video
-        style={styles.video}
-        resizeMode="contain"
-        paused={pause}
-        rate={parseFloat(speed)}
-        muted={mute}
-        volume={parseInt(volume, 10) / 100}
-        source={{ uri, type: "m3u8" } as any}
-        ref={ref => {
-          this.video = ref;
-        }}
-        onProgress={({ currentTime, seekableDuration }) => {
-          const { dispatch } = this.props;
-          this.seekable = true;
-          dispatch(
-            PlayerActions.progress({
-              duration: seekableDuration * 1000,
-              time: currentTime * 1000,
-              position: currentTime / seekableDuration
-            })
-          );
-          if (this.preseek > 0) {
-            this.time(this.preseek);
-            this.preseek = 0;
-          }
-        }}
-        onEnd={() => {
-          this.end();
-        }}
-      />
-    );
-  }
+    return uri;
+  }, [mobileStreamType, mobileStreamParams, recordedProgram, networkType, ss]);
 
-  componentDidMount() {
-    const { viewer } = this.props;
-    this.load(viewer.peakPlay);
-
+  useEffect(() => {
     if (Platform.OS === "android") {
       Immersive.on();
     }
     KeepAwake.activate();
-  }
-
-  shouldComponentUpdate(nextProps: Props) {
-    const { player } = this.props;
-    return (
-      nextProps.player === player ||
-      nextProps.player.pause !== player.pause ||
-      (nextProps.player.time === player.time &&
-        nextProps.player.position === player.position)
-    );
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    const { viewer, player } = this.props;
-    const { reset } = this.state;
-    const { pause } = player;
-
-    if (
-      player.seekTime != null &&
-      player.seekTime !== prevProps.player.seekTime
-    ) {
-      this.time(player.seekTime);
-    }
-    if (
-      player.seekPosition != null &&
-      player.seekPosition !== prevProps.player.seekPosition
-    ) {
-      this.position(player.seekPosition);
-    }
-
-    if (
-      viewer.programs !== prevProps.viewer.programs ||
-      viewer.index !== prevProps.viewer.index ||
-      viewer.extraIndex !== prevProps.viewer.extraIndex
-    ) {
-      if (pause) {
-        this.close();
-      } else {
-        this.load(viewer.peakPlay);
+  });
+  useEffect(
+    () => () => {
+      if (Platform.OS === "android") {
+        Immersive.off();
+      }
+      KeepAwake.deactivate();
+    },
+    []
+  );
+  useEffect(() => {
+    if (bootstrap) {
+      KeepAwake.activate();
+      const program = programs[index];
+      if (program && recordedProgram) {
+        if (peakPlay && program.commentMaxSpeedTime) {
+          preseek.current =
+            new Date(program.commentMaxSpeedTime).getTime() -
+            new Date(recordedProgram.start).getTime();
+        } else {
+          preseek.current =
+            new Date(program.start).getTime() -
+            new Date(recordedProgram.start).getTime();
+        }
+        setStartSeconds(0);
+        dispatch(
+          PlayerActions.progress({
+            duration: 0,
+            time: 0,
+            position: 0
+          })
+        );
       }
     }
-    if (reset) {
-      this.setState({ reset: false });
+    setBootstrap(false);
+  }, [bootstrap]);
+  useEffect(() => {
+    if (pause && !initializing.current) {
+      dispatch(ViewerActions.update({ playing: false }));
+    } else {
+      initializing.current = false;
+      setBootstrap(true);
     }
-    if (Platform.OS === "android") {
-      Immersive.on();
-    }
-  }
-
-  componentWillUnmount() {
-    if (Platform.OS === "android") {
-      Immersive.off();
-    }
-    KeepAwake.deactivate();
-  }
-
-  getRecorded() {
-    const { viewer } = this.props;
-    const { programs, index, extraIndex } = viewer;
-    const program = programs[index];
-    if (program.recorded && program.recorded[extraIndex]) {
-      return program.recorded[extraIndex];
-    }
-    return program;
-  }
-
-  load(peakPlay = false) {
-    const { dispatch, viewer } = this.props;
-    const { programs, index } = viewer;
-    const program = programs[index];
-    const recordedProgram = this.getRecorded();
-    if (program && recordedProgram) {
-      if (peakPlay && program.commentMaxSpeedTime) {
-        this.preseek =
-          new Date(program.commentMaxSpeedTime).getTime() -
-          new Date(recordedProgram.start).getTime();
+  }, [programs, index, extraIndex]);
+  useEffect(() => {
+    if (seekTime != null) {
+      if (seekable.current) {
+        vlcRef.current?.seek(Math.floor(seekTime / 1000));
+        videoRef.current?.seek(Math.floor(seekTime / 1000));
       } else {
-        this.preseek =
-          new Date(program.start).getTime() -
-          new Date(recordedProgram.start).getTime();
+        const position = seekTime / duration;
+        if (seekId.current != null) {
+          clearTimeout(seekId.current);
+        }
+        dispatch(
+          PlayerActions.progress({ duration, time: seekTime, position })
+        );
+
+        const ss = Math.floor(seekTime / 1000);
+        seekId.current = setTimeout(() => {
+          setStartSeconds(ss);
+          dispatch(PlayerActions.play());
+          seekId.current = null;
+        }, 500);
       }
+    }
+  }, [seekTime]);
+  useEffect(() => {
+    if (seekPosition != null) {
+      dispatch(PlayerActions.time(seekPosition * duration));
+    }
+  }, [seekPosition]);
+
+  const onVlcOpen = useCallback(() => {
+    dispatch(PlayerActions.play());
+  }, []);
+  const onVlcProgress = useCallback(
+    ({
+      currentTime = 0,
+      duration = 0
+    }: {
+      currentTime: number;
+      duration: number;
+    }) => {
+      if (seekId.current == null) {
+        if (duration > 0) {
+          seekable.current = true;
+          dispatch(
+            PlayerActions.progress({
+              duration,
+              time: currentTime,
+              position: currentTime / duration
+            })
+          );
+        } else {
+          const { duration } = recordedProgram;
+          const time = currentTime + ss * 1000;
+          seekable.current = false;
+          dispatch(
+            PlayerActions.progress({
+              duration,
+              time,
+              position: time / duration
+            })
+          );
+        }
+      }
+      if (preseek.current > 0) {
+        dispatch(PlayerActions.time(preseek.current));
+        preseek.current = 0;
+      }
+    },
+    [recordedProgram, ss]
+  );
+  const onVideoProgress = useCallback(
+    ({ currentTime, seekableDuration }: OnProgressData) => {
+      seekable.current = true;
       dispatch(
         PlayerActions.progress({
-          duration: 0,
-          time: 0,
-          position: 0
+          duration: seekableDuration * 1000,
+          time: currentTime * 1000,
+          position: currentTime / seekableDuration
         })
       );
-      this.setState({ reset: true });
-    }
-  }
-
-  close() {
-    const { dispatch } = this.props;
-    dispatch(ViewerActions.update({ playing: false }));
-  }
-
-  continue() {
-    const { dispatch, viewer } = this.props;
-    const { programs, index, extraIndex } = viewer;
-    const program = programs[index];
-    const nextExtraIndex = extraIndex + 1;
-    const nextIndex = index + 1;
-    if (program.recorded && program.recorded[nextExtraIndex]) {
-      dispatch(
-        ViewerActions.update({ extraIndex: nextExtraIndex, peakPlay: false })
-      );
-    } else if (programs[nextIndex]) {
-      dispatch(
-        ViewerActions.update({
-          index: nextIndex,
-          extraIndex: 0,
-          peakPlay: false
-        })
-      );
-    } else {
-      this.close();
-    }
-  }
-
-  repeat() {
-    const { dispatch, viewer } = this.props;
-    const { extraIndex } = viewer;
-    if (extraIndex === 0) {
-      this.load(false);
-    } else {
-      dispatch(ViewerActions.update({ extraIndex: 0, peakPlay: false }));
-    }
-  }
-
-  end() {
-    const { setting } = this.props;
-    const { player = {} } = setting;
-    const { repeat = "continue" } = player;
+      if (preseek.current > 0) {
+        dispatch(PlayerActions.time(preseek.current));
+        preseek.current = 0;
+      }
+    },
+    []
+  );
+  const onEnd = useCallback(() => {
     switch (repeat) {
-      case "continue":
-        this.continue();
+      case "continue": {
+        const program = programs[index];
+        const nextExtraIndex = extraIndex + 1;
+        const nextIndex = index + 1;
+        if (program.recorded?.[nextExtraIndex]) {
+          dispatch(
+            ViewerActions.update({
+              extraIndex: nextExtraIndex,
+              peakPlay: false
+            })
+          );
+        } else if (programs[nextIndex]) {
+          dispatch(
+            ViewerActions.update({
+              index: nextIndex,
+              extraIndex: 0,
+              peakPlay: false
+            })
+          );
+        } else {
+          dispatch(ViewerActions.update({ playing: false }));
+        }
         break;
-      case "repeat":
-        this.repeat();
+      }
+      case "repeat": {
+        const program = programs[index];
+        const nextExtraIndex = extraIndex + 1;
+        if (program.recorded?.[nextExtraIndex]) {
+          dispatch(
+            ViewerActions.update({
+              extraIndex: nextExtraIndex,
+              peakPlay: false
+            })
+          );
+        } else {
+          dispatch(ViewerActions.update({ extraIndex: 0, peakPlay: false }));
+        }
+        setBootstrap(true);
         break;
+      }
       default:
-        this.close();
+        dispatch(ViewerActions.update({ playing: false }));
     }
+  }, [repeat, programs, index, extraIndex]);
+  const onError = useCallback(() => {
+    Toast.show("Playback error", {
+      ...toastOptions,
+      duration: Toast.durations.LONG
+    });
+    onEnd();
+  }, [onEnd]);
+
+  if (bootstrap) {
+    return null;
   }
 
-  time(time: number) {
-    if (this.seekable) {
-      if (this.vlc) {
-        this.vlc.seek(Math.floor(time / 1000));
-      } else if (this.video) {
-        this.video.seek(Math.floor(time / 1000));
-      }
-    } else {
-      const { dispatch, player } = this.props;
-      const { duration } = player;
-      const position = time / duration;
-      if (this.seekId != null) {
-        clearTimeout(this.seekId);
-      }
-      dispatch(PlayerActions.progress({ duration, time, position }));
-
-      const ss = Math.floor(time / 1000);
-      this.seekId = setTimeout(() => {
-        const { dispatch } = this.props;
-        this.setState({ ss });
-        dispatch(PlayerActions.play());
-        delete this.seekId;
-      }, 500);
-    }
+  if (
+    type === "chinachu" ||
+    type === "epgstation" ||
+    recordedProgram.type === "file"
+  ) {
+    return (
+      <VLCPlayer
+        style={styles.video}
+        paused={pause}
+        muted={mute}
+        volume={volume}
+        initOptions={["--deinterlace=1", "--deinterlace-mode=discard"]}
+        source={{ uri }}
+        rate={speed}
+        ref={vlcRef}
+        onOpen={onVlcOpen}
+        onProgress={onVlcProgress}
+        onError={onError}
+        onEnd={onEnd}
+      />
+    );
   }
-
-  position(position: number) {
-    const { player } = this.props;
-    const { duration } = player;
-    this.time(position * duration);
-  }
-}
-
-export default connect(
-  ({
-    network,
-    player,
-    setting,
-    viewer
-  }: {
-    network: NetworkState;
-    player: PlayerState;
-    setting: SettingState;
-    viewer: ViewerState;
-  }) => ({
-    network,
-    player,
-    setting,
-    viewer
-  })
-)(Player);
+  return (
+    <Video
+      style={styles.video}
+      resizeMode="contain"
+      paused={pause}
+      rate={speed}
+      muted={mute}
+      volume={volume / 100}
+      source={{ uri, type: "m3u8" } as any}
+      ref={videoRef}
+      onProgress={onVideoProgress}
+      onEnd={onEnd}
+    />
+  );
+};
+export default Player;
 
 const styles = StyleSheet.create({
   video: {
