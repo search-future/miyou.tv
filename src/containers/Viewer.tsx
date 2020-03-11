@@ -92,7 +92,7 @@ const Viewer = memo(() => {
 
   const screenHeight = useMemo(() => {
     let screenHeight = containerHeight;
-    if (!expand) {
+    if (!playing || !expand) {
       screenHeight = (containerWidth / 16) * 9;
       const maxScreenHeight = containerHeight / 2 - 40;
       if (screenHeight > maxScreenHeight) {
@@ -100,7 +100,7 @@ const Viewer = memo(() => {
       }
     }
     return screenHeight;
-  }, [expand, containerWidth, containerHeight]);
+  }, [expand, playing, containerWidth, containerHeight]);
   const tabButtons = useMemo(
     () => [
       {
@@ -345,7 +345,7 @@ const Viewer = memo(() => {
               </TouchableOpacity>
             )}
           </View>
-          {!expand && (
+          {(!playing || !expand) && (
             <View
               style={[
                 colorStyle.bgDark,
