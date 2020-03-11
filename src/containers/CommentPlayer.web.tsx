@@ -11,19 +11,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
+import React, {
+  memo,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo
+} from "react";
 import { View, StyleSheet } from "react-native";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
+import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
-import {
-  CommentPlayerState,
-  CommentPlayerActions,
-  CommentData
-} from "../modules/commentPlayer";
-import { PlayerState } from "../modules/player";
+import { RootState } from "../modules";
+import { CommentPlayerActions, CommentData } from "../modules/commentPlayer";
 import { SettingState } from "../modules/setting";
-import { ViewerState } from "../modules/viewer";
+import { ViewerProgram } from "../modules/viewer";
 
 type Comment = {
   line: number;
@@ -31,45 +33,250 @@ type Comment = {
   element: HTMLElement;
 };
 
-type Props = {
-  dispatch: Dispatch;
-  commentPlayer: CommentPlayerState;
-  player: PlayerState;
-  setting: SettingState & {
-    commentPlayer?: {
-      duration?: string;
-      delay?: string;
-      maxLines?: string;
-      maxComments?: string;
-    };
-    queryTable?: { [channel: string]: string[] };
+type Setting = SettingState & {
+  commentPlayer?: {
+    duration?: string;
+    maxComments?: string;
+    maxLines?: string;
   };
-  viewer: ViewerState;
+  queryTable?: { [channel: string]: string[] };
 };
-type State = {
-  comments: number[];
+type State = RootState & {
+  setting: Setting;
 };
-class CommentPlayer extends Component<Props, State> {
-  screen: HTMLElement | null = null;
-  state = {
-    comments: []
-  };
-  updaterId?: number;
-  lines: (Comment | null)[] = [];
-  cp = 0;
-  time = 0;
 
-  render() {
-    const { comments } = this.state;
-    return (
-      <View
-        style={styles.container}
-        onLayout={() => {
-          this.adjust();
-        }}
-      >
-        <style>
-          {`
+const CommentPlayer = memo(() => {
+  const screenRef = useRef<HTMLDivElement | null>(null);
+  const lines = useRef<(Comment | null)[]>([]);
+  const cp = useRef(0);
+  const timeRef = useRef(0);
+
+  const dispatch = useDispatch();
+  const commentDuration = useSelector<State, number>(({ setting }) =>
+    parseInt(setting.commentPlayer?.duration || "5000", 10)
+  );
+  const maxComments = useSelector<State, number>(({ setting }) =>
+    parseInt(setting.commentPlayer?.maxComments || "50", 10)
+  );
+  const maxLines = useSelector<State, number>(({ setting }) =>
+    parseInt(setting.commentPlayer?.maxLines || "10", 10)
+  );
+  const channel = useSelector<State, string>(
+    ({ commentPlayer }) => commentPlayer.channel
+  );
+  const start = useSelector<State, number>(
+    ({ commentPlayer }) => commentPlayer.start
+  );
+  const end = useSelector<State, number>(
+    ({ commentPlayer }) => commentPlayer.end
+  );
+  const data = useSelector<State, CommentData[]>(
+    ({ commentPlayer }) => commentPlayer.data,
+    shallowEqual
+  );
+  const pointer = useSelector<State, number>(
+    ({ commentPlayer }) => commentPlayer.pointer
+  );
+  const filters = useSelector<State, string[]>(
+    ({ commentPlayer }) => commentPlayer.filters,
+    shallowEqual
+  );
+  const duration = useSelector<State, number>(({ player }) => player.duration);
+  const time = useSelector<State, number>(
+    ({ player }) => player.time,
+    (left, right) =>
+      Math.floor(left / updateInterval) === Math.floor(right / updateInterval)
+  );
+  const program = useSelector<State, ViewerProgram>(
+    ({ viewer }) => viewer.programs[viewer.index],
+    shallowEqual
+  );
+  const extraIndex = useSelector<State, number>(
+    ({ viewer }) => viewer.extraIndex
+  );
+  const queryTable = useSelector<
+    State,
+    { [channel: string]: string[] } | undefined
+  >(({ setting }) => setting.queryTable, shallowEqual);
+
+  const [comments, setComments] = useState<(number | null)[]>([]);
+
+  const recordedProgram = useMemo(
+    () => program.recorded?.[extraIndex] || program,
+    [program, extraIndex]
+  );
+
+  useEffect(() => {
+    cp.current = 0;
+    dispatch(CommentPlayerActions.seek(0));
+
+    const comments = [];
+    for (let i = 0; i < maxComments; i++) {
+      comments.push(i);
+    }
+    const commentLines = [];
+    for (let i = 0; i < maxLines; i++) {
+      commentLines.push(null);
+    }
+    lines.current = commentLines;
+    setComments(comments);
+  }, [maxComments, maxLines]);
+  useEffect(() => {
+    const { channelName } = program;
+    const { start, end } = recordedProgram;
+    dispatch(
+      CommentPlayerActions.init(
+        channelName,
+        new Date(start).getTime(),
+        new Date(end).getTime()
+      )
+    );
+  }, [program, recordedProgram, queryTable]);
+  useEffect(() => {
+    const clear = () => {
+      if (screenRef.current) {
+        const elements = screenRef.current.getElementsByClassName("comment");
+        for (let i = 0; i < elements.length; i++) {
+          const element = elements.item(i) as HTMLElement;
+          element.innerText = "";
+        }
+      }
+    };
+    const deploy = (data: CommentData) => {
+      if (screenRef.current) {
+        const elements = screenRef.current.getElementsByClassName("comment");
+        const element = elements.item(cp.current) as HTMLElement;
+        if (element) {
+          const comment = {
+            line: -1,
+            time: data.time - start,
+            element
+          };
+          element.style.visibility = "hidden";
+          element.innerText = data.text
+            .replace(/>{1,2}[0-9-]+/g, "")
+            .replace(/^>.+$/g, "")
+            .replace(/[a-zA-Z]+:\/\/\S+/g, "")
+            .trim();
+
+          activate(comment);
+        }
+        cp.current++;
+        if (cp.current >= elements.length) {
+          cp.current = 0;
+        }
+      }
+    };
+    const activate = (comment: Comment) => {
+      comment.line = selectLine(comment);
+      lines.current[Math.floor(comment.line)] = comment;
+
+      const delay = comment.time - time + updateInterval;
+
+      const { element } = comment;
+      element.style.transitionDelay = `${delay}ms`;
+      element.style.transitionDuration = `${commentDuration}ms`;
+      element.style.transitionProperty = "none";
+      element.style.transitionTimingFunction = "linear";
+      element.style.top = `${(comment.line * 100) /
+        (lines.current.length + 1)}%`;
+      element.style.right = `${-element.offsetWidth}px`;
+      element.style.visibility = "visible";
+      setTimeout(() => {
+        element.style.transitionProperty = "right";
+        element.style.right = "100%";
+      }, 0);
+    };
+    const selectLine = (comment: Comment) => {
+      const containerWidth = screenRef.current
+        ? screenRef.current.clientWidth
+        : 0;
+      const reachTime =
+        ((comment.time + commentDuration - time) * containerWidth) /
+        (containerWidth + comment.element.offsetWidth);
+      let candidateLife = Infinity;
+      let candidateRight = Infinity;
+      let candidateIndex = 0;
+      for (let i = 0; i < lines.current.length; i += 1) {
+        const line = lines.current[i];
+        if (!line || !line.element.innerText) {
+          return i;
+        }
+        const remainingTime = line.time + commentDuration - time;
+        const right = line.element.offsetLeft + line.element.offsetWidth;
+        if (remainingTime <= reachTime && right <= containerWidth) {
+          return i;
+        }
+        if (remainingTime <= candidateLife && right < candidateRight) {
+          candidateLife = remainingTime;
+          candidateRight = right;
+          candidateIndex = line.line;
+        }
+      }
+      if (Math.floor(candidateIndex + 0.25) > Math.floor(candidateIndex)) {
+        candidateIndex -= 1;
+      }
+      return candidateIndex + 0.25;
+    };
+
+    let dp = pointer;
+    let { current } = timeRef;
+    if (start === end) {
+      if (duration > 0) {
+        dispatch(CommentPlayerActions.init(channel, start, end + duration));
+      }
+    } else if (time < current) {
+      clear();
+      dp = 0;
+    } else {
+      if (time - current > commentDuration + updateInterval) {
+        current = time - commentDuration;
+        clear();
+      }
+      while (dp < data.length) {
+        const commentData = data[dp];
+        if (commentData.time >= time + start) {
+          break;
+        }
+        if (
+          commentData.time >= current + start &&
+          filters.indexOf(commentData.title) >= 0
+        ) {
+          deploy(commentData);
+        }
+        dp++;
+      }
+    }
+
+    if (dp !== pointer) {
+      dispatch(CommentPlayerActions.seek(dp));
+    }
+    dispatch(CommentPlayerActions.load(time));
+    timeRef.current = time;
+  }, [time]);
+
+  const onLayout = useCallback(() => {
+    if (screenRef.current) {
+      const elements = screenRef.current.getElementsByClassName("comment");
+      const fontSize =
+        ((screenRef.current.clientHeight / lines.current.length) * 2) / 3;
+      for (let i = 0; i < elements.length; i++) {
+        const element = elements.item(i) as HTMLElement | null;
+        if (element) {
+          element.style.fontSize = `${fontSize}px`;
+        }
+      }
+    }
+  }, []);
+  const commentRenderer = useCallback(
+    key => <CommentText key={String(key)} />,
+    []
+  );
+
+  return (
+    <View style={styles.container} onLayout={onLayout}>
+      <style>
+        {`
             .commentPlayer {
               flex: 1;
               overflow: hidden;
@@ -82,290 +289,28 @@ class CommentPlayer extends Component<Props, State> {
               white-space: nowrap;
             }
           `}
-        </style>
-        <div
-          className="commentPlayer"
-          ref={ref => {
-            this.screen = ref;
-            this.adjust();
-          }}
-        >
-          {comments.map(key => (
-            <div
-              key={key}
-              className="comment"
-              onTransitionEnd={({ target }) => {
-                const element = target as HTMLElement;
-                element.innerHTML = "";
-              }}
-            />
-          ))}
-        </div>
-      </View>
-    );
-  }
+      </style>
+      <div className="commentPlayer" ref={screenRef}>
+        {comments.map(commentRenderer)}
+      </div>
+    </View>
+  );
+});
+export default CommentPlayer;
 
-  componentDidMount() {
-    this.init();
-    this.load();
-    this.runUpdater();
-  }
+const CommentText = memo(() => {
+  const ref = useRef<HTMLDivElement>(null);
 
-  shouldComponentUpdate(nextProps: Props) {
-    const { player } = this.props;
-    return (
-      nextProps.player === player ||
-      (nextProps.player.time === player.time &&
-        nextProps.player.position === player.position)
-    );
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    const { setting, viewer } = this.props;
-    const { commentPlayer: commentPlayerSetting = {} } = setting;
-    const { commentPlayer: prevCommentPlayerSetting = {} } = prevProps.setting;
-    if (
-      commentPlayerSetting.maxComments !==
-        prevCommentPlayerSetting.maxComments ||
-      commentPlayerSetting.maxLines !== prevCommentPlayerSetting.maxLines
-    ) {
-      this.init();
+  const onTransitionEnd = useCallback(() => {
+    if (ref.current) {
+      ref.current.innerHTML = "";
     }
-    if (
-      viewer.programs !== prevProps.viewer.programs ||
-      viewer.index !== prevProps.viewer.index ||
-      viewer.extraIndex !== prevProps.viewer.extraIndex ||
-      setting.queryTable !== prevProps.setting.queryTable
-    ) {
-      this.load();
-    }
-  }
+  }, []);
 
-  componentWillUnmount() {
-    clearTimeout(this.updaterId);
-  }
-
-  init() {
-    const { dispatch, setting } = this.props;
-    const { commentPlayer: commentPlayerSetting = {} } = setting;
-    const maxComments = parseInt(commentPlayerSetting.maxComments || "50", 10);
-    const maxLines = parseInt(commentPlayerSetting.maxLines || "10", 10);
-
-    this.cp = 0;
-    dispatch(CommentPlayerActions.seek(0));
-
-    const comments = [];
-    for (let i = 0; i < maxComments; i++) {
-      comments.push(i);
-    }
-    const lines = [];
-    for (let i = 0; i < maxLines; i++) {
-      lines.push(null);
-    }
-    this.lines = lines;
-    this.setState({ comments });
-  }
-
-  load() {
-    const { dispatch, viewer } = this.props;
-    const { programs, index } = viewer;
-    const { channelName } = programs[index];
-    const { start, end } = this.getRecorded();
-    dispatch(
-      CommentPlayerActions.init(
-        channelName,
-        new Date(start).getTime(),
-        new Date(end).getTime()
-      )
-    );
-  }
-
-  runUpdater() {
-    const { dispatch, commentPlayer, player, setting } = this.props;
-    let { pointer } = commentPlayer;
-
-    if (commentPlayer.start === commentPlayer.end) {
-      if (player.duration > 0) {
-        dispatch(
-          CommentPlayerActions.init(
-            commentPlayer.channel,
-            commentPlayer.start,
-            commentPlayer.end + player.duration
-          )
-        );
-      }
-    } else if (player.time < this.time) {
-      this.clear();
-      pointer = 0;
-    } else {
-      const { start, data, filters } = commentPlayer;
-      const { commentPlayer: commentPlayerSetting = {} } = setting;
-      const duration = parseInt(commentPlayerSetting.duration || "5000", 10);
-      let time = this.time;
-      if (player.time - time > duration + updateInterval) {
-        time = player.time - duration;
-        this.clear();
-      }
-      while (pointer < data.length) {
-        const commentData = data[pointer];
-        if (commentData.time >= player.time + start) {
-          break;
-        }
-        if (
-          commentData.time >= time + start &&
-          filters.indexOf(commentData.title) >= 0
-        ) {
-          this.deploy(commentData);
-        }
-        pointer++;
-      }
-    }
-
-    if (pointer !== commentPlayer.pointer) {
-      dispatch(CommentPlayerActions.seek(pointer));
-    }
-    dispatch(CommentPlayerActions.load(player.time));
-    this.time = player.time;
-
-    this.updaterId = setTimeout(() => {
-      this.runUpdater();
-    }, updateInterval);
-  }
-
-  adjust() {
-    if (this.screen) {
-      const elements = this.screen.getElementsByClassName("comment");
-      const fontSize = ((this.screen.clientHeight / this.lines.length) * 2) / 3;
-      for (let i = 0; i < elements.length; i++) {
-        const element = elements.item(i) as HTMLElement;
-        element.style.fontSize = `${fontSize}px`;
-      }
-    }
-  }
-
-  clear() {
-    if (this.screen) {
-      const elements = this.screen.getElementsByClassName("comment");
-      for (let i = 0; i < elements.length; i++) {
-        const element = elements.item(i) as HTMLElement;
-        element.innerText = "";
-      }
-    }
-  }
-
-  deploy(data: CommentData) {
-    if (this.screen) {
-      const elements = this.screen.getElementsByClassName("comment");
-      const element = elements.item(this.cp) as HTMLElement;
-      if (element) {
-        const { commentPlayer } = this.props;
-        const { start } = commentPlayer;
-        const comment = {
-          line: -1,
-          time: data.time - start,
-          element
-        };
-        element.style.visibility = "hidden";
-        element.innerText = data.text
-          .replace(/>{1,2}[0-9-]+/g, "")
-          .replace(/^>.+$/g, "")
-          .replace(/[a-zA-Z]+:\/\/\S+/g, "")
-          .trim();
-
-        this.activate(comment);
-      }
-      this.cp++;
-      if (this.cp >= elements.length) {
-        this.cp = 0;
-      }
-    }
-  }
-
-  activate(comment: Comment) {
-    comment.line = this.selectLine(comment);
-    this.lines[Math.floor(comment.line)] = comment;
-
-    const { player, setting } = this.props;
-    const { commentPlayer: commentPlayerSetting = {} } = setting;
-    const duration = parseInt(commentPlayerSetting.duration || "5000", 10);
-    const delay = comment.time - player.time + updateInterval;
-
-    const { element } = comment;
-    element.style.transitionDelay = `${delay}ms`;
-    element.style.transitionDuration = `${duration}ms`;
-    element.style.transitionProperty = "none";
-    element.style.transitionTimingFunction = "linear";
-    element.style.top = `${(comment.line * 100) / (this.lines.length + 1)}%`;
-    element.style.right = `${-element.offsetWidth}px`;
-    element.style.visibility = "visible";
-    setTimeout(() => {
-      element.style.transitionProperty = "right";
-      element.style.right = "100%";
-    }, 0);
-  }
-
-  selectLine(comment: Comment) {
-    const { player, setting } = this.props;
-    const { commentPlayer: commentPlayerSetting = {} } = setting;
-    const duration = parseInt(commentPlayerSetting.duration || "5000", 10);
-    const containerWidth = this.screen ? this.screen.clientWidth : 0;
-    const reachTime =
-      ((comment.time + duration - player.time) * containerWidth) /
-      (containerWidth + comment.element.offsetWidth);
-    let candidateLife = Infinity;
-    let candidateRight = Infinity;
-    let candidateIndex = 0;
-    for (let i = 0; i < this.lines.length; i += 1) {
-      const line = this.lines[i];
-      if (!line || !line.element.innerText) {
-        return i;
-      }
-      const remainingTime = line.time + duration - player.time;
-      const right = line.element.offsetLeft + line.element.offsetWidth;
-      if (remainingTime <= reachTime && right <= containerWidth) {
-        return i;
-      }
-      if (remainingTime <= candidateLife && right < candidateRight) {
-        candidateLife = remainingTime;
-        candidateRight = right;
-        candidateIndex = line.line;
-      }
-    }
-    if (Math.floor(candidateIndex + 0.25) > Math.floor(candidateIndex)) {
-      candidateIndex -= 1;
-    }
-    return candidateIndex + 0.25;
-  }
-
-  getRecorded() {
-    const { viewer } = this.props;
-    const { programs, index, extraIndex } = viewer;
-    const program = programs[index];
-    if (program.recorded && program.recorded[extraIndex]) {
-      return program.recorded[extraIndex];
-    }
-    return program;
-  }
-}
-
-export default connect(
-  ({
-    commentPlayer,
-    player,
-    setting,
-    viewer
-  }: {
-    commentPlayer: CommentPlayerState;
-    player: PlayerState;
-    setting: SettingState;
-    viewer: ViewerState;
-  }) => ({
-    commentPlayer,
-    player,
-    setting,
-    viewer
-  })
-)(CommentPlayer);
+  return (
+    <div ref={ref} className="comment" onTransitionEnd={onTransitionEnd} />
+  );
+});
 
 const updateInterval = 1000;
 

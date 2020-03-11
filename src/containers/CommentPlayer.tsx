@@ -11,7 +11,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { Component } from "react";
+import React, {
+  memo,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo
+} from "react";
 import {
   View,
   StyleSheet,
@@ -19,15 +26,11 @@ import {
   Animated,
   Easing
 } from "react-native";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
+import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
-import {
-  CommentPlayerActions,
-  CommentPlayerState
-} from "../modules/commentPlayer";
-import { PlayerState } from "../modules/player";
-import { ViewerState } from "../modules/viewer";
+import { RootState } from "../modules";
+import { CommentPlayerActions, CommentData } from "../modules/commentPlayer";
+import { ViewerProgram } from "../modules/viewer";
 import { SettingState } from "../modules/setting";
 
 type Comment = {
@@ -40,139 +43,95 @@ type Comment = {
   x: Animated.AnimatedValue;
 };
 
-type Props = {
-  dispatch: Dispatch;
-  commentPlayer: CommentPlayerState;
-  player: PlayerState;
-  setting: SettingState & {
-    commentPlayer?: {
-      duration?: string;
-      delay?: string;
-      maxLines?: string;
-      maxComments?: string;
-    };
-    queryTable?: { [channel: string]: string[] };
+type Setting = SettingState & {
+  commentPlayer?: {
+    duration?: string;
+    maxLines?: string;
+    maxComments?: string;
   };
-  viewer: ViewerState;
+  queryTable?: { [channel: string]: string[] };
 };
-type State = {
-  containerWidth: number;
-  containerHeight: number;
-  comments: Comment[];
+type State = RootState & {
+  setting: Setting;
 };
-class CommentPlayer extends Component<Props, State> {
-  state: State = {
-    containerWidth: 0,
-    containerHeight: 0,
-    comments: []
-  };
-  layoutCallbackId?: number;
-  updaterId?: number;
-  lines: (Comment | null)[] = [];
-  queue: { index: number; width: number }[] = [];
-  cp = 0;
-  time = 0;
 
-  render() {
-    const { containerHeight, comments } = this.state;
-    const height = containerHeight / (this.lines.length + 1);
-    const fontSize = (height * 2) / 3;
-    return (
-      <View
-        style={styles.container}
-        onLayout={({ nativeEvent }) => {
-          if (this.layoutCallbackId != null) {
-            clearTimeout(this.layoutCallbackId);
-          }
-          const { layout } = nativeEvent;
-          const containerWidth = layout.width;
-          const containerHeight = layout.height;
-          this.layoutCallbackId = setTimeout(() => {
-            this.setState({ containerWidth, containerHeight });
-            this.clear();
-          }, 200);
-        }}
-      >
-        <View style={styles.view}>
-          {comments.map(({ id, active, line, text, x }, index) => (
-            <Animated.Text
-              key={id}
-              style={[
-                styles.comment,
-                {
-                  fontSize,
-                  height,
-                  left: 0,
-                  lineHeight: height,
-                  opacity: active ? 1 : 0,
-                  top: height * line,
-                  transform: [{ translateX: x }]
-                }
-              ]}
-              onLayout={({ nativeEvent }: LayoutChangeEvent) => {
-                const { layout } = nativeEvent;
-                const { width } = layout;
-                if (!active && width > 0) {
-                  this.queue.push({ index, width });
-                }
-              }}
-            >
-              {text}
-            </Animated.Text>
-          ))}
-        </View>
-      </View>
-    );
-  }
+const CommentPlayer = memo(() => {
+  const layoutCallbackId = useRef<number>();
+  const lines = useRef<(Comment | null)[]>([]);
+  const queue = useRef<{ index: number; width: number }[]>([]);
+  const cp = useRef(0);
+  const timeRef = useRef(0);
 
-  componentDidMount() {
-    this.init();
-    this.load();
-    this.runUpdater();
-  }
+  const dispatch = useDispatch();
+  const commentDuration = useSelector<State, number>(({ setting }) =>
+    parseInt(setting.commentPlayer?.duration || "5000", 10)
+  );
+  const maxComments = useSelector<State, number>(({ setting }) =>
+    parseInt(setting.commentPlayer?.maxComments || "50", 10)
+  );
+  const maxLines = useSelector<State, number>(({ setting }) =>
+    parseInt(setting.commentPlayer?.maxLines || "10", 10)
+  );
+  const channel = useSelector<State, string>(
+    ({ commentPlayer }) => commentPlayer.channel
+  );
+  const start = useSelector<State, number>(
+    ({ commentPlayer }) => commentPlayer.start
+  );
+  const end = useSelector<State, number>(
+    ({ commentPlayer }) => commentPlayer.end
+  );
+  const data = useSelector<State, CommentData[]>(
+    ({ commentPlayer }) => commentPlayer.data,
+    shallowEqual
+  );
+  const pointer = useSelector<State, number>(
+    ({ commentPlayer }) => commentPlayer.pointer
+  );
+  const filters = useSelector<State, string[]>(
+    ({ commentPlayer }) => commentPlayer.filters,
+    shallowEqual
+  );
+  const duration = useSelector<State, number>(({ player }) => player.duration);
+  const time = useSelector<State, number>(
+    ({ player }) => player.time,
+    (left, right) =>
+      Math.floor(left / updateInterval) === Math.floor(right / updateInterval)
+  );
+  const program = useSelector<State, ViewerProgram>(
+    ({ viewer }) => viewer.programs[viewer.index],
+    shallowEqual
+  );
+  const extraIndex = useSelector<State, number>(
+    ({ viewer }) => viewer.extraIndex
+  );
+  const queryTable = useSelector<
+    State,
+    { [channel: string]: string[] } | undefined
+  >(({ setting }) => setting.queryTable, shallowEqual);
 
-  shouldComponentUpdate(nextProps: Props) {
-    const { player } = this.props;
-    return (
-      nextProps.player === player ||
-      (nextProps.player.time === player.time &&
-        nextProps.player.position === player.position)
-    );
-  }
+  const [containerWidth, setContainerWidth] = useState(0);
+  const [containerHeight, setContainerHeight] = useState(0);
+  const [comments, setComments] = useState<Comment[]>([]);
 
-  componentDidUpdate(prevProps: Props) {
-    const { setting, viewer } = this.props;
-    const { commentPlayer: commentPlayerSetting = {} } = setting;
-    const { commentPlayer: prevCommentPlayerSetting = {} } = prevProps.setting;
-    if (
-      commentPlayerSetting.maxComments !==
-        prevCommentPlayerSetting.maxComments ||
-      commentPlayerSetting.maxLines !== prevCommentPlayerSetting.maxLines
-    ) {
-      this.init();
-    }
-    if (
-      viewer.programs !== prevProps.viewer.programs ||
-      viewer.index !== prevProps.viewer.index ||
-      viewer.extraIndex !== prevProps.viewer.extraIndex ||
-      setting.queryTable !== prevProps.setting.queryTable
-    ) {
-      this.load();
-    }
-  }
+  const recordedProgram = useMemo(
+    () => program.recorded?.[extraIndex] || program,
+    [program, extraIndex]
+  );
+  const height = useMemo(() => containerHeight / (lines.current.length + 1), [
+    containerHeight,
+    lines.current.length
+  ]);
+  const fontSize = useMemo(() => (height * 2) / 3, [height]);
 
-  componentWillUnmount() {
-    clearTimeout(this.layoutCallbackId);
-    clearTimeout(this.updaterId);
-  }
-
-  init() {
-    const { dispatch, setting } = this.props;
-    const { commentPlayer: commentPlayerSetting = {} } = setting;
-    const maxComments = parseInt(commentPlayerSetting.maxComments || "50", 10);
-    const maxLines = parseInt(commentPlayerSetting.maxLines || "10", 10);
-
-    this.cp = 0;
+  useEffect(
+    () => () => {
+      clearTimeout(layoutCallbackId.current);
+    },
+    []
+  );
+  useEffect(() => {
+    cp.current = 0;
     dispatch(CommentPlayerActions.seek(0));
 
     const comments = [];
@@ -187,19 +146,16 @@ class CommentPlayer extends Component<Props, State> {
         x: new Animated.Value(0)
       });
     }
-    const lines = [];
+    const commentLines = [];
     for (let i = 0; i < maxLines; i++) {
-      lines.push(null);
+      commentLines.push(null);
     }
-    this.lines = lines;
-    this.setState({ comments });
-  }
-
-  load() {
-    const { dispatch, viewer } = this.props;
-    const { programs, index } = viewer;
-    const { channelName } = programs[index];
-    const { start, end } = this.getRecorded();
+    lines.current = commentLines;
+    setComments(comments);
+  }, [maxComments, maxLines, containerWidth, containerHeight]);
+  useEffect(() => {
+    const { channelName } = program;
+    const { start, end } = recordedProgram;
     dispatch(
       CommentPlayerActions.init(
         channelName,
@@ -207,54 +163,78 @@ class CommentPlayer extends Component<Props, State> {
         new Date(end).getTime()
       )
     );
-  }
+  }, [program, recordedProgram, queryTable]);
+  useEffect(() => {
+    const selectLine = (comment: Comment) => {
+      const reachTime =
+        ((comment.time + commentDuration - time) * containerWidth) /
+        (containerWidth + comment.width);
+      let candidateLife = Infinity;
+      let candidateRight = Infinity;
+      let candidateIndex = 0;
+      for (let i = 0; i < lines.current.length; i += 1) {
+        const line = lines.current[i];
+        if (!line || !line.text) {
+          return i;
+        }
+        const remainingTime = line.time + commentDuration - time;
+        const right =
+          line.width +
+          containerWidth -
+          ((line.width + containerWidth) * (time - line.time)) /
+            commentDuration;
+        if (remainingTime <= reachTime && right <= containerWidth) {
+          return i;
+        }
+        if (remainingTime <= candidateLife && right < candidateRight) {
+          candidateLife = remainingTime;
+          candidateRight = right;
+          candidateIndex = line.line;
+        }
+      }
+      if (Math.floor(candidateIndex + 0.25) > Math.floor(candidateIndex)) {
+        candidateIndex -= 1;
+      }
+      return candidateIndex + 0.25;
+    };
 
-  runUpdater() {
-    const { dispatch, commentPlayer, player, setting } = this.props;
-    const { comments, containerWidth } = this.state;
-    const { commentPlayer: commentPlayerSetting = {} } = setting;
-    const duration = parseInt(commentPlayerSetting.duration || "5000", 10);
-    let { pointer } = commentPlayer;
+    let dp = pointer;
+    let { current } = timeRef;
     let hasUpdate = false;
 
-    if (commentPlayer.start === commentPlayer.end) {
-      if (player.duration > 0) {
-        dispatch(
-          CommentPlayerActions.init(
-            commentPlayer.channel,
-            commentPlayer.start,
-            commentPlayer.end + player.duration
-          )
-        );
+    if (start === end) {
+      if (duration > 0) {
+        dispatch(CommentPlayerActions.init(channel, start, end + duration));
       }
-    } else if (player.time < this.time) {
-      this.time = player.time;
+    } else if (time < current) {
+      current = time;
       for (const comment of comments) {
         comment.active = false;
         comment.text = "";
       }
-      pointer = 0;
+      dp = 0;
       hasUpdate = true;
     } else {
-      const { start, data, filters } = commentPlayer;
-      if (player.time - this.time > duration + updateInterval) {
-        this.time = player.time - duration;
-        for (const comment of comments) {
+      if (time - current > commentDuration) {
+        current = time - commentDuration;
+      }
+      for (const comment of comments) {
+        if (comment.active && comment.time + commentDuration < time) {
           comment.active = false;
           comment.text = "";
+          hasUpdate = true;
         }
-        hasUpdate = true;
       }
-      while (pointer < data.length) {
-        const commentData = data[pointer];
-        if (commentData.time >= player.time + start) {
+      while (dp < data.length) {
+        const commentData = data[dp];
+        if (commentData.time >= time + start) {
           break;
         }
         if (
-          commentData.time >= this.time + start &&
+          commentData.time >= current + start &&
           filters.indexOf(commentData.title) >= 0
         ) {
-          const comment = comments[this.cp];
+          const comment = comments[cp.current];
           if (comment) {
             comment.active = false;
             comment.id = commentData.id;
@@ -263,34 +243,33 @@ class CommentPlayer extends Component<Props, State> {
               .replace(/^>.+$/g, "")
               .replace(/[a-zA-Z]+:\/\/\S+/g, "")
               .trim();
-            comment.time = commentData.time - commentPlayer.start;
+            comment.time = Infinity;
             comment.width = 0;
-            this.cp++;
-            if (this.cp >= comments.length) {
-              this.cp = 0;
+            cp.current++;
+            if (cp.current >= comments.length) {
+              cp.current = 0;
             }
             hasUpdate = true;
           }
         }
-        pointer++;
+        dp++;
       }
     }
 
-    while (this.queue.length > 0) {
-      const info = this.queue.shift();
+    while (queue.current.length > 0) {
+      const info = queue.current.shift();
       if (info) {
         const { index, width } = info;
         const comment = comments[index];
-        if (comment && comment.text) {
+        if (comment?.text) {
           comment.active = true;
+          comment.time = time;
           comment.width = width;
-          comment.line = this.selectLine(comment);
-          this.lines[Math.floor(comment.line)] = comment;
+          comment.line = selectLine(comment);
+          lines.current[Math.floor(comment.line)] = comment;
           comment.x.setValue(containerWidth);
-          const delay = comment.time - player.time + updateInterval;
           Animated.timing(comment.x, {
-            duration,
-            delay,
+            duration: commentDuration,
             easing: Easing.linear,
             toValue: -comment.width,
             useNativeDriver: true
@@ -300,94 +279,110 @@ class CommentPlayer extends Component<Props, State> {
       }
     }
 
-    if (pointer !== commentPlayer.pointer) {
-      dispatch(CommentPlayerActions.seek(pointer));
+    if (dp !== pointer) {
+      dispatch(CommentPlayerActions.seek(dp));
     }
     if (hasUpdate) {
-      this.setState({ comments });
+      setComments(comments);
     }
-    dispatch(CommentPlayerActions.load(player.time));
-    this.time = player.time;
+    dispatch(CommentPlayerActions.load(time));
+    timeRef.current = time;
+  }, [time]);
 
-    this.updaterId = setTimeout(() => {
-      this.runUpdater();
-    }, updateInterval);
-  }
-
-  clear() {
-    const { comments } = this.state;
-    for (const comment of comments) {
-      comment.active = false;
-      comment.text = "";
+  const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
+    if (layoutCallbackId.current != null) {
+      clearTimeout(layoutCallbackId.current);
     }
-    this.setState({ comments });
-  }
-
-  selectLine(comment: Comment) {
-    const { player, setting } = this.props;
-    const { commentPlayer: commentPlayerSetting = {} } = setting;
-    const { containerWidth } = this.state;
-    const duration = parseInt(commentPlayerSetting.duration || "5000", 10);
-    const reachTime =
-      ((comment.time + duration - player.time) * containerWidth) /
-      (containerWidth + comment.width);
-    let candidateLife = Infinity;
-    let candidateRight = Infinity;
-    let candidateIndex = 0;
-    for (let i = 0; i < this.lines.length; i += 1) {
-      const line = this.lines[i];
-      if (!line || !line.text) {
-        return i;
+    const { layout } = nativeEvent;
+    const containerWidth = layout.width;
+    const containerHeight = layout.height;
+    layoutCallbackId.current = setTimeout(() => {
+      setContainerWidth(containerWidth);
+      setContainerHeight(containerHeight);
+    }, 200);
+  }, []);
+  const onLayoutComment = useCallback(
+    (active: boolean, index: number, { nativeEvent }: LayoutChangeEvent) => {
+      const { layout } = nativeEvent;
+      const { width } = layout;
+      if (!active && width > 0) {
+        queue.current.push({ index, width });
       }
-      const remainingTime = line.time + duration - player.time;
-      const right =
-        line.width +
-        containerWidth -
-        ((line.width + containerWidth) * (player.time - line.time)) / duration;
-      if (remainingTime <= reachTime && right <= containerWidth) {
-        return i;
-      }
-      if (remainingTime <= candidateLife && right < candidateRight) {
-        candidateLife = remainingTime;
-        candidateRight = right;
-        candidateIndex = line.line;
-      }
-    }
-    if (Math.floor(candidateIndex + 0.25) > Math.floor(candidateIndex)) {
-      candidateIndex -= 1;
-    }
-    return candidateIndex + 0.25;
-  }
+    },
+    []
+  );
+  const commentRenderer = useCallback(
+    (comment: Comment, index: number) => (
+      <CommentText
+        key={index}
+        index={index}
+        fontSize={fontSize}
+        height={height}
+        onLayout={onLayoutComment}
+        {...comment}
+      />
+    ),
+    [height, fontSize, onLayoutComment]
+  );
 
-  getRecorded() {
-    const { viewer } = this.props;
-    const { programs, index, extraIndex } = viewer;
-    const program = programs[index];
-    if (program.recorded && program.recorded[extraIndex]) {
-      return program.recorded[extraIndex];
-    }
-    return program;
-  }
-}
+  return (
+    <View style={styles.container} onLayout={onLayout}>
+      <View style={styles.view}>{comments.map(commentRenderer)}</View>
+    </View>
+  );
+});
+export default CommentPlayer;
 
-export default connect(
+const CommentText = memo(
   ({
-    commentPlayer,
-    player,
-    setting,
-    viewer
-  }: {
-    commentPlayer: CommentPlayerState;
-    player: PlayerState;
-    setting: SettingState;
-    viewer: ViewerState;
-  }) => ({
-    commentPlayer,
-    player,
-    setting,
-    viewer
-  })
-)(CommentPlayer);
+    active,
+    line,
+    x,
+    text,
+    index,
+    fontSize,
+    height,
+    onLayout
+  }: Comment & {
+    index: number;
+    fontSize: number;
+    height: number;
+    onLayout?: (
+      active: boolean,
+      index: number,
+      event: LayoutChangeEvent
+    ) => void;
+  }) => {
+    const onLayoutWithInfo = useCallback(
+      (event: LayoutChangeEvent) => {
+        if (onLayout) {
+          onLayout(active, index, event);
+        }
+      },
+      [active, index, onLayout]
+    );
+
+    return (
+      <Animated.Text
+        style={[
+          styles.comment,
+          {
+            fontSize,
+            height,
+            left: 0,
+            lineHeight: height,
+            opacity: active ? 1 : 0,
+            top: height * line,
+            transform: [{ translateX: x }]
+          }
+        ]}
+        onLayout={onLayoutWithInfo}
+      >
+        {text}
+      </Animated.Text>
+    );
+  }
+);
 
 const updateInterval = 1000;
 
