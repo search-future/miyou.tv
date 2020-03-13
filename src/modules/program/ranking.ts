@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { call, put, select } from "redux-saga/effects";
+import { call, delay, put, select } from "redux-saga/effects";
 import Toast from "react-native-root-toast";
 
 import { ProgramActions } from "./actions";
@@ -128,6 +128,7 @@ export function* rankingSaga() {
   try {
     yield put(LoadingActions.start(true));
     yield put(ProgramActions.update("ranking", { programs: [] }));
+    yield delay(0);
 
     const { initilized }: { initilized: boolean } = yield select(
       ({ program = {} }) => program
@@ -196,6 +197,7 @@ export function* rankingSaga() {
     }
 
     yield put(ProgramActions.update("ranking", { start, end }));
+    yield delay(0);
 
     const targetChannels = channels.filter(
       ({ type, channel }) =>
@@ -338,6 +340,7 @@ export function* rankingSaga() {
           yield put(
             ProgramActions.update("ranking", { programs: [...programs] })
           );
+          yield delay(0);
         }
       }
     }

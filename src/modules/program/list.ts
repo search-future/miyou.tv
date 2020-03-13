@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { call, put, select } from "redux-saga/effects";
+import { call, delay, put, select } from "redux-saga/effects";
 import Toast from "react-native-root-toast";
 
 import { ProgramActions } from "./actions";
@@ -42,6 +42,7 @@ export function* listSaga() {
   try {
     yield put(LoadingActions.start(true));
     yield put(ProgramActions.update("list", { programs: [] }));
+    yield delay(0);
 
     const {
       backend: backendSetting = {},
@@ -82,6 +83,7 @@ export function* listSaga() {
     const { hits } = result;
     const programs: ProgramListProgram[] = result.programs;
     yield put(ProgramActions.update("list", { hits, programs: [...programs] }));
+    yield delay(0);
 
     const { commentActive }: ServiceState = yield select(
       ({ service }) => service
@@ -134,6 +136,7 @@ export function* listSaga() {
         }
       }
       yield put(ProgramActions.update("list", { programs: [...programs] }));
+      yield delay(0);
     }
   } catch (e) {
     Toast.show(e.message || JSON.stringify(e, null, 2), {

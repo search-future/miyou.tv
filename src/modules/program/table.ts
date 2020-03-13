@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { call, put, select } from "redux-saga/effects";
+import { call, delay, put, select } from "redux-saga/effects";
 import Toast from "react-native-root-toast";
 
 import { ProgramActions } from "./actions";
@@ -202,6 +202,7 @@ export function* tableSaga() {
       }
     }
     yield put(ProgramActions.update("table", { columns: [...columns] }));
+    yield delay(0);
 
     const { commentActive }: ServiceState = yield select(
       ({ service }) => service
@@ -273,6 +274,7 @@ export function* tableSaga() {
           start: new Date(start)
         })
       );
+      yield delay(0);
     }
   } catch (e) {
     Toast.show(e.message || JSON.stringify(e, null, 2), {
