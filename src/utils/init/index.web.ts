@@ -15,6 +15,7 @@ import { Store, AnyAction } from "redux";
 import { remote, ipcRenderer } from "electron";
 import Toast from "react-native-root-toast";
 import Mousetrap from "mousetrap";
+import fs from "fs";
 
 import { FileActions } from "../../modules/file";
 import { ServiceActions } from "../../modules/service";
@@ -59,7 +60,7 @@ export default function init(store: Store) {
       return false;
     });
     const { argv }: { argv: string[] } = remote.process;
-    const paths = argv.slice(1).filter(a => a !== ".");
+    const paths = argv.slice(1).filter(a => a !== "." && fs.existsSync(a));
     if (paths.length > 0) {
       store.dispatch(FileActions.add(paths.map(path => `file://${path}`)));
     }

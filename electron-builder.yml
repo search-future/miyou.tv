@@ -18,8 +18,10 @@ extraMetadata:
     url: "http://razil.jp/"
 npmArgs: "--runtime=node "
 npmRebuild: false
+afterPack: "afterpack.js"
 mac:
   icon: "assets/miyoutv.icns"
+  entitlementsInherit: "entitlements.mac.inherit.plist"
 win:
   icon: "assets/miyoutv.ico"
   target:

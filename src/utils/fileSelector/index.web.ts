@@ -28,14 +28,15 @@ export default async function fileSelector({
   if (multiSelections) {
     properties.push("multiSelections");
   }
-  const paths = remote.dialog.showOpenDialog({
+  const { canceled, filePaths } = await remote.dialog.showOpenDialog({
     title,
     buttonLabel,
     filters,
     properties
   });
 
-  if (paths) {
-    return paths.map(path => `file://${path}`);
+  if (canceled) {
+    return;
   }
+  return filePaths.map(path => `file://${path}`);
 }

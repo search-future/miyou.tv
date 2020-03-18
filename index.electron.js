@@ -9,17 +9,17 @@ function buildAppMenu() {
 
   if (process.platform === "darwin") {
     template.push({
-      label: app.getName(),
+      label: app.name,
       submenu: [
         {
-          label: `${app.getName()}について`,
+          label: `${app.name}について`,
           role: "about"
         },
         {
           type: "separator"
         },
         {
-          label: `${app.getName()}を隠す`,
+          label: `${app.name}を隠す`,
           role: "hide"
         },
         {
@@ -122,7 +122,7 @@ function buildAppMenu() {
     label: "ヘルプ",
     submenu: [
       {
-        label: app.getName() + "について",
+        label: app.name + "について",
         click: () => {
           shell.openExternal("http://miyou.tv");
         }
@@ -356,6 +356,7 @@ try {
 if (process.platform !== "linux") {
   process.chdir(path.dirname(pluginPath));
 }
+app.commandLine.appendSwitch("no-sandbox");
 app.commandLine.appendSwitch("ignore-gpu-blacklist");
 app.commandLine.appendSwitch(
   "register-pepper-plugins",
