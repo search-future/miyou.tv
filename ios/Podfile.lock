@@ -20,7 +20,7 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - MobileVLCKit (3.3.8)
+  - MobileVLCKit (3.3.9)
   - RCTRequired (0.61.5)
   - RCTTypeSafety (0.61.5):
     - FBLazyVector (= 0.61.5)
@@ -184,13 +184,13 @@ PODS:
     - React-cxxreact (= 0.61.5)
     - React-jsi (= 0.61.5)
   - React-jsinspector (0.61.5)
-  - react-native-document-picker (3.2.4):
+  - react-native-document-picker (3.3.0):
     - React
   - react-native-keep-awake (4.0.0):
     - React
-  - react-native-netinfo (5.3.3):
+  - react-native-netinfo (5.6.2):
     - React
-  - react-native-safe-area-context (0.6.4):
+  - react-native-safe-area-context (0.7.3):
     - React
   - react-native-video/Video (5.0.2):
     - React
@@ -237,13 +237,13 @@ PODS:
     - React-cxxreact (= 0.61.5)
     - React-jsi (= 0.61.5)
     - ReactCommon/jscallinvoker (= 0.61.5)
-  - RNCAsyncStorage (1.7.1):
+  - RNCAsyncStorage (1.8.1):
     - React
-  - RNCMaskedView (0.1.6):
+  - RNCMaskedView (0.1.7):
     - React
-  - RNDateTimePicker (2.2.1):
+  - RNDateTimePicker (2.2.3):
     - React
-  - RNGestureHandler (1.5.6):
+  - RNGestureHandler (1.6.0):
     - React
   - RNSVG (11.0.1):
     - React
@@ -385,7 +385,7 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: 118d0d177724c2d67f08a59136eb29ef5943ec75
   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
   glog: 1f3da668190260b06b429bb211bfbee5cd790c28
-  MobileVLCKit: f2d012b084c1f6e491f4c163bc3108dc92c1417e
+  MobileVLCKit: cf10c4a138d89f3843b6290f94823609b34215a1
   RCTRequired: b153add4da6e7dbc44aebf93f3cf4fcae392ddf1
   RCTTypeSafety: 9aa1b91d7f9310fc6eadc3cf95126ffe818af320
   React: b6a59ef847b2b40bb6e0180a97d0ca716969ac78
@@ -395,10 +395,10 @@ SPEC CHECKSUMS:
   React-jsi: cb2cd74d7ccf4cffb071a46833613edc79cdf8f7
   React-jsiexecutor: d5525f9ed5f782fdbacb64b9b01a43a9323d2386
   React-jsinspector: fa0ecc501688c3c4c34f28834a76302233e29dc0
-  react-native-document-picker: c36bf5f067a581657ecaf7124dcd921a8be19061
+  react-native-document-picker: 0573c02d742d4bef38a5d16b5f039754cfa69888
   react-native-keep-awake: afad8a51dfef9fe9655a6344771be32c8596d774
-  react-native-netinfo: 8884d510fe67349940b4399c01db3e3591c922aa
-  react-native-safe-area-context: 52342d2d80ea8faadd0ffa76d83b6051f20c5329
+  react-native-netinfo: 73303369946c2487c600418961bfdc87748b832f
+  react-native-safe-area-context: e200d4433aba6b7e60b52da5f37af11f7a0b0392
   react-native-video: d01ed7ff1e38fa7dcc6c15c94cf505e661b7bfd0
   react-native-vlcplayer2: cf625c49f39b286f6fb5f000a1642a8de9a667c6
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76
@@ -411,10 +411,10 @@ SPEC CHECKSUMS:
   React-RCTText: 9ccc88273e9a3aacff5094d2175a605efa854dbe
   React-RCTVibration: a49a1f42bf8f5acf1c3e297097517c6b3af377ad
   ReactCommon: 198c7c8d3591f975e5431bec1b0b3b581aa1c5dd
-  RNCAsyncStorage: 44395cb9c7c1523104c2b499eb426ef7aff82bca
-  RNCMaskedView: a88953beefbd347a29072d9eba90e42945fe291e
-  RNDateTimePicker: 1a251f8b276abda796d8119a96bcd1763a76f6b0
-  RNGestureHandler: 911d3b110a7a233a34c4f800e7188a84b75319c6
+  RNCAsyncStorage: e0dd7c8a36543b4ef84969acd9f8aceba3a92dc2
+  RNCMaskedView: 76c40a1d41c3e2535df09246a2b5487f04de0814
+  RNDateTimePicker: bc947b8ee2d74cf940df1915bf1dd3359f375c9f
+  RNGestureHandler: dde546180bf24af0b5f737c8ad04b6f3fa51609a
   RNSVG: 67f1f12dae2cef6ed59a42cae74a6b8f5a9e7b46
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
