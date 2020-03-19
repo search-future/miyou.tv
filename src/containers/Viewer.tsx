@@ -225,16 +225,19 @@ const Viewer = memo(() => {
               style={[isLandscape ? { flex: 1 } : { height: screenHeight }]}
             >
               <Image
-                containerStyle={[styles.screenContent, styles.imageContainer]}
+                containerStyle={[
+                  StyleSheet.absoluteFill,
+                  styles.mediaContainer
+                ]}
                 style={styles.image}
                 source={{ uri: program.preview }}
                 resizeMode="contain"
               />
               <View
                 style={[
+                  StyleSheet.absoluteFill,
                   containerStyle.row,
-                  containerStyle.center,
-                  styles.screenContent
+                  containerStyle.center
                 ]}
               >
                 <TouchableOpacity style={styles.button} onPress={play}>
@@ -245,10 +248,10 @@ const Viewer = memo(() => {
                 </TouchableOpacity>
               </View>
               {playing && (
-                <PlayerContainer style={styles.screenContent}>
+                <PlayerContainer style={StyleSheet.absoluteFill}>
                   <Player />
                   {commentEnabled && (
-                    <View style={styles.screenContent}>
+                    <View style={StyleSheet.absoluteFill}>
                       <CommentPlayer />
                     </View>
                   )}
@@ -408,13 +411,6 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0
   },
-  screenContent: {
-    bottom: 0,
-    left: 0,
-    position: "absolute",
-    right: 0,
-    top: 0
-  },
   control: {
     backgroundColor: "#3a3a3aa8",
     bottom: 0,
@@ -422,7 +418,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 0
   },
-  imageContainer: {
+  mediaContainer: {
     backgroundColor: "#000000"
   },
   image: {
