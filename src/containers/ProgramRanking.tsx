@@ -285,7 +285,7 @@ const ProgramRanking = memo(() => {
         updaterId.current = setTimeout(updater, 1000);
       }
     }
-  }, [programs]);
+  }, [programs, isOpened, playing]);
   useEffect(() => {
     if (listRef.current && programs[viewerIndex]?.id === selectedId) {
       listRef.current.scrollToIndex({ index: viewerIndex, viewPosition: 0.5 });
