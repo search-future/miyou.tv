@@ -248,7 +248,9 @@ const Viewer = memo(() => {
                 </TouchableOpacity>
               </View>
               {playing && (
-                <PlayerContainer style={StyleSheet.absoluteFill}>
+                <PlayerContainer
+                  style={[StyleSheet.absoluteFill, styles.mediaContainer]}
+                >
                   <Player />
                   {commentEnabled && (
                     <View style={StyleSheet.absoluteFill}>
