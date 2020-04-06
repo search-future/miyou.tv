@@ -22,7 +22,8 @@ afterPack: "afterpack.js"
 afterSign: "aftersign.js"
 mac:
   icon: "assets/miyoutv.icns"
-  entitlementsInherit: "entitlements.mac.inherit.plist"
+  entitlements: "entitlements.plist"
+  entitlementsInherit: "entitlements.plist"
   hardenedRuntime: true
 win:
   icon: "assets/miyoutv.ico"
