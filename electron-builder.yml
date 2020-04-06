@@ -19,9 +19,11 @@ extraMetadata:
 npmArgs: "--runtime=node "
 npmRebuild: false
 afterPack: "afterpack.js"
+afterSign: "aftersign.js"
 mac:
   icon: "assets/miyoutv.icns"
   entitlementsInherit: "entitlements.mac.inherit.plist"
+  hardenedRuntime: true
 win:
   icon: "assets/miyoutv.ico"
   target:
