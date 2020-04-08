@@ -26,7 +26,7 @@ export default function init(store: Store) {
   BackHandler.addEventListener("hardwareBackPress", () => {
     const { nav }: { nav: NavigationState } = store.getState();
     const { index } = nav;
-    if (index > 1) {
+    if (index > 0) {
       store.dispatch(StackActions.pop({}));
       return true;
     }
