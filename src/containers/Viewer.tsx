@@ -116,6 +116,7 @@ const Viewer = memo(() => {
   useEffect(
     () => () => {
       clearTimeout(layoutCallbackId.current);
+      dispatch(ViewerActions.update({ playing: false }));
     },
     []
   );
