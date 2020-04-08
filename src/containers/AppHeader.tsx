@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     fontSize: 16,
-    minHeight: 30,
+    minHeight: Platform.OS === "web" ? 32 : 64,
     padding: 0
   },
   iconButton: {

@@ -23,7 +23,8 @@ import {
   View,
   TouchableOpacity,
   StyleSheet,
-  LayoutChangeEvent
+  LayoutChangeEvent,
+  Platform
 } from "react-native";
 import { ButtonGroup, SearchBar } from "react-native-elements";
 import {
@@ -150,7 +151,7 @@ const FooterButtons = memo(() => {
             color={selectedIndex === 2 ? active : light}
           />
         )
-      }
+      },
     ],
     [selectedIndex]
   );
@@ -260,6 +261,6 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     fontSize: 16,
-    minHeight: 30
-  }
+    minHeight: Platform.OS === "web" ? 32 : 64,
+  },
 });
