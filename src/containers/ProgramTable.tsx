@@ -94,7 +94,6 @@ function open(programs: ProgramTableProgram[], index: number) {
 }
 function roundOffset(offset: number, max: number) {
   return ((offset % max) + max) % max;
-  2;
 }
 
 const ProgramTable = memo(() => {
