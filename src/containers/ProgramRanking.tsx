@@ -152,12 +152,16 @@ const ProgramRanking = memo(() => {
   );
 
   const [containerWidth, setContainerWidth] = useState(0);
+  const [scrollEnabled, setScrollEnabled] = useState(true);
 
   const panResponder = useMemo(
     () =>
       PanResponder.create({
         onStartShouldSetPanResponder: () => true,
-        onMoveShouldSetPanResponder: ({}, { dx }) => Math.abs(dx) > 10,
+        onMoveShouldSetPanResponder: ({}, { dx }) => dx !== 0,
+        onPanResponderStart: () => {
+          setScrollEnabled(false);
+        },
         onPanResponderMove: Animated.event([null, { dx: viewX }]),
         onPanResponderEnd: ({}, { dx }) => {
           if (Math.abs(dx) > 64) {
@@ -172,6 +176,7 @@ const ProgramRanking = memo(() => {
           } else {
             viewX.setValue(0);
           }
+          setScrollEnabled(true);
         }
       }),
     [target, containerWidth, start.toDateString()]
@@ -500,6 +505,7 @@ const ProgramRanking = memo(() => {
                 end={dateFormatter.format(end, "YYYY/MM/DD A HHHH:mm")}
               />
             }
+            scrollEnabled={scrollEnabled}
             onScroll={onScroll}
           />
         </Animated.View>

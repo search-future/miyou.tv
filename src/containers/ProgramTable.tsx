@@ -148,6 +148,7 @@ const ProgramTable = memo(() => {
   );
 
   const [containerWidth, setContainerWidth] = useState(0);
+  const [scrollEnabled, setScrollEnabled] = useState(true);
 
   const selectedId = viewerProgram?.id;
 
@@ -157,7 +158,10 @@ const ProgramTable = memo(() => {
       Math.floor((containerWidth - hourWidth - scrollbarWidth) / 200);
     return PanResponder.create({
       onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: ({}, { dx }) => Math.abs(dx) > 10,
+      onMoveShouldSetPanResponder: ({}, { dx }) => dx !== 0,
+      onPanResponderStart: () => {
+        setScrollEnabled(false);
+      },
       onPanResponderMove: Animated.event([null, { dx: viewX }]),
       onPanResponderEnd: ({}, { dx }) => {
         if (Math.abs(dx) > columnWidth) {
@@ -184,6 +188,7 @@ const ProgramTable = memo(() => {
         } else {
           viewX.setValue(0);
         }
+        setScrollEnabled(true);
       }
     });
   }, [offset, containerWidth, columns.length]);
@@ -695,6 +700,7 @@ const ProgramTable = memo(() => {
             style={styles.tableView}
             contentContainerStyle={containerStyle.row}
             scrollEventThrottle={16}
+            scrollEnabled={scrollEnabled}
             ref={viewRef}
             onScroll={onScroll}
           >
