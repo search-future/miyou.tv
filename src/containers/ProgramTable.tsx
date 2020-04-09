@@ -158,13 +158,14 @@ const ProgramTable = memo(() => {
     return PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: ({}, { dx }) => Math.abs(dx) > 10,
-      onPanResponderMove: Animated.event([null, { dx: viewX }], {}),
+      onPanResponderMove: Animated.event([null, { dx: viewX }]),
       onPanResponderEnd: ({}, { dx }) => {
         if (Math.abs(dx) > columnWidth) {
           const length = Math.round(dx / columnWidth);
           const nextOffset = Math.floor(offset - length);
           Animated.timing(viewX, {
-            toValue: length * columnWidth - Math.sign(dx) * scrollbarWidth
+            toValue: length * columnWidth - Math.sign(dx) * scrollbarWidth,
+            useNativeDriver: true
           }).start(() => {
             dispatch(setOffset(roundOffset(nextOffset, columns.length)));
             viewX.setValue(0);
@@ -172,7 +173,8 @@ const ProgramTable = memo(() => {
         } else if (Math.abs(dx) > 64) {
           Animated.timing(viewX, {
             toValue:
-              Math.sign(dx) * columnWidth - Math.sign(dx) * scrollbarWidth
+              Math.sign(dx) * columnWidth - Math.sign(dx) * scrollbarWidth,
+            useNativeDriver: true
           }).start(() => {
             dispatch(
               setOffset(roundOffset(offset - Math.sign(dx), columns.length))
@@ -680,7 +682,7 @@ const ProgramTable = memo(() => {
       )}
       {containerWidth > 0 && (
         <Animated.View
-          style={[styles.view, { left: viewX }]}
+          style={[styles.view, { transform: [{ translateX: viewX }] }]}
           {...panResponder.panHandlers}
         >
           <ChannelHeader

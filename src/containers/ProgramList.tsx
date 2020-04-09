@@ -152,7 +152,8 @@ const ProgramList = memo(() => {
                 viewX.setValue(0);
               } else {
                 Animated.timing(viewX, {
-                  toValue: Math.sign(dx) * containerWidth
+                  toValue: Math.sign(dx) * containerWidth,
+                  useNativeDriver: true
                 }).start(() => {
                   dispatch(setPage(p));
                 });
@@ -504,7 +505,7 @@ const ProgramList = memo(() => {
       )}
       {containerWidth > 0 && (
         <Animated.View
-          style={[styles.view, { left: viewX }]}
+          style={[styles.view, { transform: [{ translateX: viewX }] }]}
           {...panResponder.panHandlers}
         >
           <FlatList

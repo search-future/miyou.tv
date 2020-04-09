@@ -164,7 +164,8 @@ const ProgramRanking = memo(() => {
             const [, , days] = target.split(",");
             start.setDate(start.getDate() - Math.sign(dx) * parseInt(days, 10));
             Animated.timing(viewX, {
-              toValue: Math.sign(dx) * containerWidth
+              toValue: Math.sign(dx) * containerWidth,
+              useNativeDriver: true
             }).start(() => {
               dispatch(setStart(start));
             });
@@ -478,7 +479,7 @@ const ProgramRanking = memo(() => {
       )}
       {containerWidth > 0 && (
         <Animated.View
-          style={[styles.view, { left: viewX }]}
+          style={[styles.view, { transform: [{ translateX: viewX }] }]}
           {...panResponder.panHandlers}
         >
           <FlatList
