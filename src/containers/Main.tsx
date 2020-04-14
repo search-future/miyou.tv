@@ -12,16 +12,18 @@ limitations under the License.
 */
 
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, StatusBar } from "react-native";
 import { MenuProvider } from "react-native-popup-menu";
 import SafeAreaView from "react-native-safe-area-view";
 
 import AppNavigator from "../navigators";
+import colorStyle from "../styles/color";
 
 const Main = () => {
   return (
     <MenuProvider backHandler>
-      <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" />
+      <SafeAreaView style={[colorStyle.bgBlack, styles.container]}>
         <AppNavigator />
       </SafeAreaView>
     </MenuProvider>
