@@ -46,7 +46,7 @@
 		00E356F21AD99517003FC87E /* miyoutvTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = miyoutvTests.m; sourceTree = "<group>"; };
 		0EB9DCF240E29532E20791B6 /* Pods-miyoutv-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-miyoutv-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-miyoutv-tvOSTests/Pods-miyoutv-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		12CA1D905E1B2D692A6504B1 /* Pods-miyoutvTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-miyoutvTests.release.xcconfig"; path = "Target Support Files/Pods-miyoutvTests/Pods-miyoutvTests.release.xcconfig"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* miyoutv.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = miyoutv.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* MiyouTV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MiyouTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = miyoutv/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = miyoutv/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -174,7 +174,7 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* miyoutv.app */,
+				13B07F961A680F5B00A75B9A /* MiyouTV.app */,
 				00E356EE1AD99517003FC87E /* miyoutvTests.xctest */,
 				2D02E47B1E0B4A5D006451C7 /* miyoutv-tvOS.app */,
 				2D02E4901E0B4A5D006451C7 /* miyoutv-tvOSTests.xctest */,
@@ -237,7 +237,7 @@
 			);
 			name = miyoutv;
 			productName = miyoutv;
-			productReference = 13B07F961A680F5B00A75B9A /* miyoutv.app */;
+			productReference = 13B07F961A680F5B00A75B9A /* MiyouTV.app */;
 			productType = "com.apple.product-type.application";
 		};
 		2D02E47A1E0B4A5D006451C7 /* miyoutv-tvOS */ = {
@@ -645,7 +645,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/miyoutv.app/miyoutv";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MiyouTV.app/MiyouTV";
 			};
 			name = Debug;
 		};
@@ -665,7 +665,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/miyoutv.app/miyoutv";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MiyouTV.app/MiyouTV";
 			};
 			name = Release;
 		};
@@ -684,8 +684,8 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = miyoutv;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.razil.ios.miyoutv;
+				PRODUCT_NAME = MiyouTV;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -704,8 +704,8 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = miyoutv;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.razil.ios.miyoutv;
+				PRODUCT_NAME = MiyouTV;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
