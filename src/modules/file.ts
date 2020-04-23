@@ -47,7 +47,7 @@ function* addSaga(action: AnyAction & { uris: string[] }) {
   const dateFormat = file.dateFormat || "YYMMDDHHmm";
   const programs: FileProgram[] = [];
   for (const uri of uris) {
-    const basename = uri.replace(/^.*[\/\\]/g, "");
+    const basename = decodeURIComponent(uri.replace(/^.*[\/\\]/g, ""));
     const normalizedName = basename
       .replace(/\.[^.]+$/, "")
       .replace(/[！-～]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xfee0))
