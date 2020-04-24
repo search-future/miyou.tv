@@ -448,6 +448,7 @@ const ProgramTable = memo(() => {
     ({ nativeEvent }: NativeSyntheticEvent<NativeScrollEvent>) => {
       const { contentOffset, contentSize, layoutMeasurement } = nativeEvent;
       const scrollDiff = contentOffset.y - scrollPos.current;
+      headerHeightRef.current -= scrollDiff;
       if (scrollDiff > 0) {
         setTop(false);
       }
@@ -455,12 +456,13 @@ const ProgramTable = memo(() => {
         setBottom(false);
       }
       if (contentOffset.y <= 0) {
+        headerHeightRef.current = 256;
         setTop(true);
       }
       if (contentOffset.y >= contentSize.height - layoutMeasurement.height) {
+        headerHeightRef.current = 0;
         setBottom(true);
       }
-      headerHeightRef.current += scrollPos.current - contentOffset.y;
       if (headerHeightRef.current > 256) {
         headerHeightRef.current = 256;
       } else if (headerHeightRef.current < 0) {

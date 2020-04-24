@@ -310,8 +310,15 @@ const ProgramList = memo(() => {
   }, []);
   const onScroll = useCallback(
     ({ nativeEvent }: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const { contentOffset } = nativeEvent;
-      headerHeightRef.current += scrollPos.current - contentOffset.y;
+      const { contentOffset, contentSize, layoutMeasurement } = nativeEvent;
+      const scrollDiff = contentOffset.y - scrollPos.current;
+      headerHeightRef.current -= scrollDiff;
+      if (contentOffset.y <= 0) {
+        headerHeightRef.current = 256;
+      }
+      if (contentOffset.y >= contentSize.height - layoutMeasurement.height) {
+        headerHeightRef.current = 0;
+      }
       if (headerHeightRef.current > 256) {
         headerHeightRef.current = 256;
       } else if (headerHeightRef.current < 0) {
