@@ -134,16 +134,14 @@ const ProgramList = memo(() => {
   );
 
   const [containerWidth, setContainerWidth] = useState(0);
-  const [scrollEnabled, setScrollEnabled] = useState(true);
 
   const panResponder = useMemo(
     () =>
       PanResponder.create({
-        onStartShouldSetPanResponder: () => true,
-        onMoveShouldSetPanResponder: ({}, { dx }) => dx !== 0,
-        onPanResponderStart: () => {
-          setScrollEnabled(false);
-        },
+        onStartShouldSetPanResponder: ({}, { vx, vy }) =>
+          Math.abs(vx) > Math.abs(vy),
+        onMoveShouldSetPanResponder: ({}, { vx, vy }) =>
+          Math.abs(vx) > Math.abs(vy),
         onPanResponderMove: Animated.event([null, { dx: viewX }]),
         onPanResponderEnd: ({}, { dx }) => {
           if (Math.abs(dx) > 64) {
@@ -166,7 +164,6 @@ const ProgramList = memo(() => {
           } else {
             viewX.setValue(0);
           }
-          setScrollEnabled(true);
         }
       }),
     [hits, page, view, containerWidth]
@@ -524,7 +521,6 @@ const ProgramList = memo(() => {
             keyExtractor={keyExtractor}
             renderItem={listRenderer}
             ListHeaderComponent={<ListHeader query={query} hits={hits} />}
-            scrollEnabled={scrollEnabled}
             onScroll={onScroll}
           />
         </Animated.View>
