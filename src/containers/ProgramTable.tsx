@@ -147,13 +147,15 @@ const ProgramTable = memo(() => {
   );
 
   const [containerWidth, setContainerWidth] = useState(0);
+  const [isTop, setTop] = useState(true);
+  const [isBottom, setBottom] = useState(false);
 
   const selectedId = viewerProgram?.id;
 
   const panResponder = useMemo(() => {
-    const columnWidth =
-      containerWidth /
-      Math.floor((containerWidth - hourWidth - scrollbarWidth) / 200);
+    const contentWidth = containerWidth - hourWidth - scrollbarWidth;
+    const columnWidth = contentWidth / Math.floor(contentWidth / 200);
+
     return PanResponder.create({
       onStartShouldSetPanResponder: ({}, { vx, vy }) =>
         Math.abs(vx) > Math.abs(vy),
@@ -165,7 +167,7 @@ const ProgramTable = memo(() => {
           const length = Math.round(dx / columnWidth);
           const nextOffset = Math.floor(offset - length);
           Animated.timing(viewX, {
-            toValue: length * columnWidth - Math.sign(dx) * scrollbarWidth,
+            toValue: length * columnWidth,
             useNativeDriver: true
           }).start(() => {
             dispatch(setOffset(roundOffset(nextOffset, columns.length)));
@@ -173,8 +175,7 @@ const ProgramTable = memo(() => {
           });
         } else if (Math.abs(dx) > 64) {
           Animated.timing(viewX, {
-            toValue:
-              Math.sign(dx) * columnWidth - Math.sign(dx) * scrollbarWidth,
+            toValue: Math.sign(dx) * columnWidth,
             useNativeDriver: true
           }).start(() => {
             dispatch(
@@ -213,7 +214,7 @@ const ProgramTable = memo(() => {
     }
     return tableColumns;
   }, [categories, columns, offset, containerWidth]);
-  const useTopButton = useMemo(
+  const hasPrevious = useMemo(
     () =>
       !minDate ||
       start.getFullYear() > minDate.getFullYear() ||
@@ -221,7 +222,7 @@ const ProgramTable = memo(() => {
       start.getDate() > minDate.getDate(),
     [minDate, start.toDateString()]
   );
-  const useBottomButton = useMemo(
+  const hasNext = useMemo(
     () =>
       !maxDate ||
       start.getFullYear() < maxDate.getFullYear() ||
@@ -445,7 +446,20 @@ const ProgramTable = memo(() => {
   }, []);
   const onScroll = useCallback(
     ({ nativeEvent }: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const { contentOffset } = nativeEvent;
+      const { contentOffset, contentSize, layoutMeasurement } = nativeEvent;
+      const scrollDiff = contentOffset.y - scrollPos.current;
+      if (scrollDiff > 0) {
+        setTop(false);
+      }
+      if (scrollDiff < 0) {
+        setBottom(false);
+      }
+      if (contentOffset.y <= 0) {
+        setTop(true);
+      }
+      if (contentOffset.y >= contentSize.height - layoutMeasurement.height) {
+        setBottom(true);
+      }
       headerHeightRef.current += scrollPos.current - contentOffset.y;
       if (headerHeightRef.current > 256) {
         headerHeightRef.current = 256;
@@ -475,21 +489,29 @@ const ProgramTable = memo(() => {
     dispatch(setOffset(roundOffset(offset + 1, columns.length)));
   }, [offset, columns.length]);
   const onTopPress = useCallback(() => {
-    const date = new Date(start);
-    date.setDate(date.getDate() - 1);
-    if (!minDate || date.getTime() > new Date(minDate).getTime()) {
-      dispatch(setStart(date));
-      viewRef.current?.scrollToEnd({ animated: false });
+    if (isTop) {
+      const date = new Date(start);
+      date.setDate(date.getDate() - 1);
+      if (!minDate || date.getTime() > new Date(minDate).getTime()) {
+        dispatch(setStart(date));
+        viewRef.current?.scrollToEnd({ animated: false });
+      }
+    } else {
+      viewRef.current?.scrollTo({ y: 0 });
     }
-  }, [minDate, start.toDateString()]);
+  }, [maxDate, isTop, start.toDateString()]);
   const onBottomPress = useCallback(() => {
-    const date = new Date(start);
-    date.setDate(date.getDate() + 1);
-    if (!maxDate || date.getTime() < new Date(maxDate).getTime()) {
-      dispatch(setStart(date));
-      viewRef.current?.scrollTo({ y: 0, animated: false });
+    if (isBottom) {
+      const date = new Date(start);
+      date.setDate(date.getDate() + 1);
+      if (!maxDate || date.getTime() < new Date(maxDate).getTime()) {
+        dispatch(setStart(date));
+        viewRef.current?.scrollTo({ y: 0, animated: false });
+      }
+    } else {
+      viewRef.current?.scrollToEnd();
     }
-  }, [maxDate, start.toDateString()]);
+  }, [minDate, isBottom, start.toDateString()]);
   const onItemPress = useCallback(
     ({ programs }: ProgramTableColumn, { id }: ProgramTableProgram) => {
       if (programs) {
@@ -682,32 +704,69 @@ const ProgramTable = memo(() => {
         </Animated.View>
       )}
       {containerWidth > 0 && (
-        <Animated.View
-          style={[styles.view, { transform: [{ translateX: viewX }] }]}
-          {...panResponder.panHandlers}
-        >
-          <ChannelHeader
-            channels={tableColumns}
-            onChannelPress={onChannelPress}
-            onLeftPress={onLeftPress}
-            onRightPress={onRightPress}
-          />
+        <View style={[styles.view]} {...panResponder.panHandlers}>
+          <View style={[styles.channelBackround, colorStyle.bgDark]} />
+          <View style={[styles.hourBackground, colorStyle.bgDark]} />
+          <Animated.View style={{ transform: [{ translateX: viewX }] }}>
+            <ChannelHeader
+              channels={tableColumns}
+              onChannelPress={onChannelPress}
+            />
+          </Animated.View>
           <ScrollView
-            style={styles.tableView}
-            contentContainerStyle={containerStyle.row}
+            style={[styles.tableView]}
             scrollEventThrottle={16}
             ref={viewRef}
             onScroll={onScroll}
           >
-            <HourHeader
-              useTopButton={useTopButton}
-              useBottomButton={useBottomButton}
-              onTopPress={onTopPress}
-              onBottomPress={onBottomPress}
-            />
-            {tableColumns.map(columnRenderer)}
+            <Animated.View
+              style={[
+                containerStyle.row,
+                styles.tableContent,
+                { transform: [{ translateX: viewX }] }
+              ]}
+            >
+              {tableColumns.map(columnRenderer)}
+            </Animated.View>
+            <HourHeader />
           </ScrollView>
-        </Animated.View>
+          <TouchableOpacity style={styles.buttonLeft} onPress={onLeftPress}>
+            <FontAwesome5Icon
+              name="angle-left"
+              solid
+              style={styles.icon}
+              color={light}
+              size={16}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.buttonRight} onPress={onRightPress}>
+            <FontAwesome5Icon
+              name="angle-right"
+              solid
+              style={styles.icon}
+              color={light}
+              size={16}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.buttonTop} onPress={onTopPress}>
+            <FontAwesome5Icon
+              name={hasPrevious && isTop ? "angle-double-up" : "angle-up"}
+              solid
+              style={styles.icon}
+              color={light}
+              size={16}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.buttonBottom} onPress={onBottomPress}>
+            <FontAwesome5Icon
+              name={hasNext && isBottom ? "angle-double-down" : "angle-down"}
+              solid
+              style={styles.icon}
+              color={light}
+              size={16}
+            />
+          </TouchableOpacity>
+        </View>
       )}
     </View>
   );
@@ -717,18 +776,10 @@ export default ProgramTable;
 const ChannelHeader = memo(
   ({
     channels,
-    useLeftButton = true,
-    useRightButton = true,
-    onChannelPress,
-    onLeftPress,
-    onRightPress
+    onChannelPress
   }: {
     channels: ProgramTableColumn[];
-    useLeftButton?: boolean;
-    useRightButton?: boolean;
     onChannelPress?: (column: ProgramTableColumn) => void;
-    onLeftPress?: () => void;
-    onRightPress?: () => void;
   }) => {
     const channelRenderer = useCallback(
       (column: ProgramTableColumn) => (
@@ -746,33 +797,10 @@ const ChannelHeader = memo(
         style={[
           containerStyle.row,
           containerStyle.center,
-          colorStyle.bgDark,
           styles.channelHeader
         ]}
       >
         {channels.map(channelRenderer)}
-        {useLeftButton && onLeftPress && (
-          <TouchableOpacity style={styles.buttonLeft} onPress={onLeftPress}>
-            <FontAwesome5Icon
-              name="chevron-left"
-              solid
-              style={styles.icon}
-              color={light}
-              size={16}
-            />
-          </TouchableOpacity>
-        )}
-        {useRightButton && onRightPress && (
-          <TouchableOpacity style={styles.buttonRight} onPress={onRightPress}>
-            <FontAwesome5Icon
-              name="chevron-right"
-              solid
-              style={styles.icon}
-              color={light}
-              size={16}
-            />
-          </TouchableOpacity>
-        )}
       </View>
     );
   }
@@ -804,76 +832,42 @@ const ChannelCell = memo(
   }
 );
 
-const HourHeader = memo(
-  ({
-    useTopButton = true,
-    useBottomButton = true,
-    onTopPress,
-    onBottomPress
-  }: {
-    useTopButton?: boolean;
-    useBottomButton?: boolean;
-    onTopPress?: () => void;
-    onBottomPress?: () => void;
-  }) => {
-    const hourFirst = useSelector<State, number>(({ setting }) =>
-      parseInt(setting.view?.hourFirst || "4", 10)
-    );
-    const hourFormat = useSelector<State, string>(
-      ({ setting }) => setting.view?.hourFormat || ""
-    );
-    const dateFormatter = useMemo(
-      () => new DateFormatter(hourFirst, hourFormat),
-      [hourFirst, hourFormat]
-    );
-    const hours = useMemo(() => {
-      const hours = [];
-      for (let i = 0; i < 24; i++) {
-        const hour = new Date();
-        hour.setHours(hourFirst + i);
-        hours.push(dateFormatter.getHour(hour));
-      }
-      return hours;
-    }, [hourFirst]);
+const HourHeader = memo(() => {
+  const hourFirst = useSelector<State, number>(({ setting }) =>
+    parseInt(setting.view?.hourFirst || "4", 10)
+  );
+  const hourFormat = useSelector<State, string>(
+    ({ setting }) => setting.view?.hourFormat || ""
+  );
+  const dateFormatter = useMemo(
+    () => new DateFormatter(hourFirst, hourFormat),
+    [hourFirst, hourFormat]
+  );
+  const hours = useMemo(() => {
+    const hours = [];
+    for (let i = 0; i < 24; i++) {
+      const hour = new Date();
+      hour.setHours(hourFirst + i);
+      hours.push(dateFormatter.getHour(hour));
+    }
+    return hours;
+  }, [hourFirst]);
 
-    const hourRenderer = useCallback(
-      (hour: number) => (
-        <View key={hour} style={styles.hourCell}>
-          <Text style={[textStyle.center, colorStyle.light]}>{hour}</Text>
-        </View>
-      ),
-      [dateFormatter]
-    );
-
-    return (
-      <View style={[colorStyle.bgDark, styles.hourHeader]}>
-        {hours.map(hourRenderer)}
-        {useTopButton && onTopPress && (
-          <TouchableOpacity style={styles.buttonTop} onPress={onTopPress}>
-            <FontAwesome5Icon
-              name="chevron-up"
-              solid
-              style={styles.icon}
-              color={light}
-              size={16}
-            />
-          </TouchableOpacity>
-        )}
-        {useBottomButton && onBottomPress && (
-          <TouchableOpacity style={styles.buttonBottom} onPress={onBottomPress}>
-            <FontAwesome5Icon
-              name="chevron-down"
-              solid
-              style={styles.icon}
-              color={light}
-              size={16}
-            />
-          </TouchableOpacity>
-        )}
+  const hourRenderer = useCallback(
+    (hour: number) => (
+      <View key={hour} style={styles.hourCell}>
+        <Text style={[textStyle.center, colorStyle.light]}>{hour}</Text>
       </View>
-    );
-  }
-);
+    ),
+    [dateFormatter]
+  );
+
+  return (
+    <View style={[colorStyle.bgDark, styles.hourHeader]}>
+      {hours.map(hourRenderer)}
+    </View>
+  );
+});
 
 const TableColumn = memo(
   ({
@@ -1113,6 +1107,20 @@ const styles = StyleSheet.create({
   view: {
     flex: 1
   },
+  channelBackround: {
+    left: 0,
+    position: "absolute",
+    right: 0,
+    top: 0,
+    height: 32
+  },
+  hourBackground: {
+    bottom: 0,
+    left: 0,
+    position: "absolute",
+    top: 0,
+    width: hourWidth
+  },
   channelHeader: {
     alignItems: "stretch",
     height: 32,
@@ -1127,8 +1135,12 @@ const styles = StyleSheet.create({
     overflow: "hidden"
   },
   hourHeader: {
-    width: hourWidth,
-    height: hourHeight * 24
+    bottom: 0,
+    height: hourHeight * 24,
+    left: 0,
+    position: "absolute",
+    top: 0,
+    width: hourWidth
   },
   hourCell: {
     alignItems: "center",
@@ -1142,6 +1154,10 @@ const styles = StyleSheet.create({
   },
   tableView: {
     flex: 1
+  },
+  tableContent: {
+    flex: 1,
+    marginLeft: hourWidth
   },
   tableColumn: {
     flex: 1,
@@ -1176,7 +1192,7 @@ const styles = StyleSheet.create({
   buttonTop: {
     position: "absolute",
     left: 0,
-    top: 0
+    top: 32
   },
   buttonBottom: {
     bottom: 0,
