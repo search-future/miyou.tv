@@ -142,7 +142,9 @@ const ProgramList = memo(() => {
           Math.abs(vx) > Math.abs(vy),
         onMoveShouldSetPanResponder: ({}, { vx, vy }) =>
           Math.abs(vx) > Math.abs(vy),
-        onPanResponderMove: Animated.event([null, { dx: viewX }]),
+        onPanResponderMove: Animated.event([null, { dx: viewX }], {
+          useNativeDriver: false
+        }),
         onPanResponderEnd: ({}, { dx }) => {
           if (Math.abs(dx) > 64) {
             const p = page - Math.sign(dx);
