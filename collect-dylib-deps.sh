@@ -10,7 +10,7 @@ copy_deps() {
   local dep=$1
   local depname=$(basename $dep)
   [[ -e $mpv/$depname ]] || install -m755 $dep $mpv
-  otool -L $dep | awk '/\/usr\/local.*\.dylib /{print $1}' | while read lib; do
+  otool -L $dep | awk '/\/usr\/local.*(\.dylib|Python) /{print $1}' | while read lib; do
     local libname=$(basename $lib)
     [[ $depname = $libname ]] && continue
     echo $libname
