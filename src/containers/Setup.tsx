@@ -11,9 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { memo, useEffect, useCallback, useRef } from "react";
+import React, { memo, useEffect, useCallback, useRef, ReactText } from "react";
 import {
-  Picker,
   ScrollView,
   Switch,
   TextInput,
@@ -22,6 +21,7 @@ import {
   StyleSheet,
   Platform
 } from "react-native";
+import { Picker } from "@react-native-community/picker";
 import { Text } from "react-native-elements";
 import { StackActions } from "react-navigation";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
@@ -123,7 +123,7 @@ const BackendSetup = memo(
     } = data;
 
     const backendTypeChange = useCallback(
-      (type: string) => {
+      (type: ReactText) => {
         if (onChanged && type !== backendType) {
           let streamType = "";
           let streamParams = "";
@@ -205,7 +205,7 @@ const BackendSetup = memo(
       [onChanged]
     );
     const streamTypeChange = useCallback(
-      (streamType: string) => {
+      (streamType: ReactText) => {
         if (onChanged) {
           switch (backendType) {
             case "epgstation":
@@ -249,7 +249,7 @@ const BackendSetup = memo(
       [onChanged]
     );
     const mobileStreamTypeChange = useCallback(
-      (mobileStreamType: string) => {
+      (mobileStreamType: ReactText) => {
         if (onChanged) {
           switch (backendType) {
             case "epgstation":
@@ -869,7 +869,7 @@ const ViewSetup = memo(
     const { countMode = "speed", hourFirst = "4", hourFormat = "" } = data;
 
     const countModeChange = useCallback(
-      (countMode: string) => {
+      (countMode: ReactText) => {
         if (onChanged) {
           onChanged({ countMode });
         }
@@ -877,7 +877,7 @@ const ViewSetup = memo(
       [onChanged]
     );
     const hourFirstChange = useCallback(
-      (hourFirst: string) => {
+      (hourFirst: ReactText) => {
         if (onChanged) {
           onChanged({ hourFirst });
         }
@@ -885,7 +885,7 @@ const ViewSetup = memo(
       [onChanged]
     );
     const hourFormatChange = useCallback(
-      (hourFormat: string) => {
+      (hourFormat: ReactText) => {
         if (onChanged) {
           onChanged({ hourFormat });
         }

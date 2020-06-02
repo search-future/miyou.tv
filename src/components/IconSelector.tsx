@@ -13,13 +13,13 @@ limitations under the License.
 
 import React from "react";
 import {
-  Picker,
   View,
   ViewStyle,
   StyleSheet,
   StyleProp,
   TextStyle
 } from "react-native";
+import { Picker } from "@react-native-community/picker";
 import { IconObject } from "react-native-elements";
 
 type Props = {

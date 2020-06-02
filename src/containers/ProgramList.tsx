@@ -17,11 +17,11 @@ import React, {
   useEffect,
   useCallback,
   useMemo,
-  useRef
+  useRef,
+  ReactText
 } from "react";
 import {
   FlatList,
-  Picker,
   TouchableOpacity,
   View,
   ViewStyle,
@@ -34,6 +34,7 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent
 } from "react-native";
+import { Picker } from "@react-native-community/picker";
 import { Badge, ListItem, Text } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useDispatch, useSelector } from "react-redux";
@@ -341,8 +342,8 @@ const ProgramList = memo(() => {
     dispatch(save({ view: String(view) }));
   }, []);
   const pageChange = useCallback(
-    (value: string) => {
-      const p = parseInt(value, 10);
+    (value: ReactText) => {
+      const p = parseInt(value as string, 10);
       if (p !== page && p > 0 && p <= pageCount) {
         dispatch(setPage(p));
       }
