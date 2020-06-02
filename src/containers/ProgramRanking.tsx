@@ -169,7 +169,7 @@ const ProgramRanking = memo(() => {
             start.setDate(start.getDate() - Math.sign(dx) * parseInt(days, 10));
             Animated.timing(viewX, {
               toValue: Math.sign(dx) * containerWidth,
-              useNativeDriver: true
+              useNativeDriver: Platform.OS !== "web"
             }).start(() => {
               dispatch(setStart(start));
             });

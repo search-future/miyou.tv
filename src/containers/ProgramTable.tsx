@@ -170,7 +170,7 @@ const ProgramTable = memo(() => {
           const nextOffset = Math.floor(offset - length);
           Animated.timing(viewX, {
             toValue: length * columnWidth,
-            useNativeDriver: true
+            useNativeDriver: Platform.OS !== "web"
           }).start(() => {
             dispatch(setOffset(roundOffset(nextOffset, columns.length)));
             viewX.setValue(0);
@@ -178,7 +178,7 @@ const ProgramTable = memo(() => {
         } else if (Math.abs(dx) > 64) {
           Animated.timing(viewX, {
             toValue: Math.sign(dx) * columnWidth,
-            useNativeDriver: true
+            useNativeDriver: Platform.OS !== "web"
           }).start(() => {
             dispatch(
               setOffset(roundOffset(offset - Math.sign(dx), columns.length))

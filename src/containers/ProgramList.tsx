@@ -157,7 +157,7 @@ const ProgramList = memo(() => {
               } else {
                 Animated.timing(viewX, {
                   toValue: Math.sign(dx) * containerWidth,
-                  useNativeDriver: true
+                  useNativeDriver: Platform.OS !== "web"
                 }).start(() => {
                   dispatch(setPage(p));
                 });

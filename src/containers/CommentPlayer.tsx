@@ -24,7 +24,8 @@ import {
   StyleSheet,
   LayoutChangeEvent,
   Animated,
-  Easing
+  Easing,
+  Platform
 } from "react-native";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
@@ -272,7 +273,7 @@ const CommentPlayer = memo(() => {
             duration: commentDuration,
             easing: Easing.linear,
             toValue: -comment.width,
-            useNativeDriver: true
+            useNativeDriver: Platform.OS !== "web"
           }).start();
           hasUpdate = true;
         }

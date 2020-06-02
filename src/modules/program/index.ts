@@ -36,7 +36,7 @@ import { rankingSaga } from "./ranking";
 export {
   ProgramTableData,
   ProgramTableProgram,
-  ProgramTableColumn,
+  ProgramTableColumn
 } from "./table";
 export { ProgramListData, ProgramListProgram } from "./list";
 export { ProgramRankingData, ProgramRankingProgram } from "./ranking";

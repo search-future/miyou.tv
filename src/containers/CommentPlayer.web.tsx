@@ -178,8 +178,9 @@ const CommentPlayer = memo(() => {
       element.style.transitionDuration = `${commentDuration}ms`;
       element.style.transitionProperty = "none";
       element.style.transitionTimingFunction = "linear";
-      element.style.top = `${(comment.line * 100) /
-        (lines.current.length + 1)}%`;
+      element.style.top = `${
+        (comment.line * 100) / (lines.current.length + 1)
+      }%`;
       element.style.right = `${-element.offsetWidth}px`;
       element.style.visibility = "visible";
       setTimeout(() => {

@@ -151,7 +151,7 @@ const FooterButtons = memo(() => {
             color={selectedIndex === 2 ? active : light}
           />
         )
-      },
+      }
     ],
     [selectedIndex]
   );
@@ -261,6 +261,6 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     fontSize: 16,
-    minHeight: Platform.OS === "web" ? 32 : 64,
-  },
+    minHeight: Platform.OS === "web" ? 32 : 64
+  }
 });

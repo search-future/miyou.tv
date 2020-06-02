@@ -24,7 +24,7 @@ type Props = {
   minDate?: Date;
   maxDate?: Date;
   onChange?: (value: Date) => void;
-  containerStyle?: StyleProp<ViewStyle>;
+  containerStyle?: ViewStyle | StyleProp<ViewStyle>;
   color?: string;
   backgroundColor?: string;
 };

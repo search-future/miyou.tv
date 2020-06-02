@@ -26,7 +26,8 @@ import {
   ViewProps,
   StyleSheet,
   Animated,
-  PanResponder
+  PanResponder,
+  Platform
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -66,7 +67,7 @@ function showText(animetedValue: Animated.Value) {
   Animated.timing(animetedValue, {
     toValue: 0,
     duration: 1000,
-    useNativeDriver: true
+    useNativeDriver: Platform.OS !== "web"
   }).start();
 }
 
