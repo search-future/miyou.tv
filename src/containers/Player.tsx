@@ -18,7 +18,7 @@ import React, {
   useCallback,
   useMemo
 } from "react";
-import { Platform, StyleSheet } from "react-native";
+import { StatusBar, Platform, StyleSheet } from "react-native";
 import Video, { OnProgressData } from "react-native-video";
 import KeepAwake from "react-native-keep-awake";
 import Toast from "react-native-root-toast";
@@ -131,6 +131,7 @@ const Player = () => {
   useEffect(() => {
     if (Platform.OS === "android") {
       Immersive.on();
+      StatusBar.setHidden(true);
     }
     KeepAwake.activate();
   });
@@ -138,6 +139,7 @@ const Player = () => {
     () => () => {
       if (Platform.OS === "android") {
         Immersive.off();
+        StatusBar.setHidden(false);
       }
       KeepAwake.deactivate();
     },

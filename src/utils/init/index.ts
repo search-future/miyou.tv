@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import { Store } from "redux";
-import { BackHandler, Platform } from "react-native";
+import { BackHandler, StatusBar, Platform } from "react-native";
 import { NavigationState, StackActions } from "react-navigation";
 import NetInfo from "@react-native-community/netinfo";
 import KeepAwake from "react-native-keep-awake";
@@ -44,6 +44,7 @@ export default function init(store: Store) {
 
   if (Platform.OS === "android") {
     Immersive.off();
+    StatusBar.setHidden(false);
   }
   KeepAwake.deactivate();
 
