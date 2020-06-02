@@ -141,6 +141,7 @@ function* openSaga(action: AnyAction) {
           show: false,
           webPreferences: {
             nodeIntegration: true,
+            enableRemoteModule: true,
             plugins: true
           }
         });
