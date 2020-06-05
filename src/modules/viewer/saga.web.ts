@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { all, put, select, takeLatest, take } from "redux-saga/effects";
+import { all, put, select, take, takeEvery } from "redux-saga/effects";
 import { AnyAction } from "redux";
 import Toast from "react-native-root-toast";
 import { NavigationActions } from "react-navigation";
@@ -104,14 +104,7 @@ function* initSaga() {
 function* openSaga(action: AnyAction) {
   const { mode }: ViewerState = yield select(({ viewer }) => viewer);
   if (mode === "stack") {
-    const setting: SettingState = yield select(({ setting }) => setting);
-    const { commentChannels }: ServiceState = yield select(
-      ({ service }) => service
-    );
-    const { docking = true } = setting;
-    const { programs, index, layout }: ViewerState = yield select(
-      ({ viewer }) => viewer
-    );
+    const { docking = true } = yield select(({ setting }) => setting);
     const viewerView = getViewerView();
     let viewerWindow = getViewerWindow();
     if (docking) {
@@ -119,6 +112,13 @@ function* openSaga(action: AnyAction) {
         viewerWindow.destroy();
       }
       if (viewerView) {
+        const setting: SettingState = yield select(({ setting }) => setting);
+        const { commentChannels }: ServiceState = yield select(
+          ({ service }) => service
+        );
+        const { programs, index, layout }: ViewerState = yield select(
+          ({ viewer }) => viewer
+        );
         viewerView.setBounds(layout);
         dispatchViewer(viewerView, SettingActions.restore(setting));
         dispatchViewer(
@@ -154,6 +154,14 @@ function* openSaga(action: AnyAction) {
       if (!viewerWindow.isVisible()) {
         viewerWindow.show();
       }
+
+      const setting: SettingState = yield select(({ setting }) => setting);
+      const { commentChannels }: ServiceState = yield select(
+        ({ service }) => service
+      );
+      const { programs, index }: ViewerState = yield select(
+        ({ viewer }) => viewer
+      );
       dispatchViewer(viewerWindow, SettingActions.restore(setting));
       dispatchViewer(
         viewerWindow,
@@ -288,14 +296,14 @@ function* settingSaga() {
 
 export function* viewerSaga() {
   yield all([
-    takeLatest(VIEWER_INIT, initSaga),
-    takeLatest(VIEWER_OPEN, openSaga),
-    takeLatest(VIEWER_CLOSE, closeSaga),
-    takeLatest(VIEWER_DOCK, dockSaga),
-    takeLatest(VIEWER_UNDOCK, undockSaga),
-    takeLatest(VIEWER_SEARCH, searchSaga),
-    takeLatest(VIEWER_RESIZE, resizeSaga),
-    takeLatest(VIEWER_UPDATE, updateSaga),
-    takeLatest(SETTING_UPDATE, settingSaga)
+    takeEvery(VIEWER_INIT, initSaga),
+    takeEvery(VIEWER_OPEN, openSaga),
+    takeEvery(VIEWER_CLOSE, closeSaga),
+    takeEvery(VIEWER_DOCK, dockSaga),
+    takeEvery(VIEWER_UNDOCK, undockSaga),
+    takeEvery(VIEWER_SEARCH, searchSaga),
+    takeEvery(VIEWER_RESIZE, resizeSaga),
+    takeEvery(VIEWER_UPDATE, updateSaga),
+    takeEvery(SETTING_UPDATE, settingSaga)
   ]);
 }
