@@ -18,6 +18,7 @@
     "@react-native-community/picker": "^1.6.1",
     "axios": "^0.19.2",
     "electron-store": "^5.1.1",
+    "js-base64": "^2.5.2",
     "md5": "^2.2.1",
     "moment": "^2.26.0",
     "mousetrap": "^1.6.5",
@@ -57,6 +58,7 @@
   "devDependencies": {
     "@babel/core": "^7.10.2",
     "@types/jest": "^25.2.3",
+    "@types/js-base64": "^2.3.1",
     "@types/md5": "^2.2.0",
     "@types/mousetrap": "^1.6.3",
     "@types/qs": "^6.9.3",

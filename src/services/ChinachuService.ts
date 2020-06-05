@@ -12,6 +12,7 @@ limitations under the License.
 */
 
 import Axios, { AxiosRequestConfig } from "axios";
+import { Base64 } from "js-base64";
 import qs from "qs";
 
 import BackendService, { SearchOptions, Channel } from "./BackendService";
@@ -161,6 +162,7 @@ export default class ChinachuService extends BackendService {
   ) {
     const conf: AxiosRequestConfig = {
       url: this.getUrl(path),
+      headers: this.getAuthHeaders(),
       params: {},
       data: {},
       paramsSerializer: qs.stringify,
@@ -199,14 +201,15 @@ export default class ChinachuService extends BackendService {
           .filter(a => a)
           .join("&")
       ),
-      stream: this.getUrl(
+      stream: this.getAuthUrl(
         [
           `/api/recorded/${program.id}/watch.${this.streamType}`,
           this.streamParams
         ]
           .filter(a => a)
           .join("?")
-      )
+      ),
+      authHeaders: this.getAuthHeaders()
     };
   }
 
@@ -339,7 +342,7 @@ export default class ChinachuService extends BackendService {
               .join("&")
           );
 
-          stream = this.getUrl(
+          stream = this.getAuthUrl(
             [
               `/api/recorded/${firstRecorded.id}/watch.${this.streamType}`,
               this.streamParams
@@ -363,6 +366,7 @@ export default class ChinachuService extends BackendService {
           recorded: recordedPrograms.map(program =>
             this.convertRecordedProgram(program)
           ),
+          authHeaders: this.getAuthHeaders(),
           preview,
           stream
         };
@@ -482,19 +486,36 @@ export default class ChinachuService extends BackendService {
 
   getUrl(path = "") {
     let wuiUrl = this.url || "http://127.0.0.1:20772";
-    const auth = [];
-
     if (!/^https?:\/\//.test(wuiUrl)) {
       wuiUrl = "http://${wuiUrl}";
     }
+    wuiUrl = wuiUrl.replace(/\/$/, "");
+    return `${wuiUrl}${path}`;
+  }
+
+  getAuthUrl(path = "") {
+    let wuiUrl = this.getUrl(path);
     if (this.user) {
-      auth.push(this.user);
-      if (this.password) {
+      const auth = [];
+      auth.push(encodeURIComponent(this.user));
+      if (encodeURIComponent(this.password)) {
         auth.push(this.password);
       }
       wuiUrl = wuiUrl.replace(/^(https?:\/\/)(.*)$/, `$1${auth.join(":")}@$2`);
     }
-    wuiUrl = wuiUrl.replace(/\/$/, "");
-    return `${wuiUrl}${path}`;
+    return wuiUrl;
+  }
+
+  getAuthHeaders() {
+    if (this.user) {
+      const auth = [];
+      auth.push(this.user);
+      if (this.password) {
+        auth.push(this.password);
+      }
+      return {
+        Authorization: `Basic ${Base64.encode(auth.join(":"))}`
+      };
+    }
   }
 }

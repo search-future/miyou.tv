@@ -12,6 +12,7 @@ limitations under the License.
 */
 
 import Axios, { AxiosRequestConfig } from "axios";
+import { Base64 } from "js-base64";
 import qs from "qs";
 
 import BackendService, { SearchOptions, Channel } from "./BackendService";
@@ -217,11 +218,12 @@ export default class EPGStationService extends BackendService {
         start: new Date(startAt),
         end: new Date(endAt),
         preview: this.getUrl(`/api/recorded/${id}/thumbnail`),
-        stream: this.getUrl(
+        stream: this.getAuthUrl(
           this.streamType === "raw"
             ? `/api/recorded/${id}/file`
-            : `/api/streams/recorded/${id}/${this.streamType}?${this.streamParams}`
-        )
+            : `/api/streams/recorded/${id}/${this.streamType}?${this.streamParams}`,
+        ),
+        authHeaders: this.getAuthHeaders()
       });
     }
     return { hits, programs };
@@ -279,19 +281,36 @@ export default class EPGStationService extends BackendService {
 
   getUrl(path = "") {
     let wuiUrl = this.url || "http://127.0.0.1:8888";
-    const auth = [];
-
     if (!/^https?:\/\//.test(wuiUrl)) {
       wuiUrl = "http://${wuiUrl}";
     }
+    wuiUrl = wuiUrl.replace(/\/$/, "");
+    return `${wuiUrl}${path}`;
+  }
+
+  getAuthUrl(path = "") {
+    let wuiUrl = this.getUrl(path);
     if (this.user) {
+      const auth = [];
+      auth.push(encodeURIComponent(this.user));
+      if (this.password) {
+        auth.push(encodeURIComponent(this.password));
+      }
+      wuiUrl = wuiUrl.replace(/^(https?:\/\/)(.*)$/, `$1${auth.join(":")}@$2`);
+    }
+    return wuiUrl;
+  }
+
+  getAuthHeaders() {
+    if (this.user) {
+      const auth = [];
       auth.push(this.user);
       if (this.password) {
         auth.push(this.password);
       }
-      wuiUrl = wuiUrl.replace(/^(https?:\/\/)(.*)$/, `$1${auth.join(":")}@$2`);
+      return {
+        Authorization: `Basic ${Base64.encode(auth.join(":"))}`
+      };
     }
-    wuiUrl = wuiUrl.replace(/\/$/, "");
-    return `${wuiUrl}${path}`;
   }
 }

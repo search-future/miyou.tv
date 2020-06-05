@@ -44,6 +44,7 @@ export type Program = {
   end: Date;
   preview: string;
   stream: string;
+  authHeaders?: { [key: string]: string };
   recorded?: Program[];
 };
 export type Channel = {

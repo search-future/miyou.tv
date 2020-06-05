@@ -24,11 +24,13 @@ import {
   View,
   StyleSheet,
   Platform,
-  LayoutChangeEvent
+  LayoutChangeEvent,
+  ImageSourcePropType
 } from "react-native";
 import { ButtonGroup, Image, Text } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
+import Axios from "axios";
 
 import CommentPlayer from "./CommentPlayer";
 import Controller from "./Controller";
@@ -86,6 +88,7 @@ const Viewer = memo(() => {
   const [selectedIndex, setSelectedIndex] = useState(
     Platform.OS === "web" ? 1 : 0
   );
+  const [preview, setPreview] = useState<ImageSourcePropType>({});
 
   const program = programs[index];
   const tabIndex = playing ? selectedIndex : 0;
@@ -120,6 +123,25 @@ const Viewer = memo(() => {
     },
     []
   );
+  useEffect(() => {
+    if (program?.preview) {
+      if (Platform.OS === "web") {
+        Axios.get(program.preview, {
+          headers: program.authHeaders,
+          responseType: "blob"
+        }).then(({ data }) => {
+          setPreview({
+            uri: URL.createObjectURL(data)
+          });
+        });
+      } else {
+        setPreview({
+          uri: program.preview,
+          headers: program.authHeaders
+        });
+      }
+    }
+  }, [program]);
 
   const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
     if (layoutCallbackId.current != null) {
@@ -231,7 +253,7 @@ const Viewer = memo(() => {
                   styles.mediaContainer
                 ]}
                 style={styles.image}
-                source={{ uri: program.preview }}
+                source={preview}
                 resizeMode="contain"
               />
               <View
