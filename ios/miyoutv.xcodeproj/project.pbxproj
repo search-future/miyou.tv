@@ -674,12 +674,12 @@
 			baseConfigurationReference = F50B7EF09D59B2C092A30CFB /* Pods-miyoutv.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CURRENT_PROJECT_VERSION = 1030501;
+				CURRENT_PROJECT_VERSION = 1030601;
 				DEAD_CODE_STRIPPING = NO;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = miyoutv/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.3.5;
+				MARKETING_VERSION = 1.3.6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -696,11 +696,11 @@
 			baseConfigurationReference = 1FA0798D1650FD35D9FFBB91 /* Pods-miyoutv.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CURRENT_PROJECT_VERSION = 1030501;
+				CURRENT_PROJECT_VERSION = 1030601;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = miyoutv/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.3.5;
+				MARKETING_VERSION = 1.3.6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -722,13 +722,13 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CURRENT_PROJECT_VERSION = 1030501;
+				CURRENT_PROJECT_VERSION = 1030601;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_TESTABILITY = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "miyoutv-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.3.5;
+				MARKETING_VERSION = 1.3.6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -753,12 +753,12 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1030501;
+				CURRENT_PROJECT_VERSION = 1030601;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "miyoutv-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.3.5;
+				MARKETING_VERSION = 1.3.6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
