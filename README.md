@@ -206,6 +206,7 @@ $ yarn dist-android
 $ yarn
 $ cd ios/
 $ pod install
+$ launchctl setenv GARAPON_DEVID XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
 ## Licence
