@@ -25,15 +25,24 @@ for (const filename of prebuilds) {
   tar.x({ cwd, file, strip: 2, sync: true });
 }
 
-if (fs.existsSync("mpv/mpv-dev/64/mpv-1.dll") && fs.existsSync("mpv/win-x64")) {
-  fs.copyFileSync("mpv/mpv-dev/64/mpv-1.dll", "mpv/win-x64/mpv-1.dll");
+if (fs.existsSync("mpv/libmpv/x64/mpv-1.dll") && fs.existsSync("mpv/win-x64")) {
+  fs.copyFileSync("mpv/libmpv/x64/mpv-1.dll", "mpv/win-x64/mpv-1.dll");
 }
 
 if (
-  fs.existsSync("mpv/mpv-dev/32/mpv-1.dll") &&
+  fs.existsSync("mpv/libmpv/ia32/mpv-1.dll") &&
   fs.existsSync("mpv/win-ia32/")
 ) {
-  fs.copyFileSync("mpv/mpv-dev/32/mpv-1.dll", "mpv/win-ia32/mpv-1.dll");
+  fs.copyFileSync("mpv/libmpv/ia32/mpv-1.dll", "mpv/win-ia32/mpv-1.dll");
+}
+
+if (process.platform === "win32") {
+  const src = path.join(__dirname, `mpv/libmpv/${process.arch}/mpv-1.dll`);
+  const dest = path.join(
+    __dirname,
+    "node_modules/mpv.js/build/Release/mpv-1.dll"
+  );
+  fs.copyFileSync(src, dest);
 }
 
 if (process.platform === "darwin") {
