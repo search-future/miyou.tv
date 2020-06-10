@@ -8,7 +8,10 @@ const tsLoaderConfiguration: webpack.RuleSetRule = {
     options: {
       cacheDirectory: true,
       presets: ["module:metro-react-native-babel-preset"],
-      plugins: ["react-native-web"]
+      plugins: [
+        "react-native-web",
+        ["babel-plugin-transform-react-remove-prop-types", { mode: "remove" }]
+      ]
     }
   }
 };
@@ -20,7 +23,10 @@ const jsLoaderConfiguration: webpack.RuleSetRule = {
     options: {
       cacheDirectory: true,
       presets: ["module:metro-react-native-babel-preset"],
-      plugins: ["react-native-web"]
+      plugins: [
+        "react-native-web",
+        ["babel-plugin-transform-react-remove-prop-types", { mode: "remove" }]
+      ]
     }
   }
 };
