@@ -323,9 +323,15 @@ const BackendSetup = memo(
         {backendType === "chinachu" && (
           <View>
             <View style={styles.info}>
-              <LinkText url={chinachuInfoUrl} style={colorStyle.active}>
-                Chinachu β/γに対応しています。
-              </LinkText>
+              {Platform.OS === "ios" ? (
+                <Text style={[colorStyle.black]}>
+                  Chinachu β/γに対応しています。
+                </Text>
+              ) : (
+                <LinkText url={chinachuInfoUrl} style={colorStyle.active}>
+                  Chinachu β/γに対応しています。
+                </LinkText>
+              )}
             </View>
             <Text style={[colorStyle.black, styles.label]}>ChinachuのURL</Text>
             <View
@@ -630,9 +636,11 @@ const BackendSetup = memo(
               <Text style={colorStyle.black}>
                 ガラポン伍/四/参号機に対応しています。
               </Text>
-              <LinkText url={garaponEntryUrl} style={colorStyle.active}>
-                ガラポンTVレンタル申込ページ
-              </LinkText>
+              {Platform.OS !== "ios" && (
+                <LinkText url={garaponEntryUrl} style={colorStyle.active}>
+                  ガラポンTVレンタル申込ページ
+                </LinkText>
+              )}
             </View>
             <Text style={[colorStyle.black, styles.label]}>
               ガラポンTVの接続情報をAPIから取得
@@ -726,9 +734,11 @@ const BackendSetup = memo(
               <Text style={colorStyle.black}>
                 ガラポン六号機に対応しています。
               </Text>
-              <LinkText url={garaponEntryUrl} style={colorStyle.active}>
-                ガラポンTVレンタル申込ページ
-              </LinkText>
+              {Platform.OS !== "ios" && (
+                <LinkText url={garaponEntryUrl} style={colorStyle.active}>
+                  ガラポンTVレンタル申込ページ
+                </LinkText>
+              )}
             </View>
             <Text style={[colorStyle.black, styles.label]}>
               ガラポンTVのユーザー
@@ -821,9 +831,11 @@ const CommentSetup = memo(
           <Text style={colorStyle.black}>
             コメントを表示するにはモリタポアカウントが必要です。
           </Text>
-          <LinkText url={moritapoEntryUrl} style={colorStyle.active}>
-            モリタポ新規入会ページ
-          </LinkText>
+          {Platform.OS !== "ios" && (
+            <LinkText url={moritapoEntryUrl} style={colorStyle.active}>
+              モリタポ新規入会ページ
+            </LinkText>
+          )}
         </View>
         <Text style={[colorStyle.black, styles.label]}>メールアドレス</Text>
         <View
