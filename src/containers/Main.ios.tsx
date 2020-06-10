@@ -12,17 +12,30 @@ limitations under the License.
 */
 
 import React from "react";
-import { StatusBar } from "react-native";
+import { StyleSheet, StatusBar } from "react-native";
 import { MenuProvider } from "react-native-popup-menu";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import SafeAreaView from "react-native-safe-area-view";
 
 import AppNavigator from "../navigators";
+import colorStyle from "../styles/color";
 
 const Main = () => {
   return (
     <MenuProvider backHandler>
       <StatusBar barStyle="light-content" />
-      <AppNavigator />
+      <SafeAreaProvider>
+        <SafeAreaView style={[colorStyle.bgBlack, styles.container]}>
+          <AppNavigator />
+        </SafeAreaView>
+      </SafeAreaProvider>
     </MenuProvider>
   );
 };
 export default Main;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1
+  }
+});
