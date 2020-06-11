@@ -11,7 +11,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { CSSProperties, ChangeEvent, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  ChangeEvent,
+  CSSProperties
+} from "react";
 import { View, ViewStyle, StyleSheet, StyleProp } from "react-native";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 
@@ -35,6 +41,8 @@ const TimePicker = ({
   maxDate,
   onChange
 }: Props) => {
+  const [className] = useState(`timepicker-${Date.now().toString(36)}`);
+
   const inputValue = useMemo(() => moment(value).format("HH:mm"), [value]);
   const inputMin = useMemo(() => minDate && moment(minDate).format("HH:mm"), [
     minDate
@@ -42,6 +50,21 @@ const TimePicker = ({
   const inputMax = useMemo(() => maxDate && moment(maxDate).format("HH:mm"), [
     maxDate
   ]);
+  const cssStyles = useMemo(
+    () => `
+    .${className}::-webkit-calendar-picker-indicator {
+      background: transparent url('data:image/svg+xml;utf8,${[
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="8px" height="8px">`,
+        `  <polyline points="0 6, 12 18, 24 6" fill="none" stroke="${encodeURIComponent(
+          color
+        )}" stroke-width="4" />`,
+        `</svg>`
+      ].join("")}') no-repeat center center;
+    }
+  `,
+    [color]
+  );
+
   const onInputChange = useCallback(
     ({ target }: ChangeEvent<HTMLInputElement>) => {
       if (onChange) {
@@ -65,10 +88,12 @@ const TimePicker = ({
         }
       ]}
     >
+      <style>{cssStyles}</style>
       <View style={styles.iconWrapper}>
         <FontAwesome5Icon name="clock" solid color={color} />
       </View>
       <input
+        className={className}
         style={{
           ...inputStyle,
           color
