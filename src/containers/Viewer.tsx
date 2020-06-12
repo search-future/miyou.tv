@@ -32,6 +32,7 @@ import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import Axios from "axios";
 
+import CommentInfo from "./CommentInfo";
 import CommentPlayer from "./CommentPlayer";
 import Controller from "./Controller";
 import Loading from "./Loading";
@@ -44,7 +45,6 @@ import containerStyle from "../styles/container";
 import { RootState } from "../modules";
 import { SettingState } from "../modules/setting";
 import { ViewerActions, ViewerProgram } from "../modules/viewer";
-import CommentInfo from "./CommentInfo";
 
 type Setting = SettingState & {
   commentPlayer?: {

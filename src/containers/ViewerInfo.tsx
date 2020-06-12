@@ -90,46 +90,48 @@ const FileCard = memo(
       titleStyle={colorStyle.light}
       title="ファイル情報"
     >
-      <View style={[containerStyle.row, styles.cardRow]}>
-        <View style={styles.cardLabel}>
-          <Text style={colorStyle.light}>ID</Text>
+      <View>
+        <View style={[containerStyle.row, styles.cardRow]}>
+          <View style={styles.cardLabel}>
+            <Text style={colorStyle.light}>ID</Text>
+          </View>
+          <View style={[containerStyle.row, styles.cardContent]}>
+            <Text style={colorStyle.light}>{id}</Text>
+          </View>
         </View>
-        <View style={[containerStyle.row, styles.cardContent]}>
-          <Text style={colorStyle.light}>{id}</Text>
+        <View style={[containerStyle.row, styles.cardRow]}>
+          <View style={styles.cardLabel}>
+            <Text style={colorStyle.light}>ファイル名</Text>
+          </View>
+          <View style={[containerStyle.row, styles.cardContent]}>
+            <Text style={colorStyle.light}>{fullTitle}</Text>
+          </View>
         </View>
-      </View>
-      <View style={[containerStyle.row, styles.cardRow]}>
-        <View style={styles.cardLabel}>
-          <Text style={colorStyle.light}>ファイル名</Text>
+        <View style={[containerStyle.row, styles.cardRow]}>
+          <View style={styles.cardLabel}>
+            <Text style={colorStyle.light}>日時</Text>
+          </View>
+          <View style={[containerStyle.row, styles.cardContent]}>
+            <Text style={colorStyle.light}>
+              {dateFormatter.format(start, "YYYY/MM/DD A HHHH:mm")}
+            </Text>
+          </View>
         </View>
-        <View style={[containerStyle.row, styles.cardContent]}>
-          <Text style={colorStyle.light}>{fullTitle}</Text>
+        <View style={[containerStyle.row, styles.cardRow]}>
+          <View style={styles.cardLabel}>
+            <Text style={colorStyle.light}>チャンネル</Text>
+          </View>
+          <View style={[containerStyle.row, styles.cardContent]}>
+            <Text style={colorStyle.light}>{channelName || "未設定"}</Text>
+          </View>
         </View>
-      </View>
-      <View style={[containerStyle.row, styles.cardRow]}>
-        <View style={styles.cardLabel}>
-          <Text style={colorStyle.light}>日時</Text>
-        </View>
-        <View style={[containerStyle.row, styles.cardContent]}>
-          <Text style={colorStyle.light}>
-            {dateFormatter.format(start, "YYYY/MM/DD A HHHH:mm")}
-          </Text>
-        </View>
-      </View>
-      <View style={[containerStyle.row, styles.cardRow]}>
-        <View style={styles.cardLabel}>
-          <Text style={colorStyle.light}>チャンネル</Text>
-        </View>
-        <View style={[containerStyle.row, styles.cardContent]}>
-          <Text style={colorStyle.light}>{channelName || "未設定"}</Text>
-        </View>
-      </View>
-      <View style={[containerStyle.row, styles.cardRow]}>
-        <View style={styles.cardLabel}>
-          <Text style={colorStyle.light}>URI</Text>
-        </View>
-        <View style={[containerStyle.row, styles.cardContent]}>
-          <Text style={colorStyle.light}>{stream}</Text>
+        <View style={[containerStyle.row, styles.cardRow]}>
+          <View style={styles.cardLabel}>
+            <Text style={colorStyle.light}>URI</Text>
+          </View>
+          <View style={[containerStyle.row, styles.cardContent]}>
+            <Text style={colorStyle.light}>{stream}</Text>
+          </View>
         </View>
       </View>
     </Card>
@@ -175,126 +177,130 @@ const ProgramCard = memo(
         titleStyle={colorStyle.light}
         title="番組情報"
       >
-        <View style={[containerStyle.row, styles.cardRow]}>
-          <View style={[containerStyle.row, styles.cardContent]}>
-            <Text style={[textStyle.bold, colorStyle.light]}>{fullTitle}</Text>
-            <FontAwesome5Icon
-              name="search"
-              solid
-              style={styles.icon}
-              color={light}
-              onPress={titleSearch}
-            />
+        <View>
+          <View style={[containerStyle.row, styles.cardRow]}>
+            <View style={[containerStyle.row, styles.cardContent]}>
+              <Text style={[textStyle.bold, colorStyle.light]}>
+                {fullTitle}
+              </Text>
+              <FontAwesome5Icon
+                name="search"
+                solid
+                style={styles.icon}
+                color={light}
+                onPress={titleSearch}
+              />
+            </View>
           </View>
-        </View>
-        <View style={[containerStyle.row, styles.cardRow]}>
-          <View style={styles.cardLabel}>
-            <Text style={colorStyle.light}>ID</Text>
-          </View>
-          <View style={[containerStyle.row, styles.cardContent]}>
-            <Text style={colorStyle.light}>{id}</Text>
-          </View>
-        </View>
-        <View style={[containerStyle.row, styles.cardRow]}>
-          <View style={styles.cardLabel}>
-            <Text style={colorStyle.light}>開始日時</Text>
-          </View>
-          <View style={[containerStyle.row, styles.cardContent]}>
-            <Text style={colorStyle.light}>
-              {dateFormatter.format(start, "YYYY/MM/DD A HHHH:mm")}
-            </Text>
-          </View>
-        </View>
-        <View style={[containerStyle.row, styles.cardRow]}>
-          <View style={styles.cardLabel}>
-            <Text style={colorStyle.light}>終了日時</Text>
-          </View>
-          <View style={[containerStyle.row, styles.cardContent]}>
-            <Text style={colorStyle.light}>
-              {dateFormatter.format(end, "YYYY/MM/DD A HHHH:mm")}
-            </Text>
-          </View>
-        </View>
-        <View style={[containerStyle.row, styles.cardRow]}>
-          <View style={styles.cardLabel}>
-            <Text style={colorStyle.light}>チャンネル</Text>
-          </View>
-          <View style={[containerStyle.row, styles.cardContent]}>
-            <Text style={colorStyle.light}>{channelName}</Text>
-            <FontAwesome5Icon
-              name="search"
-              solid
-              style={styles.icon}
-              color={light}
-              onPress={channelSearch}
-            />
-          </View>
-        </View>
-        <View style={[containerStyle.row, styles.cardRow]}>
-          <View style={styles.cardLabel}>
-            <Text style={colorStyle.light}>カテゴリー</Text>
-          </View>
-          <View style={[containerStyle.row, styles.cardContent]}>
-            <Badge
-              badgeStyle={[
-                colorStyle.borderGrayDark,
-                styles.badge,
-                {
-                  backgroundColor: category.color
-                }
-              ]}
-              value={category.name}
-            />
-            <FontAwesome5Icon
-              name="search"
-              solid
-              style={styles.icon}
-              color={light}
-              onPress={categorySearch}
-            />
-          </View>
-        </View>
-        <View style={[containerStyle.row, styles.cardRow]}>
-          <View style={[containerStyle.row, styles.cardContent]}>
-            <Text style={colorStyle.light}>{detail}</Text>
-          </View>
-        </View>
-        {commentCount != null && (
           <View style={[containerStyle.row, styles.cardRow]}>
             <View style={styles.cardLabel}>
-              <Text style={colorStyle.light}>コメント数</Text>
+              <Text style={colorStyle.light}>ID</Text>
             </View>
             <View style={[containerStyle.row, styles.cardContent]}>
-              <Text style={colorStyle.light}>{commentCount}</Text>
+              <Text style={colorStyle.light}>{id}</Text>
             </View>
           </View>
-        )}
-        {commentSpeed != null && (
           <View style={[containerStyle.row, styles.cardRow]}>
             <View style={styles.cardLabel}>
-              <Text style={colorStyle.light}> 平均</Text>
+              <Text style={colorStyle.light}>開始日時</Text>
             </View>
             <View style={[containerStyle.row, styles.cardContent]}>
               <Text style={colorStyle.light}>
-                {Math.ceil((commentSpeed || 0) * 10) / 10}
-                コメント/分
+                {dateFormatter.format(start, "YYYY/MM/DD A HHHH:mm")}
               </Text>
             </View>
           </View>
-        )}
-        {commentMaxSpeedTime && (
           <View style={[containerStyle.row, styles.cardRow]}>
             <View style={styles.cardLabel}>
-              <Text style={colorStyle.light}> ピーク</Text>
+              <Text style={colorStyle.light}>終了日時</Text>
             </View>
             <View style={[containerStyle.row, styles.cardContent]}>
               <Text style={colorStyle.light}>
-                {commentMaxSpeed || 0}コメント/分 (
-                {dateFormatter.format(commentMaxSpeedTime, "HHHH:mm")})
+                {dateFormatter.format(end, "YYYY/MM/DD A HHHH:mm")}
               </Text>
             </View>
           </View>
-        )}
+          <View style={[containerStyle.row, styles.cardRow]}>
+            <View style={styles.cardLabel}>
+              <Text style={colorStyle.light}>チャンネル</Text>
+            </View>
+            <View style={[containerStyle.row, styles.cardContent]}>
+              <Text style={colorStyle.light}>{channelName}</Text>
+              <FontAwesome5Icon
+                name="search"
+                solid
+                style={styles.icon}
+                color={light}
+                onPress={channelSearch}
+              />
+            </View>
+          </View>
+          <View style={[containerStyle.row, styles.cardRow]}>
+            <View style={styles.cardLabel}>
+              <Text style={colorStyle.light}>カテゴリー</Text>
+            </View>
+            <View style={[containerStyle.row, styles.cardContent]}>
+              <Badge
+                badgeStyle={[
+                  colorStyle.borderGrayDark,
+                  styles.badge,
+                  {
+                    backgroundColor: category.color
+                  }
+                ]}
+                value={category.name}
+              />
+              <FontAwesome5Icon
+                name="search"
+                solid
+                style={styles.icon}
+                color={light}
+                onPress={categorySearch}
+              />
+            </View>
+          </View>
+          <View style={[containerStyle.row, styles.cardRow]}>
+            <View style={[containerStyle.row, styles.cardContent]}>
+              <Text style={colorStyle.light}>{detail}</Text>
+            </View>
+          </View>
+          {commentCount != null && (
+            <View style={[containerStyle.row, styles.cardRow]}>
+              <View style={styles.cardLabel}>
+                <Text style={colorStyle.light}>コメント数</Text>
+              </View>
+              <View style={[containerStyle.row, styles.cardContent]}>
+                <Text style={colorStyle.light}>{commentCount}</Text>
+              </View>
+            </View>
+          )}
+          {commentSpeed != null && (
+            <View style={[containerStyle.row, styles.cardRow]}>
+              <View style={styles.cardLabel}>
+                <Text style={colorStyle.light}> 平均</Text>
+              </View>
+              <View style={[containerStyle.row, styles.cardContent]}>
+                <Text style={colorStyle.light}>
+                  {Math.ceil((commentSpeed || 0) * 10) / 10}
+                  コメント/分
+                </Text>
+              </View>
+            </View>
+          )}
+          {commentMaxSpeedTime && (
+            <View style={[containerStyle.row, styles.cardRow]}>
+              <View style={styles.cardLabel}>
+                <Text style={colorStyle.light}> ピーク</Text>
+              </View>
+              <View style={[containerStyle.row, styles.cardContent]}>
+                <Text style={colorStyle.light}>
+                  {commentMaxSpeed || 0}コメント/分 (
+                  {dateFormatter.format(commentMaxSpeedTime, "HHHH:mm")})
+                </Text>
+              </View>
+            </View>
+          )}
+        </View>
       </Card>
     );
   }
@@ -317,48 +323,50 @@ const ExtraProgramCard = memo(
       titleStyle={colorStyle.light}
       title="録画情報"
     >
-      <View style={[containerStyle.row, styles.cardRow]}>
-        <View style={styles.cardLabel}>
-          <Text style={colorStyle.light}>ID</Text>
+      <View>
+        <View style={[containerStyle.row, styles.cardRow]}>
+          <View style={styles.cardLabel}>
+            <Text style={colorStyle.light}>ID</Text>
+          </View>
+          <View style={[containerStyle.row, styles.cardContent]}>
+            <Text style={colorStyle.light}>{id}</Text>
+          </View>
         </View>
-        <View style={[containerStyle.row, styles.cardContent]}>
-          <Text style={colorStyle.light}>{id}</Text>
+        <View style={[containerStyle.row, styles.cardRow]}>
+          <View style={styles.cardLabel}>
+            <Text style={colorStyle.light}>タイトル</Text>
+          </View>
+          <View style={[containerStyle.row, styles.cardContent]}>
+            <Text style={colorStyle.light}>{fullTitle}</Text>
+          </View>
         </View>
-      </View>
-      <View style={[containerStyle.row, styles.cardRow]}>
-        <View style={styles.cardLabel}>
-          <Text style={colorStyle.light}>タイトル</Text>
+        <View style={[containerStyle.row, styles.cardRow]}>
+          <View style={styles.cardLabel}>
+            <Text style={colorStyle.light}>チャンネル</Text>
+          </View>
+          <View style={[containerStyle.row, styles.cardContent]}>
+            <Text style={colorStyle.light}>{channelName}</Text>
+          </View>
         </View>
-        <View style={[containerStyle.row, styles.cardContent]}>
-          <Text style={colorStyle.light}>{fullTitle}</Text>
+        <View style={[containerStyle.row, styles.cardRow]}>
+          <View style={styles.cardLabel}>
+            <Text style={colorStyle.light}>開始日時</Text>
+          </View>
+          <View style={[containerStyle.row, styles.cardContent]}>
+            <Text style={colorStyle.light}>
+              {dateFormatter.format(start, "YYYY/MM/DD A HHHH:mm")}
+            </Text>
+          </View>
         </View>
-      </View>
-      <View style={[containerStyle.row, styles.cardRow]}>
-        <View style={styles.cardLabel}>
-          <Text style={colorStyle.light}>チャンネル</Text>
-        </View>
-        <View style={[containerStyle.row, styles.cardContent]}>
-          <Text style={colorStyle.light}>{channelName}</Text>
-        </View>
-      </View>
-      <View style={[containerStyle.row, styles.cardRow]}>
-        <View style={styles.cardLabel}>
-          <Text style={colorStyle.light}>開始日時</Text>
-        </View>
-        <View style={[containerStyle.row, styles.cardContent]}>
-          <Text style={colorStyle.light}>
-            {dateFormatter.format(start, "YYYY/MM/DD A HHHH:mm")}
-          </Text>
-        </View>
-      </View>
-      <View style={[containerStyle.row, styles.cardRow]}>
-        <View style={styles.cardLabel}>
-          <Text style={colorStyle.light}>終了日時</Text>
-        </View>
-        <View style={[containerStyle.row, styles.cardContent]}>
-          <Text style={colorStyle.light}>
-            {dateFormatter.format(end, "YYYY/MM/DD A HHHH:mm")}
-          </Text>
+        <View style={[containerStyle.row, styles.cardRow]}>
+          <View style={styles.cardLabel}>
+            <Text style={colorStyle.light}>終了日時</Text>
+          </View>
+          <View style={[containerStyle.row, styles.cardContent]}>
+            <Text style={colorStyle.light}>
+              {dateFormatter.format(end, "YYYY/MM/DD A HHHH:mm")}
+            </Text>
+          </View>
         </View>
       </View>
     </Card>

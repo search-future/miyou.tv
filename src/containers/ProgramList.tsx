@@ -669,7 +669,7 @@ const ListProgram = memo(
 
     return (
       <ListItem
-        containerStyle={selected && programStyle.selected}
+        containerStyle={[selected && programStyle.selected]}
         titleStyle={[textStyle.bold, colorStyle.black]}
         title={fullTitle}
         bottomDivider

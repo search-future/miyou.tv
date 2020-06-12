@@ -11,29 +11,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import DocumentPicker from "react-native-document-picker";
+import FilePickerManager from "react-native-file-picker";
 
 export default async function fileSelector({
-  type = [DocumentPicker.types.allFiles],
-  multiSelections
+  title,
+  buttonLabel: chooseFileButtonTitle
 }: {
   title?: string;
   buttonLabel?: string;
   type?: any[];
   multiSelections?: boolean;
 }) {
-  try {
-    const result = [];
-    if (multiSelections) {
-      result.push(...(await DocumentPicker.pickMultiple({ type })));
-    } else {
-      result.push(await DocumentPicker.pick({ type }));
-    }
-    return result.map(({ uri }) => uri);
-  } catch (e) {
-    if (DocumentPicker.isCancel(e)) {
-      return;
-    }
-    throw e;
+  const { path, uri, didCancel, error } = await new Promise<any>(resolve => {
+    FilePickerManager.showFilePicker({ title, chooseFileButtonTitle }, resolve);
+  });
+  if (error) {
+    throw error;
   }
+  if (didCancel) {
+    return;
+  }
+  return [path ? `file://${path}` : uri];
 }
