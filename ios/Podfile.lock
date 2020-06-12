@@ -184,13 +184,13 @@ PODS:
     - React-cxxreact (= 0.62.2)
     - React-jsi (= 0.62.2)
   - React-jsinspector (0.62.2)
-  - react-native-document-picker (3.4.0):
+  - react-native-document-picker (3.5.1):
     - React
   - react-native-keep-awake (4.0.0):
     - React
   - react-native-netinfo (5.9.2):
     - React
-  - react-native-safe-area-context (3.0.2):
+  - react-native-safe-area-context (3.0.3):
     - React
   - react-native-video/Video (5.0.2):
     - React
@@ -267,11 +267,11 @@ PODS:
     - React
   - RNCPicker (1.6.1):
     - React
-  - RNDateTimePicker (2.4.0):
+  - RNDateTimePicker (2.4.1):
     - React
   - RNGestureHandler (1.6.1):
     - React
-  - RNSVG (11.0.1):
+  - RNSVG (12.1.0):
     - React
   - RNVectorIcons (6.6.0):
     - React
@@ -424,10 +424,10 @@ SPEC CHECKSUMS:
   React-jsi: b6dc94a6a12ff98e8877287a0b7620d365201161
   React-jsiexecutor: 1540d1c01bb493ae3124ed83351b1b6a155db7da
   React-jsinspector: 512e560d0e985d0e8c479a54a4e5c147a9c83493
-  react-native-document-picker: d694111879537cec2c258a1dcd2243d9df746824
+  react-native-document-picker: fa8cd9e4bf353a46bb56c36e5850fbbf0a29bd17
   react-native-keep-awake: afad8a51dfef9fe9655a6344771be32c8596d774
   react-native-netinfo: cb74e17062b2af5a16a4b137f32495f241df1a8e
-  react-native-safe-area-context: b11a34881faac509cad5578726c98161ad4d275c
+  react-native-safe-area-context: 45e98227f3d65b31d384a5d0950aec4bf73a884c
   react-native-video: d01ed7ff1e38fa7dcc6c15c94cf505e661b7bfd0
   react-native-vlcplayer2: cf625c49f39b286f6fb5f000a1642a8de9a667c6
   React-RCTActionSheet: f41ea8a811aac770e0cc6e0ad6b270c644ea8b7c
@@ -443,9 +443,9 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: d059c3ee71738c39834a627476322a5a8cd5bf36
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
   RNCPicker: b8c53479842804a3e7b721e01def0ce2c89ddc69
-  RNDateTimePicker: c4285bfdd87430f1e575b81a4742b7586a09d53e
+  RNDateTimePicker: 24daf2c23032af1bfa396174f8a2a9d3e92b37ca
   RNGestureHandler: 8f09cd560f8d533eb36da5a6c5a843af9f056b38
-  RNSVG: 67f1f12dae2cef6ed59a42cae74a6b8f5a9e7b46
+  RNSVG: ce9d996113475209013317e48b05c21ee988d42e
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
