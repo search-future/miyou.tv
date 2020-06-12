@@ -26,6 +26,7 @@ import qs from "querystring";
 import { ReactMPV } from "mpv.js";
 
 import { RootState } from "../modules";
+import { LoadingActions } from "../modules/loading";
 import { PlayerState, PlayerActions } from "../modules/player";
 import { SettingState, SettingActions } from "../modules/setting";
 import { ViewerActions, ViewerProgram } from "../modules/viewer";
@@ -68,6 +69,7 @@ const Player = memo(() => {
   const observers = useRef<{ [name: string]: ((value: any) => void) | null }>({
     path: value => {
       path.current = value;
+      dispatch(LoadingActions.start(true));
     },
     "file-format": value => {
       if (value === "hls,applehttp") {
@@ -191,6 +193,7 @@ const Player = memo(() => {
 
   useEffect(() => {
     if (bootstrap) {
+      dispatch(LoadingActions.start(true));
       const program = programs[index];
       if (program && recordedProgram) {
         if (peakPlay && program.commentMaxSpeedTime) {
@@ -275,10 +278,12 @@ const Player = memo(() => {
         dispatch(PlayerActions.time(preseek.current));
         preseek.current = 0;
       }
+      dispatch(LoadingActions.complete());
     };
   }, [position, duration]);
   useEffect(() => {
     const onStopped = () => {
+      dispatch(LoadingActions.complete());
       switch (repeat) {
         case "continue": {
           initializing.current = true;
@@ -422,6 +427,7 @@ const Player = memo(() => {
           "replace",
           opts.join(",")
         );
+        dispatch(LoadingActions.start(true));
       }
       status.current.dualMonoMode = dualMonoMode;
     }
@@ -463,6 +469,7 @@ const Player = memo(() => {
             );
             startSeconds.current = ss;
             seekId.current = null;
+            dispatch(LoadingActions.start(true));
             dispatch(PlayerActions.play());
           }, 500);
         }

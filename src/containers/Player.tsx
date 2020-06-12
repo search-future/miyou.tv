@@ -30,6 +30,7 @@ import { VLCPlayer } from "react-native-vlcplayer2";
 import { Immersive } from "react-native-immersive";
 
 import { RootState } from "../modules";
+import { LoadingActions } from "../modules/loading";
 import { PlayerActions } from "../modules/player";
 import { SettingState } from "../modules/setting";
 import { ViewerActions, ViewerProgram } from "../modules/viewer";
@@ -209,7 +210,11 @@ const Player = () => {
   }, [seekPosition]);
 
   const onVlcOpen = useCallback(() => {
+    dispatch(LoadingActions.start(true));
     dispatch(PlayerActions.play());
+  }, []);
+  const onVideoLoad = useCallback(() => {
+    dispatch(LoadingActions.start(true));
   }, []);
   const onVlcProgress = useCallback(
     ({
@@ -246,6 +251,7 @@ const Player = () => {
         dispatch(PlayerActions.time(preseek.current));
         preseek.current = 0;
       }
+      dispatch(LoadingActions.complete());
     },
     [recordedProgram, ss]
   );
@@ -263,10 +269,12 @@ const Player = () => {
         dispatch(PlayerActions.time(preseek.current));
         preseek.current = 0;
       }
+      dispatch(LoadingActions.complete());
     },
     []
   );
   const onEnd = useCallback(() => {
+    dispatch(LoadingActions.complete());
     switch (repeat) {
       case "continue": {
         const program = programs[index];
@@ -356,6 +364,7 @@ const Player = () => {
       volume={volume / 100}
       source={{ uri, type: "m3u8" } as any}
       ref={videoRef}
+      onLoadStart={onVideoLoad}
       onProgress={onVideoProgress}
       onEnd={onEnd}
     />

@@ -34,6 +34,7 @@ import Axios from "axios";
 
 import CommentPlayer from "./CommentPlayer";
 import Controller from "./Controller";
+import Loading from "./Loading";
 import Player from "./Player";
 import PlayerContainer from "./PlayerContainer";
 import Seekbar from "./Seekbar";
@@ -288,6 +289,7 @@ const Viewer = memo(() => {
                   <Controller />
                 </View>
               )}
+              <Loading />
             </View>
             {(!playing || controlEnabled || (!expand && !isLandscape)) && (
               <View
