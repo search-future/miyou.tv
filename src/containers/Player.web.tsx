@@ -113,6 +113,7 @@ const Player = memo(() => {
   });
   const startSeconds = useRef(0);
   const initializing = useRef(true);
+  const retryCount = useRef(0);
   const preseek = useRef(0);
   const path = useRef("");
   const seekable = useRef(true);
@@ -222,6 +223,7 @@ const Player = memo(() => {
       dispatch(ViewerActions.update({ playing: false }));
     } else {
       initializing.current = false;
+      retryCount.current = 0;
       setBootstrap(true);
     }
   }, [programs, index, extraIndex]);
@@ -330,11 +332,16 @@ const Player = memo(() => {
     };
     observers.current["playback-abort"] = value => {
       if (value) {
-        Toast.show("Playback was aborted.", {
-          ...toastOptions,
-          duration: Toast.durations.LONG
-        });
-        onStopped();
+        if (retryCount.current > 5) {
+          Toast.show("Playback was aborted.", {
+            ...toastOptions,
+            duration: Toast.durations.LONG
+          });
+          onStopped();
+        } else {
+          retryCount.current++;
+          setBootstrap(true);
+        }
       }
     };
   }, [repeat, programs, index, extraIndex]);
