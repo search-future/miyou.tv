@@ -118,7 +118,7 @@ const Player = memo(() => {
   const retryCount = useRef(0);
   const preseek = useRef(0);
   const path = useRef("");
-  const seekable = useRef(true);
+  const seekable = useRef(false);
   const pcrWraparound = useRef(true);
   const seekId = useRef<number | null>(null);
 
@@ -232,7 +232,7 @@ const Player = memo(() => {
   }, [programs, index, extraIndex]);
   useEffect(() => {
     observers.current.duration = value => {
-      if (value > 10) {
+      if (seekable.current && value > 0) {
         const duration = value * 1000;
         dispatch(PlayerActions.progress({ duration }));
       } else {
