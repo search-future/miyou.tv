@@ -425,16 +425,15 @@ const ProgramTable = memo(() => {
         a => a.type === type && a.channel === channel
       );
       if (columnIndex >= 0) {
-        const { id } = viewerProgram;
         const column = tableColumns[columnIndex];
-        const program = column.programs.find(a => a.id === id);
+        const program = column.programs.find(a => a.id === selectedId);
         if (program?.position) {
           const y = (program.position - 0.5) * hourHeight;
           viewRef.current.scrollTo({ y });
         }
       }
     }
-  }, [tableColumns, viewerProgram]);
+  }, [selectedId]);
 
   const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
     if (layoutCallbackId.current != null) {
@@ -461,7 +460,10 @@ const ProgramTable = memo(() => {
         headerHeightRef.current = 256;
         setTop(true);
       }
-      if (contentOffset.y >= contentSize.height - layoutMeasurement.height) {
+      if (
+        contentOffset.y >=
+        contentSize.height - layoutMeasurement.height - 1
+      ) {
         headerHeightRef.current = 0;
         setBottom(true);
       }
