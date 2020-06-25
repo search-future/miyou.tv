@@ -210,11 +210,11 @@ const Player = () => {
   }, [seekPosition]);
 
   const onVlcOpen = useCallback(() => {
-    dispatch(LoadingActions.start(true));
+    dispatch(LoadingActions.start());
     dispatch(PlayerActions.play());
   }, []);
   const onVideoLoad = useCallback(() => {
-    dispatch(LoadingActions.start(true));
+    dispatch(LoadingActions.start());
   }, []);
   const onVlcProgress = useCallback(
     ({

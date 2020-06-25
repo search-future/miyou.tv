@@ -69,7 +69,7 @@ const Player = memo(() => {
   const observers = useRef<{ [name: string]: ((value: any) => void) | null }>({
     path: value => {
       path.current = value;
-      dispatch(LoadingActions.start(true));
+      dispatch(LoadingActions.start());
     },
     "file-format": value => {
       if (value === "hls,applehttp") {
@@ -193,7 +193,7 @@ const Player = memo(() => {
 
   useEffect(() => {
     if (bootstrap) {
-      dispatch(LoadingActions.start(true));
+      dispatch(LoadingActions.start());
       const program = programs[index];
       if (program && recordedProgram) {
         if (peakPlay && program.commentMaxSpeedTime) {
@@ -427,7 +427,7 @@ const Player = memo(() => {
           "replace",
           opts.join(",")
         );
-        dispatch(LoadingActions.start(true));
+        dispatch(LoadingActions.start());
       }
       status.current.dualMonoMode = dualMonoMode;
     }
@@ -469,7 +469,7 @@ const Player = memo(() => {
             );
             startSeconds.current = ss;
             seekId.current = null;
-            dispatch(LoadingActions.start(true));
+            dispatch(LoadingActions.start());
             dispatch(PlayerActions.play());
           }, 500);
         }
