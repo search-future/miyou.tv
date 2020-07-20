@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-vlcplayer2/android/build.gradle b/node_modules/react-native-vlcplayer2/android/build.gradle
-index f798a43..2dbbe91 100644
+index f798a43..8d7f5cb 100644
 --- a/node_modules/react-native-vlcplayer2/android/build.gradle
 +++ b/node_modules/react-native-vlcplayer2/android/build.gradle
 @@ -1,12 +1,12 @@
@@ -18,6 +18,19 @@ index f798a43..2dbbe91 100644
          versionCode 1
          versionName "1.0"
          ndk {
+@@ -23,9 +23,9 @@ android {
+ }
+
+ dependencies {
+-    provided fileTree(dir: 'libs', include: ['*.jar'])
+-    compile "com.facebook.react:react-native:+"
++    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
++    implementation "com.facebook.react:react-native:+"
+     //compile 'com.yyl.vlc:vlc-android-sdk:3.0.13'
+-    compile 'org.videolan:vlc-lib-android:3.1.7'
++    implementation 'org.videolan:vlc-lib-android:3.1.7'
+     //compile 'de.mrmaffen:vlc-android-sdk:2.0.6'
+ }
 diff --git a/node_modules/react-native-vlcplayer2/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerView.java b/node_modules/react-native-vlcplayer2/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerView.java
 index b40dfda..ce40b97 100644
 --- a/node_modules/react-native-vlcplayer2/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerView.java

@@ -58,6 +58,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.10.5",
+    "@babel/runtime": "^7.8.4",
     "@types/jest": "^26.0.5",
     "@types/js-base64": "^3.0.0",
     "@types/md5": "^2.2.0",
