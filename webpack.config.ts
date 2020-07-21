@@ -48,44 +48,57 @@ const iconLoaderConfiguration: webpack.RuleSetRule = {
   include: path.resolve(__dirname, "node_modules/react-native-vector-icons")
 };
 
-const config: webpack.Configuration = {
-  entry: [path.resolve(__dirname, "index.web.js")],
+const config: webpack.Configuration[] = [
+  {
+    entry: path.resolve(__dirname, "index.web.js"),
 
-  output: {
-    path: path.resolve(__dirname, "dist/")
-  },
-
-  target: "electron-renderer",
-
-  module: {
-    rules: [
-      tsLoaderConfiguration,
-      jsLoaderConfiguration,
-      imageLoaderConfiguration,
-      iconLoaderConfiguration
-    ]
-  },
-
-  resolve: {
-    alias: {
-      "react-native": "react-native-web"
+    output: {
+      path: path.resolve(__dirname, "dist/")
     },
-    extensions: [
-      ".webpack.js",
-      ".web.ts",
-      ".web.tsx",
-      ".web.js",
-      ".ts",
-      ".tsx",
-      ".js"
+
+    target: "electron-renderer",
+
+    module: {
+      rules: [
+        tsLoaderConfiguration,
+        jsLoaderConfiguration,
+        imageLoaderConfiguration,
+        iconLoaderConfiguration
+      ]
+    },
+
+    resolve: {
+      alias: {
+        "react-native": "react-native-web"
+      },
+      extensions: [
+        ".webpack.js",
+        ".web.ts",
+        ".web.tsx",
+        ".web.js",
+        ".ts",
+        ".tsx",
+        ".js"
+      ]
+    },
+
+    plugins: [
+      new webpack.DefinePlugin({
+        __DEV__: process.env.NODE_ENV !== "production"
+      })
     ]
   },
 
-  plugins: [
-    new webpack.DefinePlugin({
-      __DEV__: process.env.NODE_ENV !== "production"
-    })
-  ]
-};
+  {
+    entry: path.resolve(__dirname, "bundle.js"),
+
+    output: {
+      filename: "bundle.js",
+      path: path.resolve(__dirname, "dist/")
+    },
+
+    target: "electron-main"
+  }
+];
 
 module.exports = config;
