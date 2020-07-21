@@ -12,18 +12,21 @@ limitations under the License.
 */
 
 import React, { memo, useCallback, useMemo } from "react";
-import { ScrollView, View, StyleSheet } from "react-native";
+import { ScrollView, View, StyleSheet, Platform } from "react-native";
 import { Card, Text, Badge } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
+import Toast from "react-native-root-toast";
 
 import DateFormatter from "../utils/DateFormatter";
-import colorStyle, { light } from "../styles/color";
+import DownloadButton from "../components/DownloadButton";
+import colorStyle, { active, black, grayDark, light } from "../styles/color";
 import containerStyle from "../styles/container";
 import textStyle from "../styles/text";
 import { RootState } from "../modules";
 import { SettingState } from "../modules/setting";
 import { ViewerActions, ViewerProgram } from "../modules/viewer";
+import { toastOptions } from "../config/constants";
 
 type Setting = SettingState & {
   view?: {
@@ -154,6 +157,7 @@ const ProgramCard = memo(
     commentSpeed,
     commentMaxSpeed,
     commentMaxSpeedTime,
+    download,
     dateFormatter = new DateFormatter()
   }: ViewerProgram & {
     dateFormatter: DateFormatter;
@@ -169,6 +173,53 @@ const ProgramCard = memo(
     const categorySearch = useCallback(() => {
       dispatch(ViewerActions.search(`cat:${category.codeName}`));
     }, [category]);
+    const onDownloadSuccess = useCallback(() => {
+      Toast.show("Downmload complete!", {
+        ...toastOptions,
+        duration: Toast.durations.SHORT
+      });
+    }, []);
+    const onDownloadFailure = useCallback((e: any) => {
+      Toast.show(e?.message, {
+        ...toastOptions,
+        duration: Toast.durations.SHORT
+      });
+    }, []);
+    const downloadRenderer = useCallback(
+      ({
+        name,
+        uri,
+        filename,
+        size
+      }: {
+        name: string;
+        uri: string;
+        filename: string;
+        size?: number;
+      }) => (
+        <DownloadButton
+          key={uri}
+          title={name}
+          source={{
+            uri,
+            size,
+            filename:
+              Platform.OS === "ios"
+                ? filename.replace(/\.m2ts$/, ".ts")
+                : filename
+          }}
+          color={light}
+          backgroundColor={black}
+          borderColor={grayDark}
+          buttonColor={black}
+          progressColor={`${light}80`}
+          successColor={active}
+          onSuccess={onDownloadSuccess}
+          onFailure={onDownloadFailure}
+        />
+      ),
+      [download]
+    );
 
     return (
       <Card
@@ -297,6 +348,16 @@ const ProgramCard = memo(
                   {commentMaxSpeed || 0}コメント/分 (
                   {dateFormatter.format(commentMaxSpeedTime, "HHHH:mm")})
                 </Text>
+              </View>
+            </View>
+          )}
+          {download && (
+            <View style={[containerStyle.row, styles.cardRow]}>
+              <View style={styles.cardLabel}>
+                <Text style={colorStyle.light}>ダウンロード</Text>
+              </View>
+              <View style={[styles.cardContent]}>
+                {download.map(downloadRenderer)}
               </View>
             </View>
           )}
