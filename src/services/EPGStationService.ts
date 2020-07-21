@@ -77,8 +77,13 @@ type EPGStationRecordedProgram = {
   hasThumbnail: boolean;
   original: boolean;
   filename?: string;
-  encoded?: any[];
-  encoding?: any[];
+  encoded?: {
+    encodedId: number;
+    name: string;
+    filename: string;
+    filesize?: number;
+  }[];
+  encoding?: { name: string; inEncoding: boolean }[];
 };
 type EPGStationRecordedPrograms = {
   total: number;
@@ -186,7 +191,11 @@ export default class EPGStationService extends BackendService {
         description = "",
         genre1 = 15,
         startAt,
-        endAt
+        endAt,
+        filesize,
+        filename,
+        original,
+        encoded
       } = recorded[i];
       let duration = 0;
       try {
@@ -199,6 +208,25 @@ export default class EPGStationService extends BackendService {
         duration = result.duration * 1000;
       } catch (e) {
         duration = endAt - startAt;
+      }
+      const download = [];
+      if (original && filename) {
+        download.push({
+          name: "TS",
+          filename,
+          size: filesize,
+          uri: this.getAuthUrl(`/api/recorded/${id}/file?mode=download`)
+        });
+      }
+      for (const { encodedId, name, filename, filesize } of encoded || []) {
+        download.push({
+          name,
+          filename,
+          size: filesize,
+          uri: this.getAuthUrl(
+            `/api/recorded/${id}/file?encodedId=${encodedId}&mode=download`
+          )
+        });
       }
       programs.push({
         id: String(id),
@@ -221,8 +249,9 @@ export default class EPGStationService extends BackendService {
         stream: this.getAuthUrl(
           this.streamType === "raw"
             ? `/api/recorded/${id}/file`
-            : `/api/streams/recorded/${id}/${this.streamType}?${this.streamParams}`,
+            : `/api/streams/recorded/${id}/${this.streamType}?${this.streamParams}`
         ),
+        download,
         authHeaders: this.getAuthHeaders()
       });
     }

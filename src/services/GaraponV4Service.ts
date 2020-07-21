@@ -20,6 +20,7 @@ import BackendService, {
   Channel,
   Program
 } from "./BackendService";
+import moment from "../utils/moment-with-locale";
 
 type GaraponSiteLoginResult = {
   status: GaraponStatusCode;
@@ -260,7 +261,25 @@ export default class GaraponV4Service extends BackendService {
             start: new Date(program.starttime * 1000),
             end: new Date(program.endtime * 1000),
             preview: program.thumbnail_url,
-            stream: `${this.url}${program.m3u8_url}&gtvsession=${this.gtvsession}`
+            stream: `${this.url}${program.m3u8_url}&gtvsession=${this.gtvsession}`,
+            download: [
+              {
+                name: "TS",
+                uri: `${this.url}/gapi/v4/Program/?${qs.stringify({
+                  gtvsession: this.gtvsession,
+                  action: "download_ts",
+                  starttime: program.starttime,
+                  endtime: program.endtime,
+                  tsid10: program.tsid10,
+                  service_type: program.service_type
+                })}`,
+                filename: `${moment(new Date(program.starttime * 1000)).format(
+                  "YYMMDD-HHmm"
+                )}-${program.bcname}-${
+                  program.series_title || program.title
+                }.m2ts`
+              }
+            ]
           };
         })
       };

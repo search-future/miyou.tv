@@ -25,6 +25,12 @@ export type SearchOptions = {
   useArchive?: boolean;
   [key: string]: any;
 };
+export type DownloadItem = {
+  name: string;
+  uri: string;
+  filename: string;
+  size?: number;
+}
 export type Program = {
   id: string;
   type: string;
@@ -46,6 +52,7 @@ export type Program = {
   stream: string;
   authHeaders?: { [key: string]: string };
   recorded?: Program[];
+  download?: DownloadItem[];
 };
 export type Channel = {
   type: string;

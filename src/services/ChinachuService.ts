@@ -17,6 +17,7 @@ import qs from "qs";
 
 import BackendService, { SearchOptions, Channel } from "./BackendService";
 import { categoryTable } from "../config/constants";
+import moment from "../utils/moment-with-locale";
 
 type RecordedProgram = {
   id: string;
@@ -209,6 +210,29 @@ export default class ChinachuService extends BackendService {
           .filter(a => a)
           .join("?")
       ),
+      download: [
+        {
+          name: "無変換",
+          uri: this.getAuthUrl(`/api/recorded/${program.id}/file.m2ts`),
+          filename: `${moment(program.start).format("YYMMDD-HHmm")}-${
+            program.channel.name
+          }-${program.title}.m2ts`
+        },
+        {
+          name: `変換(${this.streamType})`,
+          uri: this.getAuthUrl(
+            [
+              `/api/recorded/${program.id}/watch.${this.streamType}?mode=download&ext=${this.streamType}`,
+              this.streamParams
+            ]
+              .filter(a => a)
+              .join("&")
+          ),
+          filename: `${moment(program.start).format("YYMMDD-HHmm")}-${
+            program.channel.name
+          }-${program.title}.${this.streamType}`
+        }
+      ],
       authHeaders: this.getAuthHeaders()
     };
   }
@@ -351,6 +375,34 @@ export default class ChinachuService extends BackendService {
               .join("?")
           );
         }
+        const download = [];
+        for (let i = 0; i < recordedPrograms.length; i++) {
+          const { id, channel, title, start } = recordedPrograms[i];
+          download.push({
+            name: `無変換${i + 1}`,
+            uri: this.getAuthUrl(`/api/recorded/${id}/file.m2ts`),
+            filename: `${moment(start).format("YYMMDD-HHmm")}-${
+              channel.name
+            }-${title}.m2ts`
+          });
+        }
+        for (let i = 0; i < recordedPrograms.length; i++) {
+          const { id, channel, title, start } = recordedPrograms[i];
+          download.push({
+            name: `変換${i + 1}(${this.streamType})`,
+            uri: this.getAuthUrl(
+              [
+                `/api/recorded/${id}/watch.${this.streamType}?mode=download`,
+                this.streamParams
+              ]
+                .filter(a => a)
+                .join("&")
+            ),
+            filename: `${moment(start).format("YYMMDD-HHmm")}-${
+              channel.name
+            }-${title}.${this.streamType}`
+          });
+        }
         return {
           id: String(program.id),
           type: String(program.channel && program.channel.type),
@@ -368,7 +420,8 @@ export default class ChinachuService extends BackendService {
           ),
           authHeaders: this.getAuthHeaders(),
           preview,
-          stream
+          stream,
+          download
         };
       })
     };
