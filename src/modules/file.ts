@@ -22,12 +22,11 @@ import {
   takeLatest
 } from "redux-saga/effects";
 import { Platform } from "react-native";
-import { NavigationState, StackActions } from "react-navigation";
 
 import { SettingState } from "./setting";
+import navigationRef from "../navigators/navigation";
 import { ServiceState, COMMENT_READY } from "./service";
 import { Program } from "../services/BackendService";
-import searchNavRoute from "../utils/searchNavRoute";
 import moment from "../utils/moment-with-locale";
 
 export const FILE_ADD = "FILE_ADD";
@@ -93,10 +92,8 @@ function append(programs: FileProgram[]) {
 }
 function* appendSaga() {
   yield delay(500);
-  const nav: NavigationState = yield select(({ nav }) => nav);
-  const current = searchNavRoute(nav, "File");
-  if (!current) {
-    yield put(StackActions.push({ routeName: "File" }));
+  if (navigationRef.current?.getCurrentRoute()?.name !== "file") {
+    navigationRef.current?.navigate("file");
   }
 }
 

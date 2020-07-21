@@ -11,34 +11,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { connect } from "react-redux";
-import { NavigationState, NavigationDispatch } from "react-navigation";
-import {
-  createReactNavigationReduxMiddleware,
-  createReduxContainer
-} from "react-navigation-redux-helpers";
+import React from "react";
+import { StatusBar } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { MenuProvider } from "react-native-popup-menu";
 
 import StackNavigator from "./StackNavigator";
+import navigationRef from "./navigation";
 
-export const RootNavigator = StackNavigator;
-
-export const navMiddleware = createReactNavigationReduxMiddleware(
-  ({ nav }: { nav: NavigationState }) => nav,
-  "root"
-);
-
-const ReduxNavigator = createReduxContainer(RootNavigator, "root");
-
-export const AppNavigator = connect(
-  ({
-    nav: state,
-    dispatch
-  }: {
-    nav: NavigationState;
-    dispatch: NavigationDispatch;
-  }) => ({
-    state,
-    dispatch
-  })
-)(ReduxNavigator);
+const AppNavigator = () => {
+  return (
+    <MenuProvider backHandler>
+      <StatusBar barStyle="light-content" />
+      <NavigationContainer ref={navigationRef}>
+        <StackNavigator />
+      </NavigationContainer>
+    </MenuProvider>
+  );
+};
 export default AppNavigator;

@@ -23,8 +23,8 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-community/picker";
 import { Text } from "react-native-elements";
-import { StackActions } from "react-navigation";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
+import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
 import LinkText from "../components/LinkText";
@@ -38,6 +38,8 @@ import { garaponDevId, garaponEntryUrl } from "../config/constants";
 const Setup = () => {
   const hasBackendChanges = useRef(false);
   const hasMoritapoChanges = useRef(false);
+
+  const navigation = useNavigation();
 
   const dispatch = useDispatch();
   const backendSetting = useSelector<RootState, any>(
@@ -67,7 +69,7 @@ const Setup = () => {
   );
 
   const back = useCallback(() => {
-    dispatch(StackActions.pop({}));
+    navigation.goBack();
   }, []);
   const onBackendChanged = useCallback(data => {
     dispatch(SettingActions.update("backend", data));

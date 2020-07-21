@@ -18,7 +18,7 @@ import { createStore, applyMiddleware } from "redux";
 import createSagaMiddleware from "redux-saga";
 import { persistReducer, persistStore, PersistConfig } from "redux-persist";
 
-import Main from "./containers/Main";
+import AppNavigator from "./navigators";
 import Splash from "./components/Splash";
 import rootReducer, { rootSaga, RootState } from "./modules";
 import init from "./utils/init";
@@ -32,7 +32,7 @@ const App = () => {
         onBeforeLift={onBeforeLift}
         persistor={persistor as any}
       >
-        <Main />
+        <AppNavigator />
       </PersistGate>
     </Provider>
   );

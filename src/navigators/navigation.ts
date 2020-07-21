@@ -11,22 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { NavigationState } from "react-navigation";
+import { createRef } from "react";
+import { NavigationContainerRef } from "@react-navigation/native";
 
-export default function searchNavRoute(
-  route: NavigationState & { routeName?: string },
-  routeName = ""
-) {
-  while (route.index != null) {
-    route = route.routes[route.index] as NavigationState & {
-      routeName: string;
-    };
-    if (route.routeName === routeName) {
-      return route;
-    }
-  }
-  if (routeName) {
-    return null;
-  }
-  return route;
-}
+const navigationRef = createRef<NavigationContainerRef>();
+export default navigationRef;

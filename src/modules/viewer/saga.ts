@@ -11,31 +11,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { all, put, select, takeLatest } from "redux-saga/effects";
+import { all, put, takeLatest } from "redux-saga/effects";
 import { AnyAction } from "redux";
-import { NavigationActions, StackActions } from "react-navigation";
 
 import { VIEWER_OPEN, VIEWER_CLOSE, VIEWER_SEARCH } from "./actions";
 import { ProgramActions } from "../program";
-import searchNavRoute from "../../utils/searchNavRoute";
+import navigationRef from "../../navigators/navigation";
 
-function* openSaga() {
-  const { nav } = yield select(({ nav }) => ({ nav }));
-  const current = searchNavRoute(nav, "Viewer");
-  if (!current) {
-    yield put(StackActions.push({ routeName: "Viewer" }));
+function openSaga() {
+  if (navigationRef.current?.getCurrentRoute()?.name !== "viewer") {
+    navigationRef.current?.navigate("viewer");
   }
 }
 
-function* closeSaga() {
-  yield put(StackActions.pop({}));
+function closeSaga() {
+  navigationRef.current?.goBack();
 }
 
 function* searchSaga(action: AnyAction) {
   const { query = "" } = action;
-  yield put(StackActions.popToTop({}));
   yield put(ProgramActions.update("list", { query }));
-  yield put(NavigationActions.navigate({ routeName: "List" }));
+  navigationRef.current?.navigate("list");
 }
 
 export function* viewerSaga() {

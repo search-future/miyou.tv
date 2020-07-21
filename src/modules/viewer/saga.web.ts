@@ -14,7 +14,6 @@ limitations under the License.
 import { all, put, select, take, takeEvery } from "redux-saga/effects";
 import { AnyAction } from "redux";
 import Toast from "react-native-root-toast";
-import { NavigationActions } from "react-navigation";
 import { remote, BrowserWindow, BrowserView } from "electron";
 
 import {
@@ -35,6 +34,7 @@ import { SettingActions, SettingState, SETTING_UPDATE } from "../setting";
 import { WindowActions } from "../window";
 import { toastOptions } from "../../config/constants";
 import { ViewerState } from ".";
+import navigationRef from "../../navigators/navigation";
 
 function getViewerView() {
   const win = remote.getCurrentWindow();
@@ -222,7 +222,7 @@ function* searchSaga(action: AnyAction) {
   if (mode === "stack") {
     const { query = "" } = action;
     yield put(ProgramActions.update("list", { query, page: 1 }));
-    yield put(NavigationActions.navigate({ routeName: "List" }));
+    navigationRef.current?.navigate("list");
 
     const { docking = true }: SettingState = yield select(
       ({ setting }) => setting

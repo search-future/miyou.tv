@@ -12,18 +12,28 @@ limitations under the License.
 */
 
 import { Store } from "redux";
-import { StackActions } from "react-navigation";
 
+import navigationRef from "../../navigators/navigation";
 import { ServiceActions } from "../../modules/service";
 
 export default function common(store: Store) {
   const { setting } = store.getState();
   const { isConfigured } = setting;
-  store.dispatch(StackActions.popToTop({}));
-  if (!isConfigured) {
-    store.dispatch(StackActions.push({ routeName: "Setup" }));
-  } else {
+
+  if (isConfigured) {
     store.dispatch(ServiceActions.backendInit());
     store.dispatch(ServiceActions.commentInit());
+  } else {
+    navigate("setup");
+  }
+}
+
+function navigate(name: string) {
+  if (navigationRef.current) {
+    navigationRef.current.navigate(name);
+  } else {
+    setTimeout(() => {
+      navigate(name);
+    });
   }
 }

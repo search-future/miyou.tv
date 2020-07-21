@@ -12,8 +12,7 @@ limitations under the License.
 */
 
 import { Store } from "redux";
-import { BackHandler, StatusBar, Platform } from "react-native";
-import { NavigationState, StackActions } from "react-navigation";
+import { StatusBar, Platform } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
 import KeepAwake from "react-native-keep-awake";
 // @ts-ignore
@@ -23,16 +22,6 @@ import { NetworkActions } from "../../modules/network";
 import common from "./common";
 
 export default function init(store: Store) {
-  BackHandler.addEventListener("hardwareBackPress", () => {
-    const { nav }: { nav: NavigationState } = store.getState();
-    const { index } = nav;
-    if (index > 0) {
-      store.dispatch(StackActions.pop({}));
-      return true;
-    }
-    return false;
-  });
-
   NetInfo.fetch().then(state => {
     store.dispatch(NetworkActions.update(state));
   });

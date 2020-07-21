@@ -31,8 +31,8 @@ import {
 } from "react-native";
 import { Text, ListItem } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
-import { StackActions } from "react-navigation";
 import DocumentPicker from "react-native-document-picker";
+import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
 import DatePicker from "../components/DatePicker";
@@ -60,6 +60,8 @@ const FileLoader = memo(() => {
   const listRef = useRef<FlatList>(null);
   const layoutCallbackId = useRef<number>();
   const count = useRef(0);
+
+  const navigation = useNavigation();
 
   const dispatch = useDispatch();
   const programs = useSelector<State, FileProgram[]>(
@@ -130,7 +132,7 @@ const FileLoader = memo(() => {
     }, 200);
   }, []);
   const back = useCallback(() => {
-    dispatch(StackActions.pop({}));
+    navigation.goBack();
   }, []);
   const dateFormatChange = useCallback((dateFormat: string) => {
     dispatch(SettingActions.update("fileLoader", { dateFormat }));

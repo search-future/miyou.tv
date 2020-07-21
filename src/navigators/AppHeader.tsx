@@ -11,7 +11,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { memo, useState, useEffect, useCallback, useRef } from "react";
+import React, {
+  memo,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo
+} from "react";
 import {
   TouchableOpacity,
   View,
@@ -26,22 +33,20 @@ import {
   SearchBar,
   Text
 } from "react-native-elements";
-import { NavigationActions, StackActions } from "react-navigation";
 import FontAwesome5Icon, {
   FontAwesome5IconProps
 } from "react-native-vector-icons/FontAwesome5";
+import { useNavigation, NavigationState } from "@react-navigation/native";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
 import colorStyle, { active, gray, light } from "../styles/color";
 import containerStyle from "../styles/container";
 import textStyle from "../styles/text";
-import { RootState } from "../modules";
 import { ServiceActions } from "../modules/service";
 import { ProgramActions, ProgramState } from "../modules/program";
-import searchNavRoute from "../utils/searchNavRoute";
 import { appName } from "../config/constants";
 
-const AppHeader = memo(() => {
+const AppHeader = memo(({ route }: { route?: NavigationState }) => {
   const layoutCallbackId = useRef<number>();
 
   const [containerWidth, setContainerWidth] = useState(0);
@@ -65,38 +70,41 @@ const AppHeader = memo(() => {
   }, []);
   return (
     <View style={colorStyle.bgDark} onLayout={onLayout}>
-      {containerWidth > breakpoint ? <WideHeader /> : <NarrowHeader />}
+      {containerWidth > breakpoint ? (
+        <WideHeader route={route} />
+      ) : (
+        <NarrowHeader />
+      )}
     </View>
   );
 });
 export default AppHeader;
 
-const WideHeader = memo(() => {
+const WideHeader = memo(({ route }: { route?: NavigationState }) => {
+  const navigation = useNavigation();
+
   const dispatch = useDispatch();
-  const routeName = useSelector<RootState, string | undefined>(
-    ({ nav }) => searchNavRoute(nav)?.routeName
-  );
+
+  const routeName = useMemo(() => {
+    return route?.routeNames[route?.index];
+  }, [route]);
 
   const showTable = useCallback(() => {
-    dispatch(NavigationActions.navigate({ routeName: "Table" }));
+    navigation.navigate("table");
   }, []);
   const showList = useCallback(() => {
     dispatch(ProgramActions.update("list", { query: "" }));
-    dispatch(NavigationActions.navigate({ routeName: "List" }));
+    navigation.navigate("list");
   }, []);
   const showRanking = useCallback(() => {
-    dispatch(NavigationActions.navigate({ routeName: "Ranking" }));
+    navigation.navigate("ranking");
   }, []);
   const openSetup = useCallback(() => {
-    if (routeName !== "Setup") {
-      dispatch(StackActions.push({ routeName: "Setup" }));
-    }
-  }, [routeName]);
+    navigation.navigate("setup");
+  }, []);
   const openFile = useCallback(() => {
-    if (routeName !== "File") {
-      dispatch(StackActions.push({ routeName: "File" }));
-    }
-  }, [routeName]);
+    navigation.navigate("file");
+  }, []);
   const reload = useCallback(() => {
     dispatch(ServiceActions.backendInit());
     dispatch(ServiceActions.commentInit());
@@ -115,20 +123,23 @@ const WideHeader = memo(() => {
         )}
         <HeaderButton
           title="番組表"
-          routeName="Table"
+          routeName="table"
           icon={{ name: "th" }}
+          isActive={routeName === "table"}
           onPress={showTable}
         />
         <HeaderButton
           title="番組一覧"
-          routeName="List"
+          routeName="list"
           icon={{ name: "list" }}
+          isActive={routeName === "list"}
           onPress={showList}
         />
         <HeaderButton
           title="ランキング"
-          routeName="Ranking"
+          routeName="ranking"
           icon={{ name: "list-ol" }}
+          isActive={routeName === "ranking"}
           onPress={showRanking}
         />
       </View>
@@ -149,25 +160,16 @@ const WideHeader = memo(() => {
 });
 
 const NarrowHeader = memo(() => {
+  const navigation = useNavigation();
+
   const dispatch = useDispatch();
-  const routeName = useSelector<RootState, string>(({ nav }) => {
-    const route = searchNavRoute(nav);
-    if (route) {
-      return route.routeName || "";
-    }
-    return "";
-  });
 
   const openSetup = useCallback(() => {
-    if (routeName !== "Setup") {
-      dispatch(StackActions.push({ routeName: "Setup" }));
-    }
-  }, [routeName]);
+    navigation.navigate("setup");
+  }, []);
   const openFile = useCallback(() => {
-    if (routeName !== "File") {
-      dispatch(StackActions.push({ routeName: "File" }));
-    }
-  }, [routeName]);
+    navigation.navigate("file");
+  }, []);
   const reload = useCallback(() => {
     dispatch(ServiceActions.backendInit());
     dispatch(ServiceActions.commentInit());
@@ -209,45 +211,39 @@ const HeaderButton = memo(
   ({
     routeName,
     icon,
+    isActive,
     ...props
   }: ButtonProps & {
     routeName?: string;
     icon?: FontAwesome5IconProps;
-  }) => {
-    const isActive = useSelector<RootState, boolean>(
-      ({ nav }) => !!(nav && routeName && searchNavRoute(nav, routeName))
-    );
-
-    return (
-      <Button
-        buttonStyle={[
-          isActive ? colorStyle.bgBlack : colorStyle.bgDark,
-          styles.button
-        ]}
-        titleStyle={[
-          isActive ? colorStyle.active : colorStyle.light,
-          styles.buttonTitle
-        ]}
-        icon={
-          icon && (
-            <FontAwesome5Icon
-              key={routeName}
-              style={styles.buttonIcon}
-              color={isActive ? active : light}
-              size={16}
-              {...icon}
-            />
-          )
-        }
-        {...props}
-      />
-    );
-  },
+    isActive?: boolean;
+  }) => (
+    <Button
+      buttonStyle={[
+        isActive ? colorStyle.bgBlack : colorStyle.bgDark,
+        styles.button
+      ]}
+      titleStyle={[
+        isActive ? colorStyle.active : colorStyle.light,
+        styles.buttonTitle
+      ]}
+      icon={icon && (
+        <FontAwesome5Icon
+          key={routeName}
+          style={styles.buttonIcon}
+          color={isActive ? active : light}
+          size={16}
+          {...icon} />
+      )}
+      {...props} />
+  ),
   ({ icon: prevIcon, ...prevProps }, { icon: nextIcon, ...nextProps }) =>
     shallowEqual(prevProps, nextProps) && shallowEqual(prevIcon, nextIcon)
 );
 
 const HeaderSearchBar = memo(() => {
+  const navigation = useNavigation();
+
   const dispatch = useDispatch();
   const listQuery = useSelector<{ program: ProgramState }, string>(
     ({ program }) => program?.list?.query || ""
@@ -264,7 +260,7 @@ const HeaderSearchBar = memo(() => {
   }, []);
   const onSubmitQuery = useCallback(() => {
     dispatch(ProgramActions.update("list", { query }));
-    dispatch(NavigationActions.navigate({ routeName: "List" }));
+    navigation.navigate("list");
   }, [query]);
   const onClearQuery = useCallback(() => {
     dispatch(ProgramActions.update("list", { query: "" }));

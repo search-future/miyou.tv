@@ -16,14 +16,16 @@ import { View, StyleSheet, LayoutChangeEvent } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { MenuProvider } from "react-native-popup-menu";
 
-import AppNavigator from "../navigators";
-import Titlebar from "./Titlebar";
-import Viewer from "./Viewer";
+import Titlebar from "../containers/Titlebar";
+import Viewer from "../containers/Viewer";
 import colorStyle from "../styles/color";
 import { RootState } from "../modules";
 import { SettingState } from "../modules/setting";
 import { ViewerActions } from "../modules/viewer";
 import { toastOptions } from "../config/constants";
+import { NavigationContainer } from "@react-navigation/native";
+import navigationRef from "./navigation";
+import StackNavigator from "./StackNavigator";
 
 type Setting = SettingState & {
   docking?: boolean;
@@ -32,7 +34,7 @@ type State = RootState & {
   setting: Setting;
 };
 
-const Main = () => {
+const AppNavigator = () => {
   const mode = useSelector<State, string>(({ viewer: { mode } }) => mode);
   switch (mode) {
     case "view": {
@@ -150,7 +152,9 @@ const MainWindow = () => {
       <View style={[colorStyle.bgDark, styles.view]} onLayout={onLayout}>
         <View style={[StyleSheet.absoluteFill, { right }]}>
           <MenuProvider backHandler>
-            <AppNavigator />
+            <NavigationContainer ref={navigationRef}>
+              <StackNavigator />
+            </NavigationContainer>
           </MenuProvider>
         </View>
         {covered && (
@@ -160,7 +164,7 @@ const MainWindow = () => {
     </View>
   );
 };
-export default Main;
+export default AppNavigator;
 
 const styles = StyleSheet.create({
   container: {

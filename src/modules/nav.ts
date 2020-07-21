@@ -11,9 +11,31 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { createNavigationReducer } from "react-navigation-redux-helpers";
+import { AnyAction } from "redux";
 
-import { RootNavigator } from "../navigators";
+export const NAV_CHANGE = "NAV_CHANGE";
+function saveTab(tab: string) {
+  return {
+    type: NAV_CHANGE,
+    tab
+  };
+}
 
-const navReducer = createNavigationReducer(RootNavigator);
-export default navReducer;
+export const NavActions = {
+  saveTab
+};
+
+export type NavState = {
+  tab: string;
+};
+const initialState: NavState = {
+  tab: "table"
+};
+export default function navReducer(state = initialState, action: AnyAction) {
+  switch (action.type) {
+    case NAV_CHANGE:
+      return { tab: action.tab };
+    default:
+      return state;
+  }
+}

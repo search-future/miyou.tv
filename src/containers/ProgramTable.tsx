@@ -33,8 +33,8 @@ import {
 } from "react-native";
 import { Text, CheckBox, Badge } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
-import { NavigationActions } from "react-navigation";
 import { Menu, MenuTrigger, MenuOptions } from "react-native-popup-menu";
+import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
 import Balloon from "../components/Balloon";
@@ -104,6 +104,8 @@ const ProgramTable = memo(() => {
   const headerHeight = useRef(new Animated.Value(headerHeightRef.current))
     .current;
   const viewX = useRef(new Animated.Value(0)).current;
+
+  const navigation = useNavigation();
 
   const dispatch = useDispatch();
   const useArchive = useSelector<State, boolean>(
@@ -484,7 +486,7 @@ const ProgramTable = memo(() => {
           query: `type:${type} channel:${channel}`
         })
       );
-      dispatch(NavigationActions.navigate({ routeName: "List" }));
+      navigation.navigate("list");
     },
     []
   );

@@ -11,32 +11,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { createStackNavigator } from "react-navigation-stack";
+import React from "react";
+import { createStackNavigator } from "@react-navigation/stack";
 
-import MainNavigator from "./MainNavigator";
+import TabNavigator from "./TabNavigator";
 import Setup from "../containers/Setup";
 import FileLoader from "../containers/FileLoader";
 import Viewer from "../containers/Viewer";
 
-const StackNavigator = createStackNavigator(
-  {
-    MainNavigator: {
-      screen: MainNavigator
-    },
-    Setup: {
-      screen: Setup
-    },
-    File: {
-      screen: FileLoader
-    },
-    Viewer: {
-      screen: Viewer
-    }
-  },
-  {
-    initialRouteName: "MainNavigator",
-    headerMode: "none"
-  }
-);
+const Stack = createStackNavigator();
 
+const StackNavigator = () => (
+  <Stack.Navigator initialRouteName="tabs" mode="modal" headerMode="none">
+    <Stack.Screen name="tabs" component={TabNavigator} />
+    <Stack.Screen name="setup" component={Setup} />
+    <Stack.Screen name="file" component={FileLoader} />
+    <Stack.Screen name="viewer" component={Viewer} />
+  </Stack.Navigator>
+);
 export default StackNavigator;

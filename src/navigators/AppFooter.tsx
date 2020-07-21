@@ -27,22 +27,16 @@ import {
   Platform
 } from "react-native";
 import { ButtonGroup, SearchBar } from "react-native-elements";
-import {
-  NavigationActions,
-  NavigationRoute,
-  NavigationParams
-} from "react-navigation";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
-import { useSelector, useDispatch, shallowEqual } from "react-redux";
+import { useNavigation, NavigationState } from "@react-navigation/native";
+import { useSelector, useDispatch } from "react-redux";
 
 import colorStyle, { active, gray, light } from "../styles/color";
 import containerStyle from "../styles/container";
 import textStyle from "../styles/text";
-import { RootState } from "../modules";
 import { ProgramActions, ProgramState } from "../modules/program";
-import searchNavRoute from "../utils/searchNavRoute";
 
-const AppFooter = memo(() => {
+const AppFooter = memo(({ route }: { route?: NavigationState }) => {
   const layoutCallbackId = useRef<number>();
 
   const [containerWidth, setContainerWidth] = useState(0);
@@ -76,7 +70,7 @@ const AppFooter = memo(() => {
     <View style={colorStyle.bgDark} onLayout={onLayout}>
       {containerWidth <= breakpoint && (
         <View style={[containerStyle.row, colorStyle.bgDark]}>
-          <FooterButtons />
+          <FooterButtons route={route} />
           <TouchableOpacity style={styles.searchButton} onPress={openSearchBar}>
             <FontAwesome5Icon name="search" solid size={24} color={light} />
           </TouchableOpacity>
@@ -105,20 +99,10 @@ const AppFooter = memo(() => {
 });
 export default AppFooter;
 
-const FooterButtons = memo(() => {
-  const dispatch = useDispatch();
+const FooterButtons = memo(({ route }: { route?: NavigationState }) => {
+  const navigation = useNavigation();
 
-  const selectedIndex = useSelector<RootState, number>(
-    ({ nav }) => searchNavRoute(nav, "MainNavigator")?.index || 0
-  );
-  const routes = useSelector<RootState, NavigationRoute<NavigationParams>[]>(
-    ({ nav }) => {
-      const route = searchNavRoute(nav, "MainNavigator");
-      const { routes = [] } = route || {};
-      return routes;
-    },
-    shallowEqual
-  );
+  const selectedIndex = useMemo(() => route?.index, [route]);
 
   const buttons = useMemo(
     () => [
@@ -158,13 +142,12 @@ const FooterButtons = memo(() => {
 
   const navigate = useCallback(
     (index: number) => {
-      const { routeName = "" } = routes[index];
-      if (routeName === "List") {
-        dispatch(ProgramActions.update("list", { query: "" }));
+      const name = route?.routeNames[index];
+      if (name) {
+        navigation.navigate(name);
       }
-      dispatch(NavigationActions.navigate({ routeName }));
     },
-    [routes]
+    [route]
   );
 
   return (
@@ -180,6 +163,8 @@ const FooterButtons = memo(() => {
 });
 
 const FooterSearchBar = memo(() => {
+  const navigation = useNavigation();
+
   const dispatch = useDispatch();
   const listQuery = useSelector<{ program: ProgramState }, string>(
     ({ program }) => program?.list?.query || ""
@@ -196,7 +181,7 @@ const FooterSearchBar = memo(() => {
   }, []);
   const onSubmitQuery = useCallback(() => {
     dispatch(ProgramActions.update("list", { query }));
-    dispatch(NavigationActions.navigate({ routeName: "List" }));
+    navigation.navigate("list");
   }, [query]);
   const onClearQuery = useCallback(() => {
     dispatch(ProgramActions.update("list", { query: "" }));
