@@ -20,6 +20,7 @@
     "@react-navigation/native": "^5.7.1",
     "@react-navigation/stack": "^5.7.1",
     "axios": "^0.19.2",
+    "electron-dl": "^3.0.1",
     "electron-store": "^6.0.0",
     "js-base64": "^3.2.4",
     "md5": "^2.2.1",
