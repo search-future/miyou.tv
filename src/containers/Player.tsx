@@ -25,7 +25,7 @@ import Toast from "react-native-root-toast";
 import { useDispatch, useSelector } from "react-redux";
 import qs from "qs";
 // @ts-ignore
-import { VLCPlayer } from "react-native-vlcplayer2";
+import { VLCPlayer } from "react-native-vlc-media-player";
 // @ts-ignore
 import { Immersive } from "react-native-immersive";
 
@@ -89,6 +89,7 @@ const Player = () => {
   const networkType = useSelector<State, string>(({ network }) => network.type);
   const pause = useSelector<State, boolean>(({ player }) => player.pause);
   const duration = useSelector<State, number>(({ player }) => player.duration);
+  const time = useSelector<State, number>(({ player }) => player.time);
   const seekTime = useSelector<State, number>(({ player }) => player.seekTime);
   const seekPosition = useSelector<State, number>(
     ({ player }) => player.seekPosition
@@ -103,6 +104,7 @@ const Player = () => {
   const peakPlay = useSelector<State, boolean>(({ viewer }) => viewer.peakPlay);
 
   const [bootstrap, setBootstrap] = useState(false);
+  const [reset, setReset] = useState(false);
   const [ss, setStartSeconds] = useState(0);
 
   const recordedProgram = useMemo(
@@ -123,9 +125,13 @@ const Player = () => {
         uri = uri.replace(/m2ts$/, "mp4");
       }
     }
-    if (query || ss > 0) {
-      uri += `?${qs.stringify({ ...qs.parse(query), ss })}`;
+    if (ss > 0) {
+      query = `${qs.stringify({ ...qs.parse(query), ss })}`;
     }
+    if (query) {
+      uri += `?${query}`;
+    }
+
     return uri;
   }, [mobileStreamType, mobileStreamParams, recordedProgram, networkType, ss]);
 
@@ -181,10 +187,23 @@ const Player = () => {
     }
   }, [programs, index, extraIndex]);
   useEffect(() => {
+    setReset(false);
+    if (time > 0) {
+      dispatch(PlayerActions.time(time));
+    }
+  }, [reset]);
+  useEffect(() => {
+    setReset(true);
+  }, [uri]);
+  useEffect(() => {
     if (seekTime != null) {
       if (seekable.current) {
-        vlcRef.current?.seek(Math.floor(seekTime / 1000));
-        videoRef.current?.seek(Math.floor(seekTime / 1000));
+        if (Platform.OS === "ios" && vlcRef.current) {
+          dispatch(PlayerActions.position(seekTime / duration));
+        } else {
+          vlcRef.current?.seek(Math.floor(seekTime / 1000));
+          videoRef.current?.seek(Math.floor(seekTime / 1000));
+        }
       } else {
         const position = seekTime / duration;
         if (seekId.current != null) {
@@ -197,7 +216,6 @@ const Player = () => {
         const ss = Math.floor(seekTime / 1000);
         seekId.current = setTimeout(() => {
           setStartSeconds(ss);
-          dispatch(PlayerActions.play());
           seekId.current = null;
         }, 500);
       }
@@ -205,16 +223,17 @@ const Player = () => {
   }, [seekTime]);
   useEffect(() => {
     if (seekPosition != null) {
-      dispatch(PlayerActions.time(seekPosition * duration));
+      if (Platform.OS === "ios" && vlcRef.current && seekable.current) {
+        vlcRef.current.seek(seekPosition);
+      } else {
+        dispatch(PlayerActions.time(seekPosition * duration));
+      }
     }
   }, [seekPosition]);
 
-  const onVlcOpen = useCallback(() => {
+  const onLoadStart = useCallback(() => {
     dispatch(LoadingActions.start());
     dispatch(PlayerActions.play());
-  }, []);
-  const onVideoLoad = useCallback(() => {
-    dispatch(LoadingActions.start());
   }, []);
   const onVlcProgress = useCallback(
     ({
@@ -242,7 +261,7 @@ const Player = () => {
             PlayerActions.progress({
               duration,
               time,
-              position: time / duration
+              position: duration > 0 ? time / duration : 0
             })
           );
         }
@@ -328,7 +347,7 @@ const Player = () => {
     onEnd();
   }, [onEnd]);
 
-  if (bootstrap) {
+  if (bootstrap || reset) {
     return null;
   }
 
@@ -343,11 +362,14 @@ const Player = () => {
         paused={pause}
         muted={mute}
         volume={volume}
-        initOptions={["--deinterlace=1", "--deinterlace-mode=discard"]}
-        source={{ uri }}
+        source={{
+          uri,
+          initType: 0,
+          initOptions: ["--deinterlace=1", "--deinterlace-mode=discard"]
+        }}
         rate={speed}
         ref={vlcRef}
-        onOpen={onVlcOpen}
+        onLoadStart={onLoadStart}
         onProgress={onVlcProgress}
         onError={onError}
         onEnd={onEnd}
@@ -364,7 +386,7 @@ const Player = () => {
       volume={volume / 100}
       source={{ uri, type: "m3u8" } as any}
       ref={videoRef}
-      onLoadStart={onVideoLoad}
+      onLoadStart={onLoadStart}
       onProgress={onVideoProgress}
       onEnd={onEnd}
     />
