@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import React, { useState, useCallback, useMemo } from "react";
-import { View, ViewStyle, StyleSheet, StyleProp } from "react-native";
+import { ViewStyle, StyleSheet, StyleProp } from "react-native";
 import { Button } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import DateTimePicker from "react-native-modal-datetime-picker";
@@ -65,7 +65,7 @@ const DatePicker = ({
   }, []);
 
   return (
-    <View>
+    <>
       <Button
         containerStyle={StyleSheet.flatten([
           styles.container,
@@ -88,7 +88,7 @@ const DatePicker = ({
         onConfirm={onConfirm}
         onCancel={onCancel}
       />
-    </View>
+    </>
   );
 };
 export default DatePicker;

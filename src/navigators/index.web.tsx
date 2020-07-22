@@ -57,12 +57,12 @@ const ChildView = () => (
 );
 
 const ChildWindow = () => (
-  <View style={styles.container}>
+  <>
     <Titlebar />
     <MenuProvider backHandler>
       <Viewer />
     </MenuProvider>
-  </View>
+  </>
 );
 
 const MainWindow = () => {
@@ -147,7 +147,7 @@ const MainWindow = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <>
       <Titlebar />
       <View style={[colorStyle.bgDark, styles.view]} onLayout={onLayout}>
         <View style={[StyleSheet.absoluteFill, { right }]}>
@@ -161,15 +161,12 @@ const MainWindow = () => {
           <View style={[StyleSheet.absoluteFill, colorStyle.bgDark]} />
         )}
       </View>
-    </View>
+    </>
   );
 };
 export default AppNavigator;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   view: {
     flex: 1
   }

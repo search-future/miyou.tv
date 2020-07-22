@@ -93,7 +93,7 @@ const FileCard = memo(
       titleStyle={colorStyle.light}
       title="ファイル情報"
     >
-      <View>
+      <>
         <View style={[containerStyle.row, styles.cardRow]}>
           <View style={styles.cardLabel}>
             <Text style={colorStyle.light}>ID</Text>
@@ -136,7 +136,7 @@ const FileCard = memo(
             <Text style={colorStyle.light}>{stream}</Text>
           </View>
         </View>
-      </View>
+      </>
     </Card>
   )
 );
@@ -228,7 +228,7 @@ const ProgramCard = memo(
         titleStyle={colorStyle.light}
         title="番組情報"
       >
-        <View>
+        <>
           <View style={[containerStyle.row, styles.cardRow]}>
             <View style={[containerStyle.row, styles.cardContent]}>
               <Text style={[textStyle.bold, colorStyle.light]}>
@@ -361,7 +361,7 @@ const ProgramCard = memo(
               </View>
             </View>
           )}
-        </View>
+        </>
       </Card>
     );
   }
@@ -384,7 +384,7 @@ const ExtraProgramCard = memo(
       titleStyle={colorStyle.light}
       title="録画情報"
     >
-      <View>
+      <>
         <View style={[containerStyle.row, styles.cardRow]}>
           <View style={styles.cardLabel}>
             <Text style={colorStyle.light}>ID</Text>
@@ -429,7 +429,7 @@ const ExtraProgramCard = memo(
             </Text>
           </View>
         </View>
-      </View>
+      </>
     </Card>
   )
 );

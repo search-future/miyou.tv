@@ -247,41 +247,53 @@ export default class GaraponV4Service extends BackendService {
     if (result.status === "success") {
       return {
         hits: parseInt(result.hit, 10),
-        programs: result.programs.map(program => {
-          return {
-            id: program.gtvid,
-            type: program.gtvid.slice(0, 2),
-            channel: program.tsid10,
-            channelName: program.bcname,
-            title: program.series_title || program.title,
-            fullTitle: program.title,
-            detail: program.description,
-            category: GaraponV4Service.parseCategory(program.genre[0]),
-            duration: program.durationtime * 1000,
-            start: new Date(program.starttime * 1000),
-            end: new Date(program.endtime * 1000),
-            preview: program.thumbnail_url,
-            stream: `${this.url}${program.m3u8_url}&gtvsession=${this.gtvsession}`,
+        programs: result.programs.map(
+          ({
+            gtvid,
+            title,
+            description,
+            starttime,
+            endtime,
+            durationtime,
+            bcname,
+            tsid10,
+            service_type,
+            genre,
+            thumbnail_url,
+            m3u8_url,
+            series_title
+          }) => ({
+            id: gtvid,
+            type: gtvid.slice(0, 2),
+            channel: tsid10,
+            channelName: bcname,
+            title: series_title || title,
+            fullTitle: title,
+            detail: description,
+            category: GaraponV4Service.parseCategory(genre[0]),
+            duration: durationtime * 1000,
+            start: new Date(starttime * 1000),
+            end: new Date(endtime * 1000),
+            preview: thumbnail_url,
+            stream: `${this.url}${m3u8_url}&gtvsession=${this.gtvsession}`,
             download: [
               {
                 name: "TS",
                 uri: `${this.url}/gapi/v4/Program/?${qs.stringify({
                   gtvsession: this.gtvsession,
                   action: "download_ts",
-                  starttime: program.starttime,
-                  endtime: program.endtime,
-                  tsid10: program.tsid10,
-                  service_type: program.service_type
+                  starttime: starttime,
+                  endtime: endtime,
+                  tsid10: tsid10,
+                  service_type: service_type
                 })}`,
-                filename: `${moment(new Date(program.starttime * 1000)).format(
+                filename: `${moment(new Date(starttime * 1000)).format(
                   "YYMMDD-HHmm"
-                )}-${program.bcname}-${
-                  program.series_title || program.title
-                }.m2ts`
+                )}-${bcname}-${series_title || title}.m2ts`
               }
             ]
-          };
-        })
+          })
+        )
       };
     }
     throw result;

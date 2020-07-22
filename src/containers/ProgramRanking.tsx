@@ -591,7 +591,7 @@ const ListProgram = memo(
         bottomDivider
         Component={TouchableOpacity}
         subtitle={
-          <View>
+          <>
             <View style={[containerStyle.row, containerStyle.wrap]}>
               <Text style={[textStyle.bold, colorStyle.black]}>
                 {commentMaxSpeed}コメント/分
@@ -616,7 +616,7 @@ const ListProgram = memo(
                 {dateFormatter(start)}({Math.round(duration / 60000)}分)
               </Text>
             </View>
-          </View>
+          </>
         }
         leftElement={
           <View style={programStyle.listItemLeft}>

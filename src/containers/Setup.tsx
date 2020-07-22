@@ -84,7 +84,7 @@ const Setup = () => {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <>
       <View style={[containerStyle.row, colorStyle.bgDark]}>
         <TouchableOpacity style={styles.button} onPress={back}>
           <FontAwesome5Icon
@@ -103,7 +103,7 @@ const Setup = () => {
         <CommentSetup data={commentSetting} onChanged={onMoritapoChanged} />
         <ViewSetup data={viewSetting} onChanged={onViewChanged} />
       </ScrollView>
-    </View>
+    </>
   );
 };
 export default Setup;
@@ -323,7 +323,7 @@ const BackendSetup = memo(
           </Picker>
         </View>
         {backendType === "chinachu" && (
-          <View>
+          <>
             <View style={styles.info}>
               {Platform.OS === "ios" ? (
                 <Text style={[colorStyle.black]}>
@@ -359,7 +359,7 @@ const BackendSetup = memo(
               <Switch value={auth} onValueChange={backendAuthChange} />
             </View>
             {auth && (
-              <View>
+              <>
                 <Text style={[colorStyle.black, styles.label]}>
                   Chinachuのユーザー
                 </Text>
@@ -395,7 +395,7 @@ const BackendSetup = memo(
                     onChangeText={passwordChange}
                   />
                 </View>
-              </View>
+              </>
             )}
             <Text style={[colorStyle.black, styles.label]}>動画コンテナ</Text>
             <View
@@ -432,7 +432,7 @@ const BackendSetup = memo(
               />
             </View>
             {Platform.OS !== "web" && (
-              <View>
+              <>
                 <Text style={[colorStyle.black, styles.label]}>
                   動画コンテナ(モバイルデータ通信)
                 </Text>
@@ -470,12 +470,12 @@ const BackendSetup = memo(
                     onChangeText={mobileStreamParamsChange}
                   />
                 </View>
-              </View>
+              </>
             )}
-          </View>
+          </>
         )}
         {backendType === "epgstation" && (
-          <View>
+          <>
             <Text style={[colorStyle.black, styles.label]}>
               EPGStationのURL
             </Text>
@@ -502,7 +502,7 @@ const BackendSetup = memo(
               <Switch value={auth} onValueChange={backendAuthChange} />
             </View>
             {auth && (
-              <View>
+              <>
                 <Text style={[colorStyle.black, styles.label]}>
                   EPGStationのユーザー
                 </Text>
@@ -538,7 +538,7 @@ const BackendSetup = memo(
                     onChangeText={passwordChange}
                   />
                 </View>
-              </View>
+              </>
             )}
             <Text style={[colorStyle.black, styles.label]}>動画コンテナ</Text>
             <View
@@ -590,7 +590,7 @@ const BackendSetup = memo(
               />
             </View>
             {Platform.OS !== "web" && (
-              <View>
+              <>
                 <Text style={[colorStyle.black, styles.label]}>
                   動画コンテナ(モバイルデータ通信)
                 </Text>
@@ -628,12 +628,12 @@ const BackendSetup = memo(
                     onChangeText={mobileStreamParamsChange}
                   />
                 </View>
-              </View>
+              </>
             )}
-          </View>
+          </>
         )}
         {backendType === "garapon" && (
-          <View>
+          <>
             <View style={styles.info}>
               <Text style={colorStyle.black}>
                 ガラポン伍/四/参号機に対応しています。
@@ -651,7 +651,7 @@ const BackendSetup = memo(
               <Switch value={auth} onValueChange={backendAuthChange} />
             </View>
             {!auth && (
-              <View>
+              <>
                 <Text style={[colorStyle.black, styles.label]}>
                   ガラポンTVのURL
                 </Text>
@@ -689,7 +689,7 @@ const BackendSetup = memo(
                     onChangeText={versionChange}
                   />
                 </View>
-              </View>
+              </>
             )}
             <Text style={[colorStyle.black, styles.label]}>
               ガラポンTVのユーザー
@@ -728,10 +728,10 @@ const BackendSetup = memo(
                 onChangeText={passwordChange}
               />
             </View>
-          </View>
+          </>
         )}
         {backendType === "garaponv4" && (
-          <View>
+          <>
             <View style={styles.info}>
               <Text style={colorStyle.black}>
                 ガラポン六号機に対応しています。
@@ -779,7 +779,7 @@ const BackendSetup = memo(
                 onChangeText={passwordChange}
               />
             </View>
-          </View>
+          </>
         )}
         <Text style={[colorStyle.black, styles.label]}>自動更新間隔(秒)</Text>
         <View
@@ -1003,9 +1003,6 @@ const moritapoEntryUrl = "https://find.moritapo.jp/moritapo/subscribe.php";
 const chinachuInfoUrl = "https://chinachu.moe/";
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   title: {
     flex: 1,
     height: 40,

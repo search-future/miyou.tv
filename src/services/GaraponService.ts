@@ -198,25 +198,32 @@ export default class GaraponService extends BackendService {
       return {
         hits: parseInt(result.hit, 10),
         programs: result.program.map(program => {
+          const {
+            gtvid,
+            startdate,
+            ch,
+            title,
+            description,
+            genre,
+            bc
+          } = program;
           const duration = GaraponService.parseDuration(program.duration);
-          const start = new Date(
-            program.startdate.replace(" ", "T") + "+09:00"
-          );
+          const start = new Date(startdate.replace(" ", "T") + "+09:00");
           const end = new Date(start.getTime() + duration);
           return {
-            id: program.gtvid,
-            type: program.gtvid.slice(0, 2),
-            channel: program.ch,
-            channelName: program.bc,
-            title: program.title,
-            fullTitle: program.title,
-            detail: program.description,
+            id: gtvid,
+            type: gtvid.slice(0, 2),
+            channel: ch,
+            channelName: bc,
+            title: title,
+            fullTitle: title,
+            detail: description,
             duration,
             start,
             end,
-            category: GaraponService.parseCategory(program.genre[0]),
-            preview: this.getPreviewUrl(program.gtvid),
-            stream: this.getStreamUrl(program.gtvid)
+            category: GaraponService.parseCategory(genre[0]),
+            preview: this.getPreviewUrl(gtvid),
+            stream: this.getStreamUrl(gtvid)
           };
         })
       };

@@ -228,7 +228,7 @@ const CommentInfo = memo(() => {
   );
 
   return (
-    <View style={styles.container}>
+    <>
       <View style={containerStyle.row}>
         <Menu>
           <MenuTrigger
@@ -315,7 +315,7 @@ const CommentInfo = memo(() => {
           {speed}コメント/分
         </Text>
       </View>
-    </View>
+    </>
   );
 });
 export default CommentInfo;

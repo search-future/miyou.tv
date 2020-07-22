@@ -181,56 +181,63 @@ export default class ChinachuService extends BackendService {
     return this.cache[key];
   }
 
-  protected convertRecordedProgram(program: RecordedProgram) {
+  protected convertRecordedProgram({
+    id,
+    channel,
+    title,
+    fullTitle,
+    detail = "",
+    category,
+    seconds,
+    start,
+    end
+  }: RecordedProgram) {
     return {
-      id: program.id,
-      type: program.channel.type,
-      channel: String(program.channel.sid),
-      channelName: program.channel.name,
-      title: program.title,
-      fullTitle: program.fullTitle,
-      detail: program.detail || "",
-      category: ChinachuService.parseCategory(program.category),
-      duration: program.seconds * 1000,
-      start: new Date(program.start),
-      end: new Date(program.end),
+      id,
+      type: channel.type,
+      channel: String(channel.sid),
+      channelName: channel.name,
+      title,
+      fullTitle,
+      detail,
+      category: ChinachuService.parseCategory(category),
+      duration: seconds * 1000,
+      start: new Date(start),
+      end: new Date(end),
       preview: this.getUrl(
         [
-          `/api/recorded/${program.id}/preview.png?pos=${this.previewPos}`,
+          `/api/recorded/${id}/preview.png?pos=${this.previewPos}`,
           this.previewParams
         ]
           .filter(a => a)
           .join("&")
       ),
       stream: this.getAuthUrl(
-        [
-          `/api/recorded/${program.id}/watch.${this.streamType}`,
-          this.streamParams
-        ]
+        [`/api/recorded/${id}/watch.${this.streamType}`, this.streamParams]
           .filter(a => a)
           .join("?")
       ),
       download: [
         {
           name: "無変換",
-          uri: this.getAuthUrl(`/api/recorded/${program.id}/file.m2ts`),
-          filename: `${moment(program.start).format("YYMMDD-HHmm")}-${
-            program.channel.name
-          }-${program.title}.m2ts`
+          uri: this.getAuthUrl(`/api/recorded/${id}/file.m2ts`),
+          filename: `${moment(start).format("YYMMDD-HHmm")}-${
+            channel.name
+          }-${title}.m2ts`
         },
         {
           name: `変換(${this.streamType})`,
           uri: this.getAuthUrl(
             [
-              `/api/recorded/${program.id}/watch.${this.streamType}?mode=download&ext=${this.streamType}`,
+              `/api/recorded/${id}/watch.${this.streamType}?mode=download&ext=${this.streamType}`,
               this.streamParams
             ]
               .filter(a => a)
               .join("&")
           ),
-          filename: `${moment(program.start).format("YYMMDD-HHmm")}-${
-            program.channel.name
-          }-${program.title}.${this.streamType}`
+          filename: `${moment(start).format("YYMMDD-HHmm")}-${
+            channel.name
+          }-${title}.${this.streamType}`
         }
       ],
       authHeaders: this.getAuthHeaders()

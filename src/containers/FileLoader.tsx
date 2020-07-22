@@ -337,7 +337,7 @@ const ListProgram = memo(
         bottomDivider
         title={title}
         subtitle={
-          <View>
+          <>
             <View
               style={[
                 direction === "row" && containerStyle.row,
@@ -369,7 +369,7 @@ const ListProgram = memo(
                 <FontAwesome5Icon name="play" solid size={24} color={black} />
               </TouchableOpacity>
             </View>
-          </View>
+          </>
         }
       />
     );

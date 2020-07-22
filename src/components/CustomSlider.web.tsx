@@ -84,7 +84,7 @@ const CustomSlider = ({
         max={maximumValue}
         min={minimumValue}
         step={step}
-        value={value}
+        value={`${value}`}
         onChange={onChange}
       />
     </View>
