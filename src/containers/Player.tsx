@@ -83,6 +83,10 @@ const Player = () => {
   const speed = useSelector<State, number>(({ setting }) =>
     parseFloat(setting.player?.speed || "1")
   );
+  const deinterlace = useSelector<State, boolean>(
+    ({ setting }) =>
+      setting.player?.deinterlace == null || setting.player?.deinterlace
+  );
   const repeat = useSelector<State, string>(
     ({ setting }) => setting.player?.repeat || "continue"
   );
@@ -134,6 +138,16 @@ const Player = () => {
 
     return uri;
   }, [mobileStreamType, mobileStreamParams, recordedProgram, networkType, ss]);
+  const initOptions = useMemo(() => {
+    const options = [];
+    if (deinterlace) {
+      options.push("--deinterlace=1", "--deinterlace-mode=discard");
+    } else {
+      options.push("--deinterlace=0");
+    }
+
+    return options;
+  }, [deinterlace]);
 
   useEffect(() => {
     if (Platform.OS === "android") {
@@ -195,6 +209,11 @@ const Player = () => {
   useEffect(() => {
     setReset(true);
   }, [uri]);
+  useEffect(() => {
+    if (vlcRef.current) {
+      setReset(true);
+    }
+  }, [initOptions]);
   useEffect(() => {
     if (seekTime != null) {
       if (seekable.current) {
@@ -365,7 +384,7 @@ const Player = () => {
         source={{
           uri,
           initType: 0,
-          initOptions: ["--deinterlace=1", "--deinterlace-mode=discard"]
+          initOptions: [...initOptions]
         }}
         rate={speed}
         ref={vlcRef}
