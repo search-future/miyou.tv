@@ -64,7 +64,7 @@ const PlayerMenu = memo(
               <DeinterlaceSwitch />
             </View>
           )}
-          {audioTrackCount > 1 && (
+          {(Platform.OS !== "web" || audioTrackCount > 1) && (
             <View
               style={[containerStyle.row, colorStyle.bgBlack, styles.optionRow]}
             >
@@ -181,25 +181,44 @@ const SpeedSwitch = memo(() => {
 
 const AudioTrackSwitch = memo(() => {
   const dispatch = useDispatch();
-  const value = useSelector<State, number>(({ player }) => player.track.audio);
+  const value = useSelector<State, number>(
+    ({ player }) => player.track.audio || 0
+  );
   const track = useSelector<State, number>(
     ({ player }) => player.trackCount.audio
   );
 
   const onPrevious = useCallback(() => {
     const audio = value - 1;
-    if (audio > 0) {
+    if (Platform.OS === "web") {
       dispatch(PlayerActions.track({ audio }));
+      if (audio > 0) {
+        dispatch(PlayerActions.track({ audio }));
+      } else {
+        dispatch(PlayerActions.track({ audio: track }));
+      }
     } else {
-      dispatch(PlayerActions.track({ audio: track }));
+      if (audio >= 0) {
+        dispatch(PlayerActions.track({ audio }));
+      } else {
+        dispatch(PlayerActions.track({ audio: 9 }));
+      }
     }
   }, [value, track]);
   const onNext = useCallback(() => {
     const audio = value + 1;
-    if (audio <= track) {
-      dispatch(PlayerActions.track({ audio }));
+    if (Platform.OS === "web") {
+      if (audio <= track) {
+        dispatch(PlayerActions.track({ audio }));
+      } else {
+        dispatch(PlayerActions.track({ audio: 1 }));
+      }
     } else {
-      dispatch(PlayerActions.track({ audio: 1 }));
+      if (audio <= 9) {
+        dispatch(PlayerActions.track({ audio }));
+      } else {
+        dispatch(PlayerActions.track({ audio: 0 }));
+      }
     }
   }, [value, track]);
 

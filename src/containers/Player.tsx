@@ -94,6 +94,9 @@ const Player = () => {
   const pause = useSelector<State, boolean>(({ player }) => player.pause);
   const duration = useSelector<State, number>(({ player }) => player.duration);
   const time = useSelector<State, number>(({ player }) => player.time);
+  const audioTrack = useSelector<State, number>(
+    ({ player }) => player.track.audio || 0
+  );
   const dualMonoMode = useSelector<State, string>(
     ({ player }) => player.dualMonoMode
   );
@@ -159,9 +162,12 @@ const Player = () => {
         options.push("--stereo-mode=4");
         break;
     }
+    if (audioTrack > 0) {
+      options.push(`--audio-track=${audioTrack}`);
+    }
 
     return options;
-  }, [deinterlace, dualMonoMode]);
+  }, [deinterlace, audioTrack, dualMonoMode]);
   const stereoPan = useMemo(() => {
     switch (dualMonoMode) {
       case "main":
@@ -427,6 +433,7 @@ const Player = () => {
       muted={mute}
       volume={volume / 100}
       source={{ uri, type: "m3u8" } as any}
+      selectedAudioTrack={{ type: "index", value: audioTrack }}
       stereoPan={stereoPan}
       ref={videoRef}
       onLoadStart={onLoadStart}
