@@ -74,16 +74,16 @@ const PlayerMenu = memo(
               <AudioTrackSwitch />
             </View>
           )}
-          {Platform.OS === "web" && (
+          {
             <View
               style={[containerStyle.row, colorStyle.bgBlack, styles.optionRow]}
             >
               <Text style={[colorStyle.light, styles.optionLabel]}>
-                デュアルモノラル
+                {Platform.OS === "web" ? "デュアルモノラル" : "ステレオモード"}
               </Text>
               <DualMonoModeSwitch />
             </View>
-          )}
+          }
           <View
             style={[containerStyle.row, colorStyle.bgBlack, styles.optionRow]}
           >
@@ -427,12 +427,20 @@ const MaxCommentsSwitch = memo(() => {
   );
 });
 
-const dualMonoTable: { [key: string]: string } = {
-  auto: "自動",
-  both: "主/副",
-  main: "主音声",
-  sub: "副音声"
-};
+const dualMonoTable: { [key: string]: string } =
+  Platform.OS === "web"
+    ? {
+        auto: "自動",
+        both: "主/副",
+        main: "主音声",
+        sub: "副音声"
+      }
+    : {
+        auto: "自動",
+        both: "左/右",
+        main: "左",
+        sub: "右"
+      };
 
 const repeatTable: { [key: string]: string } = {
   stop: "停止",

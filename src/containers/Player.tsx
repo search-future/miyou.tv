@@ -94,6 +94,9 @@ const Player = () => {
   const pause = useSelector<State, boolean>(({ player }) => player.pause);
   const duration = useSelector<State, number>(({ player }) => player.duration);
   const time = useSelector<State, number>(({ player }) => player.time);
+  const dualMonoMode = useSelector<State, string>(
+    ({ player }) => player.dualMonoMode
+  );
   const seekTime = useSelector<State, number>(({ player }) => player.seekTime);
   const seekPosition = useSelector<State, number>(
     ({ player }) => player.seekPosition
@@ -145,9 +148,29 @@ const Player = () => {
     } else {
       options.push("--deinterlace=0");
     }
+    switch (dualMonoMode) {
+      case "both":
+        options.push("--stereo-mode=1");
+        break;
+      case "main":
+        options.push("--stereo-mode=3");
+        break;
+      case "sub":
+        options.push("--stereo-mode=4");
+        break;
+    }
 
     return options;
-  }, [deinterlace]);
+  }, [deinterlace, dualMonoMode]);
+  const stereoPan = useMemo(() => {
+    switch (dualMonoMode) {
+      case "main":
+        return -1;
+      case "sub":
+        return 1;
+    }
+    return 0;
+  }, [dualMonoMode]);
 
   useEffect(() => {
     if (Platform.OS === "android") {
@@ -404,6 +427,7 @@ const Player = () => {
       muted={mute}
       volume={volume / 100}
       source={{ uri, type: "m3u8" } as any}
+      stereoPan={stereoPan}
       ref={videoRef}
       onLoadStart={onLoadStart}
       onProgress={onVideoProgress}

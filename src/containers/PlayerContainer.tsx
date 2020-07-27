@@ -206,23 +206,44 @@ const PlayerContainer = memo(
       timeRef.current = time;
     }, [time]);
     useEffect(() => {
-      switch (dualMonoMode) {
-        case "auto":
-          setText("デュアルモノラル 自動");
-          showText(textOpacity);
-          break;
-        case "both":
-          setText("デュアルモノラル 主/副");
-          showText(textOpacity);
-          break;
-        case "main":
-          setText("デュアルモノラル 主音声");
-          showText(textOpacity);
-          break;
-        case "sub":
-          setText("デュアルモノラル 副音声");
-          showText(textOpacity);
-          break;
+      if (Platform.OS === "web") {
+        switch (dualMonoMode) {
+          case "auto":
+            setText("デュアルモノラル 自動");
+            showText(textOpacity);
+            break;
+          case "both":
+            setText("デュアルモノラル 主/副");
+            showText(textOpacity);
+            break;
+          case "main":
+            setText("デュアルモノラル 主音声");
+            showText(textOpacity);
+            break;
+          case "sub":
+            setText("デュアルモノラル 副音声");
+            showText(textOpacity);
+            break;
+        }
+      } else {
+        switch (dualMonoMode) {
+          case "auto":
+            setText("ステレオモード 自動");
+            showText(textOpacity);
+            break;
+          case "both":
+            setText("ステレオモード 左/右");
+            showText(textOpacity);
+            break;
+          case "main":
+            setText("ステレオモード 左");
+            showText(textOpacity);
+            break;
+          case "sub":
+            setText("ステレオモード 右");
+            showText(textOpacity);
+            break;
+        }
       }
     }, [dualMonoMode]);
     useEffect(() => {
