@@ -116,7 +116,7 @@ const FileCard = memo(
           </View>
           <View style={[containerStyle.row, styles.cardContent]}>
             <Text style={colorStyle.light}>
-              {dateFormatter.format(start, "YYYY/MM/DD A HHHH:mm")}
+              {dateFormatter.format(start, "YYYY/MM/DD(dd) A HHHH:mm")}
             </Text>
           </View>
         </View>
@@ -257,7 +257,7 @@ const ProgramCard = memo(
             </View>
             <View style={[containerStyle.row, styles.cardContent]}>
               <Text style={colorStyle.light}>
-                {dateFormatter.format(start, "YYYY/MM/DD A HHHH:mm")}
+                {dateFormatter.format(start, "YYYY/MM/DD(dd) A HHHH:mm")}
               </Text>
             </View>
           </View>
@@ -267,7 +267,7 @@ const ProgramCard = memo(
             </View>
             <View style={[containerStyle.row, styles.cardContent]}>
               <Text style={colorStyle.light}>
-                {dateFormatter.format(end, "YYYY/MM/DD A HHHH:mm")}
+                {dateFormatter.format(end, "YYYY/MM/DD(dd) A HHHH:mm")}
               </Text>
             </View>
           </View>
@@ -415,7 +415,7 @@ const ExtraProgramCard = memo(
           </View>
           <View style={[containerStyle.row, styles.cardContent]}>
             <Text style={colorStyle.light}>
-              {dateFormatter.format(start, "YYYY/MM/DD A HHHH:mm")}
+              {dateFormatter.format(start, "YYYY/MM/DD(dd) A HHHH:mm")}
             </Text>
           </View>
         </View>
@@ -425,7 +425,7 @@ const ExtraProgramCard = memo(
           </View>
           <View style={[containerStyle.row, styles.cardContent]}>
             <Text style={colorStyle.light}>
-              {dateFormatter.format(end, "YYYY/MM/DD A HHHH:mm")}
+              {dateFormatter.format(end, "YYYY/MM/DD(dd) A HHHH:mm")}
             </Text>
           </View>
         </View>

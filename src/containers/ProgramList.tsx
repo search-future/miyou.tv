@@ -381,7 +381,7 @@ const ProgramList = memo(() => {
   );
   const keyExtractor = useCallback(({ id }: ProgramListProgram) => id, []);
   const listDateFormatter = useCallback(
-    (date: Date) => dateFormatter.format(date, "YYYY/MM/DD A HHHH:mm"),
+    (date: Date) => dateFormatter.format(date, "YYYY/MM/DD(dd) A HHHH:mm"),
     [dateFormatter]
   );
   const listRenderer = useCallback<ListRenderItem<ProgramListProgram>>(

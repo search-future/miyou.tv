@@ -355,7 +355,7 @@ const ProgramRanking = memo(() => {
     []
   );
   const listDateFormatter = useCallback(
-    (date: Date) => dateFormatter.format(date, "YYYY/MM/DD A HHHH:mm"),
+    (date: Date) => dateFormatter.format(date, "YYYY/MM/DD(dd) A HHHH:mm"),
     [dateFormatter]
   );
   const listRenderer: ListRenderItem<ProgramRankingProgram> = useCallback(
@@ -507,8 +507,8 @@ const ProgramRanking = memo(() => {
               <ListHeader
                 visible={programs.length > 0}
                 targetName={targetName}
-                start={dateFormatter.format(start, "YYYY/MM/DD A HHHH:mm")}
-                end={dateFormatter.format(end, "YYYY/MM/DD A HHHH:mm")}
+                start={dateFormatter.format(start, "YYYY/MM/DD(dd) A HHHH:mm")}
+                end={dateFormatter.format(end, "YYYY/MM/DD(dd) A HHHH:mm")}
               />
             }
             onScroll={onScroll}
