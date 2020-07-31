@@ -287,7 +287,7 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1130;
+				LastUpgradeCheck = 1160;
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
@@ -675,6 +675,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 44E051E4D9E91763F0619D3F /* Pods-miyoutv-miyoutvTests.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -698,6 +699,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EB309C5BD6C8B7625C5F251E /* Pods-miyoutv-miyoutvTests.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = miyoutvTests/Info.plist;
@@ -720,7 +722,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 1040001;
+				CURRENT_PROJECT_VERSION = 1040002;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = miyoutv/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -745,7 +747,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 1040001;
+				CURRENT_PROJECT_VERSION = 1040002;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = miyoutv/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
