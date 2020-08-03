@@ -174,7 +174,7 @@ const ProgramCard = memo(
       dispatch(ViewerActions.search(`cat:${category.codeName}`));
     }, [category]);
     const onDownloadSuccess = useCallback(() => {
-      Toast.show("Downmload complete!", {
+      Toast.show("Download complete!", {
         ...toastOptions,
         duration: Toast.durations.SHORT
       });
