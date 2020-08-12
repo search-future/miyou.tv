@@ -152,14 +152,14 @@ export default function playerReducer(state = initialState, action: AnyAction) {
       const { time } = action;
       return {
         ...state,
-        seekTime: time
+        seekTime: time > 0 ? time : 0
       };
     }
     case PLAYER_POSITION: {
       const { position } = action;
       return {
         ...state,
-        seekPosition: position
+        seekPosition: position > 0 ? position : 0
       };
     }
     case PLAYER_TRACK: {
