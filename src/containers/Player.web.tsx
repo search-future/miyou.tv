@@ -344,6 +344,8 @@ const Player = memo(() => {
             duration: Toast.durations.LONG
           });
           onStopped();
+        } else if (retryCount.current < 0) {
+          onStopped();
         } else {
           retryCount.current++;
           setBootstrap(true);
@@ -441,6 +443,9 @@ const Player = memo(() => {
         } else {
           mpvRef.current?.property("time-pos", seekTime / 1000);
         }
+      } else if (seekTime > duration) {
+        retryCount.current = -1;
+        mpvRef.current?.command("stop");
       } else {
         const position = seekTime / duration;
         if (backendType === "chinachu" || backendType === "epgstation") {
