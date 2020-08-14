@@ -62,15 +62,6 @@ type State = RootState & {
   setting: Setting;
 };
 
-function showText(animetedValue: Animated.Value) {
-  animetedValue.setValue(1);
-  Animated.timing(animetedValue, {
-    toValue: 0,
-    duration: 1000,
-    useNativeDriver: Platform.OS !== "web"
-  }).start();
-}
-
 const PlayerContainer = memo(
   ({ children, onLayout, ...props }: PropsWithChildren<ViewProps>) => {
     const textOpacity = useRef(new Animated.Value(0)).current;
@@ -151,7 +142,7 @@ const PlayerContainer = memo(
               time += (dx - Math.sign(dx) * 10) * 5000;
               if (time < 0) {
                 time = 0;
-              } else if (time > duration) {
+              } else if (duration > 0 && time > duration) {
                 time = duration;
               }
               const clock = new Date(start);
@@ -162,7 +153,6 @@ const PlayerContainer = memo(
                   "HHHH:mm:ss"
                 )})`
               );
-              showText(textOpacity);
             } else if (Math.abs(dy) > Math.abs(dx)) {
               let value = volume;
               value -= Math.floor((dy - Math.sign(dy) * 10) / 2);
@@ -172,7 +162,6 @@ const PlayerContainer = memo(
                 value = 100;
               }
               setText(`音量 ${value}`);
-              showText(textOpacity);
             }
           },
           onPanResponderEnd: ({}, { dx, dy }) => {
@@ -210,38 +199,30 @@ const PlayerContainer = memo(
         switch (dualMonoMode) {
           case "auto":
             setText("デュアルモノラル 自動");
-            showText(textOpacity);
             break;
           case "both":
             setText("デュアルモノラル 主/副");
-            showText(textOpacity);
             break;
           case "main":
             setText("デュアルモノラル 主音声");
-            showText(textOpacity);
             break;
           case "sub":
             setText("デュアルモノラル 副音声");
-            showText(textOpacity);
             break;
         }
       } else {
         switch (dualMonoMode) {
           case "auto":
             setText("ステレオモード 自動");
-            showText(textOpacity);
             break;
           case "both":
             setText("ステレオモード 左/右");
-            showText(textOpacity);
             break;
           case "main":
             setText("ステレオモード 左");
-            showText(textOpacity);
             break;
           case "sub":
             setText("ステレオモード 右");
-            showText(textOpacity);
             break;
         }
       }
@@ -251,7 +232,7 @@ const PlayerContainer = memo(
         let time = seekTime;
         if (time < 0) {
           time = 0;
-        } else if (time > duration) {
+        } else if (duration > 0 && time > duration) {
           time = duration;
         }
         const clock = new Date(start);
@@ -259,7 +240,6 @@ const PlayerContainer = memo(
         setText(
           `${formatTime(time)}(${dateFormatter.format(clock, "HHHH:mm:ss")})`
         );
-        showText(textOpacity);
       }
     }, [seekTime]);
     useEffect(() => {
@@ -267,7 +247,7 @@ const PlayerContainer = memo(
         let time = seekPosition * duration;
         if (time < 0) {
           time = 0;
-        } else if (time > duration) {
+        } else if (duration > 0 && time > duration) {
           time = duration;
         }
         const clock = new Date(start);
@@ -275,44 +255,35 @@ const PlayerContainer = memo(
         setText(
           `${formatTime(time)}(${dateFormatter.format(clock, "HHHH:mm:ss")})`
         );
-        showText(textOpacity);
       }
     }, [seekPosition]);
     useEffect(() => {
       const delay = commentDelay;
       setText(`コメント遅延時間 ${(delay / 1000).toFixed(1)}秒`);
-      showText(textOpacity);
     }, [commentDelay]);
     useEffect(() => {
       const duration = commentDuration;
       setText(`コメント表示時間 ${(duration / 1000).toFixed(1)}秒`);
-      showText(textOpacity);
     }, [commentDuration]);
     useEffect(() => {
       setText(`コメント同時表示数 ${maxComments}`);
-      showText(textOpacity);
     }, [maxComments]);
     useEffect(() => {
       setText(`コメントライン数 ${maxLines}`);
-      showText(textOpacity);
     }, [maxLines]);
     useEffect(() => {
       setText(mute ? "ミュート" : "ミュート解除");
-      showText(textOpacity);
     }, [mute]);
     useEffect(() => {
       switch (repeat) {
         case "stop":
           setText("停止");
-          showText(textOpacity);
           break;
         case "continue":
           setText("連続再生");
-          showText(textOpacity);
           break;
         case "repeat":
           setText("リピート");
-          showText(textOpacity);
           break;
       }
     }, [repeat]);
@@ -320,7 +291,6 @@ const PlayerContainer = memo(
       if (speed) {
         const speedNum = speed;
         setText(`再生速度 x${speedNum.toFixed(1)}`);
-        showText(textOpacity);
       }
     }, [speed]);
     useEffect(() => {
@@ -332,12 +302,19 @@ const PlayerContainer = memo(
           volumeNum = 100;
         }
         setText(`音量 ${volumeNum}`);
-        showText(textOpacity);
       }
     }, [volume]);
     useEffect(() => {
       setText("");
     }, []);
+    useEffect(() => {
+      textOpacity.setValue(1);
+      Animated.timing(textOpacity, {
+        toValue: 0,
+        duration: 1000,
+        useNativeDriver: Platform.OS !== "web"
+      }).start();
+    }, [text]);
 
     const onPress = useCallback(() => {
       dispatch(ViewerActions.update({ control: !control }));
