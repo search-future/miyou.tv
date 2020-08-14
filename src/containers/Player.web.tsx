@@ -111,8 +111,7 @@ const Player = memo(() => {
     }
   });
   const options = useRef<{ [key: string]: string }>({
-    "ad-lavc-o": "dual_mono_mode=auto",
-    "stream-lavf-o": "seekable=0"
+    "ad-lavc-o": "dual_mono_mode=auto"
   });
   const startSeconds = useRef(0);
   const initializing = useRef(true);
@@ -194,7 +193,15 @@ const Player = memo(() => {
 
   useEffect(() => {
     if (bootstrap) {
+      if (seekId.current != null) {
+        clearTimeout(seekId.current);
+      }
       dispatch(LoadingActions.start());
+      if (backendType === "epgstation") {
+        options.current["stream-lavf-o"] = "seekable=-1";
+      } else {
+        options.current["stream-lavf-o"] = "seekable=0";
+      }
       const program = programs[index];
       if (program && recordedProgram) {
         if (peakPlay && program.commentMaxSpeedTime) {
@@ -216,7 +223,10 @@ const Player = memo(() => {
         if (query) {
           uri += `?${query}`;
         }
+        retryCount.current = 0;
+        startSeconds.current = 0;
         mpvRef.current?.command("loadfile", uri, "replace", opts.join(","));
+        dispatch(PlayerActions.progress({ duration: 0, time: 0, position: 0 }));
         dispatch(PlayerActions.play());
       }
       setBootstrap(false);
@@ -227,7 +237,6 @@ const Player = memo(() => {
       dispatch(ViewerActions.update({ playing: false }));
     } else {
       initializing.current = false;
-      retryCount.current = 0;
       setBootstrap(true);
     }
   }, [programs, index, extraIndex]);

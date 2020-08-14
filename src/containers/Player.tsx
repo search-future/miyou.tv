@@ -210,13 +210,7 @@ const Player = () => {
             new Date(recordedProgram.start).getTime();
         }
         setStartSeconds(0);
-        dispatch(
-          PlayerActions.progress({
-            duration: 0,
-            time: 0,
-            position: 0
-          })
-        );
+        dispatch(PlayerActions.position(0));
       }
     }
     setBootstrap(false);
@@ -224,8 +218,12 @@ const Player = () => {
   useEffect(() => {
     if (pause && !initializing.current) {
       dispatch(ViewerActions.update({ playing: false }));
-    } else {
+    } else if (!bootstrap) {
       initializing.current = false;
+      if (seekId.current != null) {
+        clearTimeout(seekId.current);
+      }
+      dispatch(PlayerActions.progress({ duration: 0, time: 0, position: 0 }));
       setBootstrap(true);
     }
   }, [programs, index, extraIndex]);
