@@ -341,7 +341,8 @@ const ListProgram = memo(
             <View
               style={[
                 direction === "row" && containerStyle.row,
-                direction === "column" && containerStyle.column
+                direction === "column" && containerStyle.column,
+                styles.row
               ]}
             >
               <View style={[colorStyle.borderGray, styles.inputWrapper]}>
@@ -360,7 +361,7 @@ const ListProgram = memo(
                 />
               </View>
             </View>
-            <View style={[containerStyle.row]}>
+            <View style={[containerStyle.row, styles.row]}>
               <TouchableOpacity style={styles.button} onPress={onRemovePress}>
                 <FontAwesome5Icon name="minus" solid size={24} color={black} />
               </TouchableOpacity>
@@ -376,7 +377,7 @@ const ListProgram = memo(
   }
 );
 
-const breakpoint = 540;
+const breakpoint = 600;
 
 const styles = StyleSheet.create({
   container: {
@@ -399,6 +400,9 @@ const styles = StyleSheet.create({
   view: {
     flex: 1
   },
+  row: {
+    width: "100%"
+  },
   spacer: {
     flex: 1
   },
@@ -410,6 +414,7 @@ const styles = StyleSheet.create({
     minWidth: 180
   },
   input: {
+    borderWidth: 0,
     fontSize: 16
   },
   selected: {

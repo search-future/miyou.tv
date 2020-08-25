@@ -78,6 +78,7 @@ export default IconSelector;
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
+    backgroundColor: "#ffffff",
     flexDirection: "row"
   },
   iconWrapper: {
