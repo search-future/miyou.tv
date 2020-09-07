@@ -87,7 +87,7 @@ function open(programs: ProgramListProgram[], index: number) {
 }
 
 const ProgramList = memo(() => {
-  const listRef = useRef<FlatList>(null);
+  const listRef = useRef<FlatList<ProgramListProgram>>(null);
   const layoutCallbackId = useRef<number>();
   const scrollPos = useRef(0);
   const headerHeightRef = useRef(256);

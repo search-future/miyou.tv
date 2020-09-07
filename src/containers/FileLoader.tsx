@@ -57,7 +57,7 @@ type State = RootState & {
 };
 
 const FileLoader = memo(() => {
-  const listRef = useRef<FlatList>(null);
+  const listRef = useRef<FlatList<FileProgram>>(null);
   const layoutCallbackId = useRef<number>();
   const count = useRef(0);
 

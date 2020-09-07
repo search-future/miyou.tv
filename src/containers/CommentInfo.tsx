@@ -54,7 +54,7 @@ type State = RootState & {
 };
 
 const CommentInfo = memo(() => {
-  const listRef = useRef<FlatList>(null);
+  const listRef = useRef<FlatList<CommentData>>(null);
   const updaterId = useRef<number>();
   const lastUpdate = useRef(0);
 
