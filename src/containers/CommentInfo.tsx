@@ -298,7 +298,7 @@ const CommentInfo = memo(() => {
         </TouchableOpacity>
       </View>
       <FlatList
-        style={[styles.container, colorStyle.bgLight]}
+        style={[containerStyle.container, colorStyle.bgLight]}
         data={filteredData}
         removeClippedSubviews={Platform.OS !== "web"}
         windowSize={3}
@@ -443,9 +443,6 @@ const maxUpdateInterval = 5000;
 const textNowrap = Platform.OS === "web" ? { whiteSpace: "nowrap" } : {};
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   spacer: {
     flex: 1
   },

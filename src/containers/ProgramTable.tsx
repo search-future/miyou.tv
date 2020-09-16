@@ -590,7 +590,10 @@ const ProgramTable = memo(() => {
   );
 
   return (
-    <View style={[colorStyle.bgLight, styles.container]} onLayout={onLayout}>
+    <View
+      style={[containerStyle.container, colorStyle.bgLight]}
+      onLayout={onLayout}
+    >
       {containerWidth > 0 && (
         <Animated.View
           style={[
@@ -1086,9 +1089,6 @@ const hourHeight = 240;
 const scrollbarWidth = Platform.OS === "web" ? 20 : 0;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   header: {
     justifyContent: "flex-end",
     overflow: "hidden"

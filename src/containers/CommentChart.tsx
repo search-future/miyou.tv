@@ -27,6 +27,7 @@ import Balloon from "../components/Balloon";
 import { CommentInterval } from "../modules/commentPlayer";
 import { PlayerActions } from "../modules/player";
 import { active } from "../styles/color";
+import containerStyle from "../styles/container";
 import { RootState } from "../modules";
 import { SettingState } from "../modules/setting";
 
@@ -135,7 +136,7 @@ const CommentChart = memo(() => {
   );
 
   return (
-    <View style={styles.container} onLayout={onLayout}>
+    <View style={[containerStyle.container, styles.container]} onLayout={onLayout}>
       {containerHeight > 0 && (
         <Svg style={styles.svg} width={containerWidth} height={containerHeight}>
           <Path fill="none" stroke={active} strokeWidth={2} d={path} />
@@ -190,7 +191,6 @@ const PeakBalloon = memo(
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     marginHorizontal: 4
   },
   svg: {

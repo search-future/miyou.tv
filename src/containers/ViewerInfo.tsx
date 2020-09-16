@@ -61,7 +61,7 @@ const ViewerInfo = memo(() => {
   );
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={containerStyle.container}>
       {program &&
         (program.type === "file" ? (
           <FileCard dateFormatter={dateFormatter} {...program} />
@@ -435,9 +435,6 @@ const ExtraProgramCard = memo(
 );
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   cardRow: {
     alignItems: "flex-start",
     padding: 1

@@ -237,7 +237,10 @@ const Viewer = memo(() => {
   }, [programs, index, peakPlayEnabled]);
 
   return (
-    <View style={[colorStyle.bgLight, styles.container]} onLayout={onLayout}>
+    <View
+      style={[containerStyle.container, colorStyle.bgLight]}
+      onLayout={onLayout}
+    >
       {program && containerWidth > 0 && (
         <View
           style={isLandscape ? [containerStyle.row, styles.view] : styles.view}
@@ -405,9 +408,6 @@ export default Viewer;
 const breakpoint = 640;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   title: {
     flex: 1,
     marginHorizontal: 16,

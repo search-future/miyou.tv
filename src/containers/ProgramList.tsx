@@ -404,7 +404,10 @@ const ProgramList = memo(() => {
   );
 
   return (
-    <View style={[colorStyle.bgLight, styles.container]} onLayout={onLayout}>
+    <View
+      style={[containerStyle.container, colorStyle.bgLight]}
+      onLayout={onLayout}
+    >
       {containerWidth > 0 && (
         <Animated.View
           style={[
@@ -713,9 +716,6 @@ const ListProgram = memo(
 const breakpoint = 540;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   header: {
     justifyContent: "flex-end",
     overflow: "hidden"

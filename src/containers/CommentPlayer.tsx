@@ -29,6 +29,7 @@ import {
 } from "react-native";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
+import containerStyle from "../styles/container";
 import { RootState } from "../modules";
 import { CommentPlayerActions, CommentData } from "../modules/commentPlayer";
 import { ViewerProgram } from "../modules/viewer";
@@ -327,7 +328,10 @@ const CommentPlayer = memo(() => {
   );
 
   return (
-    <View style={styles.container} onLayout={onLayout}>
+    <View
+      style={[containerStyle.container, styles.container]}
+      onLayout={onLayout}
+    >
       <View style={styles.view}>{comments.map(commentRenderer)}</View>
     </View>
   );
@@ -389,7 +393,6 @@ const updateInterval = 1000;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     overflow: "hidden"
   },
   view: {

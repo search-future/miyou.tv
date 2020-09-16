@@ -211,7 +211,7 @@ const FileLoader = memo(() => {
   );
 
   return (
-    <View style={styles.container} onLayout={onLayout}>
+    <View style={containerStyle.container} onLayout={onLayout}>
       <View style={[containerStyle.row, colorStyle.bgDark]}>
         <TouchableOpacity style={styles.button} onPress={back}>
           <FontAwesome5Icon

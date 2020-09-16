@@ -20,6 +20,7 @@ import SafeAreaView from "react-native-safe-area-view";
 
 import StackNavigator from "./StackNavigator";
 import colorStyle from "../styles/color";
+import containerStyle from "../styles/container";
 import navigationRef from "./navigation";
 
 const AppNavigator = () => {
@@ -27,7 +28,7 @@ const AppNavigator = () => {
     <MenuProvider backHandler>
       <StatusBar barStyle="light-content" />
       <SafeAreaProvider>
-        <SafeAreaView style={[colorStyle.bgBlack, styles.container]}>
+        <SafeAreaView style={[colorStyle.bgBlack, containerStyle.container]}>
           <NavigationContainer ref={navigationRef}>
             <StackNavigator />
           </NavigationContainer>
@@ -37,9 +38,3 @@ const AppNavigator = () => {
   );
 };
 export default AppNavigator;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  }
-});
