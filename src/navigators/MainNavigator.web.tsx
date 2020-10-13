@@ -18,7 +18,13 @@ import React, {
   useRef,
   useContext
 } from "react";
-import { View, StyleSheet, LayoutChangeEvent } from "react-native";
+import {
+  View,
+  StyleSheet,
+  LayoutChangeEvent,
+  StyleProp,
+  ViewStyle
+} from "react-native";
 import { ThemeContext } from "react-native-elements";
 import { useDispatch, useSelector } from "react-redux";
 import { MenuProvider } from "react-native-popup-menu";
@@ -32,6 +38,7 @@ import { toastOptions } from "../config/constants";
 import { NavigationContainer } from "@react-navigation/native";
 import navigationRef from "./navigation";
 import StackNavigator from "./StackNavigator";
+import containerStyle from "../styles/container";
 
 type Setting = SettingState & {
   docking?: boolean;
@@ -40,7 +47,7 @@ type State = RootState & {
   setting: Setting;
 };
 
-const AppNavigator = () => {
+const MainNavigator = () => {
   const mode = useSelector<State, string>(({ viewer: { mode } }) => mode);
   switch (mode) {
     case "view": {
@@ -55,6 +62,7 @@ const AppNavigator = () => {
     }
   }
 };
+export default MainNavigator;
 
 const ChildView = () => (
   <MenuProvider backHandler>
@@ -93,7 +101,14 @@ const MainWindow = () => {
 
   const { theme } = useContext(ThemeContext);
 
-  const right = docking && isOpened && !stacking ? viewerLayout.width : 0;
+  const mainViewStyle: StyleProp<ViewStyle> =
+    docking && isOpened && !stacking
+      ? {
+          borderColor: theme.colors?.appBorder,
+          borderRightWidth: 1,
+          right: viewerLayout.width
+        }
+      : null;
   const covered = docking && isOpened && stacking;
 
   useEffect(
@@ -157,8 +172,8 @@ const MainWindow = () => {
   return (
     <>
       <Titlebar />
-      <View style={[styles.view]} onLayout={onLayout}>
-        <View style={[StyleSheet.absoluteFill, { right }]}>
+      <View style={[containerStyle.container]} onLayout={onLayout}>
+        <View style={[StyleSheet.absoluteFill, mainViewStyle]}>
           <MenuProvider backHandler>
             <NavigationContainer ref={navigationRef} theme={theme.Navigation}>
               <StackNavigator />
@@ -170,10 +185,3 @@ const MainWindow = () => {
     </>
   );
 };
-export default AppNavigator;
-
-const styles = StyleSheet.create({
-  view: {
-    flex: 1
-  }
-});

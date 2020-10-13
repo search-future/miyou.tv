@@ -24,7 +24,6 @@ import Splash from "./components/Splash";
 import rootReducer, { rootSaga, RootState } from "./modules";
 import init from "./utils/init";
 import persistConfig from "./config/persist";
-import baseTheme from "./themes/base";
 
 const App = () => (
   <Provider store={store}>
@@ -33,7 +32,7 @@ const App = () => (
       onBeforeLift={onBeforeLift}
       persistor={persistor as any}
     >
-      <ThemeProvider theme={baseTheme}>
+      <ThemeProvider>
         <AppNavigator />
       </ThemeProvider>
     </PersistGate>

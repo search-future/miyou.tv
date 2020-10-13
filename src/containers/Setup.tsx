@@ -962,6 +962,14 @@ const ViewSetup = memo(
 
     const { theme } = useContext(ThemeContext);
 
+    const colorSchemeChange = useCallback(
+      (colorScheme: ReactText) => {
+        if (onChanged) {
+          onChanged({ colorScheme });
+        }
+      },
+      [onChanged]
+    );
     const countModeChange = useCallback(
       (countMode: ReactText) => {
         if (onChanged) {
@@ -990,6 +998,33 @@ const ViewSetup = memo(
     return (
       <View style={styles.group}>
         <Text style={[styles.groupTitle]}>表示設定</Text>
+        <Text>テーマ</Text>
+        <View
+          style={[
+            styles.inputWrapper,
+            {
+              backgroundColor: theme.colors?.background,
+              borderColor: theme.colors?.border
+            }
+          ]}
+        >
+          <Picker
+            style={[
+              styles.picker,
+              {
+                backgroundColor: theme.colors?.background,
+                color: theme.colors?.default
+              }
+            ]}
+            itemStyle={[styles.pickerItem, { color: theme.colors?.default }]}
+            selectedValue={colorScheme}
+            onValueChange={colorSchemeChange}
+          >
+            <Picker.Item label="自動" value="" />
+            <Picker.Item label="Light" value="light" />
+            <Picker.Item label="Dark" value="dark" />
+          </Picker>
+        </View>
         <Text>表示するカウント</Text>
         <View
           style={[

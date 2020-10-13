@@ -11,25 +11,44 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { useContext } from "react";
-import { StatusBar } from "react-native";
+import React, { useContext, useEffect, useMemo, useState } from "react";
+import { Platform, useColorScheme } from "react-native";
 import { ThemeContext } from "react-native-elements";
-import { NavigationContainer } from "@react-navigation/native";
-import { MenuProvider } from "react-native-popup-menu";
+import { useSelector } from "react-redux";
 
-import StackNavigator from "./StackNavigator";
-import navigationRef from "./navigation";
+import MainNavigator from "./MainNavigator";
+import { RootState } from "../modules";
+import getTheme from "../themes";
 
 const AppNavigator = () => {
-  const { theme } = useContext(ThemeContext);
-
-  return (
-    <MenuProvider backHandler>
-      <StatusBar barStyle="light-content" />
-      <NavigationContainer ref={navigationRef} theme={theme.Navigation}>
-        <StackNavigator />
-      </NavigationContainer>
-    </MenuProvider>
+  const configColorScheme = useSelector<RootState, string>(
+    ({ setting }) => setting.view?.colorScheme
   );
+  const systemColorScheme = useColorScheme();
+
+  const [reset, setReset] = useState(false);
+
+  const { replaceTheme } = useContext(ThemeContext);
+
+  const colorScheme = useMemo(() => configColorScheme || systemColorScheme, [
+    configColorScheme,
+    systemColorScheme
+  ]);
+
+  useEffect(() => {
+    replaceTheme(getTheme(colorScheme));
+    if (Platform.OS === "ios") {
+      setReset(true);
+    }
+  }, [colorScheme]);
+  useEffect(() => {
+    setReset(false);
+  }, [reset]);
+
+  if (reset) {
+    return null;
+  }
+
+  return <MainNavigator />;
 };
 export default AppNavigator;

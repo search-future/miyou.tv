@@ -23,14 +23,19 @@ import StackNavigator from "./StackNavigator";
 import containerStyle from "../styles/container";
 import navigationRef from "./navigation";
 
-const AppNavigator = () => {
+const MainNavigator = () => {
   const { theme } = useContext(ThemeContext);
 
   return (
     <MenuProvider backHandler>
       <StatusBar barStyle="light-content" />
       <SafeAreaProvider>
-        <SafeAreaView style={[containerStyle.container]}>
+        <SafeAreaView
+          style={[
+            containerStyle.container,
+            { backgroundColor: theme.colors?.controlBgActive }
+          ]}
+        >
           <NavigationContainer ref={navigationRef} theme={theme.Navigation}>
             <StackNavigator />
           </NavigationContainer>
@@ -39,4 +44,4 @@ const AppNavigator = () => {
     </MenuProvider>
   );
 };
-export default AppNavigator;
+export default MainNavigator;
