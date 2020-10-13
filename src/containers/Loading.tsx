@@ -11,11 +11,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { memo } from "react";
+import React, { memo, useContext } from "react";
 import { ActivityIndicator, StyleSheet } from "react-native";
+import { ThemeContext } from "react-native-elements";
 import { useSelector } from "react-redux";
 
-import { active } from "../styles/color";
 import { RootState } from "../modules";
 
 const Loading = memo(() => {
@@ -26,10 +26,12 @@ const Loading = memo(() => {
     ({ loading }) => loading.blocking
   );
 
+  const { theme } = useContext(ThemeContext);
+
   return (
     <ActivityIndicator
       style={[styles.container, enabled && blocking && styles.blocker]}
-      color={active}
+      color={theme.colors?.primary}
       animating={enabled}
     />
   );

@@ -15,6 +15,7 @@ import React, {
   memo,
   useState,
   useEffect,
+  useContext,
   useCallback,
   useRef,
   useMemo
@@ -23,17 +24,14 @@ import {
   View,
   TouchableOpacity,
   StyleSheet,
-  LayoutChangeEvent,
-  Platform
+  LayoutChangeEvent
 } from "react-native";
-import { ButtonGroup, SearchBar } from "react-native-elements";
+import { ButtonGroup, SearchBar, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useNavigation, NavigationState } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 
-import colorStyle, { active, gray, light } from "../styles/color";
 import containerStyle from "../styles/container";
-import textStyle from "../styles/text";
 import { ProgramActions, ProgramState } from "../modules/program";
 
 const AppFooter = memo(({ route }: { route?: NavigationState }) => {
@@ -41,6 +39,8 @@ const AppFooter = memo(({ route }: { route?: NavigationState }) => {
 
   const [containerWidth, setContainerWidth] = useState(0);
   const [searchBarVisible, setSearchBarVisible] = useState(false);
+
+  const { theme } = useContext(ThemeContext);
 
   useEffect(
     () => () => {
@@ -67,16 +67,28 @@ const AppFooter = memo(({ route }: { route?: NavigationState }) => {
   }, []);
 
   return (
-    <View style={colorStyle.bgDark} onLayout={onLayout}>
+    <View
+      style={[containerStyle.row, { backgroundColor: theme.colors?.controlBg }]}
+      onLayout={onLayout}
+    >
       {containerWidth <= breakpoint && (
-        <View style={[containerStyle.row, colorStyle.bgDark]}>
+        <>
           <FooterButtons route={route} />
           <TouchableOpacity style={styles.searchButton} onPress={openSearchBar}>
-            <FontAwesome5Icon name="search" solid size={24} color={light} />
+            <FontAwesome5Icon
+              name="search"
+              solid
+              size={24}
+              color={theme.colors?.control}
+            />
           </TouchableOpacity>
           {searchBarVisible && (
             <View
-              style={[containerStyle.row, colorStyle.bgDark, styles.searchBox]}
+              style={[
+                containerStyle.row,
+                styles.searchBox,
+                { backgroundColor: theme.colors?.controlBg }
+              ]}
             >
               <FooterSearchBar />
               <TouchableOpacity
@@ -87,12 +99,12 @@ const AppFooter = memo(({ route }: { route?: NavigationState }) => {
                   name="caret-down"
                   solid
                   size={24}
-                  color={light}
+                  color={theme.colors?.control}
                 />
               </TouchableOpacity>
             </View>
           )}
-        </View>
+        </>
       )}
     </View>
   );
@@ -102,8 +114,9 @@ export default AppFooter;
 const FooterButtons = memo(({ route }: { route?: NavigationState }) => {
   const navigation = useNavigation();
 
-  const selectedIndex = useMemo(() => route?.index, [route]);
+  const { theme } = useContext(ThemeContext);
 
+  const selectedIndex = useMemo(() => route?.index, [route]);
   const buttons = useMemo(
     () => [
       {
@@ -112,7 +125,11 @@ const FooterButtons = memo(({ route }: { route?: NavigationState }) => {
             name="th"
             solid
             size={24}
-            color={selectedIndex === 0 ? active : light}
+            color={
+              selectedIndex === 0
+                ? theme.colors?.primary
+                : theme.colors?.control
+            }
           />
         )
       },
@@ -122,7 +139,11 @@ const FooterButtons = memo(({ route }: { route?: NavigationState }) => {
             name="list"
             solid
             size={24}
-            color={selectedIndex === 1 ? active : light}
+            color={
+              selectedIndex === 1
+                ? theme.colors?.primary
+                : theme.colors?.control
+            }
           />
         )
       },
@@ -132,12 +153,16 @@ const FooterButtons = memo(({ route }: { route?: NavigationState }) => {
             name="list-ol"
             solid
             size={24}
-            color={selectedIndex === 2 ? active : light}
+            color={
+              selectedIndex === 2
+                ? theme.colors?.primary
+                : theme.colors?.control
+            }
           />
         )
       }
     ],
-    [selectedIndex]
+    [selectedIndex, theme.colors?.primary, theme.colors?.control]
   );
 
   const navigate = useCallback(
@@ -152,9 +177,16 @@ const FooterButtons = memo(({ route }: { route?: NavigationState }) => {
 
   return (
     <ButtonGroup
-      containerStyle={[colorStyle.bgDark, styles.groupContainer]}
+      containerStyle={[
+        styles.groupContainer,
+        {
+          backgroundColor: theme.colors?.controlBg,
+          borderColor: theme.colors?.controlBorder
+        }
+      ]}
+      innerBorderStyle={{ color: theme.colors?.controlBorder }}
+      selectedButtonStyle={[{ backgroundColor: theme.colors?.controlBgActive }]}
       containerBorderRadius={0}
-      selectedButtonStyle={colorStyle.bgBlack}
       buttons={buttons}
       selectedIndex={selectedIndex}
       onPress={navigate}
@@ -189,13 +221,8 @@ const FooterSearchBar = memo(() => {
 
   return (
     <SearchBar
-      containerStyle={[colorStyle.bgDark, styles.searchContainer]}
-      inputContainerStyle={[colorStyle.bgGrayDark, styles.searchInputContainer]}
-      inputStyle={[textStyle.center, colorStyle.light, styles.searchInput]}
+      containerStyle={[containerStyle.container]}
       round
-      searchIcon={
-        <FontAwesome5Icon name="search" solid size={16} color={gray} />
-      }
       placeholder="Search"
       value={query}
       onChangeText={onChangeQuery}
@@ -233,19 +260,5 @@ const styles = StyleSheet.create({
     left: 0,
     position: "absolute",
     right: 0
-  },
-  searchContainer: {
-    borderBottomWidth: 0,
-    borderTopWidth: 0,
-    flex: 1,
-    padding: 0
-  },
-  searchInputContainer: {
-    height: 32,
-    overflow: "hidden"
-  },
-  searchInput: {
-    fontSize: 16,
-    minHeight: Platform.OS === "web" ? 32 : 64
   }
 });

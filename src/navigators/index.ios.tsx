@@ -11,25 +11,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React from "react";
-import { StyleSheet, StatusBar } from "react-native";
+import React, { useContext } from "react";
+import { StatusBar } from "react-native";
+import { ThemeContext } from "react-native-elements";
 import { NavigationContainer } from "@react-navigation/native";
 import { MenuProvider } from "react-native-popup-menu";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import SafeAreaView from "react-native-safe-area-view";
 
 import StackNavigator from "./StackNavigator";
-import colorStyle from "../styles/color";
 import containerStyle from "../styles/container";
 import navigationRef from "./navigation";
 
 const AppNavigator = () => {
+  const { theme } = useContext(ThemeContext);
+
   return (
     <MenuProvider backHandler>
       <StatusBar barStyle="light-content" />
       <SafeAreaProvider>
-        <SafeAreaView style={[colorStyle.bgBlack, containerStyle.container]}>
-          <NavigationContainer ref={navigationRef}>
+        <SafeAreaView style={[containerStyle.container]}>
+          <NavigationContainer ref={navigationRef} theme={theme.Navigation}>
             <StackNavigator />
           </NavigationContainer>
         </SafeAreaView>

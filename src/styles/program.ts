@@ -50,9 +50,6 @@ const programStyle = StyleSheet.create({
   listHeader: {
     paddingLeft: 16,
     paddingRight: 16
-  },
-  selected: {
-    backgroundColor: "#9991ff66"
   }
 });
 export default programStyle;

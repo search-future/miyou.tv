@@ -12,8 +12,7 @@ limitations under the License.
 */
 
 import React from "react";
-import { StyleSheet } from "react-native";
-import { Image } from "react-native-elements";
+import { Image, StyleSheet } from "react-native";
 
 const Splash = () => (
   <Image

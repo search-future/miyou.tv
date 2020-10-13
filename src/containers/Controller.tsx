@@ -11,16 +11,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { useCallback, useMemo, memo } from "react";
+import React, { memo, useContext, useCallback, useMemo } from "react";
 import { TouchableOpacity, View, StyleSheet, Platform } from "react-native";
-import { Text } from "react-native-elements";
-import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
+import { Text, ThemeContext } from "react-native-elements";
+import FontAwesome5Icon, {
+  FontAwesome5IconProps
+} from "react-native-vector-icons/FontAwesome5";
 import { Menu, MenuTrigger, MenuOptions } from "react-native-popup-menu";
 import { useDispatch, useSelector } from "react-redux";
 
 import CustomSlider from "../components/CustomSlider";
 import PlayerMenu from "./PlayerMenu";
-import colorStyle, { light } from "../styles/color";
 import containerStyle from "../styles/container";
 import { RootState } from "../modules";
 import { SettingState, SettingActions } from "../modules/setting";
@@ -57,11 +58,7 @@ const Controller = memo(() => (
       <ToggleCommentButton />
       <ToggleExpandButton />
       {Platform.OS === "web" && <ToggleFullScreenButton />}
-      <PlayerMenu
-        triggerComponent={
-          <FontAwesome5Icon name="cog" solid color={light} size={24} />
-        }
-      />
+      <PlayerMenu triggerComponent={<ControlIcon name="cog" solid />} />
     </View>
   </View>
 ));
@@ -77,12 +74,7 @@ const TogglePlayButton = memo(() => {
 
   return (
     <TouchableOpacity style={styles.button} onPress={onPress}>
-      <FontAwesome5Icon
-        name={pause ? "play" : "pause"}
-        solid
-        color={light}
-        size={24}
-      />
+      <ControlIcon name={pause ? "play" : "pause"} solid />
     </TouchableOpacity>
   );
 });
@@ -91,6 +83,8 @@ const JumpButton = memo(({ seconds }: { seconds: number }) => {
   const dispatch = useDispatch();
   const time = useSelector<State, number>(({ player }) => player.time);
 
+  const { theme } = useContext(ThemeContext);
+
   const onPress = useCallback(() => {
     dispatch(PlayerActions.time(time + seconds * 1000));
   }, [time, seconds]);
@@ -98,11 +92,23 @@ const JumpButton = memo(({ seconds }: { seconds: number }) => {
   return (
     <TouchableOpacity style={styles.button} onPress={onPress}>
       {seconds < 0 && (
-        <FontAwesome5Icon name="caret-left" solid color={light} size={24} />
+        <FontAwesome5Icon
+          name="caret-left"
+          solid
+          color={theme.colors?.control}
+          size={24}
+        />
       )}
-      <Text style={colorStyle.light}>{Math.abs(seconds)}</Text>
+      <Text style={[{ color: theme.colors?.control }]}>
+        {Math.abs(seconds)}
+      </Text>
       {seconds > 0 && (
-        <FontAwesome5Icon name="caret-right" solid color={light} size={24} />
+        <FontAwesome5Icon
+          name="caret-right"
+          solid
+          color={theme.colors?.control}
+          size={24}
+        />
       )}
     </TouchableOpacity>
   );
@@ -119,6 +125,8 @@ const VolumeController = memo(() => {
       10
     )
   );
+
+  const { theme } = useContext(ThemeContext);
 
   const volumeIcon = useMemo(() => {
     if (mute) {
@@ -143,14 +151,20 @@ const VolumeController = memo(() => {
   return (
     <Menu>
       <MenuTrigger customStyles={{ triggerWrapper: styles.button }}>
-        <FontAwesome5Icon name={volumeIcon} solid color={light} size={24} />
+        <ControlIcon name={volumeIcon} solid />
       </MenuTrigger>
       <MenuOptions>
         <View
-          style={[containerStyle.row, colorStyle.bgBlack, styles.volumeOption]}
+          style={[
+            containerStyle.row,
+            styles.volumeOption,
+            {
+              backgroundColor: theme.colors?.controlBgActive
+            }
+          ]}
         >
           <TouchableOpacity style={styles.button} onPress={toggleMute}>
-            <FontAwesome5Icon name={volumeIcon} solid color={light} size={24} />
+            <ControlIcon name={volumeIcon} solid />
           </TouchableOpacity>
           <CustomSlider
             style={styles.slider}
@@ -182,12 +196,7 @@ const ToggleCommentButton = memo(() => {
 
   return (
     <TouchableOpacity style={styles.button} onPress={onPress}>
-      <FontAwesome5Icon
-        name={enabled ? "comment-dots" : "comment-slash"}
-        solid
-        color={light}
-        size={24}
-      />
+      <ControlIcon name={enabled ? "comment-dots" : "comment-slash"} solid />
     </TouchableOpacity>
   );
 });
@@ -204,12 +213,7 @@ const ToggleExpandButton = memo(() => {
 
   return (
     <TouchableOpacity style={styles.button} onPress={onPress}>
-      <FontAwesome5Icon
-        name={expand ? "bars" : "arrows-alt"}
-        solid
-        color={light}
-        size={24}
-      />
+      <ControlIcon name={expand ? "bars" : "arrows-alt"} solid />
     </TouchableOpacity>
   );
 });
@@ -226,14 +230,22 @@ const ToggleFullScreenButton = memo(() => {
 
   return (
     <TouchableOpacity style={styles.button} onPress={onPress}>
-      <FontAwesome5Icon
-        name={fullScreen ? "compress" : "expand"}
-        color={light}
-        size={24}
-      />
+      <ControlIcon name={fullScreen ? "compress" : "expand"} solid />
     </TouchableOpacity>
   );
 });
+
+const ControlIcon = ({ color, size, ...props }: FontAwesome5IconProps) => {
+  const { theme } = useContext(ThemeContext);
+
+  return (
+    <FontAwesome5Icon
+      {...props}
+      color={color || theme.colors?.control}
+      size={size || 24}
+    />
+  );
+};
 
 const jumpForwardSeconds = 30;
 const jumpBackwardSeconds = -10;

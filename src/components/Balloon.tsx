@@ -13,6 +13,7 @@ limitations under the License.
 
 import React, { useMemo, PropsWithChildren } from "react";
 import {
+  Text,
   TouchableOpacity,
   TouchableOpacityProps,
   View,
@@ -22,7 +23,6 @@ import {
   StyleProp,
   TextStyle
 } from "react-native";
-import { Text } from "react-native-elements";
 
 type Props = PropsWithChildren<
   {
@@ -113,10 +113,11 @@ const styles = StyleSheet.create({
     borderTopWidth: 8,
     borderTopColor: "transparent",
     height: 0,
-    top: 0,
+    top: -1,
     width: 0
   },
   text: {
+    fontSize: 14,
     textAlign: "center"
   }
 });

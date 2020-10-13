@@ -11,9 +11,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { useCallback, PropsWithChildren } from "react";
+import React, { useCallback, PropsWithChildren, useContext } from "react";
 import { TouchableOpacity, StyleProp, ViewStyle } from "react-native";
-import { Text, TextProps } from "react-native-elements";
+import { Text, TextProps, ThemeContext } from "react-native-elements";
 import { remote } from "electron";
 
 type Props = PropsWithChildren<
@@ -23,12 +23,15 @@ type Props = PropsWithChildren<
     url: string;
   } & TextProps
 >;
-const CustomLink = ({
+const LinkText = ({
   activeOpacity,
   containerStyle,
   url,
+  style,
   ...props
 }: Props) => {
+  const { theme } = useContext(ThemeContext);
+
   const openUrl = useCallback(() => {
     remote.shell.openExternal(url);
   }, [url]);
@@ -36,11 +39,11 @@ const CustomLink = ({
   return (
     <TouchableOpacity
       activeOpacity={activeOpacity}
-      style={containerStyle}
+      style={[containerStyle]}
       onPress={openUrl}
     >
-      <Text {...props} />
+      <Text style={[{ color: theme.colors?.primary }, style]} {...props} />
     </TouchableOpacity>
   );
 };
-export default CustomLink;
+export default LinkText;

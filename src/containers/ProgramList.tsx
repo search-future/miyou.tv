@@ -15,6 +15,7 @@ import React, {
   memo,
   useState,
   useEffect,
+  useContext,
   useCallback,
   useMemo,
   useRef,
@@ -24,7 +25,6 @@ import {
   FlatList,
   TouchableOpacity,
   View,
-  ViewStyle,
   StyleSheet,
   Platform,
   Animated,
@@ -35,13 +35,12 @@ import {
   NativeScrollEvent
 } from "react-native";
 import { Picker } from "@react-native-community/picker";
-import { Badge, ListItem, Text } from "react-native-elements";
+import { Badge, ListItem, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useDispatch, useSelector } from "react-redux";
 
 import Balloon from "../components/Balloon";
 import IconSelector from "../components/IconSelector";
-import colorStyle, { active, black, light } from "../styles/color";
 import containerStyle from "../styles/container";
 import textStyle from "../styles/text";
 import programStyle from "../styles/program";
@@ -135,6 +134,8 @@ const ProgramList = memo(() => {
   );
 
   const [containerWidth, setContainerWidth] = useState(0);
+
+  const { theme } = useContext(ThemeContext);
 
   const panResponder = useMemo(
     () =>
@@ -404,19 +405,16 @@ const ProgramList = memo(() => {
   );
 
   return (
-    <View
-      style={[containerStyle.container, colorStyle.bgLight]}
-      onLayout={onLayout}
-    >
+    <View style={[containerStyle.container]} onLayout={onLayout}>
       {containerWidth > 0 && (
         <Animated.View
           style={[
             containerWidth > breakpoint
               ? containerStyle.row
               : containerStyle.column,
-            colorStyle.bgBlack,
             styles.header,
             {
+              backgroundColor: theme.colors?.controlBgActive,
               maxHeight: headerHeight
             }
           ]}
@@ -436,13 +434,21 @@ const ProgramList = memo(() => {
             {archiveActive && (
               <IconSelector
                 containerStyle={[
-                  colorStyle.bgDark,
-                  colorStyle.borderGrayDark,
-                  programStyle.headerControl
+                  programStyle.headerControl,
+                  {
+                    backgroundColor: theme.colors?.controlBg,
+                    borderColor: theme.colors?.controlBorder
+                  }
                 ]}
-                style={colorStyle.bgDark}
-                color={light}
-                icon={<FontAwesome5Icon name="database" solid color={light} />}
+                style={[{ backgroundColor: theme.colors?.controlBg }]}
+                color={theme.colors?.control}
+                icon={
+                  <FontAwesome5Icon
+                    name="database"
+                    solid
+                    color={theme.colors?.control}
+                  />
+                }
                 selectedValue={useArchive ? 1 : 0}
                 onValueChange={useArchiveChange}
                 items={[
@@ -453,14 +459,21 @@ const ProgramList = memo(() => {
             )}
             <IconSelector
               containerStyle={[
-                colorStyle.bgDark,
-                colorStyle.borderGrayDark,
                 programStyle.headerControl,
-                styles.sortPicker
+                {
+                  backgroundColor: theme.colors?.controlBg,
+                  borderColor: theme.colors?.controlBorder
+                }
               ]}
-              style={colorStyle.bgDark}
-              color={light}
-              icon={<FontAwesome5Icon name="sort" solid color={light} />}
+              style={[{ backgroundColor: theme.colors?.controlBg }]}
+              color={theme.colors?.control}
+              icon={
+                <FontAwesome5Icon
+                  name="sort"
+                  solid
+                  color={theme.colors?.control}
+                />
+              }
               selectedValue={reverse ? 1 : 0}
               onValueChange={reverseChange}
               items={[
@@ -490,21 +503,29 @@ const ProgramList = memo(() => {
               ]}
             >
               {hits > 0 && (
-                <Text style={[textStyle.right, colorStyle.light]}>
+                <Text
+                  style={[textStyle.right, { color: theme.colors?.control }]}
+                >
                   {startIndex}-{endIndex}/{hits}
                 </Text>
               )}
             </View>
             <IconSelector
               containerStyle={[
-                colorStyle.bgDark,
-                colorStyle.borderGrayDark,
-                programStyle.headerControl
+                programStyle.headerControl,
+                {
+                  backgroundColor: theme.colors?.controlBg,
+                  borderColor: theme.colors?.controlBorder
+                }
               ]}
-              style={colorStyle.bgDark}
-              color={light}
+              style={[{ backgroundColor: theme.colors?.controlBg }]}
+              color={theme.colors?.control}
               icon={
-                <FontAwesome5Icon name="arrows-alt-v" solid color={light} />
+                <FontAwesome5Icon
+                  name="arrows-alt-v"
+                  solid
+                  color={theme.colors?.control}
+                />
               }
               selectedValue={view}
               onValueChange={viewChange}
@@ -524,11 +545,8 @@ const ProgramList = memo(() => {
           {...panResponder.panHandlers}
         >
           <FlatList
-            style={programStyle.list}
-            contentContainerStyle={[
-              colorStyle.bgWhite,
-              programStyle.listContents
-            ]}
+            style={[programStyle.list]}
+            contentContainerStyle={[programStyle.listContents]}
             data={programs}
             ref={listRef}
             keyExtractor={keyExtractor}
@@ -545,7 +563,7 @@ const ProgramList = memo(() => {
               name="angle-double-left"
               solid
               style={styles.pageButton}
-              color={active}
+              color={theme.colors?.primary}
               size={16}
             />
           </TouchableOpacity>
@@ -554,20 +572,36 @@ const ProgramList = memo(() => {
               name="angle-left"
               solid
               style={styles.pageButton}
-              color={active}
+              color={theme.colors?.primary}
               size={16}
             />
           </TouchableOpacity>
           <View
             style={[
-              colorStyle.bgWhite,
-              colorStyle.borderLight,
-              styles.pagePickerWrapper
+              styles.pagePickerWrapper,
+              {
+                backgroundColor: theme.colors?.background,
+                borderColor: theme.colors?.divider
+              },
+              Platform.OS === "ios" && {
+                borderWidth: 0,
+                backgroundColor: "transparent",
+                maxHeight: 96
+              }
             ]}
           >
             <Picker
-              style={styles.pagePicker}
-              itemStyle={[styles.pagePickerItem, colorStyle.black as ViewStyle]}
+              style={[
+                styles.pagePicker,
+                {
+                  backgroundColor: "transparent",
+                  color: theme.colors?.default
+                }
+              ]}
+              itemStyle={[
+                styles.pagePickerItem,
+                { color: theme.colors?.default }
+              ]}
               selectedValue={String(page)}
               onValueChange={pageChange}
             >
@@ -579,7 +613,7 @@ const ProgramList = memo(() => {
               name="angle-right"
               solid
               style={styles.pageButton}
-              color={active}
+              color={theme.colors?.primary}
               size={16}
             />
           </TouchableOpacity>
@@ -588,7 +622,7 @@ const ProgramList = memo(() => {
               name="angle-double-right"
               solid
               style={styles.pageButton}
-              color={active}
+              color={theme.colors?.primary}
               size={16}
             />
           </TouchableOpacity>
@@ -602,7 +636,7 @@ export default ProgramList;
 const ListHeader = memo(({ query, hits }: { query?: string; hits: number }) =>
   query ? (
     <View style={programStyle.listHeader}>
-      <Text h4 style={colorStyle.black}>
+      <Text h3>
         "{query}"の検索結果 ({hits}件)
       </Text>
     </View>
@@ -631,6 +665,8 @@ const ListProgram = memo(
       commentMaxSpeed = 0,
       commentSpeed = 0
     } = props;
+
+    const { theme } = useContext(ThemeContext);
 
     const count = useMemo(() => {
       switch (countMode) {
@@ -672,23 +708,21 @@ const ListProgram = memo(
 
     return (
       <ListItem
-        containerStyle={[selected && programStyle.selected]}
-        titleStyle={[textStyle.bold, colorStyle.black]}
+        containerStyle={[
+          selected && { backgroundColor: theme.colors?.selected }
+        ]}
         title={fullTitle}
-        bottomDivider
         chevron
+        bottomDivider
         Component={TouchableOpacity}
         subtitle={
           <View style={[containerStyle.row, containerStyle.wrap]}>
             <Badge
-              badgeStyle={[
-                colorStyle.borderLight,
-                { backgroundColor: category.color }
-              ]}
+              badgeStyle={[{ backgroundColor: category.color }]}
               value={category.name}
             />
-            <Text style={colorStyle.black}> {channelName} </Text>
-            <Text style={colorStyle.black}>
+            <Text> {channelName} </Text>
+            <Text>
               {dateFormatter(start)}({Math.round(duration / 60000)}分)
             </Text>
           </View>
@@ -697,7 +731,6 @@ const ListProgram = memo(
           count > 0 ? (
             <Balloon
               wrapperStyle={programStyle.listItemLeft}
-              color={black}
               backgroundColor={balloonColor}
               pointing="right"
             >
@@ -746,14 +779,7 @@ const styles = StyleSheet.create({
     maxHeight: 32,
     marginLeft: 8,
     marginRight: 8,
-    minWidth: 120,
-    ...(Platform.OS === "ios"
-      ? {
-          borderWidth: 0,
-          backgroundColor: "transparent",
-          maxHeight: 96
-        }
-      : {})
+    minWidth: 120
   },
   pagePicker: {
     borderWidth: 0,

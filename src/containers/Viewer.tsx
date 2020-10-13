@@ -15,6 +15,7 @@ import React, {
   memo,
   useState,
   useEffect,
+  useContext,
   useCallback,
   useMemo,
   useRef
@@ -27,7 +28,7 @@ import {
   LayoutChangeEvent,
   ImageSourcePropType
 } from "react-native";
-import { ButtonGroup, Image, Text } from "react-native-elements";
+import { ButtonGroup, Image, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import Axios from "axios";
@@ -40,7 +41,6 @@ import Player from "./Player";
 import PlayerContainer from "./PlayerContainer";
 import Seekbar from "./Seekbar";
 import ViewerInfo from "./ViewerInfo";
-import colorStyle, { dark, grayDark, light } from "../styles/color";
 import containerStyle from "../styles/container";
 import { RootState } from "../modules";
 import { SettingState } from "../modules/setting";
@@ -91,6 +91,8 @@ const Viewer = memo(() => {
   );
   const [preview, setPreview] = useState<ImageSourcePropType>({});
 
+  const { theme } = useContext(ThemeContext);
+
   const program = programs[index];
   const tabIndex = playing ? selectedIndex : 0;
 
@@ -108,13 +110,17 @@ const Viewer = memo(() => {
   const tabButtons = useMemo(
     () => [
       {
-        element: () => <Text style={colorStyle.light}>情報</Text>
+        element: () => (
+          <Text style={[{ color: theme.colors?.control }]}>情報</Text>
+        )
       },
       {
-        element: () => <Text style={colorStyle.light}>コメント</Text>
+        element: () => (
+          <Text style={[{ color: theme.colors?.control }]}>コメント</Text>
+        )
       }
     ],
-    []
+    [theme.colors?.control]
   );
 
   useEffect(
@@ -238,7 +244,10 @@ const Viewer = memo(() => {
 
   return (
     <View
-      style={[containerStyle.container, colorStyle.bgLight]}
+      style={[
+        containerStyle.container,
+        { backgroundColor: theme.colors?.appBg }
+      ]}
       onLayout={onLayout}
     >
       {program && containerWidth > 0 && (
@@ -268,10 +277,20 @@ const Viewer = memo(() => {
                 ]}
               >
                 <TouchableOpacity style={styles.button} onPress={play}>
-                  <FontAwesome5Icon name="play" solid color={light} size={24} />
+                  <FontAwesome5Icon
+                    name="play"
+                    solid
+                    color={theme.colors?.control}
+                    size={24}
+                  />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={peakPlay}>
-                  <FontAwesome5Icon name="star" solid color={light} size={24} />
+                  <FontAwesome5Icon
+                    name="star"
+                    solid
+                    color={theme.colors?.control}
+                    size={24}
+                  />
                 </TouchableOpacity>
               </View>
               {playing && (
@@ -287,7 +306,12 @@ const Viewer = memo(() => {
                 </PlayerContainer>
               )}
               {playing && controlEnabled && (
-                <View style={styles.control}>
+                <View
+                  style={[
+                    styles.control,
+                    { backgroundColor: theme.colors?.controlFg }
+                  ]}
+                >
                   <Seekbar />
                   <Controller />
                 </View>
@@ -299,8 +323,12 @@ const Viewer = memo(() => {
                 style={[
                   containerStyle.row,
                   containerStyle.nowrap,
-                  colorStyle.bgDark,
-                  (expand || isLandscape) && styles.primaryHeaderExpand
+                  ...(expand || isLandscape
+                    ? [
+                        styles.primaryHeaderExpand,
+                        { backgroundColor: theme.colors?.controlFg }
+                      ]
+                    : [{ backgroundColor: theme.colors?.controlBg }])
                 ]}
               >
                 {mode === "stack" && (
@@ -308,7 +336,7 @@ const Viewer = memo(() => {
                     <FontAwesome5Icon
                       name="chevron-circle-left"
                       solid
-                      color={light}
+                      color={theme.colors?.control}
                       size={24}
                     />
                   </TouchableOpacity>
@@ -318,7 +346,7 @@ const Viewer = memo(() => {
                     <FontAwesome5Icon
                       name="external-link-alt"
                       solid
-                      color={light}
+                      color={theme.colors?.control}
                       size={24}
                     />
                   </TouchableOpacity>
@@ -328,12 +356,12 @@ const Viewer = memo(() => {
                     <FontAwesome5Icon
                       name="columns"
                       solid
-                      color={light}
+                      color={theme.colors?.control}
                       size={24}
                     />
                   </TouchableOpacity>
                 )}
-                <Text h4 style={[colorStyle.light, styles.title]}>
+                <Text h2 style={[[{ color: theme.colors?.control }]]}>
                   {program.rank ? `${program.rank}. ` : ""}
                   {program.fullTitle}
                 </Text>
@@ -342,7 +370,7 @@ const Viewer = memo(() => {
                     <FontAwesome5Icon
                       name="times"
                       solid
-                      color={light}
+                      color={theme.colors?.control}
                       size={24}
                     />
                   </TouchableOpacity>
@@ -359,7 +387,7 @@ const Viewer = memo(() => {
                   solid
                   style={styles.iconShadow}
                   size={24}
-                  color={light}
+                  color={theme.colors?.control}
                 />
               </TouchableOpacity>
             )}
@@ -372,7 +400,7 @@ const Viewer = memo(() => {
                   name="chevron-right"
                   solid
                   style={styles.iconShadow}
-                  color={light}
+                  color={theme.colors?.control}
                   size={24}
                 />
               </TouchableOpacity>
@@ -381,15 +409,22 @@ const Viewer = memo(() => {
           {(!playing || !expand) && (
             <View
               style={[
-                colorStyle.bgDark,
-                isLandscape ? styles.secondaryColumn : styles.secondaryRow
+                isLandscape ? styles.secondaryColumn : styles.secondaryRow,
+                { backgroundColor: theme.colors?.controlBg }
               ]}
             >
               <ButtonGroup
-                containerStyle={[colorStyle.bgDark, colorStyle.borderGrayDark]}
+                containerStyle={[
+                  {
+                    backgroundColor: theme.colors?.controlBg,
+                    borderColor: theme.colors?.controlBorder
+                  }
+                ]}
+                innerBorderStyle={{ color: theme.colors?.controlBorder }}
+                selectedButtonStyle={[
+                  { backgroundColor: theme.colors?.controlBgActive }
+                ]}
                 containerBorderRadius={0}
-                selectedButtonStyle={colorStyle.bgBlack}
-                innerBorderStyle={{ color: grayDark }}
                 buttons={tabButtons}
                 selectedIndex={tabIndex}
                 onPress={selectedIndexChange}
@@ -432,14 +467,12 @@ const styles = StyleSheet.create({
     maxWidth: 480
   },
   primaryHeaderExpand: {
-    backgroundColor: "#3a3a3aa8",
     left: 0,
     position: "absolute",
     right: 0,
     top: 0
   },
   control: {
-    backgroundColor: "#3a3a3aa8",
     bottom: 0,
     left: 0,
     position: "absolute",
@@ -453,7 +486,7 @@ const styles = StyleSheet.create({
   },
   iconShadow: {
     opacity: 0.6,
-    textShadowColor: dark,
+    textShadowColor: "#000000",
     textShadowOffset: {
       height: 1,
       width: 1

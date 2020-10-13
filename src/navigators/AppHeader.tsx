@@ -15,6 +15,7 @@ import React, {
   memo,
   useState,
   useEffect,
+  useContext,
   useCallback,
   useRef,
   useMemo
@@ -31,7 +32,8 @@ import {
   ButtonProps,
   Image,
   SearchBar,
-  Text
+  Text,
+  ThemeContext
 } from "react-native-elements";
 import FontAwesome5Icon, {
   FontAwesome5IconProps
@@ -39,9 +41,7 @@ import FontAwesome5Icon, {
 import { useNavigation, NavigationState } from "@react-navigation/native";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
-import colorStyle, { active, gray, light } from "../styles/color";
 import containerStyle from "../styles/container";
-import textStyle from "../styles/text";
 import { ServiceActions } from "../modules/service";
 import { ProgramActions, ProgramState } from "../modules/program";
 import { appName } from "../config/constants";
@@ -50,6 +50,8 @@ const AppHeader = memo(({ route }: { route?: NavigationState }) => {
   const layoutCallbackId = useRef<number>();
 
   const [containerWidth, setContainerWidth] = useState(0);
+
+  const { theme } = useContext(ThemeContext);
 
   useEffect(
     () => () => {
@@ -68,8 +70,12 @@ const AppHeader = memo(({ route }: { route?: NavigationState }) => {
       setContainerWidth(containerWidth);
     }, 200);
   }, []);
+
   return (
-    <View style={colorStyle.bgDark} onLayout={onLayout}>
+    <View
+      style={[containerStyle.row, { backgroundColor: theme.colors?.controlBg }]}
+      onLayout={onLayout}
+    >
       {containerWidth > breakpoint ? (
         <WideHeader route={route} />
       ) : (
@@ -111,13 +117,18 @@ const WideHeader = memo(({ route }: { route?: NavigationState }) => {
   }, []);
 
   return (
-    <View style={containerStyle.row}>
-      <View style={[containerStyle.row, containerStyle.left, styles.left]}>
+    <>
+      <View
+        style={[
+          containerStyle.container,
+          containerStyle.row,
+          containerStyle.left
+        ]}
+      >
         {Platform.OS !== "web" && (
           <Image
-            containerStyle={styles.iconContainer}
-            placeholderStyle={colorStyle.bgTransparent}
-            style={styles.icon}
+            containerStyle={[styles.iconContainer]}
+            style={[styles.icon]}
             source={require("../../assets/icon_32x32.png")}
           />
         )}
@@ -143,10 +154,22 @@ const WideHeader = memo(({ route }: { route?: NavigationState }) => {
           onPress={showRanking}
         />
       </View>
-      <View style={[containerStyle.row, containerStyle.center, styles.center]}>
+      <View
+        style={[
+          containerStyle.container,
+          containerStyle.row,
+          containerStyle.center
+        ]}
+      >
         <HeaderSearchBar />
       </View>
-      <View style={[containerStyle.row, containerStyle.right, styles.right]}>
+      <View
+        style={[
+          containerStyle.container,
+          containerStyle.row,
+          containerStyle.right
+        ]}
+      >
         <HeaderButton
           title="ファイル"
           icon={{ name: "folder-open" }}
@@ -155,7 +178,7 @@ const WideHeader = memo(({ route }: { route?: NavigationState }) => {
         <HeaderButton title="更新" icon={{ name: "sync" }} onPress={reload} />
         <HeaderButton title="設定" icon={{ name: "cog" }} onPress={openSetup} />
       </View>
-    </View>
+    </>
   );
 });
 
@@ -163,6 +186,8 @@ const NarrowHeader = memo(() => {
   const navigation = useNavigation();
 
   const dispatch = useDispatch();
+
+  const { theme } = useContext(ThemeContext);
 
   const openSetup = useCallback(() => {
     navigation.navigate("setup");
@@ -176,34 +201,66 @@ const NarrowHeader = memo(() => {
   }, []);
 
   return (
-    <View style={containerStyle.row}>
-      <View style={[containerStyle.row, containerStyle.left, styles.left]}>
+    <>
+      <View
+        style={[
+          containerStyle.container,
+          containerStyle.row,
+          containerStyle.left
+        ]}
+      >
         {Platform.OS !== "web" && (
           <Image
             containerStyle={styles.iconContainer}
-            placeholderStyle={colorStyle.bgTransparent}
             style={styles.icon}
             source={require("../../assets/icon_32x32.png")}
           />
         )}
         <TouchableOpacity style={styles.iconButton} onPress={openFile}>
-          <FontAwesome5Icon name="folder-open" solid color={light} size={24} />
+          <FontAwesome5Icon
+            name="folder-open"
+            solid
+            color={theme.colors?.control}
+            size={24}
+          />
         </TouchableOpacity>
       </View>
-      <View style={[containerStyle.row, containerStyle.center, styles.center]}>
-        <Text h4 style={colorStyle.light}>
+      <View
+        style={[
+          containerStyle.container,
+          containerStyle.row,
+          containerStyle.center
+        ]}
+      >
+        <Text h1 style={[{ color: theme.colors?.control }]}>
           {appName}
         </Text>
       </View>
-      <View style={[containerStyle.row, containerStyle.right, styles.right]}>
+      <View
+        style={[
+          containerStyle.container,
+          containerStyle.row,
+          containerStyle.right
+        ]}
+      >
         <TouchableOpacity style={styles.iconButton} onPress={reload}>
-          <FontAwesome5Icon name="sync" solid size={24} color={light} />
+          <FontAwesome5Icon
+            name="sync"
+            solid
+            size={24}
+            color={theme.colors?.control}
+          />
         </TouchableOpacity>
         <TouchableOpacity style={styles.iconButton} onPress={openSetup}>
-          <FontAwesome5Icon name="cog" solid size={24} color={light} />
+          <FontAwesome5Icon
+            name="cog"
+            solid
+            size={24}
+            color={theme.colors?.control}
+          />
         </TouchableOpacity>
       </View>
-    </View>
+    </>
   );
 });
 
@@ -217,26 +274,37 @@ const HeaderButton = memo(
     routeName?: string;
     icon?: FontAwesome5IconProps;
     isActive?: boolean;
-  }) => (
-    <Button
-      buttonStyle={[
-        isActive ? colorStyle.bgBlack : colorStyle.bgDark,
-        styles.button
-      ]}
-      titleStyle={[
-        isActive ? colorStyle.active : colorStyle.light,
-        styles.buttonTitle
-      ]}
-      icon={icon && (
-        <FontAwesome5Icon
-          key={routeName}
-          style={styles.buttonIcon}
-          color={isActive ? active : light}
-          size={16}
-          {...icon} />
-      )}
-      {...props} />
-  ),
+  }) => {
+    const { theme } = useContext(ThemeContext);
+
+    return (
+      <Button
+        buttonStyle={[
+          {
+            backgroundColor: isActive
+              ? theme.colors?.controlBgActive
+              : theme.colors?.controlBg
+          },
+          styles.button
+        ]}
+        titleStyle={[
+          { color: isActive ? theme.colors?.primary : theme.colors?.control }
+        ]}
+        icon={
+          icon && (
+            <FontAwesome5Icon
+              key={routeName}
+              style={styles.buttonIcon}
+              color={[isActive ? theme.colors?.primary : theme.colors?.control]}
+              size={16}
+              {...icon}
+            />
+          )
+        }
+        {...props}
+      />
+    );
+  },
   ({ icon: prevIcon, ...prevProps }, { icon: nextIcon, ...nextProps }) =>
     shallowEqual(prevProps, nextProps) && shallowEqual(prevIcon, nextIcon)
 );
@@ -268,13 +336,8 @@ const HeaderSearchBar = memo(() => {
 
   return (
     <SearchBar
-      containerStyle={[colorStyle.bgTransparent, styles.searchContainer]}
-      inputContainerStyle={[colorStyle.bgGrayDark, styles.searchInputContainer]}
-      inputStyle={[textStyle.center, colorStyle.light, styles.searchInput]}
+      inputContainerStyle={[styles.searchInputContainer]}
       round
-      searchIcon={
-        <FontAwesome5Icon name="search" solid color={gray} size={16} />
-      }
       placeholder="Search"
       value={query}
       onChangeText={onChangeQuery}
@@ -287,15 +350,6 @@ const HeaderSearchBar = memo(() => {
 const breakpoint = 768;
 
 const styles = StyleSheet.create({
-  left: {
-    flex: 1
-  },
-  center: {
-    flex: 1
-  },
-  right: {
-    flex: 1
-  },
   iconContainer: {
     alignItems: "center",
     height: 40,
@@ -316,23 +370,8 @@ const styles = StyleSheet.create({
     paddingRight: 4,
     paddingTop: 2
   },
-  buttonTitle: {
-    fontSize: 16
-  },
-  searchContainer: {
-    borderBottomWidth: 0,
-    borderTopWidth: 0,
-    padding: 0
-  },
   searchInputContainer: {
-    height: 32,
-    minWidth: 200,
-    overflow: "hidden"
-  },
-  searchInput: {
-    fontSize: 16,
-    minHeight: Platform.OS === "web" ? 32 : 64,
-    padding: 0
+    minWidth: 200
   },
   iconButton: {
     alignItems: "center",

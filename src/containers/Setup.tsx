@@ -11,7 +11,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { memo, useEffect, useCallback, useRef, ReactText } from "react";
+import React, {
+  memo,
+  useEffect,
+  useContext,
+  useCallback,
+  useRef,
+  ReactText
+} from "react";
 import {
   ScrollView,
   Switch,
@@ -22,13 +29,12 @@ import {
   Platform
 } from "react-native";
 import { Picker } from "@react-native-community/picker";
-import { Text } from "react-native-elements";
+import { Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
 import LinkText from "../components/LinkText";
-import colorStyle, { light } from "../styles/color";
 import containerStyle from "../styles/container";
 import { RootState } from "../modules";
 import { SettingActions } from "../modules/setting";
@@ -54,6 +60,8 @@ const Setup = () => {
     ({ setting }) => setting?.view || {},
     shallowEqual
   );
+
+  const { theme } = useContext(ThemeContext);
 
   useEffect(
     () => () => {
@@ -84,17 +92,23 @@ const Setup = () => {
   }, []);
 
   return (
-    <>
-      <View style={[containerStyle.row, colorStyle.bgDark]}>
+    <View style={[containerStyle.container]}>
+      <View
+        style={[
+          containerStyle.row,
+          containerStyle.nowrap,
+          { backgroundColor: theme.colors?.controlBg }
+        ]}
+      >
         <TouchableOpacity style={styles.button} onPress={back}>
           <FontAwesome5Icon
             name="chevron-circle-left"
             solid
-            color={light}
+            color={theme.colors?.control}
             size={24}
           />
         </TouchableOpacity>
-        <Text h4 style={[colorStyle.light, styles.title]}>
+        <Text h2 style={[{ color: theme.colors?.control }]}>
           MiyouTVの設定
         </Text>
       </View>
@@ -103,7 +117,7 @@ const Setup = () => {
         <CommentSetup data={commentSetting} onChanged={onMoritapoChanged} />
         <ViewSetup data={viewSetting} onChanged={onViewChanged} />
       </ScrollView>
-    </>
+    </View>
   );
 };
 export default Setup;
@@ -123,6 +137,8 @@ const BackendSetup = memo(
       mobileStreamParams = "b:v=1M&b:a=128k&s=1280x720",
       reloadIntervalSeconds = "0"
     } = data;
+
+    const { theme } = useContext(ThemeContext);
 
     const backendTypeChange = useCallback(
       (type: ReactText) => {
@@ -291,18 +307,26 @@ const BackendSetup = memo(
 
     return (
       <View style={styles.group}>
-        <Text style={[colorStyle.black, styles.groupTitle]}>バックエンド</Text>
-        <Text style={[colorStyle.black, styles.label]}>バックエンドの種類</Text>
+        <Text h3>バックエンド</Text>
+        <Text>バックエンドの種類</Text>
         <View
           style={[
-            colorStyle.bgWhite,
-            colorStyle.borderGray,
-            styles.inputWrapper
+            styles.inputWrapper,
+            {
+              backgroundColor: theme.colors?.background,
+              borderColor: theme.colors?.border
+            }
           ]}
         >
           <Picker
-            style={styles.picker}
-            itemStyle={styles.pickerItem}
+            style={[
+              styles.picker,
+              {
+                backgroundColor: theme.colors?.background,
+                color: theme.colors?.default
+              }
+            ]}
+            itemStyle={[styles.pickerItem, { color: theme.colors?.default }]}
             selectedValue={backendType}
             onValueChange={backendTypeChange}
           >
@@ -326,25 +350,25 @@ const BackendSetup = memo(
           <>
             <View style={styles.info}>
               {Platform.OS === "ios" ? (
-                <Text style={[colorStyle.black]}>
-                  Chinachu β/γに対応しています。
-                </Text>
+                <Text>Chinachu β/γに対応しています。</Text>
               ) : (
-                <LinkText url={chinachuInfoUrl} style={colorStyle.active}>
+                <LinkText url={chinachuInfoUrl}>
                   Chinachu β/γに対応しています。
                 </LinkText>
               )}
             </View>
-            <Text style={[colorStyle.black, styles.label]}>ChinachuのURL</Text>
+            <Text>ChinachuのURL</Text>
             <View
               style={[
-                colorStyle.bgWhite,
-                colorStyle.borderGray,
-                styles.inputWrapper
+                styles.inputWrapper,
+                {
+                  backgroundColor: theme.colors?.background,
+                  borderColor: theme.colors?.border
+                }
               ]}
             >
               <TextInput
-                style={[colorStyle.black, colorStyle.bgWhite]}
+                style={[{ color: theme.colors?.default }]}
                 autoCapitalize="none"
                 placeholder="http://127.0.0.1:20772/"
                 textContentType="URL"
@@ -352,42 +376,42 @@ const BackendSetup = memo(
                 onChangeText={urlChange}
               />
             </View>
-            <Text style={[colorStyle.black, styles.label]}>
-              ユーザー名とパスワードを使用する
-            </Text>
+            <Text>ユーザー名とパスワードを使用する</Text>
             <View style={containerStyle.row}>
               <Switch value={auth} onValueChange={backendAuthChange} />
             </View>
             {auth && (
               <>
-                <Text style={[colorStyle.black, styles.label]}>
-                  Chinachuのユーザー
-                </Text>
+                <Text>Chinachuのユーザー</Text>
                 <View
                   style={[
-                    colorStyle.bgWhite,
-                    colorStyle.borderGray,
-                    styles.inputWrapper
+                    styles.inputWrapper,
+                    {
+                      backgroundColor: theme.colors?.background,
+                      borderColor: theme.colors?.border
+                    }
                   ]}
                 >
                   <TextInput
-                    style={[colorStyle.black, colorStyle.bgWhite]}
+                    style={[{ color: theme.colors?.default }]}
                     autoCapitalize="none"
                     textContentType="username"
                     value={user}
                     onChangeText={userChange}
                   />
                 </View>
-                <Text style={colorStyle.black}>Chinachuのパスワード</Text>
+                <Text>Chinachuのパスワード</Text>
                 <View
                   style={[
-                    colorStyle.bgWhite,
-                    colorStyle.borderGray,
-                    styles.inputWrapper
+                    styles.inputWrapper,
+                    {
+                      backgroundColor: theme.colors?.background,
+                      borderColor: theme.colors?.border
+                    }
                   ]}
                 >
                   <TextInput
-                    style={[colorStyle.black, colorStyle.bgWhite]}
+                    style={[{ color: theme.colors?.default }]}
                     autoCapitalize="none"
                     textContentType="password"
                     secureTextEntry
@@ -397,17 +421,28 @@ const BackendSetup = memo(
                 </View>
               </>
             )}
-            <Text style={[colorStyle.black, styles.label]}>動画コンテナ</Text>
+            <Text>動画コンテナ</Text>
             <View
               style={[
-                colorStyle.bgWhite,
-                colorStyle.borderGray,
-                styles.inputWrapper
+                styles.inputWrapper,
+                {
+                  backgroundColor: theme.colors?.background,
+                  borderColor: theme.colors?.border
+                }
               ]}
             >
               <Picker
-                style={styles.picker}
-                itemStyle={styles.pickerItem}
+                style={[
+                  styles.picker,
+                  {
+                    backgroundColor: theme.colors?.background,
+                    color: theme.colors?.default
+                  }
+                ]}
+                itemStyle={[
+                  styles.pickerItem,
+                  { color: theme.colors?.default }
+                ]}
                 selectedValue={streamType}
                 onValueChange={streamTypeChange}
               >
@@ -416,16 +451,18 @@ const BackendSetup = memo(
                 <Picker.Item label="WebM" value="webm" />
               </Picker>
             </View>
-            <Text style={[colorStyle.black, styles.label]}>動画オプション</Text>
+            <Text>動画オプション</Text>
             <View
               style={[
-                colorStyle.bgWhite,
-                colorStyle.borderGray,
-                styles.inputWrapper
+                styles.inputWrapper,
+                {
+                  backgroundColor: theme.colors?.background,
+                  borderColor: theme.colors?.border
+                }
               ]}
             >
               <TextInput
-                style={[colorStyle.black, colorStyle.bgWhite]}
+                style={[{ color: theme.colors?.default }]}
                 autoCapitalize="none"
                 value={streamParams}
                 onChangeText={streamParamsChange}
@@ -433,19 +470,28 @@ const BackendSetup = memo(
             </View>
             {Platform.OS !== "web" && (
               <>
-                <Text style={[colorStyle.black, styles.label]}>
-                  動画コンテナ(モバイルデータ通信)
-                </Text>
+                <Text>動画コンテナ(モバイルデータ通信)</Text>
                 <View
                   style={[
-                    colorStyle.bgWhite,
-                    colorStyle.borderGray,
-                    styles.inputWrapper
+                    styles.inputWrapper,
+                    {
+                      backgroundColor: theme.colors?.background,
+                      borderColor: theme.colors?.border
+                    }
                   ]}
                 >
                   <Picker
-                    style={styles.picker}
-                    itemStyle={styles.pickerItem}
+                    style={[
+                      styles.picker,
+                      {
+                        backgroundColor: theme.colors?.background,
+                        color: theme.colors?.default
+                      }
+                    ]}
+                    itemStyle={[
+                      styles.pickerItem,
+                      { color: theme.colors?.default }
+                    ]}
                     selectedValue={mobileStreamType}
                     onValueChange={mobileStreamTypeChange}
                   >
@@ -453,18 +499,18 @@ const BackendSetup = memo(
                     <Picker.Item label="WebM" value="webm" />
                   </Picker>
                 </View>
-                <Text style={[colorStyle.black, styles.label]}>
-                  動画オプション(モバイルデータ通信)
-                </Text>
+                <Text>動画オプション(モバイルデータ通信)</Text>
                 <View
                   style={[
-                    colorStyle.bgWhite,
-                    colorStyle.borderGray,
-                    styles.inputWrapper
+                    styles.inputWrapper,
+                    {
+                      backgroundColor: theme.colors?.background,
+                      borderColor: theme.colors?.border
+                    }
                   ]}
                 >
                   <TextInput
-                    style={[colorStyle.black, colorStyle.bgWhite]}
+                    style={[{ color: theme.colors?.default }]}
                     autoCapitalize="none"
                     value={mobileStreamParams}
                     onChangeText={mobileStreamParamsChange}
@@ -476,18 +522,18 @@ const BackendSetup = memo(
         )}
         {backendType === "epgstation" && (
           <>
-            <Text style={[colorStyle.black, styles.label]}>
-              EPGStationのURL
-            </Text>
+            <Text>EPGStationのURL</Text>
             <View
               style={[
-                colorStyle.bgWhite,
-                colorStyle.borderGray,
-                styles.inputWrapper
+                styles.inputWrapper,
+                {
+                  backgroundColor: theme.colors?.background,
+                  borderColor: theme.colors?.border
+                }
               ]}
             >
               <TextInput
-                style={[colorStyle.black, colorStyle.bgWhite]}
+                style={[{ color: theme.colors?.default }]}
                 autoCapitalize="none"
                 placeholder="http://127.0.0.1:8888/"
                 textContentType="URL"
@@ -495,42 +541,42 @@ const BackendSetup = memo(
                 onChangeText={urlChange}
               />
             </View>
-            <Text style={[colorStyle.black, styles.label]}>
-              ユーザー名とパスワードを使用する
-            </Text>
+            <Text>ユーザー名とパスワードを使用する</Text>
             <View style={containerStyle.row}>
               <Switch value={auth} onValueChange={backendAuthChange} />
             </View>
             {auth && (
               <>
-                <Text style={[colorStyle.black, styles.label]}>
-                  EPGStationのユーザー
-                </Text>
+                <Text>EPGStationのユーザー</Text>
                 <View
                   style={[
-                    colorStyle.bgWhite,
-                    colorStyle.borderGray,
-                    styles.inputWrapper
+                    styles.inputWrapper,
+                    {
+                      backgroundColor: theme.colors?.background,
+                      borderColor: theme.colors?.border
+                    }
                   ]}
                 >
                   <TextInput
-                    style={[colorStyle.black, colorStyle.bgWhite]}
+                    style={[{ color: theme.colors?.default }]}
                     autoCapitalize="none"
                     textContentType="username"
                     value={user}
                     onChangeText={userChange}
                   />
                 </View>
-                <Text style={colorStyle.black}>EPGStationのパスワード</Text>
+                <Text>EPGStationのパスワード</Text>
                 <View
                   style={[
-                    colorStyle.bgWhite,
-                    colorStyle.borderGray,
-                    styles.inputWrapper
+                    styles.inputWrapper,
+                    {
+                      backgroundColor: theme.colors?.background,
+                      borderColor: theme.colors?.border
+                    }
                   ]}
                 >
                   <TextInput
-                    style={[colorStyle.black, colorStyle.bgWhite]}
+                    style={[{ color: theme.colors?.default }]}
                     autoCapitalize="none"
                     textContentType="password"
                     secureTextEntry
@@ -540,18 +586,29 @@ const BackendSetup = memo(
                 </View>
               </>
             )}
-            <Text style={[colorStyle.black, styles.label]}>動画コンテナ</Text>
+            <Text>動画コンテナ</Text>
             <View
               style={[
-                colorStyle.bgWhite,
-                colorStyle.borderGray,
-                styles.inputWrapper
+                styles.inputWrapper,
+                {
+                  backgroundColor: theme.colors?.background,
+                  borderColor: theme.colors?.border
+                }
               ]}
             >
               {Platform.OS === "web" ? (
                 <Picker
-                  style={styles.picker}
-                  itemStyle={styles.pickerItem}
+                  style={[
+                    styles.picker,
+                    {
+                      backgroundColor: theme.colors?.background,
+                      color: theme.colors?.default
+                    }
+                  ]}
+                  itemStyle={[
+                    styles.pickerItem,
+                    { color: theme.colors?.default }
+                  ]}
                   selectedValue={streamType}
                   onValueChange={streamTypeChange}
                 >
@@ -562,8 +619,17 @@ const BackendSetup = memo(
                 </Picker>
               ) : (
                 <Picker
-                  style={styles.picker}
-                  itemStyle={styles.pickerItem}
+                  style={[
+                    styles.picker,
+                    {
+                      backgroundColor: theme.colors?.background,
+                      color: theme.colors?.default
+                    }
+                  ]}
+                  itemStyle={[
+                    styles.pickerItem,
+                    { color: theme.colors?.default }
+                  ]}
                   selectedValue={streamType}
                   onValueChange={streamTypeChange}
                 >
@@ -573,16 +639,18 @@ const BackendSetup = memo(
                 </Picker>
               )}
             </View>
-            <Text style={[colorStyle.black, styles.label]}>動画オプション</Text>
+            <Text>動画オプション</Text>
             <View
               style={[
-                colorStyle.bgWhite,
-                colorStyle.borderGray,
-                styles.inputWrapper
+                styles.inputWrapper,
+                {
+                  backgroundColor: theme.colors?.background,
+                  borderColor: theme.colors?.border
+                }
               ]}
             >
               <TextInput
-                style={[colorStyle.black, colorStyle.bgWhite]}
+                style={[{ color: theme.colors?.default }]}
                 autoCapitalize="none"
                 value={streamParams}
                 editable={streamType !== "raw"}
@@ -591,19 +659,28 @@ const BackendSetup = memo(
             </View>
             {Platform.OS !== "web" && (
               <>
-                <Text style={[colorStyle.black, styles.label]}>
-                  動画コンテナ(モバイルデータ通信)
-                </Text>
+                <Text>動画コンテナ(モバイルデータ通信)</Text>
                 <View
                   style={[
-                    colorStyle.bgWhite,
-                    colorStyle.borderGray,
-                    styles.inputWrapper
+                    styles.inputWrapper,
+                    {
+                      backgroundColor: theme.colors?.background,
+                      borderColor: theme.colors?.border
+                    }
                   ]}
                 >
                   <Picker
-                    style={styles.picker}
-                    itemStyle={styles.pickerItem}
+                    style={[
+                      styles.picker,
+                      {
+                        backgroundColor: theme.colors?.background,
+                        color: theme.colors?.default
+                      }
+                    ]}
+                    itemStyle={[
+                      styles.pickerItem,
+                      { color: theme.colors?.default }
+                    ]}
                     selectedValue={mobileStreamType}
                     onValueChange={mobileStreamTypeChange}
                   >
@@ -611,18 +688,18 @@ const BackendSetup = memo(
                     <Picker.Item label="WebM" value="webm" />
                   </Picker>
                 </View>
-                <Text style={[colorStyle.black, styles.label]}>
-                  動画オプション(モバイルデータ通信)
-                </Text>
+                <Text>動画オプション(モバイルデータ通信)</Text>
                 <View
                   style={[
-                    colorStyle.bgWhite,
-                    colorStyle.borderGray,
-                    styles.inputWrapper
+                    styles.inputWrapper,
+                    {
+                      backgroundColor: theme.colors?.background,
+                      borderColor: theme.colors?.border
+                    }
                   ]}
                 >
                   <TextInput
-                    style={[colorStyle.black, colorStyle.bgWhite]}
+                    style={[{ color: theme.colors?.default }]}
                     autoCapitalize="none"
                     value={mobileStreamParams}
                     onChangeText={mobileStreamParamsChange}
@@ -635,35 +712,31 @@ const BackendSetup = memo(
         {backendType === "garapon" && (
           <>
             <View style={styles.info}>
-              <Text style={colorStyle.black}>
-                ガラポン伍/四/参号機に対応しています。
-              </Text>
+              <Text>ガラポン伍/四/参号機に対応しています。</Text>
               {Platform.OS !== "ios" && (
-                <LinkText url={garaponEntryUrl} style={colorStyle.active}>
+                <LinkText url={garaponEntryUrl}>
                   ガラポンTVレンタル申込ページ
                 </LinkText>
               )}
             </View>
-            <Text style={[colorStyle.black, styles.label]}>
-              ガラポンTVの接続情報をAPIから取得
-            </Text>
+            <Text>ガラポンTVの接続情報をAPIから取得</Text>
             <View style={containerStyle.row}>
               <Switch value={auth} onValueChange={backendAuthChange} />
             </View>
             {!auth && (
               <>
-                <Text style={[colorStyle.black, styles.label]}>
-                  ガラポンTVのURL
-                </Text>
+                <Text>ガラポンTVのURL</Text>
                 <View
                   style={[
-                    colorStyle.bgWhite,
-                    colorStyle.borderGray,
-                    styles.inputWrapper
+                    styles.inputWrapper,
+                    {
+                      backgroundColor: theme.colors?.background,
+                      borderColor: theme.colors?.border
+                    }
                   ]}
                 >
                   <TextInput
-                    style={[colorStyle.black, colorStyle.bgWhite]}
+                    style={[{ color: theme.colors?.default }]}
                     autoCapitalize="none"
                     keyboardType="url"
                     textContentType="URL"
@@ -671,18 +744,18 @@ const BackendSetup = memo(
                     onChangeText={urlChange}
                   />
                 </View>
-                <Text style={[colorStyle.black, styles.label]}>
-                  ガラポンTVのAPIバージョン
-                </Text>
+                <Text>ガラポンTVのAPIバージョン</Text>
                 <View
                   style={[
-                    colorStyle.bgWhite,
-                    colorStyle.borderGray,
-                    styles.inputWrapper
+                    styles.inputWrapper,
+                    {
+                      backgroundColor: theme.colors?.background,
+                      borderColor: theme.colors?.border
+                    }
                   ]}
                 >
                   <TextInput
-                    style={[colorStyle.black, colorStyle.bgWhite]}
+                    style={[{ color: theme.colors?.default }]}
                     autoCapitalize="none"
                     keyboardType="numeric"
                     value={version}
@@ -691,36 +764,36 @@ const BackendSetup = memo(
                 </View>
               </>
             )}
-            <Text style={[colorStyle.black, styles.label]}>
-              ガラポンTVのユーザー
-            </Text>
+            <Text>ガラポンTVのユーザー</Text>
             <View
               style={[
-                colorStyle.bgWhite,
-                colorStyle.borderGray,
-                styles.inputWrapper
+                styles.inputWrapper,
+                {
+                  backgroundColor: theme.colors?.background,
+                  borderColor: theme.colors?.border
+                }
               ]}
             >
               <TextInput
-                style={[colorStyle.black, colorStyle.bgWhite]}
+                style={[{ color: theme.colors?.default }]}
                 autoCapitalize="none"
                 textContentType="username"
                 value={user}
                 onChangeText={userChange}
               />
             </View>
-            <Text style={[colorStyle.black, styles.label]}>
-              ガラポンTVのパスワード
-            </Text>
+            <Text>ガラポンTVのパスワード</Text>
             <View
               style={[
-                colorStyle.bgWhite,
-                colorStyle.borderGray,
-                styles.inputWrapper
+                styles.inputWrapper,
+                {
+                  backgroundColor: theme.colors?.background,
+                  borderColor: theme.colors?.border
+                }
               ]}
             >
               <TextInput
-                style={[colorStyle.black, colorStyle.bgWhite]}
+                style={[{ color: theme.colors?.default }]}
                 autoCapitalize="none"
                 textContentType="password"
                 secureTextEntry
@@ -733,45 +806,43 @@ const BackendSetup = memo(
         {backendType === "garaponv4" && (
           <>
             <View style={styles.info}>
-              <Text style={colorStyle.black}>
-                ガラポン六号機に対応しています。
-              </Text>
+              <Text>ガラポン六号機に対応しています。</Text>
               {Platform.OS !== "ios" && (
-                <LinkText url={garaponEntryUrl} style={colorStyle.active}>
+                <LinkText url={garaponEntryUrl}>
                   ガラポンTVレンタル申込ページ
                 </LinkText>
               )}
             </View>
-            <Text style={[colorStyle.black, styles.label]}>
-              ガラポンTVのユーザー
-            </Text>
+            <Text>ガラポンTVのユーザー</Text>
             <View
               style={[
-                colorStyle.bgWhite,
-                colorStyle.borderGray,
-                styles.inputWrapper
+                styles.inputWrapper,
+                {
+                  backgroundColor: theme.colors?.background,
+                  borderColor: theme.colors?.border
+                }
               ]}
             >
               <TextInput
-                style={[colorStyle.black, colorStyle.bgWhite]}
+                style={[{ color: theme.colors?.default }]}
                 autoCapitalize="none"
                 textContentType="username"
                 value={user}
                 onChangeText={userChange}
               />
             </View>
-            <Text style={[colorStyle.black, styles.label]}>
-              ガラポンTVのパスワード
-            </Text>
+            <Text>ガラポンTVのパスワード</Text>
             <View
               style={[
-                colorStyle.bgWhite,
-                colorStyle.borderGray,
-                styles.inputWrapper
+                styles.inputWrapper,
+                {
+                  backgroundColor: theme.colors?.background,
+                  borderColor: theme.colors?.border
+                }
               ]}
             >
               <TextInput
-                style={[colorStyle.black, colorStyle.bgWhite]}
+                style={[{ color: theme.colors?.default }]}
                 autoCapitalize="none"
                 textContentType="password"
                 secureTextEntry
@@ -781,16 +852,18 @@ const BackendSetup = memo(
             </View>
           </>
         )}
-        <Text style={[colorStyle.black, styles.label]}>自動更新間隔(秒)</Text>
+        <Text>自動更新間隔(秒)</Text>
         <View
           style={[
-            colorStyle.bgWhite,
-            colorStyle.borderGray,
-            styles.inputWrapper
+            styles.inputWrapper,
+            {
+              backgroundColor: theme.colors?.background,
+              borderColor: theme.colors?.border
+            }
           ]}
         >
           <TextInput
-            style={[colorStyle.black, colorStyle.bgWhite]}
+            style={[{ color: theme.colors?.default }]}
             autoCapitalize="none"
             keyboardType="number-pad"
             textContentType="none"
@@ -806,6 +879,8 @@ const BackendSetup = memo(
 const CommentSetup = memo(
   ({ data, onChanged }: { data: any; onChanged?: (data: any) => void }) => {
     const { email = "", password = "" } = data;
+
+    useContext(ThemeContext);
 
     const emailChange = useCallback(
       (email: string) => {
@@ -826,29 +901,25 @@ const CommentSetup = memo(
 
     return (
       <View style={styles.group}>
-        <Text style={[colorStyle.black, styles.groupTitle]}>
-          モリタポアカウント
-        </Text>
+        <Text style={[styles.groupTitle]}>モリタポアカウント</Text>
         <View style={styles.info}>
-          <Text style={colorStyle.black}>
-            コメントを表示するにはモリタポアカウントが必要です。
-          </Text>
+          <Text>コメントを表示するにはモリタポアカウントが必要です。</Text>
           {Platform.OS !== "ios" && (
-            <LinkText url={moritapoEntryUrl} style={colorStyle.active}>
-              モリタポ新規入会ページ
-            </LinkText>
+            <LinkText url={moritapoEntryUrl}>モリタポ新規入会ページ</LinkText>
           )}
         </View>
-        <Text style={[colorStyle.black, styles.label]}>メールアドレス</Text>
+        <Text>メールアドレス</Text>
         <View
           style={[
-            colorStyle.bgWhite,
-            colorStyle.borderGray,
-            styles.inputWrapper
+            styles.inputWrapper,
+            {
+              backgroundColor: theme.colors?.background,
+              borderColor: theme.colors?.border
+            }
           ]}
         >
           <TextInput
-            style={[colorStyle.black, colorStyle.bgWhite]}
+            style={[{ color: theme.colors?.default }]}
             autoCapitalize="none"
             keyboardType="email-address"
             textContentType="emailAddress"
@@ -856,16 +927,18 @@ const CommentSetup = memo(
             onChangeText={emailChange}
           />
         </View>
-        <Text style={[colorStyle.black, styles.label]}>パスワード</Text>
+        <Text>パスワード</Text>
         <View
           style={[
-            colorStyle.bgWhite,
-            colorStyle.borderGray,
-            styles.inputWrapper
+            styles.inputWrapper,
+            {
+              backgroundColor: theme.colors?.background,
+              borderColor: theme.colors?.border
+            }
           ]}
         >
           <TextInput
-            style={[colorStyle.black, colorStyle.bgWhite]}
+            style={[{ color: theme.colors?.default }]}
             autoCapitalize="none"
             textContentType="password"
             secureTextEntry
@@ -880,7 +953,14 @@ const CommentSetup = memo(
 
 const ViewSetup = memo(
   ({ data, onChanged }: { data: any; onChanged?: (data: any) => void }) => {
-    const { countMode = "speed", hourFirst = "4", hourFormat = "" } = data;
+    const {
+      colorScheme = "",
+      countMode = "speed",
+      hourFirst = "4",
+      hourFormat = ""
+    } = data;
+
+    const { theme } = useContext(ThemeContext);
 
     const countModeChange = useCallback(
       (countMode: ReactText) => {
@@ -909,18 +989,26 @@ const ViewSetup = memo(
 
     return (
       <View style={styles.group}>
-        <Text style={[colorStyle.black, styles.groupTitle]}>表示設定</Text>
-        <Text style={[colorStyle.black, styles.label]}>表示するカウント</Text>
+        <Text style={[styles.groupTitle]}>表示設定</Text>
+        <Text>表示するカウント</Text>
         <View
           style={[
-            colorStyle.bgWhite,
-            colorStyle.borderGray,
-            styles.inputWrapper
+            styles.inputWrapper,
+            {
+              backgroundColor: theme.colors?.background,
+              borderColor: theme.colors?.border
+            }
           ]}
         >
           <Picker
-            style={styles.picker}
-            itemStyle={styles.pickerItem}
+            style={[
+              styles.picker,
+              {
+                backgroundColor: theme.colors?.background,
+                color: theme.colors?.default
+              }
+            ]}
+            itemStyle={[styles.pickerItem, { color: theme.colors?.default }]}
             selectedValue={countMode}
             onValueChange={countModeChange}
           >
@@ -930,17 +1018,25 @@ const ViewSetup = memo(
             <Picker.Item label="非表示" value="none" />
           </Picker>
         </View>
-        <Text style={[colorStyle.black, styles.label]}>日付を変更する時刻</Text>
+        <Text>日付を変更する時刻</Text>
         <View
           style={[
-            colorStyle.bgWhite,
-            colorStyle.borderGray,
-            styles.inputWrapper
+            styles.inputWrapper,
+            {
+              backgroundColor: theme.colors?.background,
+              borderColor: theme.colors?.border
+            }
           ]}
         >
           <Picker
-            style={styles.picker}
-            itemStyle={styles.pickerItem}
+            style={[
+              styles.picker,
+              {
+                backgroundColor: theme.colors?.background,
+                color: theme.colors?.default
+              }
+            ]}
+            itemStyle={[styles.pickerItem, { color: theme.colors?.default }]}
             selectedValue={hourFirst}
             onValueChange={hourFirstChange}
           >
@@ -970,17 +1066,25 @@ const ViewSetup = memo(
             <Picker.Item label="23時" value="23" />
           </Picker>
         </View>
-        <Text style={[colorStyle.black, styles.label]}>時刻フォーマット</Text>
+        <Text>時刻フォーマット</Text>
         <View
           style={[
-            colorStyle.bgWhite,
-            colorStyle.borderGray,
-            styles.inputWrapper
+            styles.inputWrapper,
+            {
+              backgroundColor: theme.colors?.background,
+              borderColor: theme.colors?.border
+            }
           ]}
         >
           <Picker
-            style={styles.picker}
-            itemStyle={styles.pickerItem}
+            style={[
+              styles.picker,
+              {
+                backgroundColor: theme.colors?.background,
+                color: theme.colors?.default
+              }
+            ]}
+            itemStyle={[styles.pickerItem, { color: theme.colors?.default }]}
             selectedValue={hourFormat}
             onValueChange={hourFormatChange}
           >
@@ -1027,9 +1131,6 @@ const styles = StyleSheet.create({
   groupTitle: {
     fontSize: 24,
     fontWeight: "bold"
-  },
-  label: {
-    fontSize: 16
   },
   info: {
     fontSize: 16,

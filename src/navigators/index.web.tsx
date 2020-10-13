@@ -11,14 +11,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useContext
+} from "react";
 import { View, StyleSheet, LayoutChangeEvent } from "react-native";
+import { ThemeContext } from "react-native-elements";
 import { useDispatch, useSelector } from "react-redux";
 import { MenuProvider } from "react-native-popup-menu";
 
 import Titlebar from "../containers/Titlebar";
 import Viewer from "../containers/Viewer";
-import colorStyle from "../styles/color";
 import { RootState } from "../modules";
 import { SettingState } from "../modules/setting";
 import { ViewerActions } from "../modules/viewer";
@@ -85,6 +91,8 @@ const MainWindow = () => {
     height: 0
   });
 
+  const { theme } = useContext(ThemeContext);
+
   const right = docking && isOpened && !stacking ? viewerLayout.width : 0;
   const covered = docking && isOpened && stacking;
 
@@ -149,17 +157,15 @@ const MainWindow = () => {
   return (
     <>
       <Titlebar />
-      <View style={[colorStyle.bgDark, styles.view]} onLayout={onLayout}>
+      <View style={[styles.view]} onLayout={onLayout}>
         <View style={[StyleSheet.absoluteFill, { right }]}>
           <MenuProvider backHandler>
-            <NavigationContainer ref={navigationRef}>
+            <NavigationContainer ref={navigationRef} theme={theme.Navigation}>
               <StackNavigator />
             </NavigationContainer>
           </MenuProvider>
         </View>
-        {covered && (
-          <View style={[StyleSheet.absoluteFill, colorStyle.bgDark]} />
-        )}
+        {covered && <View style={[StyleSheet.absoluteFill]} />}
       </View>
     </>
   );

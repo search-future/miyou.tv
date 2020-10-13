@@ -15,6 +15,7 @@ import React, {
   memo,
   useState,
   useEffect,
+  useContext,
   useCallback,
   useRef,
   ReactText,
@@ -29,7 +30,7 @@ import {
   Platform,
   ListRenderItem
 } from "react-native";
-import { Text, ListItem } from "react-native-elements";
+import { Text, ListItem, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import DocumentPicker from "react-native-document-picker";
 import { useNavigation } from "@react-navigation/native";
@@ -38,7 +39,6 @@ import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import DatePicker from "../components/DatePicker";
 import IconSelector from "../components/IconSelector";
 import TimePicker from "../components/TimePicker";
-import colorStyle, { black, light } from "../styles/color";
 import containerStyle from "../styles/container";
 import textStyle from "../styles/text";
 import { RootState } from "../modules";
@@ -83,6 +83,8 @@ const FileLoader = memo(() => {
   const playing = useSelector<State, boolean>(({ viewer }) => viewer.playing);
 
   const [containerWidth, setContainerWidth] = useState(0);
+
+  const { theme } = useContext(ThemeContext);
 
   const selectedId = useMemo(() => viewerPrograms[viewerIndex]?.id, [
     viewerPrograms,
@@ -211,22 +213,30 @@ const FileLoader = memo(() => {
   );
 
   return (
-    <View style={containerStyle.container} onLayout={onLayout}>
-      <View style={[containerStyle.row, colorStyle.bgDark]}>
+    <View style={[containerStyle.container]} onLayout={onLayout}>
+      <View
+        style={[
+          containerStyle.row,
+          containerStyle.nowrap,
+          { backgroundColor: theme.colors?.controlBg }
+        ]}
+      >
         <TouchableOpacity style={styles.button} onPress={back}>
           <FontAwesome5Icon
             name="chevron-circle-left"
             solid
             size={24}
-            color={light}
+            color={theme.colors?.control}
           />
         </TouchableOpacity>
-        <Text h4 style={[colorStyle.light, styles.title]}>
+        <Text h2 style={[{ color: theme.colors?.control }]}>
           ファイル再生
         </Text>
       </View>
-      <View style={[styles.view, colorStyle.bgWhite]}>
-        <Text h4 style={[colorStyle.black, textStyle.center]}>
+      <View
+        style={[styles.view, { backgroundColor: theme.colors?.background }]}
+      >
+        <Text h3 style={[textStyle.center]}>
           プレイリスト
         </Text>
         <FlatList
@@ -238,7 +248,12 @@ const FileLoader = memo(() => {
         />
         <View style={[containerStyle.row, containerStyle.center]}>
           <TouchableOpacity style={styles.button} onPress={selectFile}>
-            <FontAwesome5Icon name="plus" solid color={black} size={24} />
+            <FontAwesome5Icon
+              name="plus"
+              solid
+              color={theme.colors?.default}
+              size={24}
+            />
           </TouchableOpacity>
         </View>
         <View
@@ -248,18 +263,18 @@ const FileLoader = memo(() => {
             containerStyle.wrap
           ]}
         >
-          <Text style={[colorStyle.black, styles.label]}>
-            日時取得フォーマット
-          </Text>
+          <Text>日時取得フォーマット</Text>
           <View
             style={[
-              colorStyle.bgWhite,
-              colorStyle.borderGray,
-              styles.inputWrapper
+              styles.inputWrapper,
+              {
+                backgroundColor: theme.colors?.background,
+                borderColor: theme.colors?.border
+              }
             ]}
           >
             <TextInput
-              style={styles.input}
+              style={[styles.input]}
               placeholder="YYMMDDHHmm"
               value={dateFormat}
               onChangeText={dateFormatChange}
@@ -292,6 +307,8 @@ const ListProgram = memo(
     onPlay?: (program: FileProgram) => void;
   }) => {
     const { title, channelName, start } = props;
+
+    const { theme } = useContext(ThemeContext);
 
     const channelItems = useMemo(
       () => [
@@ -333,9 +350,11 @@ const ListProgram = memo(
 
     return (
       <ListItem
-        containerStyle={[selected && styles.selected]}
-        bottomDivider
+        containerStyle={[
+          selected && { backgroundColor: theme.colors?.selected }
+        ]}
         title={title}
+        bottomDivider
         subtitle={
           <>
             <View
@@ -345,16 +364,55 @@ const ListProgram = memo(
                 styles.row
               ]}
             >
-              <View style={[colorStyle.borderGray, styles.inputWrapper]}>
-                <DatePicker value={start} onChange={dateChange} />
+              <View
+                style={[
+                  styles.inputWrapper,
+                  { borderColor: theme.colors?.border }
+                ]}
+              >
+                <DatePicker
+                  color={theme.colors?.default}
+                  backgroundColor={theme.colors?.background}
+                  value={start}
+                  onChange={dateChange}
+                />
               </View>
-              <View style={[colorStyle.borderGray, styles.inputWrapper]}>
-                <TimePicker value={start} onChange={dateChange} />
+              <View
+                style={[
+                  styles.inputWrapper,
+                  { borderColor: theme.colors?.border }
+                ]}
+              >
+                <TimePicker
+                  color={theme.colors?.default}
+                  backgroundColor={theme.colors?.background}
+                  value={start}
+                  onChange={dateChange}
+                />
               </View>
-              <View style={[colorStyle.borderGray, styles.inputWrapper]}>
+              <View
+                style={[
+                  styles.inputWrapper,
+                  {
+                    backgroundColor: theme.colors?.background,
+                    borderColor: theme.colors?.border
+                  }
+                ]}
+              >
                 <IconSelector
-                  icon={<FontAwesome5Icon name="tv" solid />}
-                  itemStyle={styles.input}
+                  icon={
+                    <FontAwesome5Icon
+                      name="tv"
+                      solid
+                      color={theme.colors?.default}
+                    />
+                  }
+                  containerStyle={[
+                    { backgroundColor: theme.colors?.background }
+                  ]}
+                  itemStyle={[styles.input]}
+                  style={[{ backgroundColor: theme.colors?.background }]}
+                  color={theme.colors?.default}
                   items={channelItems}
                   selectedValue={channelName}
                   onValueChange={channelChange}
@@ -362,12 +420,22 @@ const ListProgram = memo(
               </View>
             </View>
             <View style={[containerStyle.row, styles.row]}>
-              <TouchableOpacity style={styles.button} onPress={onRemovePress}>
-                <FontAwesome5Icon name="minus" solid size={24} color={black} />
+              <TouchableOpacity style={[styles.button]} onPress={onRemovePress}>
+                <FontAwesome5Icon
+                  name="minus"
+                  solid
+                  size={24}
+                  color={theme.colors?.default}
+                />
               </TouchableOpacity>
               <View style={styles.spacer} />
               <TouchableOpacity style={[styles.button]} onPress={onPlayPress}>
-                <FontAwesome5Icon name="play" solid size={24} color={black} />
+                <FontAwesome5Icon
+                  name="play"
+                  solid
+                  size={24}
+                  color={theme.colors?.default}
+                />
               </TouchableOpacity>
             </View>
           </>
@@ -380,9 +448,6 @@ const ListProgram = memo(
 const breakpoint = 600;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   title: {
     flex: 1,
     height: 40,
@@ -406,9 +471,6 @@ const styles = StyleSheet.create({
   spacer: {
     flex: 1
   },
-  label: {
-    fontSize: 16
-  },
   inputWrapper: {
     borderWidth: 1,
     minWidth: 180
@@ -416,8 +478,5 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 0,
     fontSize: 16
-  },
-  selected: {
-    backgroundColor: "#9991ff66"
   }
 });

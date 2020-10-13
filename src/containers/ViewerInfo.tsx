@@ -11,16 +11,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { memo, useCallback, useMemo } from "react";
+import React, { memo, useContext, useMemo, useCallback } from "react";
 import { ScrollView, View, StyleSheet, Platform } from "react-native";
-import { Card, Text, Badge } from "react-native-elements";
+import { Card, Text, Badge, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import Toast from "react-native-root-toast";
 
 import DateFormatter from "../utils/DateFormatter";
 import DownloadButton from "../components/DownloadButton";
-import colorStyle, { active, black, grayDark, light } from "../styles/color";
 import containerStyle from "../styles/container";
 import textStyle from "../styles/text";
 import { RootState } from "../modules";
@@ -86,61 +85,73 @@ const FileCard = memo(
     dateFormatter = new DateFormatter()
   }: ViewerProgram & {
     dateFormatter?: DateFormatter;
-  }) => (
-    <Card
-      containerStyle={[colorStyle.bgDark, colorStyle.borderGrayDark]}
-      dividerStyle={colorStyle.bgGrayDark}
-      titleStyle={colorStyle.light}
-      title="ファイル情報"
-    >
-      <>
-        <View style={[containerStyle.row, styles.cardRow]}>
-          <View style={styles.cardLabel}>
-            <Text style={colorStyle.light}>ID</Text>
-          </View>
-          <View style={[containerStyle.row, styles.cardContent]}>
-            <Text style={colorStyle.light}>{id}</Text>
-          </View>
-        </View>
-        <View style={[containerStyle.row, styles.cardRow]}>
-          <View style={styles.cardLabel}>
-            <Text style={colorStyle.light}>ファイル名</Text>
-          </View>
-          <View style={[containerStyle.row, styles.cardContent]}>
-            <Text style={colorStyle.light}>{fullTitle}</Text>
-          </View>
-        </View>
-        <View style={[containerStyle.row, styles.cardRow]}>
-          <View style={styles.cardLabel}>
-            <Text style={colorStyle.light}>日時</Text>
-          </View>
-          <View style={[containerStyle.row, styles.cardContent]}>
-            <Text style={colorStyle.light}>
-              {dateFormatter.format(start, "YYYY/MM/DD(dd) A HHHH:mm")}
-            </Text>
-          </View>
-        </View>
-        <View style={[containerStyle.row, styles.cardRow]}>
-          <View style={styles.cardLabel}>
-            <Text style={colorStyle.light}>チャンネル</Text>
-          </View>
-          <View style={[containerStyle.row, styles.cardContent]}>
-            <Text style={colorStyle.light}>{channelName || "未設定"}</Text>
-          </View>
-        </View>
-        <View style={[containerStyle.row, styles.cardRow]}>
-          <View style={styles.cardLabel}>
-            <Text style={colorStyle.light}>URI</Text>
-          </View>
-          <View style={[containerStyle.row, styles.cardContent]}>
-            <Text style={colorStyle.light}>{stream}</Text>
-          </View>
-        </View>
-      </>
-    </Card>
-  )
-);
+  }) => {
+    const { theme } = useContext(ThemeContext);
 
+    return (
+      <Card
+        containerStyle={[
+          {
+            backgroundColor: theme.colors?.controlBg,
+            borderColor: theme.colors?.controlBorder
+          }
+        ]}
+        dividerStyle={{ backgroundColor: theme.colors?.controlBorder }}
+        titleStyle={[{ color: theme.colors?.control }]}
+        title="ファイル情報"
+      >
+        <>
+          <View style={[containerStyle.row, styles.cardRow]}>
+            <View style={styles.cardLabel}>
+              <Text style={[{ color: theme.colors?.control }]}>ID</Text>
+            </View>
+            <View style={[containerStyle.row, styles.cardContent]}>
+              <Text style={[{ color: theme.colors?.control }]}>{id}</Text>
+            </View>
+          </View>
+          <View style={[containerStyle.row, styles.cardRow]}>
+            <View style={styles.cardLabel}>
+              <Text style={[{ color: theme.colors?.control }]}>ファイル名</Text>
+            </View>
+            <View style={[containerStyle.row, styles.cardContent]}>
+              <Text style={[{ color: theme.colors?.control }]}>
+                {fullTitle}
+              </Text>
+            </View>
+          </View>
+          <View style={[containerStyle.row, styles.cardRow]}>
+            <View style={styles.cardLabel}>
+              <Text style={[{ color: theme.colors?.control }]}>日時</Text>
+            </View>
+            <View style={[containerStyle.row, styles.cardContent]}>
+              <Text style={[{ color: theme.colors?.control }]}>
+                {dateFormatter.format(start, "YYYY/MM/DD(dd) A HHHH:mm")}
+              </Text>
+            </View>
+          </View>
+          <View style={[containerStyle.row, styles.cardRow]}>
+            <View style={styles.cardLabel}>
+              <Text style={[{ color: theme.colors?.control }]}>チャンネル</Text>
+            </View>
+            <View style={[containerStyle.row, styles.cardContent]}>
+              <Text style={[{ color: theme.colors?.control }]}>
+                {channelName || "未設定"}
+              </Text>
+            </View>
+          </View>
+          <View style={[containerStyle.row, styles.cardRow]}>
+            <View style={styles.cardLabel}>
+              <Text style={[{ color: theme.colors?.control }]}>URI</Text>
+            </View>
+            <View style={[containerStyle.row, styles.cardContent]}>
+              <Text style={[{ color: theme.colors?.control }]}>{stream}</Text>
+            </View>
+          </View>
+        </>
+      </Card>
+    );
+  }
+);
 const ProgramCard = memo(
   ({
     id,
@@ -163,6 +174,8 @@ const ProgramCard = memo(
     dateFormatter: DateFormatter;
   }) => {
     const dispatch = useDispatch();
+
+    const { theme } = useContext(ThemeContext);
 
     const titleSearch = useCallback(() => {
       dispatch(ViewerActions.search(title));
@@ -208,12 +221,12 @@ const ProgramCard = memo(
                 ? filename.replace(/\.m2ts$/, ".ts")
                 : filename
           }}
-          color={light}
-          backgroundColor={black}
-          borderColor={grayDark}
-          buttonColor={black}
-          progressColor={`${light}80`}
-          successColor={active}
+          color={theme.colors?.control}
+          backgroundColor={theme.colors?.controlBgActive}
+          borderColor={theme.colors?.controlBorder}
+          buttonColor={theme.colors?.controlBg}
+          progressColor={theme.colors?.selected}
+          successColor={theme.colors?.primary}
           onSuccess={onDownloadSuccess}
           onFailure={onDownloadFailure}
         />
@@ -223,80 +236,87 @@ const ProgramCard = memo(
 
     return (
       <Card
-        containerStyle={[colorStyle.bgDark, colorStyle.borderGrayDark]}
-        dividerStyle={colorStyle.bgGrayDark}
-        titleStyle={colorStyle.light}
+        containerStyle={[
+          {
+            backgroundColor: theme.colors?.controlBg,
+            borderColor: theme.colors?.controlBorder
+          }
+        ]}
+        dividerStyle={{ backgroundColor: theme.colors?.controlBorder }}
+        titleStyle={[{ color: theme.colors?.control }]}
         title="番組情報"
       >
         <>
           <View style={[containerStyle.row, styles.cardRow]}>
             <View style={[containerStyle.row, styles.cardContent]}>
-              <Text style={[textStyle.bold, colorStyle.light]}>
+              <Text style={[textStyle.bold, { color: theme.colors?.control }]}>
                 {fullTitle}
               </Text>
               <FontAwesome5Icon
                 name="search"
                 solid
                 style={styles.icon}
-                color={light}
+                color={theme.colors?.control}
                 onPress={titleSearch}
               />
             </View>
           </View>
           <View style={[containerStyle.row, styles.cardRow]}>
             <View style={styles.cardLabel}>
-              <Text style={colorStyle.light}>ID</Text>
+              <Text style={[{ color: theme.colors?.control }]}>ID</Text>
             </View>
             <View style={[containerStyle.row, styles.cardContent]}>
-              <Text style={colorStyle.light}>{id}</Text>
+              <Text style={[{ color: theme.colors?.control }]}>{id}</Text>
             </View>
           </View>
           <View style={[containerStyle.row, styles.cardRow]}>
             <View style={styles.cardLabel}>
-              <Text style={colorStyle.light}>開始日時</Text>
+              <Text style={[{ color: theme.colors?.control }]}>開始日時</Text>
             </View>
             <View style={[containerStyle.row, styles.cardContent]}>
-              <Text style={colorStyle.light}>
+              <Text style={[{ color: theme.colors?.control }]}>
                 {dateFormatter.format(start, "YYYY/MM/DD(dd) A HHHH:mm")}
               </Text>
             </View>
           </View>
           <View style={[containerStyle.row, styles.cardRow]}>
             <View style={styles.cardLabel}>
-              <Text style={colorStyle.light}>終了日時</Text>
+              <Text style={[{ color: theme.colors?.control }]}>終了日時</Text>
             </View>
             <View style={[containerStyle.row, styles.cardContent]}>
-              <Text style={colorStyle.light}>
+              <Text style={[{ color: theme.colors?.control }]}>
                 {dateFormatter.format(end, "YYYY/MM/DD(dd) A HHHH:mm")}
               </Text>
             </View>
           </View>
           <View style={[containerStyle.row, styles.cardRow]}>
             <View style={styles.cardLabel}>
-              <Text style={colorStyle.light}>チャンネル</Text>
+              <Text style={[{ color: theme.colors?.control }]}>チャンネル</Text>
             </View>
             <View style={[containerStyle.row, styles.cardContent]}>
-              <Text style={colorStyle.light}>{channelName}</Text>
+              <Text style={[{ color: theme.colors?.control }]}>
+                {channelName}
+              </Text>
               <FontAwesome5Icon
                 name="search"
                 solid
                 style={styles.icon}
-                color={light}
+                color={theme.colors?.control}
                 onPress={channelSearch}
               />
             </View>
           </View>
           <View style={[containerStyle.row, styles.cardRow]}>
             <View style={styles.cardLabel}>
-              <Text style={colorStyle.light}>カテゴリー</Text>
+              <Text style={[{ color: theme.colors?.control }]}>カテゴリー</Text>
             </View>
             <View style={[containerStyle.row, styles.cardContent]}>
               <Badge
                 badgeStyle={[
-                  colorStyle.borderGrayDark,
                   styles.badge,
                   {
-                    backgroundColor: category.color
+                    backgroundColor: category.color,
+                    borderColor: theme.colors?.controlBorder
                   }
                 ]}
                 value={category.name}
@@ -305,33 +325,37 @@ const ProgramCard = memo(
                 name="search"
                 solid
                 style={styles.icon}
-                color={light}
+                color={theme.colors?.control}
                 onPress={categorySearch}
               />
             </View>
           </View>
           <View style={[containerStyle.row, styles.cardRow]}>
             <View style={[containerStyle.row, styles.cardContent]}>
-              <Text style={colorStyle.light}>{detail}</Text>
+              <Text style={[{ color: theme.colors?.control }]}>{detail}</Text>
             </View>
           </View>
           {commentCount != null && (
             <View style={[containerStyle.row, styles.cardRow]}>
               <View style={styles.cardLabel}>
-                <Text style={colorStyle.light}>コメント数</Text>
+                <Text style={[{ color: theme.colors?.control }]}>
+                  コメント数
+                </Text>
               </View>
               <View style={[containerStyle.row, styles.cardContent]}>
-                <Text style={colorStyle.light}>{commentCount}</Text>
+                <Text style={[{ color: theme.colors?.control }]}>
+                  {commentCount}
+                </Text>
               </View>
             </View>
           )}
           {commentSpeed != null && (
             <View style={[containerStyle.row, styles.cardRow]}>
               <View style={styles.cardLabel}>
-                <Text style={colorStyle.light}> 平均</Text>
+                <Text style={[{ color: theme.colors?.control }]}> 平均</Text>
               </View>
               <View style={[containerStyle.row, styles.cardContent]}>
-                <Text style={colorStyle.light}>
+                <Text style={[{ color: theme.colors?.control }]}>
                   {Math.ceil((commentSpeed || 0) * 10) / 10}
                   コメント/分
                 </Text>
@@ -341,10 +365,10 @@ const ProgramCard = memo(
           {commentMaxSpeedTime && (
             <View style={[containerStyle.row, styles.cardRow]}>
               <View style={styles.cardLabel}>
-                <Text style={colorStyle.light}> ピーク</Text>
+                <Text style={[{ color: theme.colors?.control }]}> ピーク</Text>
               </View>
               <View style={[containerStyle.row, styles.cardContent]}>
-                <Text style={colorStyle.light}>
+                <Text style={[{ color: theme.colors?.control }]}>
                   {commentMaxSpeed || 0}コメント/分 (
                   {dateFormatter.format(commentMaxSpeedTime, "HHHH:mm")})
                 </Text>
@@ -354,7 +378,9 @@ const ProgramCard = memo(
           {download && (
             <View style={[containerStyle.row, styles.cardRow]}>
               <View style={styles.cardLabel}>
-                <Text style={colorStyle.light}>ダウンロード</Text>
+                <Text style={[{ color: theme.colors?.control }]}>
+                  ダウンロード
+                </Text>
               </View>
               <View style={[styles.cardContent]}>
                 {download.map(downloadRenderer)}
@@ -366,7 +392,6 @@ const ProgramCard = memo(
     );
   }
 );
-
 const ExtraProgramCard = memo(
   ({
     id,
@@ -377,61 +402,74 @@ const ExtraProgramCard = memo(
     dateFormatter = new DateFormatter()
   }: ViewerProgram & {
     dateFormatter?: DateFormatter;
-  }) => (
-    <Card
-      containerStyle={[colorStyle.bgDark, colorStyle.borderGrayDark]}
-      dividerStyle={colorStyle.bgGrayDark}
-      titleStyle={colorStyle.light}
-      title="録画情報"
-    >
-      <>
-        <View style={[containerStyle.row, styles.cardRow]}>
-          <View style={styles.cardLabel}>
-            <Text style={colorStyle.light}>ID</Text>
+  }) => {
+    const { theme } = useContext(ThemeContext);
+
+    return (
+      <Card
+        containerStyle={[
+          {
+            backgroundColor: theme.colors?.controlBg,
+            borderColor: theme.colors?.controlBorder
+          }
+        ]}
+        dividerStyle={{ backgroundColor: theme.colors?.controlBorder }}
+        titleStyle={[{ color: theme.colors?.control }]}
+        title="録画情報"
+      >
+        <>
+          <View style={[containerStyle.row, styles.cardRow]}>
+            <View style={styles.cardLabel}>
+              <Text style={[{ color: theme.colors?.control }]}>ID</Text>
+            </View>
+            <View style={[containerStyle.row, styles.cardContent]}>
+              <Text style={[{ color: theme.colors?.control }]}>{id}</Text>
+            </View>
           </View>
-          <View style={[containerStyle.row, styles.cardContent]}>
-            <Text style={colorStyle.light}>{id}</Text>
+          <View style={[containerStyle.row, styles.cardRow]}>
+            <View style={styles.cardLabel}>
+              <Text style={[{ color: theme.colors?.control }]}>タイトル</Text>
+            </View>
+            <View style={[containerStyle.row, styles.cardContent]}>
+              <Text style={[{ color: theme.colors?.control }]}>
+                {fullTitle}
+              </Text>
+            </View>
           </View>
-        </View>
-        <View style={[containerStyle.row, styles.cardRow]}>
-          <View style={styles.cardLabel}>
-            <Text style={colorStyle.light}>タイトル</Text>
+          <View style={[containerStyle.row, styles.cardRow]}>
+            <View style={styles.cardLabel}>
+              <Text style={[{ color: theme.colors?.control }]}>チャンネル</Text>
+            </View>
+            <View style={[containerStyle.row, styles.cardContent]}>
+              <Text style={[{ color: theme.colors?.control }]}>
+                {channelName}
+              </Text>
+            </View>
           </View>
-          <View style={[containerStyle.row, styles.cardContent]}>
-            <Text style={colorStyle.light}>{fullTitle}</Text>
+          <View style={[containerStyle.row, styles.cardRow]}>
+            <View style={styles.cardLabel}>
+              <Text style={[{ color: theme.colors?.control }]}>開始日時</Text>
+            </View>
+            <View style={[containerStyle.row, styles.cardContent]}>
+              <Text style={[{ color: theme.colors?.control }]}>
+                {dateFormatter.format(start, "YYYY/MM/DD(dd) A HHHH:mm")}
+              </Text>
+            </View>
           </View>
-        </View>
-        <View style={[containerStyle.row, styles.cardRow]}>
-          <View style={styles.cardLabel}>
-            <Text style={colorStyle.light}>チャンネル</Text>
+          <View style={[containerStyle.row, styles.cardRow]}>
+            <View style={styles.cardLabel}>
+              <Text style={[{ color: theme.colors?.control }]}>終了日時</Text>
+            </View>
+            <View style={[containerStyle.row, styles.cardContent]}>
+              <Text style={[{ color: theme.colors?.control }]}>
+                {dateFormatter.format(end, "YYYY/MM/DD(dd) A HHHH:mm")}
+              </Text>
+            </View>
           </View>
-          <View style={[containerStyle.row, styles.cardContent]}>
-            <Text style={colorStyle.light}>{channelName}</Text>
-          </View>
-        </View>
-        <View style={[containerStyle.row, styles.cardRow]}>
-          <View style={styles.cardLabel}>
-            <Text style={colorStyle.light}>開始日時</Text>
-          </View>
-          <View style={[containerStyle.row, styles.cardContent]}>
-            <Text style={colorStyle.light}>
-              {dateFormatter.format(start, "YYYY/MM/DD(dd) A HHHH:mm")}
-            </Text>
-          </View>
-        </View>
-        <View style={[containerStyle.row, styles.cardRow]}>
-          <View style={styles.cardLabel}>
-            <Text style={colorStyle.light}>終了日時</Text>
-          </View>
-          <View style={[containerStyle.row, styles.cardContent]}>
-            <Text style={colorStyle.light}>
-              {dateFormatter.format(end, "YYYY/MM/DD(dd) A HHHH:mm")}
-            </Text>
-          </View>
-        </View>
-      </>
-    </Card>
-  )
+        </>
+      </Card>
+    );
+  }
 );
 
 const styles = StyleSheet.create({

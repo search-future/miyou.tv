@@ -15,6 +15,7 @@ import React, {
   memo,
   useState,
   useEffect,
+  useContext,
   useCallback,
   useMemo,
   useRef
@@ -33,13 +34,12 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent
 } from "react-native";
-import { Badge, ListItem, Text } from "react-native-elements";
+import { Badge, ListItem, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
 import DatePicker from "../components/DatePicker";
 import IconSelector from "../components/IconSelector";
-import colorStyle, { dark, light } from "../styles/color";
 import containerStyle from "../styles/container";
 import textStyle from "../styles/text";
 import programStyle from "../styles/program";
@@ -152,6 +152,8 @@ const ProgramRanking = memo(() => {
   );
 
   const [containerWidth, setContainerWidth] = useState(0);
+
+  const { theme } = useContext(ThemeContext);
 
   const panResponder = useMemo(
     () =>
@@ -293,7 +295,10 @@ const ProgramRanking = memo(() => {
   }, [programs, isOpened, playing]);
   useEffect(() => {
     if (listRef.current && programs[viewerIndex]?.id === selectedId) {
-      listRef.current.scrollToIndex({ index: viewerIndex, viewPosition: 0.5 });
+      listRef.current.scrollToIndex({
+        index: viewerIndex,
+        viewPosition: 0.5
+      });
     }
   }, [viewerIndex]);
 
@@ -371,19 +376,16 @@ const ProgramRanking = memo(() => {
   );
 
   return (
-    <View
-      style={[containerStyle.container, colorStyle.bgLight]}
-      onLayout={onLayout}
-    >
+    <View style={[containerStyle.container]} onLayout={onLayout}>
       {containerWidth > 0 && (
         <Animated.View
           style={[
             containerWidth > breakpoint
               ? containerStyle.row
               : containerStyle.column,
-            colorStyle.bgBlack,
             styles.header,
             {
+              backgroundColor: theme.colors?.controlBgActive,
               maxHeight: headerHeight
             }
           ]}
@@ -403,13 +405,25 @@ const ProgramRanking = memo(() => {
             {archiveActive && (
               <IconSelector
                 containerStyle={[
-                  colorStyle.bgDark,
-                  colorStyle.borderGrayDark,
-                  programStyle.headerControl
+                  programStyle.headerControl,
+                  {
+                    backgroundColor: theme.colors?.controlBg,
+                    borderColor: theme.colors?.controlBg
+                  }
                 ]}
-                style={colorStyle.bgDark}
-                color={light}
-                icon={<FontAwesome5Icon name="database" solid color={light} />}
+                style={[
+                  {
+                    backgroundColor: theme.colors?.controlBg
+                  }
+                ]}
+                color={theme.colors?.control}
+                icon={
+                  <FontAwesome5Icon
+                    name="database"
+                    solid
+                    color={theme.colors?.control}
+                  />
+                }
                 selectedValue={useArchive ? 1 : 0}
                 onValueChange={useArchiveChange}
                 items={[
@@ -420,25 +434,33 @@ const ProgramRanking = memo(() => {
             )}
             <IconSelector
               containerStyle={[
-                colorStyle.bgDark,
-                colorStyle.borderGrayDark,
                 programStyle.headerControl,
+                {
+                  backgroundColor: theme.colors?.controlBg,
+                  borderColor: theme.colors?.controlBg
+                },
                 styles.targetPicker
               ]}
-              style={colorStyle.bgDark}
-              color={light}
-              icon={<FontAwesome5Icon name="clock" solid color={light} />}
+              style={[{ backgroundColor: theme.colors?.controlBg }]}
+              color={theme.colors?.control}
+              icon={
+                <FontAwesome5Icon
+                  name="clock"
+                  solid
+                  color={theme.colors?.control}
+                />
+              }
               selectedValue={target}
               onValueChange={targetChange}
               items={targets}
             />
             <DatePicker
               containerStyle={[
-                colorStyle.borderGrayDark,
-                programStyle.headerControl
+                programStyle.headerControl,
+                { borderColor: theme.colors?.controlBorder }
               ]}
-              color={light}
-              backgroundColor={dark}
+              color={theme.colors?.control}
+              backgroundColor={theme.colors?.controlBg}
               maxDate={maxDate}
               minDate={minDate}
               value={start}
@@ -466,19 +488,32 @@ const ProgramRanking = memo(() => {
               ]}
             >
               <Switch value={unique} onValueChange={uniqueChange} />
-              <Text style={colorStyle.light}> 同一の番組を再表示しない</Text>
+              <Text style={[{ color: theme.colors?.control }]}>
+                {" "}
+                同一の番組を再表示しない
+              </Text>
             </View>
             <IconSelector
               icon={
-                <FontAwesome5Icon name="arrows-alt-v" solid color={light} />
+                <FontAwesome5Icon
+                  name="arrows-alt-v"
+                  solid
+                  color={theme.colors?.control}
+                />
               }
               containerStyle={[
-                colorStyle.bgDark,
-                colorStyle.borderGrayDark,
-                programStyle.headerControl
+                programStyle.headerControl,
+                {
+                  backgroundColor: theme.colors?.controlBg,
+                  borderColor: theme.colors?.controlBg
+                }
               ]}
-              style={colorStyle.bgDark}
-              color={light}
+              style={[
+                {
+                  backgroundColor: theme.colors?.controlBg
+                }
+              ]}
+              color={theme.colors?.control}
               selectedValue={view}
               onValueChange={viewChange}
               items={[
@@ -497,11 +532,8 @@ const ProgramRanking = memo(() => {
           {...panResponder.panHandlers}
         >
           <FlatList
-            style={programStyle.list}
-            contentContainerStyle={[
-              colorStyle.bgWhite,
-              programStyle.listContents
-            ]}
+            style={[programStyle.list]}
+            contentContainerStyle={[programStyle.listContents]}
             data={programs}
             ref={listRef}
             keyExtractor={keyExtractor}
@@ -534,8 +566,8 @@ const ListHeader = memo(
     targetName?: string;
     start: string;
     end: string;
-  }) =>
-    visible ? (
+  }) => {
+    return visible ? (
       <View
         style={[
           containerStyle.row,
@@ -543,17 +575,18 @@ const ListHeader = memo(
           programStyle.listHeader
         ]}
       >
-        <Text h4 style={[textStyle.bold, colorStyle.black]}>
+        <Text h3 style={[textStyle.bold]}>
           勢いランキング{" "}
         </Text>
-        <Text h4 style={[textStyle.bold, colorStyle.black]}>
+        <Text h3 style={[textStyle.bold]}>
           {targetName}{" "}
         </Text>
-        <Text style={colorStyle.black}>
+        <Text>
           期間: {start}～{end}
         </Text>
       </View>
-    ) : null
+    ) : null;
+  }
 );
 const ListProgram = memo(
   ({
@@ -579,6 +612,8 @@ const ListProgram = memo(
       commentMaxSpeedTime
     } = props;
 
+    const { theme } = useContext(ThemeContext);
+
     const onPressWithProps = useCallback(() => {
       if (onPress) {
         onPress(props);
@@ -587,8 +622,9 @@ const ListProgram = memo(
 
     return (
       <ListItem
-        containerStyle={[selected && programStyle.selected]}
-        titleStyle={[textStyle.bold, colorStyle.black]}
+        containerStyle={[
+          selected && { backgroundColor: theme.colors?.selected }
+        ]}
         title={fullTitle}
         chevron
         bottomDivider
@@ -596,26 +632,21 @@ const ListProgram = memo(
         subtitle={
           <>
             <View style={[containerStyle.row, containerStyle.wrap]}>
-              <Text style={[textStyle.bold, colorStyle.black]}>
+              <Text style={[textStyle.bold]}>
                 {commentMaxSpeed}コメント/分
                 {commentMaxSpeedTime &&
                   `(${dateFormatter(commentMaxSpeedTime)})`}{" "}
               </Text>
-              <Text style={colorStyle.black}>
-                平均: {Math.ceil(commentSpeed * 10) / 10}コメント/分{" "}
-              </Text>
+              <Text>平均: {Math.ceil(commentSpeed * 10) / 10}コメント/分 </Text>
               <Text>コメント数: {commentCount}</Text>
             </View>
             <View style={[containerStyle.row, containerStyle.wrap]}>
               <Badge
-                badgeStyle={[
-                  colorStyle.borderLight,
-                  { backgroundColor: category.color }
-                ]}
+                badgeStyle={[{ backgroundColor: category.color }]}
                 value={category.name}
               />
-              <Text style={colorStyle.black}>{channelName} </Text>
-              <Text style={colorStyle.black}>
+              <Text>{channelName} </Text>
+              <Text>
                 {dateFormatter(start)}({Math.round(duration / 60000)}分)
               </Text>
             </View>
@@ -624,8 +655,14 @@ const ListProgram = memo(
         leftElement={
           <View style={programStyle.listItemLeft}>
             <Text
-              h3
-              style={[textStyle.center, textStyle.bold, colorStyle.active]}
+              h4
+              style={[
+                textStyle.center,
+                textStyle.bold,
+                {
+                  color: theme.colors?.primary
+                }
+              ]}
             >
               {rank}
             </Text>
@@ -636,7 +673,6 @@ const ListProgram = memo(
     );
   }
 );
-
 const breakpoint = 540;
 
 const styles = StyleSheet.create({

@@ -12,20 +12,14 @@ limitations under the License.
 */
 
 import React from "react";
-import { Slider, SliderProps } from "react-native-elements";
 import { StyleSheet } from "react-native";
+import { Slider, SliderProps } from "react-native-elements";
 
 type Props = SliderProps & {
   thumbRound?: boolean;
 };
-const CustomSlider = ({
-  thumbTintColor = "#9991ff",
-  thumbStyle,
-  thumbRound,
-  ...props
-}: Props) => (
+const CustomSlider = ({ thumbStyle, thumbRound, ...props }: Props) => (
   <Slider
-    thumbTintColor={thumbTintColor}
     thumbStyle={thumbRound ? thumbStyle : [styles.thumbSquare, thumbStyle]}
     {...props}
   />

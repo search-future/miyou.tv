@@ -75,7 +75,7 @@ const DatePicker = ({
           }
         ])}
         buttonStyle={styles.button}
-        titleStyle={[styles.title, { color }]}
+        titleStyle={[{ color }]}
         title={title}
         icon={Icon}
         onPress={onPress}

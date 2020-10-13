@@ -11,18 +11,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { memo, useState, useEffect, useCallback, useRef } from "react";
+import React, {
+  memo,
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+  useRef,
+  useMemo
+} from "react";
 import {
   TouchableOpacity,
   View,
   StyleSheet,
   LayoutChangeEvent
 } from "react-native";
-import { Image, Text } from "react-native-elements";
+import { Image, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useDispatch, useSelector } from "react-redux";
 
-import colorStyle, { active, black, dark, light } from "../styles/color";
 import containerStyle from "../styles/container";
 import { RootState } from "../modules";
 import { WindowActions } from "../modules/window";
@@ -44,6 +51,34 @@ const Titlebar = memo(() => {
   const title = useSelector<RootState, string>(({ window }) => window.title);
 
   const [containerWidth, setContainerWidth] = useState(0);
+
+  const { theme } = useContext(ThemeContext);
+
+  const cssStyles = useMemo(
+    () => `
+        #react-app{
+          border: 2px solid ${theme.colors?.appBorder};
+          background-color: ${theme.colors?.appBg}:
+        }
+
+        .titlebar {
+          border-bottom: 2px solid ${theme.colors?.titlebarBorder};
+          user-select: none;
+          -webkit-app-region: drag;
+        }
+
+        .titlebar .button {
+          -webkit-app-region: no-drag;
+        }
+        .titlebar .button:hover {
+          background-color: #070707;
+        }
+        .titlebar .close:hover {
+          background-color: #d32535;
+        }
+      `,
+    [theme.colors?.appBg, theme.colors?.appBorder, theme.colors?.titlebarBorder]
+  );
 
   useEffect(
     () => () => {
@@ -88,7 +123,10 @@ const Titlebar = memo(() => {
     <div className="titlebar">
       <style>{cssStyles}</style>
       <View
-        style={[containerStyle.row, colorStyle.bgBlack]}
+        style={[
+          containerStyle.row,
+          { backgroundColor: theme.colors?.titlebarBg }
+        ]}
         onLayout={onLayout}
       >
         <View
@@ -96,7 +134,7 @@ const Titlebar = memo(() => {
         >
           <Image
             containerStyle={styles.iconContainer}
-            placeholderStyle={colorStyle.bgTransparent}
+            placeholderStyle={[{ backgroundColor: theme.colors?.titlebarBg }]}
             style={styles.icon}
             source={require("../../assets/icon_16x16.png")}
             resizeMode="center"
@@ -106,7 +144,7 @@ const Titlebar = memo(() => {
           <View
             style={[styles.contents, containerStyle.row, containerStyle.center]}
           >
-            <Text style={[colorStyle.light, styles.title]}>
+            <Text style={[styles.title, { color: theme.colors?.titlebar }]}>
               {title || appName}
             </Text>
           </View>
@@ -119,36 +157,58 @@ const Titlebar = memo(() => {
               <FontAwesome5Icon
                 name="thumbtack"
                 solid
-                color={alwaysOnTop ? active : light}
+                color={
+                  alwaysOnTop ? theme.colors?.primary : theme.colors?.titlebar
+                }
               />
             </TouchableOpacity>
           </div>
           <div className="button">
             <TouchableOpacity style={styles.button} onPress={minimize}>
-              <FontAwesome5Icon name="window-minimize" solid color={light} />
+              <FontAwesome5Icon
+                name="window-minimize"
+                solid
+                color={theme.colors?.titlebar}
+              />
             </TouchableOpacity>
           </div>
           {maximized ? (
             <div className="button">
               <TouchableOpacity style={styles.button} onPress={restore}>
-                <FontAwesome5Icon name="window-restore" solid color={light} />
+                <FontAwesome5Icon
+                  name="window-restore"
+                  solid
+                  color={theme.colors?.titlebar}
+                />
               </TouchableOpacity>
             </div>
           ) : (
             <div className="button">
               <TouchableOpacity style={styles.button} onPress={maximize}>
-                <FontAwesome5Icon name="window-maximize" solid color={light} />
+                <FontAwesome5Icon
+                  name="window-maximize"
+                  solid
+                  color={theme.colors?.titlebar}
+                />
               </TouchableOpacity>
             </div>
           )}
           <div className="button">
             <TouchableOpacity style={styles.button} onPress={toggleFullScreen}>
-              <FontAwesome5Icon name="square-full" solid color={light} />
+              <FontAwesome5Icon
+                name="square-full"
+                solid
+                color={theme.colors?.titlebar}
+              />
             </TouchableOpacity>
           </div>
           <div className="button close">
             <TouchableOpacity style={styles.button} onPress={close}>
-              <FontAwesome5Icon name="times" solid color={light} />
+              <FontAwesome5Icon
+                name="times"
+                solid
+                color={theme.colors?.titlebar}
+              />
             </TouchableOpacity>
           </div>
         </View>
@@ -185,25 +245,3 @@ const styles = StyleSheet.create({
     width: 32
   }
 });
-
-const cssStyles = `
-  #react-app{
-    border: 2px solid ${dark};
-  }
-
-  .titlebar {
-    border-bottom: 2px solid ${black};
-    user-select: none;
-    -webkit-app-region: drag;
-  }
-
-  .titlebar .button {
-    -webkit-app-region: no-drag;
-  }
-  .titlebar .button:hover {
-    background-color: #070707;
-  }
-  .titlebar .close:hover {
-    background-color: #d32535;
-  }
-`;

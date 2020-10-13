@@ -14,6 +14,7 @@ limitations under the License.
 import React from "react";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
+import { ThemeProvider } from "react-native-elements";
 import { createStore, applyMiddleware } from "redux";
 import createSagaMiddleware from "redux-saga";
 import { persistReducer, persistStore, PersistConfig } from "redux-persist";
@@ -23,20 +24,21 @@ import Splash from "./components/Splash";
 import rootReducer, { rootSaga, RootState } from "./modules";
 import init from "./utils/init";
 import persistConfig from "./config/persist";
+import baseTheme from "./themes/base";
 
-const App = () => {
-  return (
-    <Provider store={store}>
-      <PersistGate
-        loading={<Splash />}
-        onBeforeLift={onBeforeLift}
-        persistor={persistor as any}
-      >
+const App = () => (
+  <Provider store={store}>
+    <PersistGate
+      loading={<Splash />}
+      onBeforeLift={onBeforeLift}
+      persistor={persistor as any}
+    >
+      <ThemeProvider theme={baseTheme}>
         <AppNavigator />
-      </PersistGate>
-    </Provider>
-  );
-};
+      </ThemeProvider>
+    </PersistGate>
+  </Provider>
+);
 export default App;
 
 const sagaMiddleware = createSagaMiddleware();

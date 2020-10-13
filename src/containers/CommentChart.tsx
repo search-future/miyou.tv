@@ -15,18 +15,19 @@ import React, {
   memo,
   useState,
   useEffect,
+  useContext,
   useCallback,
   useRef,
   useMemo
 } from "react";
 import { View, StyleSheet } from "react-native";
+import { ThemeContext } from "react-native-elements";
 import { Svg, Path } from "react-native-svg";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
 import Balloon from "../components/Balloon";
 import { CommentInterval } from "../modules/commentPlayer";
 import { PlayerActions } from "../modules/player";
-import { active } from "../styles/color";
 import containerStyle from "../styles/container";
 import { RootState } from "../modules";
 import { SettingState } from "../modules/setting";
@@ -60,6 +61,8 @@ const CommentChart = memo(() => {
 
   const [containerWidth, setContainerWidth] = useState(0);
   const [containerHeight, setContainerHeight] = useState(0);
+
+  const { theme } = useContext(ThemeContext);
 
   const offset = useMemo(() => start - delay, [delay, start]);
   const length = useMemo(() => end - start, [start, end]);
@@ -136,10 +139,18 @@ const CommentChart = memo(() => {
   );
 
   return (
-    <View style={[containerStyle.container, styles.container]} onLayout={onLayout}>
+    <View
+      style={[containerStyle.container, styles.container]}
+      onLayout={onLayout}
+    >
       {containerHeight > 0 && (
         <Svg style={styles.svg} width={containerWidth} height={containerHeight}>
-          <Path fill="none" stroke={active} strokeWidth={2} d={path} />
+          <Path
+            fill="none"
+            stroke={theme.colors?.primary}
+            strokeWidth={2}
+            d={path}
+          />
         </Svg>
       )}
       {containerWidth > 0 && peaks.map(peakRenderer)}

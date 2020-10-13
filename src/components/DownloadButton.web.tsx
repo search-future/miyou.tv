@@ -206,7 +206,7 @@ const DownloadButton = ({
             { borderColor, backgroundColor: successColor }
           ]}
         >
-          <Text style={{ color, textAlign: "center" }}>
+          <Text style={[{ color, textAlign: "center" }]}>
             {success} {total && `(${total})`}
           </Text>
         </View>
@@ -253,7 +253,6 @@ const styles = StyleSheet.create({
     minHeight: 32
   },
   text: {
-    fontSize: 16,
     textAlign: "center"
   },
   progress: {
@@ -261,7 +260,6 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 8
   },
   progressText: {
-    fontSize: 16,
     marginRight: 24,
     textAlign: "center"
   },

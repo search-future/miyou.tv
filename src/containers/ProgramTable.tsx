@@ -15,6 +15,7 @@ import React, {
   memo,
   useState,
   useEffect,
+  useContext,
   useCallback,
   useMemo,
   useRef
@@ -31,7 +32,7 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent
 } from "react-native";
-import { Text, CheckBox, Badge } from "react-native-elements";
+import { Badge, CheckBox, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { Menu, MenuTrigger, MenuOptions } from "react-native-popup-menu";
 import { useNavigation } from "@react-navigation/native";
@@ -40,13 +41,6 @@ import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import Balloon from "../components/Balloon";
 import DatePicker from "../components/DatePicker";
 import IconSelector from "../components/IconSelector";
-import colorStyle, {
-  active,
-  black,
-  dark,
-  grayDark,
-  light
-} from "../styles/color";
 import containerStyle from "../styles/container";
 import textStyle from "../styles/text";
 import programStyle from "../styles/program";
@@ -151,6 +145,8 @@ const ProgramTable = memo(() => {
   const [containerWidth, setContainerWidth] = useState(0);
   const [isTop, setTop] = useState(true);
   const [isBottom, setBottom] = useState(false);
+
+  const { theme } = useContext(ThemeContext);
 
   const selectedId = viewerProgram?.id;
 
@@ -562,18 +558,20 @@ const ProgramTable = memo(() => {
         <CheckBox
           key={code}
           containerStyle={[
-            colorStyle.bgDark,
-            colorStyle.borderGrayDark,
-            styles.menuCheckbox
+            styles.menuCheckbox,
+            {
+              backgroundColor: theme.colors?.controlBg,
+              borderColor: theme.colors?.controlBorder
+            }
           ]}
-          textStyle={colorStyle.light}
+          textStyle={[{ color: theme.colors?.control }]}
           title={name}
           checked={categories.indexOf(String(code)) >= 0}
           onPress={onPress}
         />
       );
     },
-    [categories]
+    [theme, categories]
   );
   const columnRenderer = useCallback(
     (column: ProgramTableColumn) => (
@@ -590,19 +588,16 @@ const ProgramTable = memo(() => {
   );
 
   return (
-    <View
-      style={[containerStyle.container, colorStyle.bgLight]}
-      onLayout={onLayout}
-    >
+    <View style={[containerStyle.container]} onLayout={onLayout}>
       {containerWidth > 0 && (
         <Animated.View
           style={[
             containerWidth > breakpoint
               ? containerStyle.row
               : containerStyle.column,
-            colorStyle.bgBlack,
             styles.header,
             {
+              backgroundColor: theme.colors?.controlBgActive,
               maxHeight: headerHeight
             }
           ]}
@@ -622,13 +617,21 @@ const ProgramTable = memo(() => {
             {archiveActive && (
               <IconSelector
                 containerStyle={[
-                  colorStyle.bgDark,
-                  colorStyle.borderGrayDark,
-                  programStyle.headerControl
+                  programStyle.headerControl,
+                  {
+                    backgroundColor: theme.colors?.controlBg,
+                    borderColor: theme.colors?.controlBorder
+                  }
                 ]}
-                icon={<FontAwesome5Icon name="database" solid color={light} />}
-                style={colorStyle.bgDark}
-                color={light}
+                icon={
+                  <FontAwesome5Icon
+                    name="database"
+                    solid
+                    color={theme.colors?.control}
+                  />
+                }
+                style={{ backgroundColor: theme.colors?.controlBg }}
+                color={theme.colors?.control}
                 selectedValue={useArchive ? 1 : 0}
                 onValueChange={useArchiveChange}
                 items={[
@@ -652,11 +655,11 @@ const ProgramTable = memo(() => {
           >
             <DatePicker
               containerStyle={[
-                colorStyle.borderGrayDark,
-                programStyle.headerControl
+                programStyle.headerControl,
+                { borderColor: theme.colors?.controlBorder }
               ]}
-              color={light}
-              backgroundColor={dark}
+              color={theme.colors?.control}
+              backgroundColor={theme.colors?.controlBg}
               maxDate={maxDate}
               minDate={minDate}
               value={start}
@@ -679,14 +682,16 @@ const ProgramTable = memo(() => {
               <MenuTrigger
                 customStyles={{
                   triggerOuterWrapper: [
-                    colorStyle.bgDark,
-                    colorStyle.borderGrayDark,
-                    programStyle.headerControl
+                    programStyle.headerControl,
+                    {
+                      backgroundColor: theme.colors?.controlBg,
+                      borderColor: theme.colors?.controlBorder
+                    }
                   ],
                   triggerWrapper: [
                     containerStyle.row,
-                    colorStyle.bgDark,
-                    styles.menuButton
+                    styles.menuButton,
+                    { backgroundColor: theme.colors?.controlBg }
                   ]
                 }}
               >
@@ -694,16 +699,25 @@ const ProgramTable = memo(() => {
                   <FontAwesome5Icon
                     name="filter"
                     solid
-                    color={categories.length > 0 ? active : light}
+                    color={
+                      categories.length > 0
+                        ? theme.colors?.primary
+                        : theme.colors?.control
+                    }
                   />
                 </View>
-                <Text style={[colorStyle.light, styles.menuButtonText]}>
+                <Text
+                  style={[
+                    styles.menuButtonText,
+                    { color: theme.colors?.control }
+                  ]}
+                >
                   カテゴリ選択
                 </Text>
               </MenuTrigger>
               <MenuOptions
                 customStyles={{
-                  optionsWrapper: colorStyle.bgBlack
+                  optionsWrapper: { backgroundColor: theme.colors?.controlBg }
                 }}
               >
                 <ScrollView style={styles.menuView}>
@@ -716,14 +730,33 @@ const ProgramTable = memo(() => {
       )}
       {containerWidth > 0 && (
         <View style={[styles.view]} {...panResponder.panHandlers}>
-          <View style={[styles.channelBackround, colorStyle.bgDark]} />
-          <View style={[styles.hourBackground, colorStyle.bgDark]} />
+          <View
+            style={[
+              styles.channelBackround,
+              { backgroundColor: theme.colors?.controlBg }
+            ]}
+          />
+          <View
+            style={[
+              styles.hourBackground,
+              { backgroundColor: theme.colors?.controlBg }
+            ]}
+          />
           <Animated.View style={{ transform: [{ translateX: viewX }] }}>
             <ChannelHeader
               channels={tableColumns}
               onChannelPress={onChannelPress}
             />
           </Animated.View>
+          <View
+            style={[
+              styles.cornerHeader,
+              {
+                backgroundColor: theme.colors?.controlBg,
+                borderColor: theme.colors?.controlBorder
+              }
+            ]}
+          />
           <ScrollView
             style={[styles.tableView]}
             scrollEventThrottle={16}
@@ -746,7 +779,7 @@ const ProgramTable = memo(() => {
               name="angle-left"
               solid
               style={styles.icon}
-              color={light}
+              color={theme.colors?.control}
               size={16}
             />
           </TouchableOpacity>
@@ -755,7 +788,7 @@ const ProgramTable = memo(() => {
               name="angle-right"
               solid
               style={styles.icon}
-              color={light}
+              color={theme.colors?.control}
               size={16}
             />
           </TouchableOpacity>
@@ -764,7 +797,7 @@ const ProgramTable = memo(() => {
               name={hasPrevious && isTop ? "angle-double-up" : "angle-up"}
               solid
               style={styles.icon}
-              color={light}
+              color={theme.colors?.control}
               size={16}
             />
           </TouchableOpacity>
@@ -773,7 +806,7 @@ const ProgramTable = memo(() => {
               name={hasNext && isBottom ? "angle-double-down" : "angle-down"}
               solid
               style={styles.icon}
-              color={light}
+              color={theme.colors?.control}
               size={16}
             />
           </TouchableOpacity>
@@ -826,6 +859,8 @@ const ChannelCell = memo(
   }) => {
     const { channelName } = props;
 
+    const { theme } = useContext(ThemeContext);
+
     const onPressWithProps = useCallback(() => {
       if (onPress) {
         onPress(props);
@@ -834,10 +869,17 @@ const ChannelCell = memo(
 
     return (
       <TouchableOpacity
-        style={[colorStyle.borderGrayDark, styles.channelCell]}
+        style={[
+          styles.channelCell,
+          {
+            borderColor: theme.colors?.controlBorder
+          }
+        ]}
         onPress={onPressWithProps}
       >
-        <Text style={[textStyle.center, colorStyle.light]}>{channelName}</Text>
+        <Text style={[textStyle.center, { color: theme.colors?.control }]}>
+          {channelName}
+        </Text>
       </TouchableOpacity>
     );
   }
@@ -850,6 +892,9 @@ const HourHeader = memo(() => {
   const hourFormat = useSelector<State, string>(
     ({ setting }) => setting.view?.hourFormat || ""
   );
+
+  const { theme } = useContext(ThemeContext);
+
   const dateFormatter = useMemo(
     () => new DateFormatter(hourFirst, hourFormat),
     [hourFirst, hourFormat]
@@ -866,15 +911,27 @@ const HourHeader = memo(() => {
 
   const hourRenderer = useCallback(
     (hour: number) => (
-      <View key={hour} style={styles.hourCell}>
-        <Text style={[textStyle.center, colorStyle.light]}>{hour}</Text>
+      <View
+        key={hour}
+        style={[styles.hourCell, { borderColor: theme.colors?.controlBorder }]}
+      >
+        <Text style={[textStyle.center, { color: theme.colors?.control }]}>
+          {hour}
+        </Text>
       </View>
     ),
     [dateFormatter]
   );
 
   return (
-    <View style={[colorStyle.bgDark, styles.hourHeader]}>
+    <View
+      style={[
+        styles.hourHeader,
+        {
+          backgroundColor: theme.colors?.controlBg
+        }
+      ]}
+    >
       {hours.map(hourRenderer)}
     </View>
   );
@@ -959,6 +1016,8 @@ const TableCell = memo(
       size = 0
     } = props;
 
+    const { theme } = useContext(ThemeContext);
+
     const onPressWithProps = useCallback(() => {
       if (onPress) {
         onPress(props);
@@ -968,31 +1027,35 @@ const TableCell = memo(
     return (
       <View
         style={[
-          colorStyle.bgWhite,
-          colorStyle.borderLight,
-          selected && programStyle.selected,
           styles.tableCellWrapper,
           {
+            backgroundColor: theme.colors?.background,
+            borderColor: theme.colors?.divider,
             top: position * hourHeight,
             height: size * hourHeight
           }
         ]}
       >
-        <TouchableOpacity style={styles.tableCell} onPress={onPressWithProps}>
+        <TouchableOpacity
+          style={[
+            styles.tableCell,
+            selected && { backgroundColor: theme.colors?.selected }
+          ]}
+          onPress={onPressWithProps}
+        >
           <View style={[containerStyle.row, containerStyle.wrap]}>
-            <Text style={[textStyle.bold, colorStyle.black]}>
-              <Text style={colorStyle.active}>{dateFormatter(start)}</Text>{" "}
+            <Text style={[textStyle.bold]}>
+              <Text style={[{ color: theme.colors?.primary }]}>
+                {dateFormatter(start)}
+              </Text>{" "}
               {fullTitle}
             </Text>
             <Badge
-              badgeStyle={[
-                colorStyle.borderLight,
-                { backgroundColor: category.color }
-              ]}
+              badgeStyle={[{ backgroundColor: category.color }]}
               value={category.name}
             />
           </View>
-          <Text style={colorStyle.black}>{detail}</Text>
+          <Text>{detail}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -1072,7 +1135,6 @@ const ProgramTableBalloon = memo(
           right: 0,
           top
         }}
-        color={black}
         backgroundColor={balloonColor}
         pointing="left"
         onPress={onPressWithProps}
@@ -1115,6 +1177,15 @@ const styles = StyleSheet.create({
   view: {
     flex: 1
   },
+  cornerHeader: {
+    borderBottomWidth: 1,
+    borderRightWidth: 1,
+    height: 32,
+    left: 0,
+    position: "absolute",
+    top: 0,
+    width: hourWidth
+  },
   channelBackround: {
     left: 0,
     position: "absolute",
@@ -1136,6 +1207,7 @@ const styles = StyleSheet.create({
     paddingRight: scrollbarWidth
   },
   channelCell: {
+    borderBottomWidth: 1,
     borderLeftWidth: 1,
     borderRightWidth: 1,
     flex: 1,
@@ -1152,10 +1224,9 @@ const styles = StyleSheet.create({
   },
   hourCell: {
     alignItems: "center",
-    borderBottomColor: "transparent",
     borderBottomWidth: 1,
-    borderTopColor: grayDark,
     borderTopWidth: 1,
+    borderRightWidth: 1,
     flex: 1,
     justifyContent: "center",
     overflow: "hidden"

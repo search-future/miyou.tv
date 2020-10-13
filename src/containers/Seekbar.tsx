@@ -11,15 +11,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { memo, useCallback, useMemo } from "react";
+import React, { memo, useContext, useCallback, useMemo } from "react";
 import { TouchableOpacity, View, StyleSheet } from "react-native";
-import { Text } from "react-native-elements";
+import { Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
 import CommentChart from "./CommentChart";
 import CustomSlider from "../components/CustomSlider";
-import colorStyle, { gray, light } from "../styles/color";
 import containerStyle from "../styles/container";
 import { RootState } from "../modules";
 import { PlayerActions } from "../modules/player";
@@ -54,6 +53,8 @@ const Seekbar = () => {
   const extraIndex = useSelector<State, number>(
     ({ viewer }) => viewer.extraIndex
   );
+
+  const { theme } = useContext(ThemeContext);
 
   const dateFormatter = useMemo(
     () => new DateFormatter(hourFirst, hourFormat),
@@ -104,7 +105,11 @@ const Seekbar = () => {
           <FontAwesome5Icon
             name="step-backward"
             solid
-            color={program.recorded[extraIndex - 1] ? light : gray}
+            color={
+              program.recorded[extraIndex - 1]
+                ? theme.colors?.control
+                : theme.colors?.disabled
+            }
             size={24}
           />
         </TouchableOpacity>
@@ -134,7 +139,11 @@ const Seekbar = () => {
           <FontAwesome5Icon
             name="step-forward"
             solid
-            color={program.recorded[extraIndex + 1] ? light : gray}
+            color={
+              program.recorded[extraIndex + 1]
+                ? theme.colors?.control
+                : theme.colors?.disabled
+            }
             size={24}
           />
         </TouchableOpacity>
@@ -158,6 +167,8 @@ const TimeText = memo(
     formatter: (date: Date) => string;
     onPress?: () => void;
   }) => {
+    const { theme } = useContext(ThemeContext);
+
     const timeText = useMemo(
       () =>
         useClock && date
@@ -174,7 +185,7 @@ const TimeText = memo(
 
     return (
       <TouchableOpacity onPress={onPressHandler}>
-        <Text style={colorStyle.light}>{timeText}</Text>
+        <Text style={[{ color: theme.colors?.control }]}>{timeText}</Text>
       </TouchableOpacity>
     );
   }

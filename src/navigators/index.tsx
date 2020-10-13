@@ -11,8 +11,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React from "react";
+import React, { useContext } from "react";
 import { StatusBar } from "react-native";
+import { ThemeContext } from "react-native-elements";
 import { NavigationContainer } from "@react-navigation/native";
 import { MenuProvider } from "react-native-popup-menu";
 
@@ -20,10 +21,12 @@ import StackNavigator from "./StackNavigator";
 import navigationRef from "./navigation";
 
 const AppNavigator = () => {
+  const { theme } = useContext(ThemeContext);
+
   return (
     <MenuProvider backHandler>
       <StatusBar barStyle="light-content" />
-      <NavigationContainer ref={navigationRef}>
+      <NavigationContainer ref={navigationRef} theme={theme.Navigation}>
         <StackNavigator />
       </NavigationContainer>
     </MenuProvider>

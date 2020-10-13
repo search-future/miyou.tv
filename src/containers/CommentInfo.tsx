@@ -11,7 +11,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { memo, useEffect, useCallback, useMemo, useRef } from "react";
+import React, {
+  memo,
+  useEffect,
+  useContext,
+  useCallback,
+  useMemo,
+  useRef
+} from "react";
 import {
   FlatList,
   ScrollView,
@@ -21,7 +28,7 @@ import {
   Platform,
   ListRenderItem
 } from "react-native";
-import { Text, CheckBox } from "react-native-elements";
+import { Text, CheckBox, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import {
   Menu,
@@ -31,7 +38,6 @@ import {
 } from "react-native-popup-menu";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
-import colorStyle, { active, light } from "../styles/color";
 import containerStyle from "../styles/container";
 import textStyle from "../styles/text";
 import { RootState } from "../modules";
@@ -104,6 +110,8 @@ const CommentInfo = memo(() => {
     ({ setting }) => setting.view?.hourFormat || "",
     shallowEqual
   );
+
+  const { theme } = useContext(ThemeContext);
 
   const dateFormatter = useMemo(
     () => new DateFormatter(hourFirst, hourFormat),
@@ -235,22 +243,33 @@ const CommentInfo = memo(() => {
             customStyles={{
               triggerWrapper: [
                 containerStyle.row,
-                colorStyle.bgDark,
-                colorStyle.borderGrayDark,
-                styles.menuButton
+                styles.menuButton,
+                {
+                  backgroundColor: theme.colors?.controlBg,
+                  borderColor: theme.colors?.controlBorder
+                }
               ]
             }}
           >
-            <Text style={[colorStyle.light, styles.menuButtonText]}>
+            <Text
+              style={[styles.menuButtonText, { color: theme.colors?.control }]}
+            >
               チャンネル
             </Text>
             <View style={styles.menuButtonIcon}>
-              <FontAwesome5Icon name="caret-down" solid color={light} />
+              <FontAwesome5Icon
+                name="caret-down"
+                solid
+                color={theme.colors?.control}
+              />
             </View>
           </MenuTrigger>
           <MenuOptions
             customStyles={{
-              optionsContainer: [colorStyle.bgBlack, styles.menuContainer]
+              optionsContainer: [
+                styles.menuContainer,
+                { backgroundColor: theme.colors?.controlBgActive }
+              ]
             }}
           >
             <ScrollView style={styles.menuView}>
@@ -264,23 +283,29 @@ const CommentInfo = memo(() => {
             customStyles={{
               triggerWrapper: [
                 containerStyle.row,
-                colorStyle.bgDark,
-                colorStyle.borderGrayDark,
-                styles.menuButton
+                styles.menuButton,
+                {
+                  backgroundColor: theme.colors?.controlBg,
+                  borderColor: theme.colors?.controlBorder
+                }
               ]
             }}
           >
-            <Text style={[colorStyle.light, styles.menuButtonText]}>
+            <Text
+              style={[styles.menuButtonText, { color: theme.colors?.control }]}
+            >
               スレッド
             </Text>
             <View style={styles.menuButtonIcon}>
-              <FontAwesome5Icon name="caret-down" solid color={light} />
+              <FontAwesome5Icon
+                name="caret-down"
+                solid
+                color={theme.colors?.control}
+              />
             </View>
           </MenuTrigger>
           <MenuOptions
-            customStyles={{
-              optionsContainer: [colorStyle.bgBlack, styles.menuContainer]
-            }}
+            customStyles={{ optionsContainer: [styles.menuContainer] }}
           >
             <ScrollView style={styles.menuView}>
               {titles.map(threadRenderer)}
@@ -292,13 +317,20 @@ const CommentInfo = memo(() => {
           <FontAwesome5Icon
             name="sort-amount-down"
             solid
-            color={autoScroll ? active : light}
+            color={autoScroll ? theme.colors?.primary : theme.colors?.control}
             size={16}
           />
         </TouchableOpacity>
       </View>
       <FlatList
-        style={[containerStyle.container, colorStyle.bgLight]}
+        style={[
+          containerStyle.container,
+          styles.list,
+          {
+            backgroundColor: theme.colors?.controlBgActive,
+            borderColor: theme.colors?.controlBorder
+          }
+        ]}
         data={filteredData}
         removeClippedSubviews={Platform.OS !== "web"}
         windowSize={3}
@@ -307,11 +339,13 @@ const CommentInfo = memo(() => {
         getItemLayout={getListItemLayout}
         renderItem={listRenderer}
       />
-      <View style={[containerStyle.row, containerStyle.wrap]}>
-        <Text style={colorStyle.light}>
+      <View style={[containerStyle.row, styles.footer]}>
+        <Text
+          style={[containerStyle.container, { color: theme.colors?.control }]}
+        >
           {CommentService.channelToQueries(channel, queryTable).join(",")}
         </Text>
-        <Text style={[colorStyle.light, textStyle.right, styles.speedText]}>
+        <Text style={[textStyle.right, { color: theme.colors?.control }]}>
           {speed}コメント/分
         </Text>
       </View>
@@ -330,6 +364,8 @@ const CustomCheckBox = memo(
     checked?: boolean;
     onPress?: (value: string, checked: boolean) => void;
   }) => {
+    const { theme } = useContext(ThemeContext);
+
     const onPressHandler = useCallback(() => {
       if (onPress) {
         onPress(value, !checked);
@@ -338,11 +374,13 @@ const CustomCheckBox = memo(
     return (
       <CheckBox
         containerStyle={[
-          colorStyle.bgDark,
-          colorStyle.borderGrayDark,
-          styles.menuCheckbox
+          styles.menuCheckbox,
+          {
+            backgroundColor: theme.colors?.controlBgActive,
+            borderColor: theme.colors?.controlBorder
+          }
         ]}
-        textStyle={colorStyle.light}
+        textStyle={[{ color: theme.colors?.control }]}
         title={value}
         checked={checked}
         onPress={onPressHandler}
@@ -364,6 +402,8 @@ const CommentListItem = memo(
   }) => {
     const { title, name, email, text, time, id } = props;
 
+    const { theme } = useContext(ThemeContext);
+
     const playTime = useMemo(() => formatTime(time - offset), [time, offset]);
     const airTime = useMemo(() => dateFormatter(time), [time, dateFormatter]);
 
@@ -378,59 +418,76 @@ const CommentListItem = memo(
         <MenuTrigger
           customStyles={{
             triggerWrapper: [
-              colorStyle.bgWhite,
-              colorStyle.borderGray,
-              styles.item
+              styles.item,
+              {
+                backgroundColor: theme.colors?.background,
+                borderColor: theme.colors?.divider
+              }
             ]
           }}
         >
-          <Text style={[colorStyle.black, styles.itemTextSmall]}>
+          <Text style={[styles.itemTextSmall]}>
             {playTime}({airTime}) {name}[{email}](
             {id})
           </Text>
-          <Text style={[textStyle.bold, colorStyle.black, styles.itemText]}>
-            {text.trim()}
-          </Text>
-          <Text style={[colorStyle.black, styles.itemTextSmall]}>{title}</Text>
+          <Text style={[textStyle.bold, styles.itemText]}>{text.trim()}</Text>
+          <Text style={[styles.itemTextSmall]}>{title}</Text>
         </MenuTrigger>
         <MenuOptions
           customStyles={{
-            optionsContainer: [colorStyle.borderGray, styles.itemMenuContainer]
+            optionsContainer: [
+              styles.itemMenuContainer,
+              {
+                backgroundColor: theme.colors?.background,
+                borderColor: theme.colors?.divider
+              }
+            ]
           }}
         >
           <MenuOption
-            style={[containerStyle.row, colorStyle.bgDark]}
+            style={[
+              containerStyle.row,
+              { backgroundColor: theme.colors?.controlBgActive }
+            ]}
             onSelect={onSelectHandler}
           >
             <View style={styles.itemMenuIcon}>
-              <FontAwesome5Icon name="clock" solid color={light} size={16} />
+              <FontAwesome5Icon
+                name="clock"
+                solid
+                color={theme.colors?.control}
+                size={16}
+              />
             </View>
-            <Text style={[colorStyle.light, styles.itemMenuTitle]}>
+            <Text
+              style={[
+                styles.itemMenuTitle,
+                {
+                  color: theme.colors?.control
+                }
+              ]}
+            >
               {playTime}({airTime})
             </Text>
           </MenuOption>
-          <Text
-            style={[textStyle.bold, colorStyle.black, styles.itemMenuContent]}
-          >
+          <Text style={[textStyle.bold, styles.itemMenuContent]}>
             {text.trim()}
           </Text>
           <View style={containerStyle.row}>
-            <Text style={[colorStyle.black, styles.itemMenuName]}>
-              スレッド
-            </Text>
-            <Text style={[colorStyle.black, styles.itemMenuText]}>{title}</Text>
+            <Text style={[styles.itemMenuName]}>スレッド</Text>
+            <Text style={[styles.itemMenuText]}>{title}</Text>
           </View>
           <View style={containerStyle.row}>
-            <Text style={[colorStyle.black, styles.itemMenuName]}>名前</Text>
-            <Text style={[colorStyle.black, styles.itemMenuText]}>{name}</Text>
+            <Text style={[styles.itemMenuName]}>名前</Text>
+            <Text style={[styles.itemMenuText]}>{name}</Text>
           </View>
           <View style={containerStyle.row}>
-            <Text style={[colorStyle.black, styles.itemMenuName]}>メール</Text>
-            <Text style={[colorStyle.black, styles.itemMenuText]}>{email}</Text>
+            <Text style={[styles.itemMenuName]}>メール</Text>
+            <Text style={[styles.itemMenuText]}>{email}</Text>
           </View>
           <View style={containerStyle.row}>
-            <Text style={[colorStyle.black, styles.itemMenuName]}>ID</Text>
-            <Text style={[colorStyle.black, styles.itemMenuText]}>{id}</Text>
+            <Text style={[styles.itemMenuName]}>ID</Text>
+            <Text style={[styles.itemMenuText]}>{id}</Text>
           </View>
         </MenuOptions>
       </Menu>
@@ -483,7 +540,8 @@ const styles = StyleSheet.create({
     width: 32
   },
   list: {
-    flex: 1
+    borderBottomWidth: 1,
+    borderTopWidth: 1
   },
   item: {
     borderBottomWidth: 1,
@@ -537,7 +595,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginHorizontal: 4
   },
-  speedText: {
-    marginLeft: "auto"
+  footer: {
+    padding: 8
   }
 });

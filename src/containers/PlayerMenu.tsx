@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from "react";
+import React, { useContext, useCallback, memo } from "react";
 import {
   Switch,
   TouchableOpacity,
@@ -6,12 +6,11 @@ import {
   Platform,
   StyleSheet
 } from "react-native";
-import { Text } from "react-native-elements";
+import { Text, ThemeContext } from "react-native-elements";
 import { Menu, MenuTrigger, MenuOptions } from "react-native-popup-menu";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useDispatch, useSelector } from "react-redux";
 
-import colorStyle, { light } from "../styles/color";
 import containerStyle from "../styles/container";
 import { RootState } from "../modules";
 import { PlayerActions } from "../modules/player";
@@ -40,84 +39,95 @@ const PlayerMenu = memo(
       ({ player }) => player.trackCount.audio
     );
 
+    const { theme } = useContext(ThemeContext);
+
     return (
       <Menu>
         <MenuTrigger customStyles={{ triggerWrapper: styles.button }}>
           {triggerComponent}
         </MenuTrigger>
         <MenuOptions
-          customStyles={{ optionsContainer: styles.optionContainer }}
+          customStyles={{
+            optionsContainer: [
+              styles.optionContainer,
+              { backgroundColor: theme.colors?.controlBgActive }
+            ]
+          }}
         >
-          <View
-            style={[containerStyle.row, colorStyle.bgBlack, styles.optionRow]}
-          >
-            <Text style={[colorStyle.light, styles.optionLabel]}>再生速度</Text>
+          <View style={[containerStyle.row, styles.optionRow]}>
+            <Text
+              style={[styles.optionLabel, { color: theme.colors?.control }]}
+            >
+              再生速度
+            </Text>
             <SpeedSwitch />
           </View>
           {Platform.OS === "web" && (
-            <View
-              style={[containerStyle.row, colorStyle.bgBlack, styles.optionRow]}
-            >
-              <Text style={[colorStyle.light, styles.optionLabel]}>
+            <View style={[containerStyle.row, styles.optionRow]}>
+              <Text
+                style={[styles.optionLabel, { color: theme.colors?.control }]}
+              >
                 インターレース解除
               </Text>
               <DeinterlaceSwitch />
             </View>
           )}
           {(Platform.OS !== "web" || audioTrackCount > 1) && (
-            <View
-              style={[containerStyle.row, colorStyle.bgBlack, styles.optionRow]}
-            >
-              <Text style={[colorStyle.light, styles.optionLabel]}>
+            <View style={[containerStyle.row, styles.optionRow]}>
+              <Text
+                style={[styles.optionLabel, { color: theme.colors?.control }]}
+              >
                 音声トラック
               </Text>
               <AudioTrackSwitch />
             </View>
           )}
           {
-            <View
-              style={[containerStyle.row, colorStyle.bgBlack, styles.optionRow]}
-            >
-              <Text style={[colorStyle.light, styles.optionLabel]}>
+            <View style={[containerStyle.row, styles.optionRow]}>
+              <Text
+                style={[styles.optionLabel, { color: theme.colors?.control }]}
+              >
                 {Platform.OS === "web" ? "デュアルモノラル" : "ステレオモード"}
               </Text>
               <DualMonoModeSwitch />
             </View>
           }
-          <View
-            style={[containerStyle.row, colorStyle.bgBlack, styles.optionRow]}
-          >
-            <Text style={[colorStyle.light, styles.optionLabel]}>連続再生</Text>
+          <View style={[containerStyle.row, styles.optionRow]}>
+            <Text
+              style={[styles.optionLabel, { color: theme.colors?.control }]}
+            >
+              連続再生
+            </Text>
             <RepeatSwitch />
           </View>
-          <View
-            style={[containerStyle.row, colorStyle.bgBlack, styles.optionRow]}
-          >
-            <Text style={[colorStyle.light, styles.optionLabel]}>
+          <View style={[containerStyle.row, styles.optionRow]}>
+            <Text
+              style={[styles.optionLabel, { color: theme.colors?.control }]}
+            >
               コメント表示時間
             </Text>
             <CommentDurationSwitch />
           </View>
-          <View
-            style={[containerStyle.row, colorStyle.bgBlack, styles.optionRow]}
-          >
-            <Text style={[colorStyle.light, styles.optionLabel]}>
+          <View style={[containerStyle.row, styles.optionRow]}>
+            <Text
+              style={[styles.optionLabel, { color: theme.colors?.control }]}
+            >
               コメント遅延時間
             </Text>
             <CommentDelaySwitch />
           </View>
-          <View
-            style={[containerStyle.row, colorStyle.bgBlack, styles.optionRow]}
-          >
-            <Text style={[colorStyle.light, styles.optionLabel]}>
+          <View style={[containerStyle.row, styles.optionRow]}>
+            <Text
+              style={[styles.optionLabel, { color: theme.colors?.control }]}
+            >
               コメントライン数
             </Text>
             <CommentMaxLinesSwitch />
           </View>
-          <View
-            style={[containerStyle.row, colorStyle.bgBlack, styles.optionRow]}
-          >
-            <Text style={[colorStyle.light, styles.optionLabel]}>
+          <View style={[containerStyle.row, styles.optionRow]}>
+            <Text
+              style={[styles.optionLabel, { color: theme.colors?.control }]}
+            >
               コメント同時表示数
             </Text>
             <MaxCommentsSwitch />
@@ -138,17 +148,33 @@ const PropertySwitch = memo(
     value: string | number;
     onPrevious: () => void;
     onNext: () => void;
-  }) => (
-    <View style={[containerStyle.row, containerStyle.center]}>
-      <TouchableOpacity style={styles.button} onPress={onPrevious}>
-        <FontAwesome5Icon name="caret-left" solid color={light} size={24} />
-      </TouchableOpacity>
-      <Text style={[colorStyle.light, styles.optionValue]}>{value}</Text>
-      <TouchableOpacity style={styles.button} onPress={onNext}>
-        <FontAwesome5Icon name="caret-right" solid color={light} size={24} />
-      </TouchableOpacity>
-    </View>
-  )
+  }) => {
+    const { theme } = useContext(ThemeContext);
+
+    return (
+      <View style={[containerStyle.row, containerStyle.center]}>
+        <TouchableOpacity style={styles.button} onPress={onPrevious}>
+          <FontAwesome5Icon
+            name="caret-left"
+            solid
+            color={theme.colors?.control}
+            size={24}
+          />
+        </TouchableOpacity>
+        <Text style={[styles.optionValue, { color: theme.colors?.control }]}>
+          {value}
+        </Text>
+        <TouchableOpacity style={styles.button} onPress={onNext}>
+          <FontAwesome5Icon
+            name="caret-right"
+            solid
+            color={theme.colors?.control}
+            size={24}
+          />
+        </TouchableOpacity>
+      </View>
+    );
+  }
 );
 
 const SpeedSwitch = memo(() => {

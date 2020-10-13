@@ -64,7 +64,7 @@ const TimePicker = ({
           }
         ])}
         buttonStyle={styles.button}
-        titleStyle={[styles.title, { color }]}
+        titleStyle={[{ color }]}
         title={title}
         icon={
           <FontAwesome5Icon
@@ -100,9 +100,6 @@ const styles = StyleSheet.create({
     height: 32,
     justifyContent: "flex-start",
     paddingVertical: 0
-  },
-  title: {
-    fontSize: 16
   },
   icon: {
     width: 32,

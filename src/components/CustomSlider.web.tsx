@@ -11,9 +11,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { useCallback, ChangeEvent } from "react";
+import React, { useContext, useCallback, ChangeEvent } from "react";
 import { View } from "react-native";
-import { SliderProps } from "react-native-elements";
+import { SliderProps, ThemeContext } from "react-native-elements";
 
 type Props = SliderProps & {
   thumbRound?: boolean;
@@ -24,11 +24,13 @@ const CustomSlider = ({
   minimumValue,
   step,
   style,
-  thumbTintColor = "#9991ff",
+  thumbTintColor = "",
   value,
   onValueChange,
   thumbRound = false
 }: Props) => {
+  const { theme } = useContext(ThemeContext);
+
   const cssStyles = `
     .slider {
       padding: 0;
@@ -51,7 +53,9 @@ const CustomSlider = ({
       cursor: pointer;
     }
     .slider::-webkit-slider-thumb {
-      background: ${thumbTintColor};
+      background: ${
+        thumbTintColor || theme.Slider?.thumbTintColor || "#ff0000"
+      };
       position: relative;
       top: -8px;
       width: 8px;
@@ -66,10 +70,15 @@ const CustomSlider = ({
       border-radius: 16px;
     }
   `;
+
   const onChange = useCallback(
     ({ currentTarget }: ChangeEvent<HTMLInputElement>) => {
       const { value } = currentTarget;
-      onValueChange && onValueChange(parseFloat(value));
+      if (onValueChange) {
+        onValueChange(parseFloat(value));
+      } else if (theme.Slider?.onValueChange) {
+        theme.Slider.onValueChange(parseFloat(value));
+      }
     },
     [onValueChange]
   );
@@ -80,11 +89,11 @@ const CustomSlider = ({
       <input
         type="range"
         className={thumbRound ? "slider slider-round" : "slider"}
-        disabled={disabled}
-        max={maximumValue}
-        min={minimumValue}
-        step={step}
-        value={`${value}`}
+        disabled={disabled != null ? disabled : theme.Slider?.disabled}
+        max={maximumValue || theme.Slider?.maximumValue}
+        min={minimumValue || theme.Slider?.minimumValue}
+        step={step || theme.Slider?.step}
+        value={`${value || theme.Slider?.value}`}
         onChange={onChange}
       />
     </View>
