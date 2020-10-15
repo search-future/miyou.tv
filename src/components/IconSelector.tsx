@@ -43,7 +43,7 @@ const IconSelector = ({
   onValueChange
 }: Props) => (
   <View style={[styles.container, containerStyle]}>
-    <View style={styles.iconWrapper}>{icon}</View>
+    {icon && <View style={styles.iconWrapper}>{icon}</View>}
     <Picker
       style={[{ color }, styles.picker, style]}
       itemStyle={itemStyle}

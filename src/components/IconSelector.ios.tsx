@@ -64,7 +64,7 @@ const IconSelector = ({
 
   return (
     <View style={[styles.container, containerStyle]}>
-      <View style={styles.iconWrapper}>{icon}</View>
+      {icon && <View style={styles.iconWrapper}>{icon}</View>}
       <TouchableOpacity style={[styles.button, style]} onPress={onPress}>
         <Text style={[{ color }, itemStyle]}>
           {selected ? selected.label : selectedValue}
