@@ -22,18 +22,16 @@ import React, {
 import {
   ScrollView,
   Switch,
-  TextInput,
   TouchableOpacity,
   View,
   StyleSheet,
   Platform
 } from "react-native";
-import { Picker } from "@react-native-community/picker";
-import { Text, ThemeContext } from "react-native-elements";
+import { Input, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
-
+import IconSelector from "../components/IconSelector";
 import LinkText from "../components/LinkText";
 import containerStyle from "../styles/container";
 import { RootState } from "../modules";
@@ -112,7 +110,10 @@ const Setup = () => {
           MiyouTVの設定
         </Text>
       </View>
-      <ScrollView style={styles.view}>
+      <ScrollView
+        style={[containerStyle.container]}
+        contentContainerStyle={[containerStyle.row, containerStyle.wrap]}
+      >
         <BackendSetup data={backendSetting} onChanged={onBackendChanged} />
         <CommentSetup data={commentSetting} onChanged={onMoritapoChanged} />
         <ViewSetup data={viewSetting} onChanged={onViewChanged} />
@@ -309,43 +310,35 @@ const BackendSetup = memo(
       <View style={styles.group}>
         <Text h3>バックエンド</Text>
         <Text>バックエンドの種類</Text>
-        <View
-          style={[
+        <IconSelector
+          containerStyle={[
             styles.inputWrapper,
             {
               backgroundColor: theme.colors?.background,
               borderColor: theme.colors?.border
             }
           ]}
-        >
-          <Picker
-            style={[
-              styles.picker,
-              {
-                backgroundColor: theme.colors?.background,
-                color: theme.colors?.default
-              }
-            ]}
-            itemStyle={[styles.pickerItem, { color: theme.colors?.default }]}
-            selectedValue={backendType}
-            onValueChange={backendTypeChange}
-          >
-            <Picker.Item label="Chinachu" value="chinachu" />
-            <Picker.Item label="EPGStation" value="epgstation" />
-            {garaponDevId && (
-              <Picker.Item
-                label="ガラポンTV API Ver.3 (～伍号機)"
-                value="garapon"
-              />
-            )}
-            {garaponDevId && (
-              <Picker.Item
-                label="ガラポンTV API Ver.4 (六号機～)"
-                value="garaponv4"
-              />
-            )}
-          </Picker>
-        </View>
+          style={{ backgroundColor: theme.colors?.background }}
+          color={theme.colors?.default}
+          items={[
+            { label: "Chinachu", value: "chinachu" },
+            { label: "EPGStation", value: "epgstation" },
+            ...(garaponDevId
+              ? [
+                  {
+                    label: "ガラポンTV API Ver.3 (～伍号機)",
+                    value: "garapon"
+                  },
+                  {
+                    label: "ガラポンTV API Ver.4 (六号機～)",
+                    value: "garaponv4"
+                  }
+                ]
+              : [])
+          ]}
+          selectedValue={backendType}
+          onValueChange={backendTypeChange}
+        />
         {backendType === "chinachu" && (
           <>
             <View style={styles.info}>
@@ -357,354 +350,190 @@ const BackendSetup = memo(
                 </LinkText>
               )}
             </View>
-            <Text>ChinachuのURL</Text>
-            <View
-              style={[
-                styles.inputWrapper,
-                {
-                  backgroundColor: theme.colors?.background,
-                  borderColor: theme.colors?.border
-                }
-              ]}
-            >
-              <TextInput
-                style={[{ color: theme.colors?.default }]}
-                autoCapitalize="none"
-                placeholder="http://127.0.0.1:20772/"
-                textContentType="URL"
-                value={url}
-                onChangeText={urlChange}
-              />
-            </View>
+            <Input
+              label="ChinachuのURL"
+              inputContainerStyle={[styles.inputWrapper]}
+              autoCapitalize="none"
+              placeholder="http://127.0.0.1:20772/"
+              textContentType="URL"
+              value={url}
+              onChangeText={urlChange}
+            />
             <Text>ユーザー名とパスワードを使用する</Text>
             <View style={containerStyle.row}>
               <Switch value={auth} onValueChange={backendAuthChange} />
             </View>
             {auth && (
               <>
-                <Text>Chinachuのユーザー</Text>
-                <View
-                  style={[
-                    styles.inputWrapper,
-                    {
-                      backgroundColor: theme.colors?.background,
-                      borderColor: theme.colors?.border
-                    }
-                  ]}
-                >
-                  <TextInput
-                    style={[{ color: theme.colors?.default }]}
-                    autoCapitalize="none"
-                    textContentType="username"
-                    value={user}
-                    onChangeText={userChange}
-                  />
-                </View>
-                <Text>Chinachuのパスワード</Text>
-                <View
-                  style={[
-                    styles.inputWrapper,
-                    {
-                      backgroundColor: theme.colors?.background,
-                      borderColor: theme.colors?.border
-                    }
-                  ]}
-                >
-                  <TextInput
-                    style={[{ color: theme.colors?.default }]}
-                    autoCapitalize="none"
-                    textContentType="password"
-                    secureTextEntry
-                    value={password}
-                    onChangeText={passwordChange}
-                  />
-                </View>
+                <Input
+                  label="Chinachuのユーザー"
+                  inputContainerStyle={[styles.inputWrapper]}
+                  autoCapitalize="none"
+                  textContentType="username"
+                  value={user}
+                  onChangeText={userChange}
+                />
+                <Input
+                  label="Chinachuのパスワード"
+                  inputContainerStyle={[styles.inputWrapper]}
+                  autoCapitalize="none"
+                  textContentType="password"
+                  secureTextEntry
+                  value={password}
+                  onChangeText={passwordChange}
+                />
               </>
             )}
             <Text>動画コンテナ</Text>
-            <View
-              style={[
+            <IconSelector
+              containerStyle={[
                 styles.inputWrapper,
                 {
                   backgroundColor: theme.colors?.background,
                   borderColor: theme.colors?.border
                 }
               ]}
-            >
-              <Picker
-                style={[
-                  styles.picker,
-                  {
-                    backgroundColor: theme.colors?.background,
-                    color: theme.colors?.default
-                  }
-                ]}
-                itemStyle={[
-                  styles.pickerItem,
-                  { color: theme.colors?.default }
-                ]}
-                selectedValue={streamType}
-                onValueChange={streamTypeChange}
-              >
-                <Picker.Item label="MPEG2-TS" value="m2ts" />
-                <Picker.Item label="MP4" value="mp4" />
-                <Picker.Item label="WebM" value="webm" />
-              </Picker>
-            </View>
-            <Text>動画オプション</Text>
-            <View
-              style={[
-                styles.inputWrapper,
-                {
-                  backgroundColor: theme.colors?.background,
-                  borderColor: theme.colors?.border
-                }
+              style={{ backgroundColor: theme.colors?.background }}
+              color={theme.colors?.default}
+              items={[
+                { label: "MPEG2-TS", value: "m2ts" },
+                { label: "MP4", value: "mp4" },
+                { label: "WebM", value: "webm" }
               ]}
-            >
-              <TextInput
-                style={[{ color: theme.colors?.default }]}
-                autoCapitalize="none"
-                value={streamParams}
-                onChangeText={streamParamsChange}
-              />
-            </View>
+              selectedValue={streamType}
+              onValueChange={streamTypeChange}
+            />
+            <Input
+              label="動画オプション"
+              inputContainerStyle={[styles.inputWrapper]}
+              autoCapitalize="none"
+              value={streamParams}
+              onChangeText={streamParamsChange}
+            />
             {Platform.OS !== "web" && (
               <>
                 <Text>動画コンテナ(モバイルデータ通信)</Text>
-                <View
-                  style={[
+                <IconSelector
+                  containerStyle={[
                     styles.inputWrapper,
                     {
                       backgroundColor: theme.colors?.background,
                       borderColor: theme.colors?.border
                     }
                   ]}
-                >
-                  <Picker
-                    style={[
-                      styles.picker,
-                      {
-                        backgroundColor: theme.colors?.background,
-                        color: theme.colors?.default
-                      }
-                    ]}
-                    itemStyle={[
-                      styles.pickerItem,
-                      { color: theme.colors?.default }
-                    ]}
-                    selectedValue={mobileStreamType}
-                    onValueChange={mobileStreamTypeChange}
-                  >
-                    <Picker.Item label="MP4" value="mp4" />
-                    <Picker.Item label="WebM" value="webm" />
-                  </Picker>
-                </View>
-                <Text>動画オプション(モバイルデータ通信)</Text>
-                <View
-                  style={[
-                    styles.inputWrapper,
-                    {
-                      backgroundColor: theme.colors?.background,
-                      borderColor: theme.colors?.border
-                    }
+                  style={{ backgroundColor: theme.colors?.background }}
+                  color={theme.colors?.default}
+                  items={[
+                    { label: "MP4", value: "mp4" },
+                    { label: "WebM", value: "webm" }
                   ]}
-                >
-                  <TextInput
-                    style={[{ color: theme.colors?.default }]}
-                    autoCapitalize="none"
-                    value={mobileStreamParams}
-                    onChangeText={mobileStreamParamsChange}
-                  />
-                </View>
+                  selectedValue={mobileStreamType}
+                  onValueChange={mobileStreamTypeChange}
+                />
+                <Input
+                  label="動画オプション(モバイルデータ通信)"
+                  inputContainerStyle={[styles.inputWrapper]}
+                  autoCapitalize="none"
+                  value={mobileStreamParams}
+                  onChangeText={mobileStreamParamsChange}
+                />
               </>
             )}
           </>
         )}
         {backendType === "epgstation" && (
           <>
-            <Text>EPGStationのURL</Text>
-            <View
-              style={[
-                styles.inputWrapper,
-                {
-                  backgroundColor: theme.colors?.background,
-                  borderColor: theme.colors?.border
-                }
-              ]}
-            >
-              <TextInput
-                style={[{ color: theme.colors?.default }]}
-                autoCapitalize="none"
-                placeholder="http://127.0.0.1:8888/"
-                textContentType="URL"
-                value={url}
-                onChangeText={urlChange}
-              />
-            </View>
+            <Input
+              label="EPGStationのURL"
+              inputContainerStyle={[styles.inputWrapper]}
+              autoCapitalize="none"
+              placeholder="http://127.0.0.1:8888/"
+              textContentType="URL"
+              value={url}
+              onChangeText={urlChange}
+            />
             <Text>ユーザー名とパスワードを使用する</Text>
             <View style={containerStyle.row}>
               <Switch value={auth} onValueChange={backendAuthChange} />
             </View>
             {auth && (
               <>
-                <Text>EPGStationのユーザー</Text>
-                <View
-                  style={[
-                    styles.inputWrapper,
-                    {
-                      backgroundColor: theme.colors?.background,
-                      borderColor: theme.colors?.border
-                    }
-                  ]}
-                >
-                  <TextInput
-                    style={[{ color: theme.colors?.default }]}
-                    autoCapitalize="none"
-                    textContentType="username"
-                    value={user}
-                    onChangeText={userChange}
-                  />
-                </View>
-                <Text>EPGStationのパスワード</Text>
-                <View
-                  style={[
-                    styles.inputWrapper,
-                    {
-                      backgroundColor: theme.colors?.background,
-                      borderColor: theme.colors?.border
-                    }
-                  ]}
-                >
-                  <TextInput
-                    style={[{ color: theme.colors?.default }]}
-                    autoCapitalize="none"
-                    textContentType="password"
-                    secureTextEntry
-                    value={password}
-                    onChangeText={passwordChange}
-                  />
-                </View>
+                <Input
+                  label="EPGStationのユーザー"
+                  inputContainerStyle={[styles.inputWrapper]}
+                  autoCapitalize="none"
+                  textContentType="username"
+                  value={user}
+                  onChangeText={userChange}
+                />
+                <Input
+                  label="EPGStationのパスワード"
+                  inputContainerStyle={[styles.inputWrapper]}
+                  autoCapitalize="none"
+                  textContentType="password"
+                  secureTextEntry
+                  value={password}
+                  onChangeText={passwordChange}
+                />
               </>
             )}
             <Text>動画コンテナ</Text>
-            <View
-              style={[
+            <IconSelector
+              containerStyle={[
                 styles.inputWrapper,
                 {
                   backgroundColor: theme.colors?.background,
                   borderColor: theme.colors?.border
                 }
               ]}
-            >
-              {Platform.OS === "web" ? (
-                <Picker
-                  style={[
-                    styles.picker,
-                    {
-                      backgroundColor: theme.colors?.background,
-                      color: theme.colors?.default
-                    }
-                  ]}
-                  itemStyle={[
-                    styles.pickerItem,
-                    { color: theme.colors?.default }
-                  ]}
-                  selectedValue={streamType}
-                  onValueChange={streamTypeChange}
-                >
-                  <Picker.Item label="無変換" value="raw" />
-                  <Picker.Item label="MP4" value="mp4" />
-                  <Picker.Item label="WebM" value="webm" />
-                  <Picker.Item label="MPEG2-TS" value="mpegts" />
-                </Picker>
-              ) : (
-                <Picker
-                  style={[
-                    styles.picker,
-                    {
-                      backgroundColor: theme.colors?.background,
-                      color: theme.colors?.default
-                    }
-                  ]}
-                  itemStyle={[
-                    styles.pickerItem,
-                    { color: theme.colors?.default }
-                  ]}
-                  selectedValue={streamType}
-                  onValueChange={streamTypeChange}
-                >
-                  <Picker.Item label="MP4" value="mp4" />
-                  <Picker.Item label="WebM" value="webm" />
-                  <Picker.Item label="MPEG2-TS" value="mpegts" />
-                </Picker>
-              )}
-            </View>
-            <Text>動画オプション</Text>
-            <View
-              style={[
-                styles.inputWrapper,
-                {
-                  backgroundColor: theme.colors?.background,
-                  borderColor: theme.colors?.border
-                }
+              style={{ backgroundColor: theme.colors?.background }}
+              color={theme.colors?.default}
+              items={[
+                ...(Platform.OS === "web"
+                  ? [{ label: "無変換", value: "raw" }]
+                  : []),
+                { label: "MP4", value: "mp4" },
+                { label: "WebM", value: "webm" },
+                { label: "MPEG2-TS", value: "mpegts" }
               ]}
-            >
-              <TextInput
-                style={[{ color: theme.colors?.default }]}
-                autoCapitalize="none"
-                value={streamParams}
-                editable={streamType !== "raw"}
-                onChangeText={streamParamsChange}
-              />
-            </View>
+              selectedValue={streamType}
+              onValueChange={streamTypeChange}
+            />
+            <Input
+              label="動画オプション"
+              inputContainerStyle={[styles.inputWrapper]}
+              autoCapitalize="none"
+              value={streamParams}
+              editable={streamType !== "raw"}
+              onChangeText={streamParamsChange}
+            />
             {Platform.OS !== "web" && (
               <>
                 <Text>動画コンテナ(モバイルデータ通信)</Text>
-                <View
-                  style={[
+                <IconSelector
+                  containerStyle={[
                     styles.inputWrapper,
                     {
                       backgroundColor: theme.colors?.background,
                       borderColor: theme.colors?.border
                     }
                   ]}
-                >
-                  <Picker
-                    style={[
-                      styles.picker,
-                      {
-                        backgroundColor: theme.colors?.background,
-                        color: theme.colors?.default
-                      }
-                    ]}
-                    itemStyle={[
-                      styles.pickerItem,
-                      { color: theme.colors?.default }
-                    ]}
-                    selectedValue={mobileStreamType}
-                    onValueChange={mobileStreamTypeChange}
-                  >
-                    <Picker.Item label="MP4" value="mp4" />
-                    <Picker.Item label="WebM" value="webm" />
-                  </Picker>
-                </View>
-                <Text>動画オプション(モバイルデータ通信)</Text>
-                <View
-                  style={[
-                    styles.inputWrapper,
-                    {
-                      backgroundColor: theme.colors?.background,
-                      borderColor: theme.colors?.border
-                    }
+                  style={{ backgroundColor: theme.colors?.background }}
+                  color={theme.colors?.default}
+                  items={[
+                    { label: "MP4", value: "mp4" },
+                    { label: "WebM", value: "webm" }
                   ]}
-                >
-                  <TextInput
-                    style={[{ color: theme.colors?.default }]}
-                    autoCapitalize="none"
-                    value={mobileStreamParams}
-                    onChangeText={mobileStreamParamsChange}
-                  />
-                </View>
+                  selectedValue={mobileStreamType}
+                  onValueChange={mobileStreamTypeChange}
+                />
+                <Input
+                  label="動画オプション(モバイルデータ通信)"
+                  inputContainerStyle={[styles.inputWrapper]}
+                  autoCapitalize="none"
+                  value={mobileStreamParams}
+                  onChangeText={mobileStreamParamsChange}
+                />
               </>
             )}
           </>
@@ -725,82 +554,42 @@ const BackendSetup = memo(
             </View>
             {!auth && (
               <>
-                <Text>ガラポンTVのURL</Text>
-                <View
-                  style={[
-                    styles.inputWrapper,
-                    {
-                      backgroundColor: theme.colors?.background,
-                      borderColor: theme.colors?.border
-                    }
-                  ]}
-                >
-                  <TextInput
-                    style={[{ color: theme.colors?.default }]}
-                    autoCapitalize="none"
-                    keyboardType="url"
-                    textContentType="URL"
-                    value={url}
-                    onChangeText={urlChange}
-                  />
-                </View>
-                <Text>ガラポンTVのAPIバージョン</Text>
-                <View
-                  style={[
-                    styles.inputWrapper,
-                    {
-                      backgroundColor: theme.colors?.background,
-                      borderColor: theme.colors?.border
-                    }
-                  ]}
-                >
-                  <TextInput
-                    style={[{ color: theme.colors?.default }]}
-                    autoCapitalize="none"
-                    keyboardType="numeric"
-                    value={version}
-                    onChangeText={versionChange}
-                  />
-                </View>
+                <Input
+                  label="ガラポンTVのURL"
+                  inputContainerStyle={[styles.inputWrapper]}
+                  autoCapitalize="none"
+                  keyboardType="url"
+                  textContentType="URL"
+                  value={url}
+                  onChangeText={urlChange}
+                />
+                <Input
+                  label="ガラポンTVのAPIバージョン"
+                  inputContainerStyle={[styles.inputWrapper]}
+                  autoCapitalize="none"
+                  keyboardType="numeric"
+                  value={version}
+                  onChangeText={versionChange}
+                />
               </>
             )}
-            <Text>ガラポンTVのユーザー</Text>
-            <View
-              style={[
-                styles.inputWrapper,
-                {
-                  backgroundColor: theme.colors?.background,
-                  borderColor: theme.colors?.border
-                }
-              ]}
-            >
-              <TextInput
-                style={[{ color: theme.colors?.default }]}
-                autoCapitalize="none"
-                textContentType="username"
-                value={user}
-                onChangeText={userChange}
-              />
-            </View>
-            <Text>ガラポンTVのパスワード</Text>
-            <View
-              style={[
-                styles.inputWrapper,
-                {
-                  backgroundColor: theme.colors?.background,
-                  borderColor: theme.colors?.border
-                }
-              ]}
-            >
-              <TextInput
-                style={[{ color: theme.colors?.default }]}
-                autoCapitalize="none"
-                textContentType="password"
-                secureTextEntry
-                value={password}
-                onChangeText={passwordChange}
-              />
-            </View>
+            <Input
+              label="ガラポンTVのユーザー"
+              inputContainerStyle={[styles.inputWrapper]}
+              autoCapitalize="none"
+              textContentType="username"
+              value={user}
+              onChangeText={userChange}
+            />
+            <Input
+              label="ガラポンTVのパスワード"
+              inputContainerStyle={[styles.inputWrapper]}
+              autoCapitalize="none"
+              textContentType="password"
+              secureTextEntry
+              value={password}
+              onChangeText={passwordChange}
+            />
           </>
         )}
         {backendType === "garaponv4" && (
@@ -813,64 +602,34 @@ const BackendSetup = memo(
                 </LinkText>
               )}
             </View>
-            <Text>ガラポンTVのユーザー</Text>
-            <View
-              style={[
-                styles.inputWrapper,
-                {
-                  backgroundColor: theme.colors?.background,
-                  borderColor: theme.colors?.border
-                }
-              ]}
-            >
-              <TextInput
-                style={[{ color: theme.colors?.default }]}
-                autoCapitalize="none"
-                textContentType="username"
-                value={user}
-                onChangeText={userChange}
-              />
-            </View>
-            <Text>ガラポンTVのパスワード</Text>
-            <View
-              style={[
-                styles.inputWrapper,
-                {
-                  backgroundColor: theme.colors?.background,
-                  borderColor: theme.colors?.border
-                }
-              ]}
-            >
-              <TextInput
-                style={[{ color: theme.colors?.default }]}
-                autoCapitalize="none"
-                textContentType="password"
-                secureTextEntry
-                value={password}
-                onChangeText={passwordChange}
-              />
-            </View>
+            <Input
+              label="ガラポンTVのパスワード"
+              inputContainerStyle={[styles.inputWrapper]}
+              autoCapitalize="none"
+              textContentType="username"
+              value={user}
+              onChangeText={userChange}
+            />
+            <Input
+              label="ガラポンTVのパスワード"
+              inputContainerStyle={[styles.inputWrapper]}
+              autoCapitalize="none"
+              textContentType="password"
+              secureTextEntry
+              value={password}
+              onChangeText={passwordChange}
+            />
           </>
         )}
-        <Text>自動更新間隔(秒)</Text>
-        <View
-          style={[
-            styles.inputWrapper,
-            {
-              backgroundColor: theme.colors?.background,
-              borderColor: theme.colors?.border
-            }
-          ]}
-        >
-          <TextInput
-            style={[{ color: theme.colors?.default }]}
-            autoCapitalize="none"
-            keyboardType="number-pad"
-            textContentType="none"
-            value={reloadIntervalSeconds}
-            onChangeText={reloadIntervalSecondsChange}
-          />
-        </View>
+        <Input
+          label="自動更新間隔(秒)"
+          inputContainerStyle={[styles.inputWrapper]}
+          autoCapitalize="none"
+          keyboardType="number-pad"
+          textContentType="none"
+          value={reloadIntervalSeconds}
+          onChangeText={reloadIntervalSecondsChange}
+        />
       </View>
     );
   }
@@ -901,51 +660,31 @@ const CommentSetup = memo(
 
     return (
       <View style={styles.group}>
-        <Text style={[styles.groupTitle]}>モリタポアカウント</Text>
+        <Text h3>モリタポアカウント</Text>
         <View style={styles.info}>
           <Text>コメントを表示するにはモリタポアカウントが必要です。</Text>
           {Platform.OS !== "ios" && (
             <LinkText url={moritapoEntryUrl}>モリタポ新規入会ページ</LinkText>
           )}
         </View>
-        <Text>メールアドレス</Text>
-        <View
-          style={[
-            styles.inputWrapper,
-            {
-              backgroundColor: theme.colors?.background,
-              borderColor: theme.colors?.border
-            }
-          ]}
-        >
-          <TextInput
-            style={[{ color: theme.colors?.default }]}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            textContentType="emailAddress"
-            value={email}
-            onChangeText={emailChange}
-          />
-        </View>
-        <Text>パスワード</Text>
-        <View
-          style={[
-            styles.inputWrapper,
-            {
-              backgroundColor: theme.colors?.background,
-              borderColor: theme.colors?.border
-            }
-          ]}
-        >
-          <TextInput
-            style={[{ color: theme.colors?.default }]}
-            autoCapitalize="none"
-            textContentType="password"
-            secureTextEntry
-            value={password}
-            onChangeText={passwordChange}
-          />
-        </View>
+        <Input
+          label="メールアドレス"
+          inputContainerStyle={[styles.inputWrapper]}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          textContentType="emailAddress"
+          value={email}
+          onChangeText={emailChange}
+        />
+        <Input
+          label="パスワード"
+          inputContainerStyle={[styles.inputWrapper]}
+          autoCapitalize="none"
+          textContentType="password"
+          secureTextEntry
+          value={password}
+          onChangeText={passwordChange}
+        />
       </View>
     );
   }
@@ -997,142 +736,110 @@ const ViewSetup = memo(
 
     return (
       <View style={styles.group}>
-        <Text style={[styles.groupTitle]}>表示設定</Text>
+        <Text h3>表示設定</Text>
         <Text>テーマ</Text>
-        <View
-          style={[
+        <IconSelector
+          containerStyle={[
             styles.inputWrapper,
             {
               backgroundColor: theme.colors?.background,
               borderColor: theme.colors?.border
             }
           ]}
-        >
-          <Picker
-            style={[
-              styles.picker,
-              {
-                backgroundColor: theme.colors?.background,
-                color: theme.colors?.default
-              }
-            ]}
-            itemStyle={[styles.pickerItem, { color: theme.colors?.default }]}
-            selectedValue={colorScheme}
-            onValueChange={colorSchemeChange}
-          >
-            <Picker.Item label="自動" value="" />
-            <Picker.Item label="Light" value="light" />
-            <Picker.Item label="Dark" value="dark" />
-          </Picker>
-        </View>
+          style={{ backgroundColor: theme.colors?.background }}
+          color={theme.colors?.default}
+          items={[
+            { label: "自動", value: "" },
+            { label: "Light", value: "light" },
+            { label: "Dark", value: "dark" }
+          ]}
+          selectedValue={colorScheme}
+          onValueChange={colorSchemeChange}
+        />
         <Text>表示するカウント</Text>
-        <View
-          style={[
+        <IconSelector
+          containerStyle={[
             styles.inputWrapper,
             {
               backgroundColor: theme.colors?.background,
               borderColor: theme.colors?.border
             }
           ]}
-        >
-          <Picker
-            style={[
-              styles.picker,
-              {
-                backgroundColor: theme.colors?.background,
-                color: theme.colors?.default
-              }
-            ]}
-            itemStyle={[styles.pickerItem, { color: theme.colors?.default }]}
-            selectedValue={countMode}
-            onValueChange={countModeChange}
-          >
-            <Picker.Item label="コメント数" value="comment" />
-            <Picker.Item label="勢い(コメント数/分)" value="speed" />
-            <Picker.Item label="最大勢い(コメント数/分)" value="maxspeed" />
-            <Picker.Item label="非表示" value="none" />
-          </Picker>
-        </View>
+          style={{ backgroundColor: theme.colors?.background }}
+          color={theme.colors?.default}
+          items={[
+            { label: "コメント数", value: "comment" },
+            { label: "勢い(コメント数/分)", value: "speed" },
+            { label: "最大勢い(コメント数/分)", value: "maxspeed" },
+            { label: "非表示", value: "none" }
+          ]}
+          selectedValue={countMode}
+          onValueChange={countModeChange}
+        />
         <Text>日付を変更する時刻</Text>
-        <View
-          style={[
+        <IconSelector
+          containerStyle={[
             styles.inputWrapper,
             {
               backgroundColor: theme.colors?.background,
               borderColor: theme.colors?.border
             }
           ]}
-        >
-          <Picker
-            style={[
-              styles.picker,
-              {
-                backgroundColor: theme.colors?.background,
-                color: theme.colors?.default
-              }
-            ]}
-            itemStyle={[styles.pickerItem, { color: theme.colors?.default }]}
-            selectedValue={hourFirst}
-            onValueChange={hourFirstChange}
-          >
-            <Picker.Item label="0時" value="0" />
-            <Picker.Item label="1時" value="1" />
-            <Picker.Item label="2時" value="2" />
-            <Picker.Item label="3時" value="3" />
-            <Picker.Item label="4時" value="4" />
-            <Picker.Item label="5時" value="5" />
-            <Picker.Item label="6時" value="6" />
-            <Picker.Item label="7時" value="7" />
-            <Picker.Item label="9時" value="8" />
-            <Picker.Item label="9時" value="9" />
-            <Picker.Item label="10時" value="10" />
-            <Picker.Item label="11時" value="11" />
-            <Picker.Item label="12時" value="12" />
-            <Picker.Item label="13時" value="13" />
-            <Picker.Item label="14時" value="14" />
-            <Picker.Item label="15時" value="15" />
-            <Picker.Item label="16時" value="16" />
-            <Picker.Item label="17時" value="17" />
-            <Picker.Item label="18時" value="18" />
-            <Picker.Item label="19時" value="19" />
-            <Picker.Item label="20時" value="20" />
-            <Picker.Item label="21時" value="21" />
-            <Picker.Item label="22時" value="22" />
-            <Picker.Item label="23時" value="23" />
-          </Picker>
-        </View>
+          style={{ backgroundColor: theme.colors?.background }}
+          color={theme.colors?.default}
+          items={[
+            { label: "0時", value: "0" },
+            { label: "1時", value: "1" },
+            { label: "2時", value: "2" },
+            { label: "3時", value: "3" },
+            { label: "4時", value: "4" },
+            { label: "5時", value: "5" },
+            { label: "6時", value: "6" },
+            { label: "7時", value: "7" },
+            { label: "9時", value: "8" },
+            { label: "9時", value: "9" },
+            { label: "10時", value: "10" },
+            { label: "11時", value: "11" },
+            { label: "12時", value: "12" },
+            { label: "13時", value: "13" },
+            { label: "14時", value: "14" },
+            { label: "15時", value: "15" },
+            { label: "16時", value: "16" },
+            { label: "17時", value: "17" },
+            { label: "18時", value: "18" },
+            { label: "19時", value: "19" },
+            { label: "20時", value: "20" },
+            { label: "21時", value: "21" },
+            { label: "22時", value: "22" },
+            { label: "23時", value: "23" }
+          ]}
+          selectedValue={hourFirst}
+          onValueChange={hourFirstChange}
+        />
         <Text>時刻フォーマット</Text>
-        <View
-          style={[
+        <IconSelector
+          containerStyle={[
             styles.inputWrapper,
             {
               backgroundColor: theme.colors?.background,
               borderColor: theme.colors?.border
             }
           ]}
-        >
-          <Picker
-            style={[
-              styles.picker,
-              {
-                backgroundColor: theme.colors?.background,
-                color: theme.colors?.default
-              }
-            ]}
-            itemStyle={[styles.pickerItem, { color: theme.colors?.default }]}
-            selectedValue={hourFormat}
-            onValueChange={hourFormatChange}
-          >
-            <Picker.Item label="0-11時表記" value="0:12" />
-            <Picker.Item label="1-12時表記" value="1:12" />
-            <Picker.Item label="0-23時表記" value="0:24" />
-            <Picker.Item label="1-24時表記" value="1:24" />
-            <Picker.Item
-              label={`${hourFirst}-${parseInt(hourFirst, 10) + 23}時表記`}
-              value=""
-            />
-          </Picker>
-        </View>
+          style={{ backgroundColor: theme.colors?.background }}
+          color={theme.colors?.default}
+          items={[
+            { label: "0-11時表記", value: "0:12" },
+            { label: "1-12時表記", value: "1:12" },
+            { label: "0-23時表記", value: "0:24" },
+            { label: "1-24時表記", value: "1:24" },
+            {
+              label: `${hourFirst}-${parseInt(hourFirst, 10) + 23}時表記`,
+              value: ""
+            }
+          ]}
+          selectedValue={hourFormat}
+          onValueChange={hourFormatChange}
+        />
       </View>
     );
   }
@@ -1156,16 +863,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 40
   },
-  view: {
-    flex: 1
-  },
   group: {
-    margin: 16,
-    marginTop: 0
-  },
-  groupTitle: {
-    fontSize: 24,
-    fontWeight: "bold"
+    alignSelf: "stretch",
+    padding: 16,
+    maxWidth: 480,
+    width: "100%"
   },
   info: {
     fontSize: 16,
@@ -1173,15 +875,6 @@ const styles = StyleSheet.create({
   },
   inputWrapper: {
     borderWidth: 1,
-    maxWidth: 320
-  },
-  picker: {
-    borderWidth: 0,
-    fontSize: 16,
-    maxHeight: 96
-  },
-  pickerItem: {
-    fontSize: 16,
-    maxHeight: 96
+    height: 36
   }
 });

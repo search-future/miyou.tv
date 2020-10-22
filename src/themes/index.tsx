@@ -45,6 +45,35 @@ function getTheme(colorScheme: string | null = "") {
     Image: {
       placeholderStyle: [{ backgroundColor: "transparent" }]
     },
+    Input: {
+      placeholderTextColor: colors.disabled,
+      renderErrorMessage: false,
+      containerStyle: [
+        {
+          paddingLeft: 0,
+          paddingRight: 0
+        }
+      ],
+      inputContainerStyle: [
+        {
+          backgroundColor: colors.background,
+          borderColor: colors.border
+        }
+      ],
+      inputStyle: [
+        {
+          color: colors.default,
+          fontSize: 16
+        }
+      ],
+      labelStyle: [
+        {
+          color: colors.default,
+          fontSize: 16,
+          fontWeight: "normal"
+        }
+      ]
+    },
     ListItem: {
       containerStyle: [{ backgroundColor: colors.background }],
       titleStyle: [{ color: colors.default, fontWeight: "bold" }]
