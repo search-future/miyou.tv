@@ -452,7 +452,7 @@ const Player = memo(() => {
         } else {
           mpvRef.current?.property("time-pos", seekTime / 1000);
         }
-      } else if (seekTime > duration) {
+      } else if (duration > 0  && seekTime > duration) {
         retryCount.current = -1;
         mpvRef.current?.command("stop");
       } else {
