@@ -13,8 +13,8 @@ const workDir = path.join(__dirname, "mpv");
     fs.mkdirSync(workDir);
   }
 
-  await download(workDir, path.join(workDir, "libmpv/x64"), "x86_64");
-  await download(workDir, path.join(workDir, "libmpv/ia32"), "i686");
+  await download(workDir, path.join(workDir, "libmpv/x64"), "x86_64-20200830");
+  await download(workDir, path.join(workDir, "libmpv/ia32"), "i686-20200830");
   console.log("Complete!");
 })();
 
