@@ -192,7 +192,7 @@ $ yarn dist-electron
 
 ```
 $ yarn
-$ vi android/app/local.properties
+$ vi ~/.gradle/gradle.properties
   MIYOUTV_UPLOAD_STORE_FILE=release.keystore
   MIYOUTV_UPLOAD_KEY_ALIAS=MiyouTV
   MIYOUTV_UPLOAD_STORE_PASSWORD=XXXXXXXX
