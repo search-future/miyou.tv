@@ -12,11 +12,11 @@ limitations under the License.
 */
 
 import storage from "@react-native-community/async-storage";
-import createEncryptor from "redux-persist-transform-encrypt";
+import { encryptTransform } from "redux-persist-transform-encrypt";
 
 import { persistSecretKey } from "../config/constants";
 
-const encryptor = createEncryptor({
+const encryptor = encryptTransform({
   secretKey: persistSecretKey
 });
 
