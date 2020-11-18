@@ -59,6 +59,7 @@ const Player = () => {
   const seekable = useRef(true);
   const seekId = useRef<number | null>(null);
   const initializing = useRef(true);
+  const retryCount = useRef(0);
 
   const dispatch = useDispatch();
   const type = useSelector<State, string>(
@@ -232,9 +233,11 @@ const Player = () => {
     }
   }, [programs, index, extraIndex]);
   useEffect(() => {
-    setReset(false);
-    if (time > 0) {
-      dispatch(PlayerActions.time(time));
+    if (reset) {
+      setReset(false);
+      if (time > 0) {
+        dispatch(PlayerActions.time(time));
+      }
     }
   }, [reset]);
   useEffect(() => {
@@ -265,6 +268,7 @@ const Player = () => {
 
         const ss = Math.floor(seekTime / 1000);
         seekId.current = setTimeout(() => {
+          retryCount.current = 0;
           setStartSeconds(ss);
           seekId.current = null;
         }, 500);
@@ -343,6 +347,7 @@ const Player = () => {
     []
   );
   const onEnd = useCallback(() => {
+    retryCount.current = 0;
     dispatch(LoadingActions.complete());
     switch (repeat) {
       case "continue": {
@@ -390,11 +395,16 @@ const Player = () => {
     }
   }, [repeat, programs, index, extraIndex]);
   const onError = useCallback(() => {
-    Toast.show("Playback error", {
-      ...toastOptions,
-      duration: Toast.durations.LONG
-    });
-    onEnd();
+    if (retryCount.current > 5) {
+      Toast.show("Playback error", {
+        ...toastOptions,
+        duration: Toast.durations.LONG
+      });
+      onEnd();
+    } else {
+      retryCount.current++;
+      setReset(true);
+    }
   }, [onEnd]);
 
   if (bootstrap || reset) {
