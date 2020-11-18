@@ -145,7 +145,11 @@ const Player = () => {
     return uri;
   }, [mobileStreamType, mobileStreamParams, recordedProgram, networkType, ss]);
   const initOptions = useMemo(() => {
-    const options = [];
+    const options = [
+      "--file-caching=5000",
+      "--live-caching=10000",
+      "--network-caching=10000"
+    ];
     if (deinterlace) {
       options.push("--deinterlace=1", "--deinterlace-mode=discard");
     } else {
