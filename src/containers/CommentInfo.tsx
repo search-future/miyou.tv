@@ -13,6 +13,7 @@ limitations under the License.
 
 import React, {
   memo,
+  useState,
   useEffect,
   useContext,
   useCallback,
@@ -54,6 +55,10 @@ type Setting = SettingState & {
     hourFirst?: string;
     hourFormat?: string;
   };
+};
+type Anchor = {
+  index: number;
+  comment: CommentData;
 };
 type State = RootState & {
   setting: Setting;
@@ -228,11 +233,12 @@ const CommentInfo = memo(() => {
       <CommentListItem
         {...item}
         offset={start}
+        list={data}
         dateFormatter={listDateFormatter}
         onSelect={onListSelect}
       />
     ),
-    [start, listDateFormatter, onListSelect]
+    [data, start, listDateFormatter, onListSelect]
   );
 
   return (
@@ -392,11 +398,13 @@ const CustomCheckBox = memo(
 const CommentListItem = memo(
   ({
     offset,
+    list,
     dateFormatter = date => new Date(date).toTimeString(),
     onSelect,
     ...props
   }: CommentData & {
     offset: number;
+    list: CommentData[];
     dateFormatter: (time: number) => string;
     onSelect?: (data: CommentData) => void;
   }) => {
@@ -404,17 +412,88 @@ const CommentListItem = memo(
 
     const { theme } = useContext(ThemeContext);
 
+    const [anchors, setAnchors] = useState<Anchor[]>([]);
+    const [anchorIndex, setAnchorIndex] = useState<number>(-1);
+
     const playTime = useMemo(() => formatTime(time - offset), [time, offset]);
     const airTime = useMemo(() => dateFormatter(time), [time, dateFormatter]);
+    const anchorComment = useMemo(
+      () =>
+        anchorIndex > 0
+          ? anchors.find(({ index }) => index === anchorIndex)?.comment
+          : anchors[0]?.comment,
+      [anchors, anchorIndex]
+    );
 
+    const onOpen = useCallback(() => {
+      const pattern = />>([0-9]{1,4})([,-][0-9]{1,4})*/g;
+      const [board, thread] = id.split("/");
+      const anchors: Anchor[] = [];
+      const matches = text.match(pattern);
+      if (matches) {
+        let match;
+        while ((match = matches.shift())) {
+          const dests = match.replace(">>", "").split(",");
+          for (const dest of dests) {
+            const [left, right] = dest.split("-");
+            const start = parseInt(left > right ? right : left, 10);
+            const end = parseInt(left < right ? right : left, 10);
+            for (let i = start; i <= end; i++) {
+              const searchId = [
+                board,
+                thread,
+                String(i + 10000).slice(-4)
+              ].join("/");
+              const comment = list.find(a => a.id === searchId);
+              if (comment && !anchors.some(({ index }) => index === i)) {
+                anchors.push({ index: i, comment });
+                const more = comment.text.match(pattern);
+                if (more) {
+                  matches.push(...more);
+                }
+              }
+            }
+          }
+        }
+      }
+      setAnchors(anchors);
+    }, [text, id]);
     const onSelectHandler = useCallback(() => {
       if (onSelect) {
         onSelect(props);
       }
     }, [props, onSelect]);
+    const anchorRenderer = useCallback(
+      ({ index, comment }) => (
+        <TouchableOpacity
+          key={index}
+          style={[
+            styles.anchorButton,
+            {
+              backgroundColor:
+                comment === anchorComment
+                  ? theme.colors?.selected
+                  : theme.colors?.background,
+              borderColor: theme.colors?.border
+            }
+          ]}
+          onPress={() => {
+            setAnchorIndex(index);
+          }}
+        >
+          <Text>{`>>${index}`}</Text>
+        </TouchableOpacity>
+      ),
+      [anchorComment]
+    );
+    const onAnchorCommentSelect = useCallback(() => {
+      if (onSelect && anchorComment) {
+        onSelect(anchorComment);
+      }
+    }, [onSelect, anchorComment]);
 
     return (
-      <Menu>
+      <Menu onOpen={onOpen}>
         <MenuTrigger
           customStyles={{
             triggerWrapper: [
@@ -489,6 +568,28 @@ const CommentListItem = memo(
             <Text style={[styles.itemMenuName]}>ID</Text>
             <Text style={[styles.itemMenuText]}>{id}</Text>
           </View>
+          {anchors.length > 0 && (
+            <View style={[containerStyle.row, containerStyle.wrap]}>
+              {anchors.map(anchorRenderer)}
+            </View>
+          )}
+          {anchorComment && (
+            <TouchableOpacity
+              style={[
+                styles.anchorContent,
+                { borderColor: theme.colors?.border }
+              ]}
+              onPress={onAnchorCommentSelect}
+            >
+              <Text style={[styles.itemMenuText]}>
+                {dateFormatter(anchorComment.time)} {anchorComment.name}[
+                {anchorComment.email}]({anchorComment.id})
+              </Text>
+              <Text style={[textStyle.bold, styles.itemMenuContent]}>
+                {anchorComment.text.trim()}
+              </Text>
+            </TouchableOpacity>
+          )}
         </MenuOptions>
       </Menu>
     );
@@ -575,7 +676,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     marginHorizontal: 4
   },
-
   itemMenuContent: {
     fontSize: 14,
     lineHeight: 21,
@@ -594,6 +694,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 18,
     marginHorizontal: 4
+  },
+  anchorButton: {
+    borderWidth: 1,
+    margin: 4
+  },
+  anchorContent: {
+    borderTopWidth: 1
   },
   footer: {
     padding: 8
