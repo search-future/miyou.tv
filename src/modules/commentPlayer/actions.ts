@@ -24,7 +24,6 @@ export type CommentData = {
   text: string;
   id: string;
   time: number;
-  autoScroll: boolean;
 };
 
 export const COMMENT_PLAYER_INIT = "COMMENT_PLAYER_INIT";
