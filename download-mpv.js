@@ -48,7 +48,7 @@ async function download(downloadDir, outDir, filter = "") {
       https.get(url, res => {
         if (res.statusCode === 200) {
           console.log(`Downloading MPV binary from ${url}`);
-          const downloadPath = path.join(downloadDir, path.basename(url));
+          const downloadPath = path.join(downloadDir, path.basename(url).split('?').shift());
           const outFile = fs.createWriteStream(downloadPath, {
             autoClose: false
           });
