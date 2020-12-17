@@ -80,10 +80,10 @@ const Player = memo(() => {
     "percent-pos": null,
     "time-pos": null,
     "eof-reached": null,
-    "ao-volume": value => {
+    "options/volume": value => {
       status.current.volume = value;
     },
-    "ao-mute": value => {
+    "options/mute": value => {
       status.current.mute = value;
     },
     "track-list/count": null,
@@ -391,10 +391,10 @@ const Player = memo(() => {
   }, [track, trackCount]);
   useEffect(() => {
     if (mute !== status.current.mute) {
-      mpvRef.current?.property("ao-mute", mute);
+      mpvRef.current?.property("options/mute", mute);
     }
     if (volume !== status.current.volume) {
-      mpvRef.current?.property("ao-volume", volume);
+      mpvRef.current?.property("options/volume", volume);
     }
     if (
       trackCount.video > 0 &&
