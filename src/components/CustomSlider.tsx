@@ -20,7 +20,7 @@ type Props = SliderProps & {
 };
 const CustomSlider = ({ thumbStyle, thumbRound, ...props }: Props) => (
   <Slider
-    thumbStyle={thumbRound ? thumbStyle : [styles.thumbSquare, thumbStyle]}
+    thumbStyle={thumbRound ? [thumbStyle] : [styles.thumbSquare, thumbStyle]}
     {...props}
   />
 );

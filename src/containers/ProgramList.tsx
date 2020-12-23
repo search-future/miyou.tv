@@ -711,12 +711,23 @@ const ListProgram = memo(
         containerStyle={[
           selected && { backgroundColor: theme.colors?.selected }
         ]}
-        title={fullTitle}
-        chevron
         bottomDivider
-        Component={TouchableOpacity}
-        subtitle={
-          <View style={[containerStyle.row, containerStyle.wrap]}>
+        onPress={onPressWithProps}
+      >
+        {count > 0 ? (
+          <Balloon
+            wrapperStyle={programStyle.listItemLeft}
+            backgroundColor={balloonColor}
+            pointing="right"
+          >
+            {count}
+          </Balloon>
+        ) : (
+          <View style={programStyle.listItemLeft} />
+        )}
+        <ListItem.Content>
+          <ListItem.Title>{fullTitle}</ListItem.Title>
+          <ListItem.Subtitle>
             <Badge
               badgeStyle={[{ backgroundColor: category.color }]}
               value={category.name}
@@ -725,23 +736,10 @@ const ListProgram = memo(
             <Text>
               {dateFormatter(start)}({Math.round(duration / 60000)}分)
             </Text>
-          </View>
-        }
-        leftElement={
-          count > 0 ? (
-            <Balloon
-              wrapperStyle={programStyle.listItemLeft}
-              backgroundColor={balloonColor}
-              pointing="right"
-            >
-              {count}
-            </Balloon>
-          ) : (
-            <View style={programStyle.listItemLeft} />
-          )
-        }
-        onPress={onPressWithProps}
-      />
+          </ListItem.Subtitle>
+        </ListItem.Content>
+        <ListItem.Chevron color={theme.colors?.default} />
+      </ListItem>
     );
   }
 );
