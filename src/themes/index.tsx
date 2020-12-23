@@ -75,8 +75,10 @@ function getTheme(colorScheme: string | null = "") {
       ]
     },
     ListItem: {
-      containerStyle: [{ backgroundColor: colors.background }],
-      titleStyle: [{ color: colors.default, fontWeight: "bold" }]
+      containerStyle: [{ backgroundColor: colors.background }]
+    },
+    ListItemTitle: {
+      style: [{ color: colors.default, fontWeight: "bold" }]
     },
     SearchBar: {
       containerStyle: [
@@ -109,7 +111,10 @@ function getTheme(colorScheme: string | null = "") {
       )
     },
     Slider: {
-      thumbTintColor: colors.primary
+      allowTouchTrack: true,
+      thumbTintColor: colors.primary,
+      thumbTouchSize: { height: 0, width: 0 },
+      thumbStyle: [{ height: 24, width: 24 }]
     },
     Text: {
       style: [{ fontSize: 16, color: colors.default }],

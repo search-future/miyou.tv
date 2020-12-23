@@ -34,7 +34,13 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent
 } from "react-native";
-import { Badge, ListItem, Text, ThemeContext } from "react-native-elements";
+import {
+  Badge,
+  colors,
+  ListItem,
+  Text,
+  ThemeContext
+} from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
@@ -625,51 +631,53 @@ const ListProgram = memo(
         containerStyle={[
           selected && { backgroundColor: theme.colors?.selected }
         ]}
-        title={fullTitle}
-        chevron
         bottomDivider
-        Component={TouchableOpacity}
-        subtitle={
-          <>
-            <View style={[containerStyle.row, containerStyle.wrap]}>
-              <Text style={[textStyle.bold]}>
-                {commentMaxSpeed}コメント/分
-                {commentMaxSpeedTime &&
-                  `(${dateFormatter(commentMaxSpeedTime)})`}{" "}
-              </Text>
-              <Text>平均: {Math.ceil(commentSpeed * 10) / 10}コメント/分 </Text>
-              <Text>コメント数: {commentCount}</Text>
-            </View>
-            <View style={[containerStyle.row, containerStyle.wrap]}>
-              <Badge
-                badgeStyle={[{ backgroundColor: category.color }]}
-                value={category.name}
-              />
-              <Text>{channelName} </Text>
-              <Text>
-                {dateFormatter(start)}({Math.round(duration / 60000)}分)
-              </Text>
-            </View>
-          </>
-        }
-        leftElement={
-          <View style={programStyle.listItemLeft}>
-            <Text
-              h4
-              style={[
-                textStyle.center,
-                textStyle.bold,
-                {
-                  color: theme.colors?.primary
-                }
-              ]}
-            >
-              {rank}
-            </Text>
-          </View>
-        }
         onPress={onPressWithProps}
-      />
+      >
+        <View style={programStyle.listItemLeft}>
+          <Text
+            h4
+            style={[
+              textStyle.center,
+              textStyle.bold,
+              {
+                color: theme.colors?.primary
+              }
+            ]}
+          >
+            {rank}
+          </Text>
+        </View>
+        <ListItem.Content>
+          <ListItem.Title>{fullTitle}</ListItem.Title>
+          <ListItem.Subtitle>
+            <View>
+              <View style={[containerStyle.row, containerStyle.wrap]}>
+                <Text style={[textStyle.bold]}>
+                  {commentMaxSpeed}コメント/分
+                  {commentMaxSpeedTime &&
+                    `(${dateFormatter(commentMaxSpeedTime)})`}{" "}
+                </Text>
+                <Text>
+                  平均: {Math.ceil(commentSpeed * 10) / 10}コメント/分{" "}
+                </Text>
+                <Text>コメント数: {commentCount}</Text>
+              </View>
+              <View style={[containerStyle.row, containerStyle.wrap]}>
+                <Badge
+                  badgeStyle={[{ backgroundColor: category.color }]}
+                  value={category.name}
+                />
+                <Text>{channelName} </Text>
+                <Text>
+                  {dateFormatter(start)}({Math.round(duration / 60000)}分)
+                </Text>
+              </View>
+            </View>
+          </ListItem.Subtitle>
+        </ListItem.Content>
+        <ListItem.Chevron color={theme.colors?.default} />
+      </ListItem>
     );
   }
 );

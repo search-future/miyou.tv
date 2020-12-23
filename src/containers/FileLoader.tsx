@@ -353,10 +353,11 @@ const ListProgram = memo(
         containerStyle={[
           selected && { backgroundColor: theme.colors?.selected }
         ]}
-        title={title}
         bottomDivider
-        subtitle={
-          <>
+      >
+        <ListItem.Content>
+          <ListItem.Title>{title}</ListItem.Title>
+          <ListItem.Subtitle>
             <View
               style={[
                 direction === "row" && containerStyle.row,
@@ -438,9 +439,9 @@ const ListProgram = memo(
                 />
               </TouchableOpacity>
             </View>
-          </>
-        }
-      />
+          </ListItem.Subtitle>
+        </ListItem.Content>
+      </ListItem>
     );
   }
 );
