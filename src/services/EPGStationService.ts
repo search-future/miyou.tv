@@ -89,6 +89,78 @@ type EPGStationRecordedPrograms = {
   total: number;
   recorded: EPGStationRecordedProgram[];
 };
+type EPGStationV2SearchParams = {
+  isHalfWidth: boolean;
+  offset?: number;
+  limit?: number;
+  isReverse?: boolean;
+  ruleId?: number;
+  channelId?: number;
+  genre?: number;
+  keyword?: string;
+  hasOriginalFile?: boolean;
+};
+type EPGStationV2ChannnelItem = {
+  id: number;
+  serviceId: number;
+  networkId: number;
+  name: string;
+  halfWidthName: string;
+  hasLogoData: boolean;
+  channelType: "GR" | "BS" | "CS" | "SKY";
+  channel: string;
+};
+type EPGStationV2RecordedItem = {
+  id: number;
+  ruleId?: number;
+  programId?: number;
+  channelId?: number;
+  startAt: number;
+  endAt: number;
+  name: string;
+  description?: string;
+  extended?: string;
+  genre1?: number;
+  subGenre1?: number;
+  genre2?: number;
+  subGenre2?: number;
+  genre3?: number;
+  subGenre3?: number;
+  videoType?: "mpeg2" | "h.264" | "h.265";
+  videoResolution?:
+    | "240p"
+    | "480i"
+    | "480p"
+    | "720p"
+    | "1080i"
+    | "2160p"
+    | "4320p";
+  videoStreamContent?: number;
+  videoComponentType?: number;
+  audioSamplingRate?: 16000 | 22050 | 24000 | 32000 | 44100 | 48000;
+  audioComponentType?: number;
+  isRecording: boolean;
+  thumbnails: number[];
+  videoFiles: {
+    id: number;
+    name: string;
+    type: "ts" | "encoded";
+    size: number;
+  }[];
+  dropLog: {
+    id: number;
+    errorCnt: number;
+    dropCnt: number;
+    scramblingCnt: number;
+  };
+  tags?: { id: number; name: string; color: string }[];
+  isEncoding: boolean;
+  isProtected: boolean;
+};
+type EPGStationV2Records = {
+  total: number;
+  records: EPGStationV2RecordedItem[];
+};
 
 export default class EPGStationService extends BackendService {
   url: string;
@@ -96,6 +168,7 @@ export default class EPGStationService extends BackendService {
   password: string;
   streamType: string;
   streamParams: string;
+  version: string = "";
 
   constructor({
     url = "http://127.0.0.1:8888/",
@@ -112,11 +185,24 @@ export default class EPGStationService extends BackendService {
     this.streamParams = streamParams;
   }
 
-  init() {
+  async init() {
+    try {
+      const { version } = await this.request("/api/version");
+      this.version = version;
+    } catch (e) {
+      this.version = "1.0.0";
+    }
     return this.request("/api/config");
   }
 
-  async search({ query = "", ...options }: SearchOptions = {}) {
+  async search(options: SearchOptions = {}) {
+    if (parseInt(this.version) >= 2) {
+      return this.searchV2(options);
+    }
+    return this.searchV1(options);
+  }
+
+  async searchV1({ query = "", ...options }: SearchOptions = {}) {
     const {
       view = 100,
       page = 1,
@@ -220,9 +306,7 @@ export default class EPGStationService extends BackendService {
         id: String(id),
         type: channelType,
         channel: String(channelId),
-        channelName: (
-          channels.find(({ id }) => id === channelId) || { name: "" }
-        ).name,
+        channelName: channels.find(({ id }) => id === channelId)?.name || "",
         title: name,
         fullTitle: name,
         detail: description,
@@ -246,25 +330,174 @@ export default class EPGStationService extends BackendService {
     return { hits, programs };
   }
 
+  async searchV2({ query = "", ...options }: SearchOptions = {}) {
+    const {
+      view = 100,
+      page = 1,
+      reverse = false,
+      keyword,
+      type,
+      channel,
+      category,
+      start,
+      end
+    } = {
+      ...BackendService.parseQuery(query),
+      ...options
+    };
+    const channels: EPGStationV2ChannnelItem[] = await this.request(
+      "/api/channels"
+    );
+
+    const params: EPGStationV2SearchParams = {
+      isHalfWidth: true,
+      limit: 2 ** 31 - 1,
+      isReverse: !reverse
+    };
+    if (keyword) {
+      params.keyword = keyword;
+    }
+    if (channel) {
+      if (!isNaN(channel as any)) {
+        params.channelId = parseInt(channel, 10);
+      } else {
+        const { id } =
+          channels.find(
+            ({ serviceId, name }) =>
+              String(serviceId) === channel || name === channel
+          ) || {};
+        params.channelId = id;
+      }
+    }
+    if (!isNaN(category as number)) {
+      params.genre = category as number;
+    } else if (category) {
+      const { code = 15 } =
+        categoryTable.find(
+          ({ codeName, name }) => codeName === category || name === category
+        ) || {};
+      params.genre = code;
+    }
+
+    const result: EPGStationV2Records = await this.request("/api/recorded", {
+      params
+    });
+
+    const records = result.records.filter(
+      program =>
+        (type == null ||
+          channels.find(({ id }) => id === program.channelId)?.channelType ===
+            type) &&
+        (end == null || isNaN(end) || program.startAt < end) &&
+        (start == null || isNaN(start) || program.endAt > start)
+    );
+
+    const hits = records.length;
+    const programs = [];
+    const begin = (page - 1) * view;
+    let length = page * view;
+    if (length > records.length) {
+      length = records.length;
+    }
+    for (let i = begin; i < length; i++) {
+      const {
+        id,
+        channelId,
+        name,
+        description = "",
+        genre1 = 15,
+        startAt,
+        endAt,
+        videoFiles,
+        thumbnails
+      } = records[i];
+      const videoFileId =
+        videoFiles.find(({ type }) => type === "ts")?.id ||
+        videoFiles.find(({ type }) => type === "encoded")?.id;
+      programs.push({
+        id: String(id),
+        type: channels.find(({ id }) => id === channelId)?.channelType || "GR",
+        channel: String(channelId),
+        channelName: channels.find(({ id }) => id === channelId)?.name || "",
+        title: name,
+        fullTitle: name,
+        detail: description,
+        category: categoryTable.find(({ code }) => code === genre1) || {
+          code: 15,
+          name: "etc"
+        },
+        duration: endAt - startAt,
+        start: new Date(startAt),
+        end: new Date(endAt),
+        preview:
+          thumbnails.length > 0
+            ? this.getUrl(`/api/thumbnails/${thumbnails[0]}`)
+            : "",
+        stream:
+          this.streamType === "raw"
+            ? this.getAuthUrl(`/api/videos/${videoFileId}`)
+            : this.getAuthUrl(
+                `/api/streams/recorded/${videoFileId}/${this.streamType}?ss=0&${this.streamParams}`
+              ),
+        download: videoFiles.map(({ id, name, size, type }) => ({
+          name,
+          filename: name,
+          size,
+          uri: this.getAuthUrl(`/api/video/${id}?isDownload=true`)
+        })),
+        authHeaders: this.getAuthHeaders()
+      });
+    }
+    return { hits, programs };
+  }
+
   async getChannels({} = {}) {
-    const result: EPGStationServiceItem[] = await this.request("/api/channels");
     const channels: Channel[] = [];
-    for (const { id, channelType, name } of result) {
-      const { total }: EPGStationRecordedPrograms = await this.request(
-        "/api/recorded",
-        {
-          params: {
-            channel: id,
-            limit: 1
-          }
-        }
+    if (parseInt(this.version, 10) >= 2) {
+      const result: EPGStationV2ChannnelItem[] = await this.request(
+        "/api/channels",
+        { params: { isHalfWidth: true } }
       );
-      if (total > 0) {
-        channels.push({
-          type: channelType,
-          channel: String(id),
-          channelName: name
-        });
+      for (const { id, channelType, name } of result) {
+        const { total }: EPGStationV2Records = await this.request(
+          "/api/recorded",
+          {
+            params: {
+              isHalfWidth: true,
+              channelId: id,
+              limit: 1
+            }
+          }
+        );
+        if (total > 0) {
+          channels.push({
+            type: channelType,
+            channel: String(id),
+            channelName: name
+          });
+        }
+      }
+    } else {
+      const result: EPGStationServiceItem[] = await this.request(
+        "/api/channels"
+      );
+      for (const { id, channelType, name } of result) {
+        const { total }: EPGStationRecordedPrograms = await this.request(
+          "/api/recorded",
+          {
+            params: {
+              channel: id,
+              limit: 1
+            }
+          }
+        );
+        if (total > 0) {
+          channels.push({
+            type: channelType,
+            channel: String(id),
+            channelName: name
+          });
+        }
       }
     }
     return channels;
