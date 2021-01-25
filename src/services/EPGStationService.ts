@@ -283,6 +283,25 @@ export default class EPGStationService extends BackendService {
         original,
         encoded
       } = recorded[i];
+      const {
+        type: videoType = "ts",
+        name: videoName = "",
+        ...params
+      } = qs.parse(this.streamParams);
+      let streamPath = `/api/recorded/${id}/file`;
+      if (this.streamType === "raw") {
+        if (videoType === "encoded" && encoded) {
+          const encodedId =
+            encoded.find(({ name }) => name === videoName)?.encodedId ||
+            encoded.find(({ name }) => name !== videoName)?.encodedId;
+          if (encodedId != null) {
+            streamPath += `?encodedId=${encodedId}`;
+          }
+        }
+      } else {
+        const streamParams = qs.stringify(params);
+        streamPath = `/api/streams/recorded/${id}/${this.streamType}?${streamParams}`;
+      }
       const download = [];
       if (original && filename) {
         download.push({
@@ -318,11 +337,7 @@ export default class EPGStationService extends BackendService {
         start: new Date(startAt),
         end: new Date(endAt),
         preview: this.getUrl(`/api/recorded/${id}/thumbnail`),
-        stream: this.getAuthUrl(
-          this.streamType === "raw"
-            ? `/api/recorded/${id}/file`
-            : `/api/streams/recorded/${id}/${this.streamType}?${this.streamParams}`
-        ),
+        stream: this.getAuthUrl(streamPath),
         download,
         authHeaders: this.getAuthHeaders()
       });
@@ -411,9 +426,18 @@ export default class EPGStationService extends BackendService {
         videoFiles,
         thumbnails
       } = records[i];
+      const {
+        type: videoType = "ts",
+        name: videoName = "",
+        ...params
+      } = qs.parse(this.streamParams);
       const videoFileId =
-        videoFiles.find(({ type }) => type === "ts")?.id ||
-        videoFiles.find(({ type }) => type === "encoded")?.id;
+        videoFiles.find(
+          ({ type, name }) => type === videoType && name === videoName
+        )?.id ||
+        videoFiles.find(({ type }) => type === videoType)?.id ||
+        videoFiles.find(({ type }) => type !== videoType)?.id;
+      const streamParams = qs.stringify(params);
       programs.push({
         id: String(id),
         type: channels.find(({ id }) => id === channelId)?.channelType || "GR",
@@ -437,7 +461,7 @@ export default class EPGStationService extends BackendService {
           this.streamType === "raw"
             ? this.getAuthUrl(`/api/videos/${videoFileId}`)
             : this.getAuthUrl(
-                `/api/streams/recorded/${videoFileId}/${this.streamType}?ss=0&${this.streamParams}`
+                `/api/streams/recorded/${videoFileId}/${this.streamType}?ss=0&${streamParams}`
               ),
         download: videoFiles.map(({ id, name, size, type }) => ({
           name,
