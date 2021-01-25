@@ -133,6 +133,7 @@ const Viewer = memo(() => {
   useEffect(() => {
     if (program?.preview) {
       if (Platform.OS === "web") {
+        setPreview({});
         Axios.get(program.preview, {
           headers: program.authHeaders,
           responseType: "blob"
