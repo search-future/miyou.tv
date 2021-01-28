@@ -15,6 +15,7 @@ import React, {
   memo,
   useEffect,
   useContext,
+  useMemo,
   useCallback,
   useRef,
   ReactText
@@ -31,6 +32,8 @@ import { Input, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
+import qs from "qs";
+
 import IconSelector from "../components/IconSelector";
 import LinkText from "../components/LinkText";
 import containerStyle from "../styles/container";
@@ -140,6 +143,37 @@ const BackendSetup = memo(
     } = data;
 
     const { theme } = useContext(ThemeContext);
+
+    const {
+      "c:v": videoCodec = "",
+      "c:a": audioCodec = "",
+      "b:v": videoBitrate = "",
+      "b:a": audioBitrate = "",
+      s: videoSize = "",
+      type: videoType = "ts",
+      name: videoName = "",
+      mode: streamMode = "0"
+    }: {
+      "c:v"?: string;
+      "c:a"?: string;
+      "b:v"?: string;
+      "b:a"?: string;
+      s?: string;
+      type?: string;
+      name?: string;
+      mode?: string;
+    } = useMemo(() => qs.parse(streamParams), [streamParams]);
+    const {
+      "b:v": mobileVideoBitrate = "",
+      "b:a": mobileAudioBitrate = "",
+      s: mobileVideoSize = "",
+      mode: mobileStreamMode = "0"
+    }: {
+      "b:v"?: string;
+      "b:a"?: string;
+      s?: string;
+      mode?: string;
+    } = useMemo(() => qs.parse(mobileStreamParams), [mobileStreamParams]);
 
     const backendTypeChange = useCallback(
       (type: ReactText) => {
@@ -267,6 +301,124 @@ const BackendSetup = memo(
       },
       [onChanged]
     );
+    const videoCodecChange = useCallback(
+      (videoCodec: ReactText) => {
+        if (onChanged) {
+          onChanged({
+            streamParams: qs.stringify(
+              {
+                ...qs.parse(streamParams),
+                "c:v": videoCodec || null,
+                ...(videoCodec === "copy" ? { s: null, "b:v": null } : {})
+              },
+              qsStringfyOptions
+            )
+          });
+        }
+      },
+      [streamParams, onChanged]
+    );
+    const videoSizeChange = useCallback(
+      (videoSize: ReactText) => {
+        if (onChanged) {
+          onChanged({
+            streamParams: qs.stringify(
+              { ...qs.parse(streamParams), s: videoSize || null },
+              qsStringfyOptions
+            )
+          });
+        }
+      },
+      [streamParams, onChanged]
+    );
+    const videoBitrateChange = useCallback(
+      (videoBitrate: ReactText) => {
+        if (onChanged) {
+          onChanged({
+            streamParams: qs.stringify(
+              {
+                ...qs.parse(streamParams, {}),
+                "b:v": videoBitrate || null
+              },
+              qsStringfyOptions
+            )
+          });
+        }
+      },
+      [streamParams, onChanged]
+    );
+    const audioCodecChange = useCallback(
+      (audioCodec: ReactText) => {
+        if (onChanged) {
+          onChanged({
+            streamParams: qs.stringify(
+              {
+                ...qs.parse(streamParams),
+                "c:a": audioCodec || null,
+                ...(audioCodec === "copy" ? { "b:a": null } : {})
+              },
+              qsStringfyOptions
+            )
+          });
+        }
+      },
+      [streamParams, onChanged]
+    );
+    const audioBitrateChange = useCallback(
+      (audioBitrate: ReactText) => {
+        if (onChanged) {
+          onChanged({
+            streamParams: qs.stringify(
+              {
+                ...qs.parse(streamParams),
+                "b:a": audioBitrate || null
+              },
+              qsStringfyOptions
+            )
+          });
+        }
+      },
+      [streamParams, onChanged]
+    );
+    const videoTypeChange = useCallback(
+      (type: ReactText) => {
+        if (onChanged) {
+          onChanged({
+            streamParams: qs.stringify(
+              { ...qs.parse(streamParams), type },
+              qsStringfyOptions
+            )
+          });
+        }
+      },
+      [streamParams, onChanged]
+    );
+    const videoNameChange = useCallback(
+      (name: string) => {
+        if (onChanged) {
+          onChanged({
+            streamParams: qs.stringify(
+              { ...qs.parse(streamParams), name },
+              qsStringfyOptions
+            )
+          });
+        }
+      },
+      [streamParams, onChanged]
+    );
+    const streamModeChange = useCallback(
+      (mode: string) => {
+        if (onChanged) {
+          onChanged({
+            streamParams: qs.stringify(
+              { ...qs.parse(streamParams), mode },
+              qsStringfyOptions
+            )
+          });
+        }
+      },
+      [streamParams, onChanged]
+    );
     const mobileStreamTypeChange = useCallback(
       (mobileStreamType: ReactText) => {
         if (onChanged) {
@@ -296,6 +448,67 @@ const BackendSetup = memo(
         }
       },
       [onChanged]
+    );
+    const mobileVideoSizeChange = useCallback(
+      (videoSize: ReactText) => {
+        if (onChanged) {
+          onChanged({
+            mobileStreamParams: qs.stringify(
+              { ...qs.parse(mobileStreamParams), s: videoSize || null },
+              qsStringfyOptions
+            )
+          });
+        }
+      },
+      [mobileStreamParams, onChanged]
+    );
+    const mobileVideoBitrateChange = useCallback(
+      (videoBitrate: ReactText) => {
+        if (onChanged) {
+          onChanged({
+            mobileStreamParams: qs.stringify(
+              {
+                ...qs.parse(mobileStreamParams, {}),
+                "b:v": videoBitrate || null
+              },
+              qsStringfyOptions
+            )
+          });
+        }
+      },
+      [mobileStreamParams, onChanged]
+    );
+    const mobileAudioBitrateChange = useCallback(
+      (audioBitrate: ReactText) => {
+        if (onChanged) {
+          onChanged({
+            mobileStreamParams: qs.stringify(
+              {
+                ...qs.parse(mobileStreamParams),
+                "b:a": audioBitrate || null
+              },
+              qsStringfyOptions
+            )
+          });
+        }
+      },
+      [mobileStreamParams, onChanged]
+    );
+    const mobileStreamModeChange = useCallback(
+      (mode: string) => {
+        if (onChanged) {
+          onChanged({
+            mobileStreamParams: qs.stringify(
+              {
+                ...qs.parse(mobileStreamParams),
+                mode
+              },
+              qsStringfyOptions
+            )
+          });
+        }
+      },
+      [mobileStreamParams, onChanged]
     );
     const reloadIntervalSecondsChange = useCallback(
       (reloadIntervalSeconds: string) => {
@@ -410,6 +623,128 @@ const BackendSetup = memo(
               value={streamParams}
               onChangeText={streamParamsChange}
             />
+            {streamType === "m2ts" && (
+              <>
+                <Text>映像コーデック</Text>
+                <IconSelector
+                  containerStyle={[
+                    styles.inputWrapper,
+                    {
+                      backgroundColor: theme.colors?.background,
+                      borderColor: theme.colors?.border
+                    }
+                  ]}
+                  style={{ backgroundColor: theme.colors?.background }}
+                  color={theme.colors?.default}
+                  items={[
+                    { label: "自動", value: "" },
+                    { label: "無変換", value: "copy" },
+                    { label: "H.264", value: "libx264" },
+                    { label: "MPEG-2", value: "mpeg2video" }
+                  ]}
+                  selectedValue={videoCodec}
+                  onValueChange={videoCodecChange}
+                />
+              </>
+            )}
+            {videoCodec !== "copy" && (
+              <>
+                <Text>動画解像度</Text>
+                <IconSelector
+                  containerStyle={[
+                    styles.inputWrapper,
+                    {
+                      backgroundColor: theme.colors?.background,
+                      borderColor: theme.colors?.border
+                    }
+                  ]}
+                  style={{ backgroundColor: theme.colors?.background }}
+                  color={theme.colors?.default}
+                  items={[
+                    { label: "", value: "" },
+                    { label: "576p(WSVGA)", value: "1024x576" },
+                    { label: "720p(HD)", value: "1280x720" },
+                    { label: "1080p(FHD)", value: "1920x1080" }
+                  ]}
+                  selectedValue={videoSize}
+                  onValueChange={videoSizeChange}
+                />
+              </>
+            )}
+            {videoCodec !== "copy" && (
+              <>
+                <Text>映像ビットレート</Text>
+                <IconSelector
+                  containerStyle={[
+                    styles.inputWrapper,
+                    {
+                      backgroundColor: theme.colors?.background,
+                      borderColor: theme.colors?.border
+                    }
+                  ]}
+                  style={{ backgroundColor: theme.colors?.background }}
+                  color={theme.colors?.default}
+                  items={[
+                    { label: "", value: "" },
+                    { label: "3Mbps", value: "3M" },
+                    { label: "2Mbps", value: "2M" },
+                    { label: "1Mbps", value: "1M" },
+                    { label: "512kbps", value: "512k" },
+                    { label: "256kbps", value: "256k" }
+                  ]}
+                  selectedValue={videoBitrate}
+                  onValueChange={videoBitrateChange}
+                />
+              </>
+            )}
+            {streamType === "m2ts" && (
+              <>
+                <Text>音声コーデック</Text>
+                <IconSelector
+                  containerStyle={[
+                    styles.inputWrapper,
+                    {
+                      backgroundColor: theme.colors?.background,
+                      borderColor: theme.colors?.border
+                    }
+                  ]}
+                  style={{ backgroundColor: theme.colors?.background }}
+                  color={theme.colors?.default}
+                  items={[
+                    { label: "自動", value: "" },
+                    { label: "無変換", value: "copy" },
+                    { label: "AAC", value: "libfdk_aac" },
+                    { label: "Vorbis", value: "libvorbis" }
+                  ]}
+                  selectedValue={audioCodec}
+                  onValueChange={audioCodecChange}
+                />
+              </>
+            )}
+            {audioCodec !== "copy" && (
+              <>
+                <Text>音声ビットレート</Text>
+                <IconSelector
+                  containerStyle={[
+                    styles.inputWrapper,
+                    {
+                      backgroundColor: theme.colors?.background,
+                      borderColor: theme.colors?.border
+                    }
+                  ]}
+                  style={{ backgroundColor: theme.colors?.background }}
+                  color={theme.colors?.default}
+                  items={[
+                    { label: "", value: "" },
+                    { label: "192kbps", value: "192k" },
+                    { label: "128kbps", value: "128k" },
+                    { label: "64kbps", value: "64k" }
+                  ]}
+                  selectedValue={audioBitrate}
+                  onValueChange={audioBitrateChange}
+                />
+              </>
+            )}
             {Platform.OS !== "web" && (
               <>
                 <Text>動画コンテナ(モバイルデータ通信)</Text>
@@ -436,6 +771,68 @@ const BackendSetup = memo(
                   autoCapitalize="none"
                   value={mobileStreamParams}
                   onChangeText={mobileStreamParamsChange}
+                />
+                <Text>動画解像度(モバイルデータ通信)</Text>
+                <IconSelector
+                  containerStyle={[
+                    styles.inputWrapper,
+                    {
+                      backgroundColor: theme.colors?.background,
+                      borderColor: theme.colors?.border
+                    }
+                  ]}
+                  style={{ backgroundColor: theme.colors?.background }}
+                  color={theme.colors?.default}
+                  items={[
+                    { label: "", value: "" },
+                    { label: "576p(WSVGA)", value: "1024x576" },
+                    { label: "720p(HD)", value: "1280x720" },
+                    { label: "1080p(FHD)", value: "1920x1080" }
+                  ]}
+                  selectedValue={mobileVideoSize}
+                  onValueChange={mobileVideoSizeChange}
+                />
+                <Text>映像ビットレート(モバイルデータ通信)</Text>
+                <IconSelector
+                  containerStyle={[
+                    styles.inputWrapper,
+                    {
+                      backgroundColor: theme.colors?.background,
+                      borderColor: theme.colors?.border
+                    }
+                  ]}
+                  style={{ backgroundColor: theme.colors?.background }}
+                  color={theme.colors?.default}
+                  items={[
+                    { label: "", value: "" },
+                    { label: "3Mbps", value: "3M" },
+                    { label: "2Mbps", value: "2M" },
+                    { label: "1Mbps", value: "1M" },
+                    { label: "512kbps", value: "512k" },
+                    { label: "256kbps", value: "256k" }
+                  ]}
+                  selectedValue={mobileVideoBitrate}
+                  onValueChange={mobileVideoBitrateChange}
+                />
+                <Text>音声ビットレート(モバイルデータ通信)</Text>
+                <IconSelector
+                  containerStyle={[
+                    styles.inputWrapper,
+                    {
+                      backgroundColor: theme.colors?.background,
+                      borderColor: theme.colors?.border
+                    }
+                  ]}
+                  style={{ backgroundColor: theme.colors?.background }}
+                  color={theme.colors?.default}
+                  items={[
+                    { label: "", value: "" },
+                    { label: "192kbps", value: "192k" },
+                    { label: "128kbps", value: "128k" },
+                    { label: "64kbps", value: "64k" }
+                  ]}
+                  selectedValue={mobileAudioBitrate}
+                  onValueChange={mobileAudioBitrateChange}
                 />
               </>
             )}
@@ -477,6 +874,36 @@ const BackendSetup = memo(
                 />
               </>
             )}
+            <Text>
+              {streamType === "raw"
+                ? "再生するビデオファイル"
+                : "再生するビデオファイル(v2以降で有効)"}
+            </Text>
+            <IconSelector
+              containerStyle={[
+                styles.inputWrapper,
+                {
+                  backgroundColor: theme.colors?.background,
+                  borderColor: theme.colors?.border
+                }
+              ]}
+              style={{ backgroundColor: theme.colors?.background }}
+              color={theme.colors?.default}
+              items={[
+                { label: "TS", value: "ts" },
+                { label: "エンコード済", value: "encoded" }
+              ]}
+              selectedValue={videoType}
+              onValueChange={videoTypeChange}
+            />
+            <Input
+              label="再生するビデオ名"
+              inputContainerStyle={[styles.inputWrapper]}
+              autoCapitalize="none"
+              placeholder="TS"
+              value={videoName}
+              onChangeText={videoNameChange}
+            />
             <Text>動画コンテナ</Text>
             <IconSelector
               containerStyle={[
@@ -490,7 +917,7 @@ const BackendSetup = memo(
               color={theme.colors?.default}
               items={[
                 ...(Platform.OS === "web"
-                  ? [{ label: "無変換", value: "raw" }]
+                  ? [{ label: "直接再生", value: "raw" }]
                   : []),
                 { label: "MP4", value: "mp4" },
                 { label: "WebM", value: "webm" },
@@ -499,14 +926,15 @@ const BackendSetup = memo(
               selectedValue={streamType}
               onValueChange={streamTypeChange}
             />
-            <Input
-              label="動画オプション"
-              inputContainerStyle={[styles.inputWrapper]}
-              autoCapitalize="none"
-              value={streamParams}
-              editable={streamType !== "raw"}
-              onChangeText={streamParamsChange}
-            />
+            {streamType !== "raw" && (
+              <Input
+                label="ストリーミング設定"
+                inputContainerStyle={[styles.inputWrapper]}
+                autoCapitalize="none"
+                value={streamMode}
+                onChangeText={streamModeChange}
+              />
+            )}
             {Platform.OS !== "web" && (
               <>
                 <Text>動画コンテナ(モバイルデータ通信)</Text>
@@ -528,11 +956,11 @@ const BackendSetup = memo(
                   onValueChange={mobileStreamTypeChange}
                 />
                 <Input
-                  label="動画オプション(モバイルデータ通信)"
+                  label="ストリーミング設定(モバイルデータ通信)"
                   inputContainerStyle={[styles.inputWrapper]}
                   autoCapitalize="none"
-                  value={mobileStreamParams}
-                  onChangeText={mobileStreamParamsChange}
+                  value={mobileStreamMode}
+                  onChangeText={mobileStreamModeChange}
                 />
               </>
             )}
@@ -847,6 +1275,11 @@ const ViewSetup = memo(
 
 const moritapoEntryUrl = "https://find.moritapo.jp/moritapo/subscribe.php";
 const chinachuInfoUrl = "https://chinachu.moe/";
+
+const qsStringfyOptions: qs.IStringifyOptions = {
+  encode: false,
+  skipNulls: true
+};
 
 const styles = StyleSheet.create({
   title: {
