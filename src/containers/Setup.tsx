@@ -611,7 +611,6 @@ const BackendSetup = memo(
               items={[
                 { label: "MPEG2-TS", value: "m2ts" },
                 { label: "MP4", value: "mp4" },
-                { label: "WebM", value: "webm" }
               ]}
               selectedValue={streamType}
               onValueChange={streamTypeChange}
@@ -760,7 +759,6 @@ const BackendSetup = memo(
                   color={theme.colors?.default}
                   items={[
                     { label: "MP4", value: "mp4" },
-                    { label: "WebM", value: "webm" }
                   ]}
                   selectedValue={mobileStreamType}
                   onValueChange={mobileStreamTypeChange}
