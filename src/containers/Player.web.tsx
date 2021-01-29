@@ -21,7 +21,8 @@ import React, {
 } from "react";
 import Toast from "react-native-root-toast";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
-import qs from "querystring";
+import qs from "qs";
+import Mousetrap from "mousetrap";
 // @ts-ignore
 import { ReactMPV } from "mpv.js";
 
