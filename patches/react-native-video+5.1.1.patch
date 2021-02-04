@@ -1,9 +1,9 @@
 diff --git a/node_modules/react-native-video/ios/Video/RCTVideo.h b/node_modules/react-native-video/ios/Video/RCTVideo.h
-index 26d436c..582f0fe 100644
+index 6fee299..6828f53 100644
 --- a/node_modules/react-native-video/ios/Video/RCTVideo.h
 +++ b/node_modules/react-native-video/ios/Video/RCTVideo.h
 @@ -21,11 +21,11 @@
- @interface RCTVideo : UIView <RCTVideoPlayerViewControllerDelegate, AVPictureInPictureControllerDelegate>
+ @interface RCTVideo : UIView <RCTVideoPlayerViewControllerDelegate, AVPictureInPictureControllerDelegate, AVAssetResourceLoaderDelegate>
  #endif
  
 -@property (nonatomic, copy) RCTDirectEventBlock onVideoLoadStart;
@@ -18,10 +18,10 @@ index 26d436c..582f0fe 100644
  @property (nonatomic, copy) RCTDirectEventBlock onVideoSeek;
  @property (nonatomic, copy) RCTDirectEventBlock onVideoEnd;
 diff --git a/node_modules/react-native-video/ios/Video/RCTVideoManager.m b/node_modules/react-native-video/ios/Video/RCTVideoManager.m
-index 1614eab..2ef377f 100644
+index 000a9e8..32681de 100644
 --- a/node_modules/react-native-video/ios/Video/RCTVideoManager.m
 +++ b/node_modules/react-native-video/ios/Video/RCTVideoManager.m
-@@ -45,11 +45,11 @@ - (dispatch_queue_t)methodQueue
+@@ -50,11 +50,11 @@ - (dispatch_queue_t)methodQueue
  RCT_EXPORT_VIEW_PROPERTY(progressUpdateInterval, float);
  RCT_EXPORT_VIEW_PROPERTY(restoreUserInterfaceForPIPStopCompletionHandler, BOOL);
  /* Should support: onLoadStart, onLoad, and onError to stay consistent with Image */
