@@ -1,0 +1,41 @@
+diff --git a/node_modules/react-native-vlc-media-player/VLCPlayer.js b/node_modules/react-native-vlc-media-player/VLCPlayer.js
+index 486dfe7..a2fb5c8 100644
+--- a/node_modules/react-native-vlc-media-player/VLCPlayer.js
++++ b/node_modules/react-native-vlc-media-player/VLCPlayer.js
+@@ -126,7 +126,7 @@ export default class VLCPlayer extends Component {
+ 
+     let isNetwork = !!(uri && uri.match(/^https?:/));
+     const isAsset = !!(
+-      uri && uri.match(/^(assets-library|file|content|ms-appx|ms-appdata):/)
++      uri && uri.match(/^(assets-library|ms-appx|ms-appdata):/)
+     );
+     if (!isAsset) {
+       isNetwork = true;
+diff --git a/node_modules/react-native-vlc-media-player/android/build.gradle b/node_modules/react-native-vlc-media-player/android/build.gradle
+index fe58e50..9a164bf 100644
+--- a/node_modules/react-native-vlc-media-player/android/build.gradle
++++ b/node_modules/react-native-vlc-media-player/android/build.gradle
+@@ -29,8 +29,8 @@ repositories {
+ }
+ 
+ dependencies {
+-    provided fileTree(dir: 'libs', include: ['*.jar'])
+-    compile "com.facebook.react:react-native:+"
++    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
++    implementation "com.facebook.react:react-native:+"
+     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+     implementation 'org.videolan.android:libvlc-all:3.1.12'
+ }
+diff --git a/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m b/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m
+index c66783e..e855613 100644
+--- a/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m
++++ b/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m
+@@ -237,7 +237,7 @@ static NSString *const playbackRate = @"rate";
+         int remainingTime = [[_player remainingTime] intValue];
+         int duration      = [_player.media.length intValue];
+         
+-        if( currentTime >= 0 && currentTime < duration) {
++        if( currentTime >= 0 ) {
+             self.onVideoProgress(@{
+                                    @"target": self.reactTag,
+                                    @"currentTime": [NSNumber numberWithInt:currentTime],
