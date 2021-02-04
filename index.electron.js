@@ -256,6 +256,7 @@ function createWindow() {
     minHeight: 480,
     frame: false,
     webPreferences: {
+      contextIsolation: false,
       nodeIntegration: true,
       enableRemoteModule: true
     }
@@ -279,6 +280,7 @@ function createWindow() {
 
   const view = new BrowserView({
     webPreferences: {
+      contextIsolation: false,
       nodeIntegration: true,
       enableRemoteModule: true,
       plugins: true

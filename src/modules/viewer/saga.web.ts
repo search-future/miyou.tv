@@ -140,6 +140,7 @@ function* openSaga(action: AnyAction) {
           frame: false,
           show: false,
           webPreferences: {
+            contextIsolation: false,
             nodeIntegration: true,
             enableRemoteModule: true,
             plugins: true
