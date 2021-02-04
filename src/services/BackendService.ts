@@ -30,7 +30,7 @@ export type DownloadItem = {
   uri: string;
   filename: string;
   size?: number;
-}
+};
 export type Program = {
   id: string;
   type: string;
@@ -64,7 +64,7 @@ export type SearchResult = {
   programs: Program[];
 };
 
-export default abstract class BackendService {
+abstract class BackendService {
   hasArchive = false;
   protected cache: { [key: string]: any } = {};
 
@@ -104,3 +104,4 @@ export default abstract class BackendService {
   abstract getChannels(options?: SearchOptions): Promise<Channel[]>;
   abstract clearCache(): void;
 }
+export default BackendService;
