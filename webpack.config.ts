@@ -48,7 +48,7 @@ const iconLoaderConfiguration: webpack.RuleSetRule = {
   include: path.resolve(__dirname, "node_modules/react-native-vector-icons")
 };
 
-const config: webpack.Configuration[] = [
+const factory: webpack.MultiConfigurationFactory = (env, args) => [
   {
     entry: path.resolve(__dirname, "index.web.js"),
 
@@ -84,7 +84,7 @@ const config: webpack.Configuration[] = [
 
     plugins: [
       new webpack.DefinePlugin({
-        __DEV__: process.env.NODE_ENV !== "production"
+        __DEV__: args.mode !== "production"
       })
     ]
   },
@@ -101,4 +101,4 @@ const config: webpack.Configuration[] = [
   }
 ];
 
-module.exports = config;
+module.exports = factory;
