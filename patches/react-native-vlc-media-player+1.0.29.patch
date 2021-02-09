@@ -27,15 +27,53 @@ index fe58e50..9a164bf 100644
      implementation 'org.videolan.android:libvlc-all:3.1.12'
  }
 diff --git a/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m b/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m
-index c66783e..e855613 100644
+index c66783e..d0f2cad 100644
 --- a/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m
 +++ b/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m
 @@ -237,7 +237,7 @@ static NSString *const playbackRate = @"rate";
          int remainingTime = [[_player remainingTime] intValue];
          int duration      = [_player.media.length intValue];
-         
+ 
 -        if( currentTime >= 0 && currentTime < duration) {
 +        if( currentTime >= 0 ) {
              self.onVideoProgress(@{
                                     @"target": self.reactTag,
                                     @"currentTime": [NSNumber numberWithInt:currentTime],
+@@ -261,6 +261,24 @@ static NSString *const playbackRate = @"rate";
+         [_player jumpForward:interval];
+ }
+ 
++- (void)setMuted:(BOOL)muted
++{
++    if(_player){
++        VLCAudio *audio = _player.audio;
++        [audio setMuted: muted];
++    }
++}
++
++-(void)setVolume:(int)interval
++{
++    if(_player){
++        VLCAudio *audio = _player.audio;
++        if(interval >= 0){
++            audio.volume = interval;
++        }
++    }
++}
++
+ -(void)setSeek:(float)pos
+ {
+     if([_player isSeekable]){
+diff --git a/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayerManager.m b/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayerManager.m
+index f68be9d..2bf5397 100644
+--- a/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayerManager.m
++++ b/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayerManager.m
+@@ -33,6 +33,8 @@ RCT_EXPORT_VIEW_PROPERTY(source, NSDictionary);
+ RCT_EXPORT_VIEW_PROPERTY(paused, BOOL);
+ RCT_EXPORT_VIEW_PROPERTY(seek, float);
+ RCT_EXPORT_VIEW_PROPERTY(rate, float);
++RCT_EXPORT_VIEW_PROPERTY(muted, BOOL);
++RCT_EXPORT_VIEW_PROPERTY(volume, int);
+ RCT_EXPORT_VIEW_PROPERTY(resume, BOOL);
+ RCT_EXPORT_VIEW_PROPERTY(videoAspectRatio, NSString);
+ RCT_EXPORT_VIEW_PROPERTY(snapshotPath, NSString);
