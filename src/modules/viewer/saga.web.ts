@@ -14,7 +14,7 @@ limitations under the License.
 import { all, put, select, take, takeEvery } from "redux-saga/effects";
 import { AnyAction } from "redux";
 import Toast from "react-native-root-toast";
-import { remote, BrowserWindow, BrowserView } from "electron";
+import { BrowserWindow, BrowserView } from "electron";
 
 import {
   VIEWER_INIT,
@@ -37,13 +37,13 @@ import { ViewerState } from ".";
 import navigationRef from "../../navigators/navigation";
 
 function getViewerView() {
-  const win = remote.getCurrentWindow();
+  const win = window.remote.getCurrentWindow();
   const viewerView = win.getBrowserView();
   return viewerView;
 }
 
 function getViewerWindow() {
-  const [viewerWindow = null] = remote.BrowserWindow.getAllWindows()
+  const [viewerWindow = null] = window.remote.BrowserWindow.getAllWindows()
     .sort(({ id: a }, { id: b }) => a - b)
     .slice(1)
     .filter(({ isDestroyed }) => !isDestroyed());
@@ -52,7 +52,7 @@ function getViewerWindow() {
 
 function dispatchMain(action: AnyAction) {
   try {
-    const [win] = remote.BrowserWindow.getAllWindows().sort(
+    const [win] = window.remote.BrowserWindow.getAllWindows().sort(
       ({ id: a }, { id: b }) => a - b
     );
     const data = JSON.stringify(action);
@@ -80,12 +80,12 @@ function dispatchViewer(child: BrowserWindow | BrowserView, action: AnyAction) {
 let powerSaveBlockerId: number | undefined;
 
 function startPowerSaveBlocker() {
-  const { powerSaveBlocker } = remote;
+  const { powerSaveBlocker } = window.remote;
   powerSaveBlockerId = powerSaveBlocker.start("prevent-display-sleep");
 }
 
 function stopPowerSaveBlocker() {
-  const { powerSaveBlocker } = remote;
+  const { powerSaveBlocker } = window.remote;
   if (
     powerSaveBlockerId != null &&
     powerSaveBlocker.isStarted(powerSaveBlockerId)
@@ -132,7 +132,7 @@ function* openSaga(action: AnyAction) {
         viewerView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
       }
       if (!viewerWindow || viewerWindow.isDestroyed()) {
-        viewerWindow = new remote.BrowserWindow({
+        viewerWindow = new window.remote.BrowserWindow({
           width: 800,
           height: 600,
           minWidth: 320,
@@ -142,7 +142,6 @@ function* openSaga(action: AnyAction) {
           webPreferences: {
             preload: window.preloadPath,
             contextIsolation: false,
-            nodeIntegration: true,
             enableRemoteModule: true,
             plugins: true
           }

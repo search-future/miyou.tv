@@ -258,7 +258,6 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, "dist/preload.js"),
       contextIsolation: false,
-      nodeIntegration: true,
       enableRemoteModule: true
     }
   });
@@ -283,7 +282,6 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, "dist/preload.js"),
       contextIsolation: false,
-      nodeIntegration: true,
       enableRemoteModule: true,
       plugins: true
     }

@@ -11,8 +11,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { remote } from "electron";
-
 export default async function fileSelector({
   title,
   buttonLabel,
@@ -28,7 +26,7 @@ export default async function fileSelector({
   if (multiSelections) {
     properties.push("multiSelections");
   }
-  const { canceled, filePaths } = await remote.dialog.showOpenDialog({
+  const { canceled, filePaths } = await window.remote.dialog.showOpenDialog({
     title,
     buttonLabel,
     filters,

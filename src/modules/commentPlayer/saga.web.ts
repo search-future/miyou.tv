@@ -14,7 +14,6 @@ limitations under the License.
 import { all, put, select, takeLatest, throttle } from "redux-saga/effects";
 import { AnyAction } from "redux";
 import Toast from "react-native-root-toast";
-import { remote } from "electron";
 
 import {
   COMMENT_PLAYER_INIT,
@@ -27,13 +26,13 @@ import { requestIntervals, requestComments } from "./service";
 import { toastOptions } from "../../config/constants";
 
 function getViewerView() {
-  const win = remote.getCurrentWindow();
+  const win = window.remote.getCurrentWindow();
   const viewerView = win.getBrowserView();
   return viewerView;
 }
 
 function getViewerWindow() {
-  const [viewerWindow = null] = remote.BrowserWindow.getAllWindows()
+  const [viewerWindow = null] = window.remote.BrowserWindow.getAllWindows()
     .sort(({ id: a }, { id: b }) => a - b)
     .slice(1)
     .filter(({ isDestroyed }) => !isDestroyed());
@@ -42,7 +41,7 @@ function getViewerWindow() {
 
 function dispatchMain(action: AnyAction) {
   try {
-    const [win] = remote.BrowserWindow.getAllWindows().sort(
+    const [win] = window.remote.BrowserWindow.getAllWindows().sort(
       ({ id: a }, { id: b }) => a - b
     );
     const data = JSON.stringify(action);

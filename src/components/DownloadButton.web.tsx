@@ -13,7 +13,7 @@ limitations under the License.
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Text, TouchableOpacity, View, StyleSheet } from "react-native";
-import { ipcRenderer, IpcRendererEvent } from "electron";
+import { IpcRendererEvent } from "electron";
 import { Progress } from "electron-dl";
 
 type Props = {
@@ -130,27 +130,27 @@ const DownloadButton = ({
         setStatus("failure");
       }
     };
-    ipcRenderer.on("download-started", onDownloadStarted);
-    ipcRenderer.on("download-cancel", onDownloadCancel);
-    ipcRenderer.on("download-progress", onDownloadProgress);
-    ipcRenderer.on("download-success", onDownloadSuccess);
-    ipcRenderer.on("download-failure", onDownloadFailute);
+    window.ipcRenderer.on("download-started", onDownloadStarted);
+    window.ipcRenderer.on("download-cancel", onDownloadCancel);
+    window.ipcRenderer.on("download-progress", onDownloadProgress);
+    window.ipcRenderer.on("download-success", onDownloadSuccess);
+    window.ipcRenderer.on("download-failure", onDownloadFailute);
     return () => {
-      ipcRenderer.off("download-started", onDownloadStarted);
-      ipcRenderer.off("download-cancel", onDownloadCancel);
-      ipcRenderer.off("download-progress", onDownloadProgress);
-      ipcRenderer.off("download-success", onDownloadSuccess);
-      ipcRenderer.off("download-failure", onDownloadFailute);
+      window.ipcRenderer.off("download-started", onDownloadStarted);
+      window.ipcRenderer.off("download-cancel", onDownloadCancel);
+      window.ipcRenderer.off("download-progress", onDownloadProgress);
+      window.ipcRenderer.off("download-success", onDownloadSuccess);
+      window.ipcRenderer.off("download-failure", onDownloadFailute);
     };
   }, [status]);
 
   const onPress = useCallback(() => {
     const { uri, filename } = source;
     setStatus("started");
-    ipcRenderer.send("download-request", { filename, url: uri });
+    window.ipcRenderer.send("download-request", { filename, url: uri });
   }, [source]);
   const onCancelPress = useCallback(() => {
-    ipcRenderer.send("download-abort");
+    window.ipcRenderer.send("download-abort");
   }, []);
 
   switch (status) {

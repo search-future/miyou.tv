@@ -14,7 +14,6 @@ limitations under the License.
 import React, { useCallback, PropsWithChildren, useContext } from "react";
 import { TouchableOpacity, StyleProp, ViewStyle } from "react-native";
 import { Text, TextProps, ThemeContext } from "react-native-elements";
-import { remote } from "electron";
 
 type Props = PropsWithChildren<
   {
@@ -33,7 +32,7 @@ const LinkText = ({
   const { theme } = useContext(ThemeContext);
 
   const openUrl = useCallback(() => {
-    remote.shell.openExternal(url);
+    window.remote.shell.openExternal(url);
   }, [url]);
 
   return (

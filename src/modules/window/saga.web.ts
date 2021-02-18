@@ -13,7 +13,6 @@ limitations under the License.
 
 import { AnyAction } from "redux";
 import { all, takeLatest } from "redux-saga/effects";
-import { remote } from "electron";
 
 import {
   WINDOW_ALWAYSONTOP,
@@ -26,33 +25,33 @@ import {
 
 function setAlwaysOnTopSaga(action: AnyAction) {
   const { enabled = true } = action;
-  const win = remote.getCurrentWindow();
+  const win = window.remote.getCurrentWindow();
   win.setAlwaysOnTop(enabled);
 }
 
 function setFullScreenSaga(action: AnyAction) {
   const { enabled = true } = action;
-  const win = remote.getCurrentWindow();
+  const win = window.remote.getCurrentWindow();
   win.setFullScreen(enabled);
 }
 
 function maximizeSaga() {
-  const win = remote.getCurrentWindow();
+  const win = window.remote.getCurrentWindow();
   win.maximize();
 }
 
 function minimizeSaga() {
-  const win = remote.getCurrentWindow();
+  const win = window.remote.getCurrentWindow();
   win.minimize();
 }
 
 function restoreSaga() {
-  const win = remote.getCurrentWindow();
+  const win = window.remote.getCurrentWindow();
   win.restore();
 }
 
 function closeSaga() {
-  const win = remote.getCurrentWindow();
+  const win = window.remote.getCurrentWindow();
   win.close();
 }
 

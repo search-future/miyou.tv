@@ -11,11 +11,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import createElectronStorage from "redux-persist-electron-storage";
-
 import { persistSecretKey } from "../config/constants";
 
-const storage = createElectronStorage({
+const storage = window.createElectronStorage({
   electronStoreOpts: {
     encryptionKey: persistSecretKey
   }

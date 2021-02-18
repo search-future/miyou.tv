@@ -11,13 +11,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { remote } from "electron";
+import { remote, ipcRenderer } from "electron";
 import path from "path";
+import fs from "fs";
+import createElectronStorage from "redux-persist-electron-storage";
 
 declare global {
   interface Window {
     preloadPath: string;
+    remote: typeof remote;
+    ipcRenderer: typeof ipcRenderer;
+    fs: typeof fs;
+    createElectronStorage: typeof createElectronStorage;
   }
 }
 
 window.preloadPath = path.join(remote.app.getAppPath(), "dist/preload.js");
+window.remote = remote;
+window.ipcRenderer = ipcRenderer;
+window.fs = fs;
+window.createElectronStorage = createElectronStorage;

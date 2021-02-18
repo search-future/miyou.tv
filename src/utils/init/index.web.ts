@@ -12,10 +12,8 @@ limitations under the License.
 */
 
 import { Store, AnyAction } from "redux";
-import { remote, ipcRenderer } from "electron";
 import Toast from "react-native-root-toast";
 import Mousetrap from "mousetrap";
-import fs from "fs";
 
 import { FileActions } from "../../modules/file";
 import { ServiceActions } from "../../modules/service";
@@ -39,7 +37,7 @@ export default function init(store: Store) {
     mode = "stack";
     boundsSettingName = "bounds";
     window.addEventListener("beforeunload", () => {
-      const win = remote.getCurrentWindow();
+      const win = window.remote.getCurrentWindow();
       win.removeAllListeners();
       const view = win.getBrowserView();
       if (view) {
@@ -47,7 +45,7 @@ export default function init(store: Store) {
         view.webContents.reload();
       }
 
-      remote.BrowserWindow.getAllWindows()
+      window.remote.BrowserWindow.getAllWindows()
         .sort(({ id: a }, { id: b }) => a - b)
         .slice(1)
         .forEach(({ isDestroyed, close }) => {
@@ -59,8 +57,8 @@ export default function init(store: Store) {
       store.dispatch(ServiceActions.commentInit());
       return false;
     });
-    const { argv }: { argv: string[] } = remote.process;
-    const paths = argv.slice(1).filter(a => a !== "." && fs.existsSync(a));
+    const { argv }: { argv: string[] } = window.remote.process;
+    const paths = argv.slice(1).filter(a => a !== "." && window.fs.existsSync(a));
     if (paths.length > 0) {
       store.dispatch(FileActions.add(paths.map(path => `file://${path}`)));
     }
@@ -68,7 +66,7 @@ export default function init(store: Store) {
   }
   store.dispatch(ViewerActions.init(mode));
 
-  const win = remote.getCurrentWindow();
+  const win = window.remote.getCurrentWindow();
   const windowStateDispatcher = () => {
     store.dispatch(
       WindowActions.update({
@@ -111,7 +109,7 @@ export default function init(store: Store) {
     win.setBounds({ ...win.getBounds(), ...bounds });
   }
 
-  ipcRenderer.on("dispatch", ({}, data: string) => {
+  window.ipcRenderer.on("dispatch", ({}, data: string) => {
     const action = JSON.parse(data);
     store.dispatch(action);
   });
@@ -127,7 +125,7 @@ export default function init(store: Store) {
 
 function dispatchWindow(action: AnyAction) {
   try {
-    const win = remote.getCurrentWindow();
+    const win = window.remote.getCurrentWindow();
     const data = JSON.stringify(action);
     win.webContents.send("dispatch", data);
   } catch (e) {
