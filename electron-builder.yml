@@ -8,6 +8,7 @@ files:
   - "index.html"
   - "dist/main.js"
   - "dist/bundle.js"
+  - "dist/preload.js"
   - "assets/splash_screen.png"
   - "!node_modules/**/*"
 extraResources:

@@ -256,6 +256,7 @@ function createWindow() {
     minHeight: 480,
     frame: false,
     webPreferences: {
+      preload: path.join(__dirname, "dist/preload.js"),
       contextIsolation: false,
       nodeIntegration: true,
       enableRemoteModule: true
@@ -280,6 +281,7 @@ function createWindow() {
 
   const view = new BrowserView({
     webPreferences: {
+      preload: path.join(__dirname, "dist/preload.js"),
       contextIsolation: false,
       nodeIntegration: true,
       enableRemoteModule: true,
