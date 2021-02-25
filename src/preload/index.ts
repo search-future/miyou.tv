@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { remote } from "electron";
+import { contextBridge, remote } from "electron";
 
 import utils from "./utils";
 import win from "./win";
@@ -30,9 +30,9 @@ declare global {
   }
 }
 
-window.dialog = remote.dialog;
-window.utils = utils;
-window.win = win;
-window.ipc = ipc;
-window.viewer = viewer;
-window.download = download;
+contextBridge.exposeInMainWorld("dialog", remote.dialog);
+contextBridge.exposeInMainWorld("utils", utils);
+contextBridge.exposeInMainWorld("win", win);
+contextBridge.exposeInMainWorld("ipc", ipc);
+contextBridge.exposeInMainWorld("viewer", viewer);
+contextBridge.exposeInMainWorld("download", download);

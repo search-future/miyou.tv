@@ -47,7 +47,7 @@ const viewer = {
       show: false,
       webPreferences: {
         preload: path.join(remote.app.getAppPath(), "dist/preload.js"),
-        contextIsolation: false,
+        contextIsolation: true,
         enableRemoteModule: true,
         plugins: true
       }

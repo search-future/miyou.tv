@@ -257,7 +257,7 @@ function createWindow() {
     frame: false,
     webPreferences: {
       preload: path.join(__dirname, "dist/preload.js"),
-      contextIsolation: false,
+      contextIsolation: true,
       enableRemoteModule: true
     }
   });
@@ -281,7 +281,7 @@ function createWindow() {
   const view = new BrowserView({
     webPreferences: {
       preload: path.join(__dirname, "dist/preload.js"),
-      contextIsolation: false,
+      contextIsolation: true,
       enableRemoteModule: true,
       plugins: true
     }
