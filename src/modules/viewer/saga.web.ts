@@ -14,7 +14,6 @@ limitations under the License.
 import { all, put, select, take, takeEvery } from "redux-saga/effects";
 import { AnyAction } from "redux";
 import Toast from "react-native-root-toast";
-import { BrowserWindow, BrowserView } from "electron";
 
 import {
   VIEWER_INIT,
@@ -36,27 +35,9 @@ import { toastOptions } from "../../config/constants";
 import { ViewerState } from ".";
 import navigationRef from "../../navigators/navigation";
 
-function getViewerView() {
-  const win = window.remote.getCurrentWindow();
-  const viewerView = win.getBrowserView();
-  return viewerView;
-}
-
-function getViewerWindow() {
-  const [viewerWindow = null] = window.remote.BrowserWindow.getAllWindows()
-    .sort(({ id: a }, { id: b }) => a - b)
-    .slice(1)
-    .filter(({ isDestroyed }) => !isDestroyed());
-  return viewerWindow;
-}
-
 function dispatchMain(action: AnyAction) {
   try {
-    const [win] = window.remote.BrowserWindow.getAllWindows().sort(
-      ({ id: a }, { id: b }) => a - b
-    );
-    const data = JSON.stringify(action);
-    win.webContents.send("dispatch", data);
+    window.ipc.dispatchMain(action);
   } catch (e) {
     Toast.show(e.message || JSON.stringify(e, null, 2), {
       ...toastOptions,
@@ -65,10 +46,9 @@ function dispatchMain(action: AnyAction) {
   }
 }
 
-function dispatchViewer(child: BrowserWindow | BrowserView, action: AnyAction) {
+function dispatchChild(action: AnyAction) {
   try {
-    const data = JSON.stringify(action);
-    child.webContents.send("dispatch", data);
+    window.ipc.dispatchChild(action);
   } catch (e) {
     Toast.show(e.message || JSON.stringify(e, null, 2), {
       ...toastOptions,
@@ -77,20 +57,14 @@ function dispatchViewer(child: BrowserWindow | BrowserView, action: AnyAction) {
   }
 }
 
-let powerSaveBlockerId: number | undefined;
-
-function startPowerSaveBlocker() {
-  const { powerSaveBlocker } = window.remote;
-  powerSaveBlockerId = powerSaveBlocker.start("prevent-display-sleep");
-}
-
-function stopPowerSaveBlocker() {
-  const { powerSaveBlocker } = window.remote;
-  if (
-    powerSaveBlockerId != null &&
-    powerSaveBlocker.isStarted(powerSaveBlockerId)
-  ) {
-    powerSaveBlocker.stop(powerSaveBlockerId);
+function dispatchView(action: AnyAction) {
+  try {
+    window.ipc.dispatchView(action);
+  } catch (e) {
+    Toast.show(e.message || JSON.stringify(e, null, 2), {
+      ...toastOptions,
+      duration: Toast.durations.SHORT
+    });
   }
 }
 
@@ -105,56 +79,28 @@ function* openSaga(action: AnyAction) {
   const { mode }: ViewerState = yield select(({ viewer }) => viewer);
   if (mode === "stack") {
     const { docking = true } = yield select(({ setting }) => setting);
-    const viewerView = getViewerView();
-    let viewerWindow = getViewerWindow();
     if (docking) {
-      if (viewerWindow) {
-        viewerWindow.destroy();
-      }
-      if (viewerView) {
-        const setting: SettingState = yield select(({ setting }) => setting);
-        const { commentChannels }: ServiceState = yield select(
-          ({ service }) => service
-        );
-        const { programs, index, layout }: ViewerState = yield select(
-          ({ viewer }) => viewer
-        );
-        viewerView.setBounds(layout);
-        dispatchViewer(viewerView, SettingActions.restore(setting));
-        dispatchViewer(
-          viewerView,
-          ServiceActions.commentReady(commentChannels)
-        );
-        dispatchViewer(viewerView, ViewerActions.update({ programs, index }));
-      }
+      window.viewer.closeWindow();
+      const setting: SettingState = yield select(({ setting }) => setting);
+      const { commentChannels }: ServiceState = yield select(
+        ({ service }) => service
+      );
+      const { programs, index, layout }: ViewerState = yield select(
+        ({ viewer }) => viewer
+      );
+      window.viewer.setViewSize(layout);
+      dispatchView(SettingActions.restore(setting));
+      dispatchView(ServiceActions.commentReady(commentChannels));
+      dispatchView(ViewerActions.update({ programs, index }));
     } else {
-      if (viewerView) {
-        viewerView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
-      }
-      if (!viewerWindow || viewerWindow.isDestroyed()) {
-        viewerWindow = new window.remote.BrowserWindow({
-          width: 800,
-          height: 600,
-          minWidth: 320,
-          minHeight: 480,
-          frame: false,
-          show: false,
-          webPreferences: {
-            preload: window.preloadPath,
-            contextIsolation: false,
-            enableRemoteModule: true,
-            plugins: true
-          }
-        });
-        viewerWindow.on("close", () => {
+      window.viewer.setViewSize({ x: 0, y: 0, width: 0, height: 0 });
+      if (!window.viewer.hasWindow()) {
+        window.viewer.createWindow(() => {
           dispatchMain(ViewerActions.close());
         });
-        viewerWindow.loadURL(`${location.href}#child`);
         yield take(VIEWER_READY);
       }
-      if (!viewerWindow.isVisible()) {
-        viewerWindow.show();
-      }
+      window.viewer.showWindow();
 
       const setting: SettingState = yield select(({ setting }) => setting);
       const { commentChannels }: ServiceState = yield select(
@@ -163,12 +109,9 @@ function* openSaga(action: AnyAction) {
       const { programs, index }: ViewerState = yield select(
         ({ viewer }) => viewer
       );
-      dispatchViewer(viewerWindow, SettingActions.restore(setting));
-      dispatchViewer(
-        viewerWindow,
-        ServiceActions.commentReady(commentChannels)
-      );
-      dispatchViewer(viewerWindow, ViewerActions.update({ programs, index }));
+      dispatchChild(SettingActions.restore(setting));
+      dispatchChild(ServiceActions.commentReady(commentChannels));
+      dispatchChild(ViewerActions.update({ programs, index }));
     }
   } else {
     dispatchMain(action);
@@ -178,16 +121,9 @@ function* openSaga(action: AnyAction) {
 function* closeSaga(action: AnyAction) {
   const { mode }: ViewerState = yield select(({ viewer }) => viewer);
   if (mode === "stack") {
-    const viewerView = getViewerView();
-    const viewerWindow = getViewerWindow();
-    if (viewerView) {
-      viewerView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
-      dispatchViewer(viewerView, ViewerActions.update({ playing: false }));
-    }
-    if (viewerWindow) {
-      viewerWindow.destroy();
-    }
-    stopPowerSaveBlocker();
+    window.viewer.closeWindow();
+    window.viewer.setViewSize({ x: 0, y: 0, width: 0, height: 0 });
+    window.utils.stopPowerSaveBlocker();
   } else {
     dispatchMain(action);
   }
@@ -206,10 +142,7 @@ function* dockSaga(action: AnyAction) {
 function* undockSaga(action: AnyAction) {
   const { mode }: ViewerState = yield select(({ viewer }) => viewer);
   if (mode === "stack") {
-    const viewerView = getViewerView();
-    if (viewerView) {
-      dispatchViewer(viewerView, ViewerActions.update({ playing: false }));
-    }
+    dispatchView(ViewerActions.update({ playing: false }));
     yield put(SettingActions.update("docking", false));
     yield openSaga(action);
   } else {
@@ -247,10 +180,7 @@ function* resizeSaga() {
       ({ viewer }) => viewer
     );
     if (docking && isOpened) {
-      const viewerView = getViewerView();
-      if (viewerView) {
-        viewerView.setBounds(layout);
-      }
+      window.viewer.setViewSize(layout);
     }
   }
 }
@@ -260,9 +190,9 @@ function* updateSaga(action: AnyAction) {
   const { mode, playing } = viewer;
   if (mode === "stack") {
     if (playing) {
-      startPowerSaveBlocker();
+      window.utils.startPowerSaveBlocker();
     } else {
-      stopPowerSaveBlocker();
+      window.utils.stopPowerSaveBlocker();
     }
   } else {
     dispatchMain(action);
@@ -282,14 +212,8 @@ function* settingSaga() {
   const { mode } = viewer;
 
   if (mode === "stack") {
-    const viewerView = getViewerView();
-    const viewerWindow = getViewerWindow();
-    if (viewerView) {
-      dispatchViewer(viewerView, SettingActions.restore(setting));
-    }
-    if (viewerWindow) {
-      dispatchViewer(viewerWindow, SettingActions.restore(setting));
-    }
+    dispatchView(SettingActions.restore(setting));
+    dispatchChild(SettingActions.restore(setting));
   } else {
     dispatchMain(SettingActions.restore(setting));
   }

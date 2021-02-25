@@ -32,7 +32,7 @@ const LinkText = ({
   const { theme } = useContext(ThemeContext);
 
   const openUrl = useCallback(() => {
-    window.remote.shell.openExternal(url);
+    window.utils.openExternal(url);
   }, [url]);
 
   return (

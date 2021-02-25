@@ -25,27 +25,9 @@ import {
 import { requestIntervals, requestComments } from "./service";
 import { toastOptions } from "../../config/constants";
 
-function getViewerView() {
-  const win = window.remote.getCurrentWindow();
-  const viewerView = win.getBrowserView();
-  return viewerView;
-}
-
-function getViewerWindow() {
-  const [viewerWindow = null] = window.remote.BrowserWindow.getAllWindows()
-    .sort(({ id: a }, { id: b }) => a - b)
-    .slice(1)
-    .filter(({ isDestroyed }) => !isDestroyed());
-  return viewerWindow;
-}
-
 function dispatchMain(action: AnyAction) {
   try {
-    const [win] = window.remote.BrowserWindow.getAllWindows().sort(
-      ({ id: a }, { id: b }) => a - b
-    );
-    const data = JSON.stringify(action);
-    win.webContents.send("dispatch", data);
+    window.ipc.dispatchMain(action);
   } catch (e) {
     Toast.show(e.message || JSON.stringify(e, null, 2), {
       ...toastOptions,
@@ -56,15 +38,8 @@ function dispatchMain(action: AnyAction) {
 
 function dispatchViewer(action: AnyAction) {
   try {
-    const data = JSON.stringify(action);
-    const viewerView = getViewerView();
-    const viewerWindow = getViewerWindow();
-    if (viewerView) {
-      viewerView.webContents.send("dispatch", data);
-    }
-    if (viewerWindow) {
-      viewerWindow.webContents.send("dispatch", data);
-    }
+    window.ipc.dispatchView(action);
+    window.ipc.dispatchChild(action);
   } catch (e) {
     Toast.show(e.message || JSON.stringify(e, null, 2), {
       ...toastOptions,

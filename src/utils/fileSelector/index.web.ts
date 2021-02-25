@@ -26,7 +26,7 @@ export default async function fileSelector({
   if (multiSelections) {
     properties.push("multiSelections");
   }
-  const { canceled, filePaths } = await window.remote.dialog.showOpenDialog({
+  const { canceled, filePaths } = await window.dialog.showOpenDialog({
     title,
     buttonLabel,
     filters,

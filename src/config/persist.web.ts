@@ -13,7 +13,7 @@ limitations under the License.
 
 import { persistSecretKey } from "../config/constants";
 
-const storage = window.createElectronStorage({
+const storage = window.utils.createElectronStorage({
   electronStoreOpts: {
     encryptionKey: persistSecretKey
   }

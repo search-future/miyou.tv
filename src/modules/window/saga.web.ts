@@ -25,34 +25,28 @@ import {
 
 function setAlwaysOnTopSaga(action: AnyAction) {
   const { enabled = true } = action;
-  const win = window.remote.getCurrentWindow();
-  win.setAlwaysOnTop(enabled);
+  window.win.setAlwaysOnTop(enabled);
 }
 
 function setFullScreenSaga(action: AnyAction) {
   const { enabled = true } = action;
-  const win = window.remote.getCurrentWindow();
-  win.setFullScreen(enabled);
+  window.win.setFullScreen(enabled);
 }
 
 function maximizeSaga() {
-  const win = window.remote.getCurrentWindow();
-  win.maximize();
+  window.win.maximize();
 }
 
 function minimizeSaga() {
-  const win = window.remote.getCurrentWindow();
-  win.minimize();
+  window.win.minimize();
 }
 
 function restoreSaga() {
-  const win = window.remote.getCurrentWindow();
-  win.restore();
+  window.win.restore();
 }
 
 function closeSaga() {
-  const win = window.remote.getCurrentWindow();
-  win.close();
+  window.win.close();
 }
 
 export function* windowSaga() {

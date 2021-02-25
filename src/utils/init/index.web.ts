@@ -37,28 +37,17 @@ export default function init(store: Store) {
     mode = "stack";
     boundsSettingName = "bounds";
     window.addEventListener("beforeunload", () => {
-      const win = window.remote.getCurrentWindow();
-      win.removeAllListeners();
-      const view = win.getBrowserView();
-      if (view) {
-        view.setBounds({ x: 0, y: 0, width: 0, height: 0 });
-        view.webContents.reload();
-      }
-
-      window.remote.BrowserWindow.getAllWindows()
-        .sort(({ id: a }, { id: b }) => a - b)
-        .slice(1)
-        .forEach(({ isDestroyed, close }) => {
-          !isDestroyed() && close();
-        });
+      window.win.closeAll();
     });
     Mousetrap.bind("mod+r", () => {
       store.dispatch(ServiceActions.backendInit());
       store.dispatch(ServiceActions.commentInit());
       return false;
     });
-    const { argv }: { argv: string[] } = window.remote.process;
-    const paths = argv.slice(1).filter(a => a !== "." && window.fs.existsSync(a));
+    const argv = window.utils.getArgv();
+    const paths = argv
+      .slice(1)
+      .filter(a => a !== "." && window.utils.fileExists(a));
     if (paths.length > 0) {
       store.dispatch(FileActions.add(paths.map(path => `file://${path}`)));
     }
@@ -66,25 +55,17 @@ export default function init(store: Store) {
   }
   store.dispatch(ViewerActions.init(mode));
 
-  const win = window.remote.getCurrentWindow();
   const windowStateDispatcher = () => {
     store.dispatch(
       WindowActions.update({
-        alwaysOnTop: win.isAlwaysOnTop(),
-        fullScreen: win.isFullScreen(),
-        maximized: win.isMaximized(),
-        minimized: win.isMinimized()
+        alwaysOnTop: window.win.isAlwaysOnTop(),
+        fullScreen: window.win.isFullScreen(),
+        maximized: window.win.isMaximized(),
+        minimized: window.win.isMinimized()
       })
     );
   };
-  win
-    .on("maximize", windowStateDispatcher)
-    .on("unmaximize", windowStateDispatcher)
-    .on("minimize", windowStateDispatcher)
-    .on("restore", windowStateDispatcher)
-    .on("enter-full-screen", windowStateDispatcher)
-    .on("leave-full-screen", windowStateDispatcher)
-    .on("always-on-top-changed", windowStateDispatcher);
+  window.win.addStateListener(windowStateDispatcher);
   windowStateDispatcher();
 
   if (boundsSettingName) {
@@ -94,22 +75,22 @@ export default function init(store: Store) {
       if (boundsDispatcherId != null) {
         clearTimeout(boundsDispatcherId);
       }
-      if (!win.isFullScreen() && !win.isMaximized()) {
+      if (!window.win.isFullScreen() && !window.win.isMaximized()) {
         boundsDispatcherId = setTimeout(
           () =>
             store.dispatch(
-              SettingActions.update(boundsSettingName, win.getBounds())
+              SettingActions.update(boundsSettingName, window.win.getBounds())
             ),
           500
         );
       }
     };
-    win.on("resize", windowBoundsDispatcher).on("move", windowBoundsDispatcher);
+    window.win.addBoundsListener(windowBoundsDispatcher);
     const bounds = setting[boundsSettingName] || {};
-    win.setBounds({ ...win.getBounds(), ...bounds });
+    window.win.setBounds({ ...window.win.getBounds(), ...bounds });
   }
 
-  window.ipcRenderer.on("dispatch", ({}, data: string) => {
+  window.ipc.addDispatchListener((data: string) => {
     const action = JSON.parse(data);
     store.dispatch(action);
   });
@@ -118,16 +99,14 @@ export default function init(store: Store) {
     dispatchWindow(WindowActions.setFullScreen(false));
   });
   Mousetrap.bind("mod+I", () => {
-    win.webContents.toggleDevTools();
+    window.utils.toggleDevTools();
     return false;
   });
 }
 
 function dispatchWindow(action: AnyAction) {
   try {
-    const win = window.remote.getCurrentWindow();
-    const data = JSON.stringify(action);
-    win.webContents.send("dispatch", data);
+    window.ipc.dispatchWindow(action);
   } catch (e) {
     Toast.show(e.message || JSON.stringify(e, null, 2), {
       ...toastOptions,

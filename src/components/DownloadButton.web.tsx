@@ -130,27 +130,27 @@ const DownloadButton = ({
         setStatus("failure");
       }
     };
-    window.ipcRenderer.on("download-started", onDownloadStarted);
-    window.ipcRenderer.on("download-cancel", onDownloadCancel);
-    window.ipcRenderer.on("download-progress", onDownloadProgress);
-    window.ipcRenderer.on("download-success", onDownloadSuccess);
-    window.ipcRenderer.on("download-failure", onDownloadFailute);
+    window.download.on("started", onDownloadStarted);
+    window.download.on("cancel", onDownloadCancel);
+    window.download.on("progress", onDownloadProgress);
+    window.download.on("success", onDownloadSuccess);
+    window.download.on("failure", onDownloadFailute);
     return () => {
-      window.ipcRenderer.off("download-started", onDownloadStarted);
-      window.ipcRenderer.off("download-cancel", onDownloadCancel);
-      window.ipcRenderer.off("download-progress", onDownloadProgress);
-      window.ipcRenderer.off("download-success", onDownloadSuccess);
-      window.ipcRenderer.off("download-failure", onDownloadFailute);
+      window.download.off("started", onDownloadStarted);
+      window.download.off("cancel", onDownloadCancel);
+      window.download.off("progress", onDownloadProgress);
+      window.download.off("success", onDownloadSuccess);
+      window.download.off("failure", onDownloadFailute);
     };
   }, [status]);
 
   const onPress = useCallback(() => {
     const { uri, filename } = source;
     setStatus("started");
-    window.ipcRenderer.send("download-request", { filename, url: uri });
+    window.download.request(uri, filename);
   }, [source]);
   const onCancelPress = useCallback(() => {
-    window.ipcRenderer.send("download-abort");
+    window.download.abort();
   }, []);
 
   switch (status) {
