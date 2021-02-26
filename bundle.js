@@ -20,7 +20,7 @@ electronDl({
   openFolderWhenDone: true
 });
 let downloadItem;
-ipcMain.on("download-request", async ({ sender }, { filename, url }) => {
+ipcMain.handle("download-request", async ({ sender }, { filename, url }) => {
   const win = BrowserWindow.getFocusedWindow();
   try {
     await download(win, url, {
@@ -43,6 +43,6 @@ ipcMain.on("download-request", async ({ sender }, { filename, url }) => {
     sender.send(`download-failure`, e);
   }
 });
-ipcMain.on("download-abort", () => {
+ipcMain.handle("download-abort", () => {
   downloadItem.cancel();
 });

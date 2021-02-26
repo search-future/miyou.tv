@@ -62,10 +62,10 @@ ipcRenderer.on("download-failure", (event, ...args) => {
 
 const download = {
   request: (uri: string, filename: string) => {
-    ipcRenderer.send("download-request", { filename, url: uri });
+    ipcRenderer.invoke("download-request", { filename, url: uri });
   },
   abort: () => {
-    ipcRenderer.send("download-abort");
+    ipcRenderer.invoke("download-abort");
   },
   on: (
     channel: DownloadChannel,
