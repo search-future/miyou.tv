@@ -90,7 +90,7 @@ const factory: webpack.MultiConfigurationFactory = (env, args) => [
   },
 
   {
-    entry: path.resolve(__dirname, "src/preload/index.ts"),
+    entry: path.resolve(__dirname, "src/electron/preload/index.ts"),
 
     output: {
       filename: "preload.js",
@@ -107,14 +107,20 @@ const factory: webpack.MultiConfigurationFactory = (env, args) => [
   },
 
   {
-    entry: path.resolve(__dirname, "bundle.js"),
+    entry: path.resolve(__dirname, "src/electron/bundle/index.ts"),
 
     output: {
       filename: "bundle.js",
       path: path.resolve(__dirname, "dist/")
     },
 
-    target: "electron-main"
+    target: "electron-main",
+
+    module: {
+      rules: [tsLoaderConfiguration, jsLoaderConfiguration]
+    },
+
+    resolve: { extensions: [".ts", ".js"] }
   }
 ];
 

@@ -44,24 +44,27 @@ export default function init(store: Store) {
       store.dispatch(ServiceActions.commentInit());
       return false;
     });
-    const argv = window.utils.getArgv();
-    const paths = argv
-      .slice(1)
-      .filter(a => a !== "." && window.utils.fileExists(a));
-    if (paths.length > 0) {
-      store.dispatch(FileActions.add(paths.map(path => `file://${path}`)));
-    }
+
+    (async () => {
+      const argv = await window.utils.getArgv();
+      const paths = argv
+        .slice(1)
+        .filter(a => a !== "." && window.utils.fileExists(a));
+      if (paths.length > 0) {
+        store.dispatch(FileActions.add(paths.map(path => `file://${path}`)));
+      }
+    })();
     common(store);
   }
   store.dispatch(ViewerActions.init(mode));
 
-  const windowStateDispatcher = () => {
+  const windowStateDispatcher = async () => {
     store.dispatch(
       WindowActions.update({
-        alwaysOnTop: window.win.isAlwaysOnTop(),
-        fullScreen: window.win.isFullScreen(),
-        maximized: window.win.isMaximized(),
-        minimized: window.win.isMinimized()
+        alwaysOnTop: await window.win.isAlwaysOnTop(),
+        fullScreen: await window.win.isFullScreen(),
+        maximized: await window.win.isMaximized(),
+        minimized: await window.win.isMinimized()
       })
     );
   };
@@ -71,15 +74,21 @@ export default function init(store: Store) {
   if (boundsSettingName) {
     const { setting } = store.getState();
     let boundsDispatcherId: number;
-    const windowBoundsDispatcher = () => {
+    const windowBoundsDispatcher = async () => {
       if (boundsDispatcherId != null) {
         clearTimeout(boundsDispatcherId);
       }
-      if (!window.win.isFullScreen() && !window.win.isMaximized()) {
+      if (
+        !(await window.win.isFullScreen()) &&
+        !(await window.win.isMaximized())
+      ) {
         boundsDispatcherId = setTimeout(
-          () =>
+          async () =>
             store.dispatch(
-              SettingActions.update(boundsSettingName, window.win.getBounds())
+              SettingActions.update(
+                boundsSettingName,
+                await window.win.getBounds()
+              )
             ),
           500
         );
@@ -87,7 +96,9 @@ export default function init(store: Store) {
     };
     window.win.addBoundsListener(windowBoundsDispatcher);
     const bounds = setting[boundsSettingName] || {};
-    window.win.setBounds({ ...window.win.getBounds(), ...bounds });
+    (async () => {
+      window.win.setBounds({ ...(await window.win.getBounds()), ...bounds });
+    })();
   }
 
   window.ipc.addDispatchListener((data: string) => {

@@ -12,31 +12,23 @@ limitations under the License.
 */
 
 import { existsSync } from "fs";
-import { remote } from "electron";
+import { ipcRenderer } from "electron";
 import createElectronStorage from "redux-persist-electron-storage";
-
-let powerSaveBlockerId: number | undefined;
 
 const utils = {
   fileExists: existsSync,
-  getArgv: () => remote.process.argv,
+  getArgv: () => ipcRenderer.invoke("argv") as Promise<string[]>,
   toggleDevTools: () => {
-    remote.getCurrentWebContents().toggleDevTools();
+    ipcRenderer.invoke("devtool-toggle");
   },
   startPowerSaveBlocker: () => {
-    powerSaveBlockerId = remote.powerSaveBlocker.start("prevent-display-sleep");
+    ipcRenderer.invoke("powersaveblocker-start");
   },
-
   stopPowerSaveBlocker: () => {
-    if (
-      powerSaveBlockerId != null &&
-      remote.powerSaveBlocker.isStarted(powerSaveBlockerId)
-    ) {
-      remote.powerSaveBlocker.stop(powerSaveBlockerId);
-    }
+    ipcRenderer.invoke("powersaveblocker-stop");
   },
   openExternal: (url: string) => {
-    remote.shell.openExternal(url);
+    ipcRenderer.invoke("open-external", url);
   },
   createElectronStorage
 };

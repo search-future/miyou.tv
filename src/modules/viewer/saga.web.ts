@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { all, put, select, take, takeEvery } from "redux-saga/effects";
+import { all, call, put, select, take, takeEvery } from "redux-saga/effects";
 import { AnyAction } from "redux";
 import Toast from "react-native-root-toast";
 
@@ -80,7 +80,7 @@ function* openSaga(action: AnyAction) {
   if (mode === "stack") {
     const { docking = true } = yield select(({ setting }) => setting);
     if (docking) {
-      window.viewer.closeWindow();
+      yield call(window.viewer.closeWindow);
       const setting: SettingState = yield select(({ setting }) => setting);
       const { commentChannels }: ServiceState = yield select(
         ({ service }) => service
@@ -88,19 +88,23 @@ function* openSaga(action: AnyAction) {
       const { programs, index, layout }: ViewerState = yield select(
         ({ viewer }) => viewer
       );
-      window.viewer.setViewSize(layout);
+      yield call(() => window.viewer.setViewSize(layout));
       dispatchView(SettingActions.restore(setting));
       dispatchView(ServiceActions.commentReady(commentChannels));
       dispatchView(ViewerActions.update({ programs, index }));
     } else {
-      window.viewer.setViewSize({ x: 0, y: 0, width: 0, height: 0 });
-      if (!window.viewer.hasWindow()) {
-        window.viewer.createWindow(() => {
-          dispatchMain(ViewerActions.close());
-        });
+      yield call(() =>
+        window.viewer.setViewSize({ x: 0, y: 0, width: 0, height: 0 })
+      );
+      if (!((yield call(window.viewer.hasWindow)) as boolean)) {
+        yield call(() =>
+          window.viewer.createWindow(() => {
+            dispatchMain(ViewerActions.close());
+          })
+        );
         yield take(VIEWER_READY);
       }
-      window.viewer.showWindow();
+      yield call(window.viewer.showWindow);
 
       const setting: SettingState = yield select(({ setting }) => setting);
       const { commentChannels }: ServiceState = yield select(
@@ -121,7 +125,7 @@ function* openSaga(action: AnyAction) {
 function* closeSaga(action: AnyAction) {
   const { mode }: ViewerState = yield select(({ viewer }) => viewer);
   if (mode === "stack") {
-    window.viewer.closeWindow();
+    yield call(window.viewer.closeWindow);
     window.viewer.setViewSize({ x: 0, y: 0, width: 0, height: 0 });
     window.utils.stopPowerSaveBlocker();
   } else {
@@ -180,7 +184,7 @@ function* resizeSaga() {
       ({ viewer }) => viewer
     );
     if (docking && isOpened) {
-      window.viewer.setViewSize(layout);
+      yield call(() => window.viewer.setViewSize(layout));
     }
   }
 }

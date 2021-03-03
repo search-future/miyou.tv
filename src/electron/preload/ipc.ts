@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { ipcRenderer, remote } from "electron";
+import { ipcRenderer } from "electron";
 import { AnyAction } from "redux";
 
 const ipc = {
@@ -21,29 +21,20 @@ const ipc = {
     });
   },
   dispatchWindow: (action: AnyAction) => {
-    const win = remote.getCurrentWindow();
     const data = JSON.stringify(action);
-    win.webContents.send("dispatch", data);
+    ipcRenderer.invoke("dispatch-window", data);
   },
   dispatchMain: (action: AnyAction) => {
-    const [win] = remote.BrowserWindow.getAllWindows().sort(
-      ({ id: a }, { id: b }) => a - b
-    );
     const data = JSON.stringify(action);
-    win.webContents.send("dispatch", data);
+    ipcRenderer.invoke("dispatch-main", data);
   },
   dispatchChild: (action: AnyAction) => {
-    const [win = null] = remote.BrowserWindow.getAllWindows()
-      .sort(({ id: a }, { id: b }) => a - b)
-      .slice(1)
-      .filter(({ isDestroyed }) => !isDestroyed());
     const data = JSON.stringify(action);
-    win?.webContents.send("dispatch", data);
+    ipcRenderer.invoke("dispatch-child", data);
   },
   dispatchView: (action: AnyAction) => {
-    const view = remote.getCurrentWindow().getBrowserView();
     const data = JSON.stringify(action);
-    view?.webContents.send("dispatch", data);
-  },
+    ipcRenderer.invoke("dispatch-view", data);
+  }
 };
 export default ipc;

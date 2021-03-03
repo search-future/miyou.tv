@@ -11,36 +11,38 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-const { BrowserWindow, ipcMain } = require("electron");
-const electronDl = require("electron-dl");
+import { BrowserWindow, ipcMain, DownloadItem } from "electron";
+import electronDl from "electron-dl";
 
 const { download } = electronDl;
 electronDl({
   saveAs: true,
   openFolderWhenDone: true
 });
-let downloadItem;
+let downloadItem: DownloadItem;
 ipcMain.handle("download-request", async ({ sender }, { filename, url }) => {
   const win = BrowserWindow.getFocusedWindow();
-  try {
-    await download(win, url, {
-      filename,
-      saveAs: true,
-      openFolderWhenDone: true,
-      onStarted: item => {
-        downloadItem = item;
-        sender.send(`download-started`);
-      },
-      onCancel: () => {
-        sender.send(`download-cancel`);
-      },
-      onProgress: progress => {
-        sender.send(`download-progress`, progress);
-      }
-    });
-    sender.send(`download-success`);
-  } catch (e) {
-    sender.send(`download-failure`, e);
+  if (win) {
+    try {
+      await download(win, url, {
+        filename,
+        saveAs: true,
+        openFolderWhenDone: true,
+        onStarted: (item: DownloadItem) => {
+          downloadItem = item;
+          sender.send(`download-started`);
+        },
+        onCancel: () => {
+          sender.send(`download-cancel`);
+        },
+        onProgress: (progress: electronDl.Progress) => {
+          sender.send(`download-progress`, progress);
+        }
+      });
+      sender.send(`download-success`);
+    } catch (e) {
+      sender.send(`download-failure`, e);
+    }
   }
 });
 ipcMain.handle("download-abort", () => {
