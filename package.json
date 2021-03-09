@@ -106,7 +106,15 @@
   },
   "homepage": "http://miyou.tv/",
   "jest": {
-    "preset": "react-native-web"
+    "preset": "react-native-web",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
   },
   "keywords": [
     "chinachu",
@@ -124,6 +132,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/search-future/miyou.tv.git"
+  },
+  "resolutions": {
+    "@types/react": "^16"
   },
   "scripts": {
     "start": "npm run env-cmd -- node node_modules/react-native/local-cli/cli.js start",

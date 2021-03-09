@@ -17,7 +17,6 @@
 		2DCD954D1E0B4F2C00145EB5 /* miyoutvTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* miyoutvTests.m */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		9D52C2EDDF218E73E6DE5421 /* libPods-miyoutv-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AC58EC52520E41A9E9C0A7E /* libPods-miyoutv-tvOS.a */; };
-		A440741124C5A54800A57094 /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 008F07F21AC5B25A0029DE68 /* main.jsbundle */; };
 		A4918D00B405E78A4DFAC6A9 /* libPods-miyoutv-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 13862986CE4B062F2E4352B1 /* libPods-miyoutv-tvOSTests.a */; };
 		AAA4444B17AB49FEDCC8AEB2 /* libPods-miyoutv-miyoutvTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 008FA60B9E0B9F7D7CECA50D /* libPods-miyoutv-miyoutvTests.a */; };
 		F1853ABC7C542CC8534F4CDD /* libPods-miyoutv.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BCD2D0F88B6F157F87E29CC /* libPods-miyoutv.a */; };
@@ -41,7 +40,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		008F07F21AC5B25A0029DE68 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		008FA60B9E0B9F7D7CECA50D /* libPods-miyoutv-miyoutvTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-miyoutv-miyoutvTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356EE1AD99517003FC87E /* miyoutvTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = miyoutvTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -126,7 +124,6 @@
 		13B07FAE1A68108700A75B9A /* miyoutv */ = {
 			isa = PBXGroup;
 			children = (
-				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -340,7 +337,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A440741124C5A54800A57094 /* main.jsbundle in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);
@@ -675,7 +671,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 44E051E4D9E91763F0619D3F /* Pods-miyoutv-miyoutvTests.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -699,7 +694,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EB309C5BD6C8B7625C5F251E /* Pods-miyoutv-miyoutvTests.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -737,7 +731,6 @@
 				PRODUCT_NAME = MiyouTV;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -762,7 +755,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = jp.razil.ios.miyoutv;
 				PRODUCT_NAME = MiyouTV;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
