@@ -27,19 +27,19 @@ index fe58e50..9a164bf 100644
      implementation 'org.videolan.android:libvlc-all:3.1.12'
  }
 diff --git a/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m b/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m
-index c66783e..d0f2cad 100644
+index 2398efa..603d7dc 100644
 --- a/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m
 +++ b/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m
-@@ -237,7 +237,7 @@ static NSString *const playbackRate = @"rate";
+@@ -231,7 +231,7 @@ static NSString *const playbackRate = @"rate";
          int remainingTime = [[_player remainingTime] intValue];
          int duration      = [_player.media.length intValue];
- 
+         
 -        if( currentTime >= 0 && currentTime < duration) {
 +        if( currentTime >= 0 ) {
              self.onVideoProgress(@{
                                     @"target": self.reactTag,
                                     @"currentTime": [NSNumber numberWithInt:currentTime],
-@@ -261,6 +261,24 @@ static NSString *const playbackRate = @"rate";
+@@ -255,6 +255,24 @@ static NSString *const playbackRate = @"rate";
          [_player jumpForward:interval];
  }
  
