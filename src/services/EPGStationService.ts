@@ -467,7 +467,7 @@ export default class EPGStationService extends BackendService {
           name,
           filename: name,
           size,
-          uri: this.getAuthUrl(`/api/video/${id}?isDownload=true`)
+          uri: this.getAuthUrl(`/api/videos/${id}?isDownload=true`)
         })),
         authHeaders: this.getAuthHeaders()
       });
@@ -536,6 +536,7 @@ export default class EPGStationService extends BackendService {
   ) {
     const conf: AxiosRequestConfig = {
       url: this.getUrl(path),
+      headers: this.getAuthHeaders(),
       params: {},
       data: {},
       paramsSerializer: qs.stringify,
