@@ -285,7 +285,7 @@ const Player = memo(() => {
         dispatch(PlayerActions.progress({ time, position }));
       }
 
-      if (preseek.current > 0) {
+      if (preseek.current > 0 && duration) {
         dispatch(PlayerActions.time(preseek.current));
         preseek.current = 0;
       }
@@ -453,7 +453,7 @@ const Player = memo(() => {
         } else {
           mpvRef.current?.property("time-pos", seekTime / 1000);
         }
-      } else if (duration > 0  && seekTime > duration) {
+      } else if (duration > 0 && seekTime > duration) {
         retryCount.current = -1;
         mpvRef.current?.command("stop");
       } else {
