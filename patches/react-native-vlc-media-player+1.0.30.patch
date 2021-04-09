@@ -26,6 +26,20 @@ index fe58e50..9a164bf 100644
      implementation 'androidx.legacy:legacy-support-v4:1.0.0'
      implementation 'org.videolan.android:libvlc-all:3.1.12'
  }
+diff --git a/node_modules/react-native-vlc-media-player/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerViewManager.java b/node_modules/react-native-vlc-media-player/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerViewManager.java
+index c59fc1d..01dbb1a 100644
+--- a/node_modules/react-native-vlc-media-player/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerViewManager.java
++++ b/node_modules/react-native-vlc-media-player/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerViewManager.java
+@@ -109,7 +109,8 @@ public class ReactVlcPlayerViewManager extends SimpleViewManager<ReactVlcPlayerV
+ 
+     @ReactProp(name = PROP_SEEK)
+     public void setSeek(final ReactVlcPlayerView videoView, final float seek) {
+-        videoView.seekTo(Math.round(seek * 1000f));
++        videoView.setPosition(seek);
++        //videoView.seekTo(Math.round(seek * 1000f));
+         //videoView.seekTo(seek);
+     }
+ 
 diff --git a/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m b/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m
 index 2398efa..603d7dc 100644
 --- a/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m

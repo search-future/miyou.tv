@@ -251,10 +251,9 @@ const Player = () => {
   useEffect(() => {
     if (seekTime != null) {
       if (seekable.current) {
-        if (Platform.OS === "ios" && vlcRef.current) {
+        if (vlcRef.current) {
           dispatch(PlayerActions.position(seekTime / duration));
         } else {
-          vlcRef.current?.seek(Math.floor(seekTime / 1000));
           videoRef.current?.seek(Math.floor(seekTime / 1000));
         }
       } else {
@@ -277,7 +276,7 @@ const Player = () => {
   }, [seekTime]);
   useEffect(() => {
     if (seekPosition != null) {
-      if (Platform.OS === "ios" && vlcRef.current && seekable.current) {
+      if (vlcRef.current && seekable.current) {
         vlcRef.current.seek(seekPosition);
       } else {
         dispatch(PlayerActions.time(seekPosition * duration));
