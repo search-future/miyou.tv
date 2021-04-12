@@ -249,8 +249,8 @@ const EndText = memo(
 
 const SeekSlider = memo(
   ({ onChange }: { onChange?: (position: number) => void }) => {
-    const position = useSelector<State, number>(
-      ({ player }) => player.position
+    const position = useSelector<State, number>(({ player }) =>
+      isNaN(player.position) ? 0 : player.position
     );
 
     const onChangeHandler = useCallback(
