@@ -17,6 +17,7 @@ import ChinachuService from "./ChinachuService";
 import GaraponService from "./GaraponService";
 import GaraponV4Service from "./GaraponV4Service";
 import EPGStationService from "./EPGStationService";
+import MirakcTimeshiftService from "./MirakcTimeshiftService";
 
 import { garaponDevId } from "../config/constants";
 
@@ -26,6 +27,9 @@ export async function initBackendService({ type, ...options }: any) {
     switch (type) {
       case "epgstation":
         backendService = new EPGStationService(options);
+        break;
+      case "mirakc":
+        backendService = new MirakcTimeshiftService(options);
         break;
       case "garapon":
         GaraponService.devId = garaponDevId || "";

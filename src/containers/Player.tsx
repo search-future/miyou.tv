@@ -300,6 +300,10 @@ const Player = () => {
             /\/api\/videos\/[0-9]+$/.test(baseUri);
           break;
         }
+        case "mirakc": {
+          seekable.current = true;
+          break;
+        }
         default:
           seekable.current = false;
       }
@@ -469,6 +473,7 @@ const Player = () => {
   if (
     type === "chinachu" ||
     type === "epgstation" ||
+    type === "mirakc" ||
     recordedProgram.type === "file"
   ) {
     return (

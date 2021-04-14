@@ -541,6 +541,7 @@ const BackendSetup = memo(
           items={[
             { label: "Chinachu", value: "chinachu" },
             { label: "EPGStation", value: "epgstation" },
+            { label: "mirakc(タイムシフト録画)", value: "mirakc" },
             ...(garaponDevId
               ? [
                   {
@@ -963,6 +964,45 @@ const BackendSetup = memo(
                   autoCapitalize="none"
                   value={mobileStreamMode}
                   onChangeText={mobileStreamModeChange}
+                />
+              </>
+            )}
+          </>
+        )}
+        {backendType === "mirakc" && (
+          <>
+            <Input
+              label="mirakcのURL"
+              inputContainerStyle={[styles.inputWrapper]}
+              autoCapitalize="none"
+              placeholder="http://127.0.0.1:40772/"
+              keyboardType="url"
+              textContentType="URL"
+              value={url}
+              onChangeText={urlChange}
+            />
+            <Text>ユーザー名とパスワードを使用する</Text>
+            <View style={containerStyle.row}>
+              <Switch value={auth} onValueChange={backendAuthChange} />
+            </View>
+            {auth && (
+              <>
+                <Input
+                  label="mirakcのユーザー"
+                  inputContainerStyle={[styles.inputWrapper]}
+                  autoCapitalize="none"
+                  textContentType="username"
+                  value={user}
+                  onChangeText={userChange}
+                />
+                <Input
+                  label="mirakcのパスワード"
+                  inputContainerStyle={[styles.inputWrapper]}
+                  autoCapitalize="none"
+                  textContentType="password"
+                  secureTextEntry
+                  value={password}
+                  onChangeText={passwordChange}
                 />
               </>
             )}

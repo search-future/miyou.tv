@@ -198,7 +198,7 @@ const Player = memo(() => {
         clearTimeout(seekId.current);
       }
       dispatch(LoadingActions.start());
-      if (backendType === "epgstation") {
+      if (backendType === "epgstation" || backendType === "mirakc") {
         options.current["stream-lavf-o"] = "seekable=-1";
       } else {
         options.current["stream-lavf-o"] = "seekable=0";
