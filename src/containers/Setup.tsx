@@ -188,8 +188,8 @@ const BackendSetup = memo(
             mobileStreamType = "mp4";
             mobileStreamParams = "b:v=1M&b:a=128k&s=1280x720";
           } else if (type === "epgstation") {
-            streamType = Platform.OS === "web" ? "raw" : "mp4";
-            streamParams = Platform.OS === "web" ? "" : "mode=0";
+            streamType = "raw";
+            streamParams = "";
             mobileStreamType = "mp4";
             mobileStreamParams = "mode=0";
           }
@@ -265,12 +265,16 @@ const BackendSetup = memo(
               if (streamType === "raw") {
                 onChanged({
                   streamType,
-                  streamParams: ""
+                  streamParams: "",
+                  mobileStreamType: "mp4",
+                  mobileStreamParams: "mode=0"
                 });
               } else {
                 onChanged({
                   streamType,
-                  streamParams: "mode=0"
+                  streamParams: "mode=0",
+                  mobileStreamType: "mp4",
+                  mobileStreamParams: "mode=0"
                 });
               }
               break;
@@ -387,7 +391,8 @@ const BackendSetup = memo(
             streamParams: qs.stringify(
               { ...qs.parse(streamParams), type },
               qsStringfyOptions
-            )
+            ),
+            mobileStreamType: "mp4"
           });
         }
       },
@@ -426,7 +431,7 @@ const BackendSetup = memo(
             case "epgstation":
               onChanged({
                 mobileStreamType,
-                mobileStreamParams: "mode=0"
+                mobileStreamParams: mobileStreamType === "raw" ? "" : "mode=0"
               });
               break;
             case "chinachu":
@@ -610,7 +615,7 @@ const BackendSetup = memo(
               color={theme.colors?.default}
               items={[
                 { label: "MPEG2-TS", value: "m2ts" },
-                { label: "MP4", value: "mp4" },
+                { label: "MP4", value: "mp4" }
               ]}
               selectedValue={streamType}
               onValueChange={streamTypeChange}
@@ -757,9 +762,7 @@ const BackendSetup = memo(
                   ]}
                   style={{ backgroundColor: theme.colors?.background }}
                   color={theme.colors?.default}
-                  items={[
-                    { label: "MP4", value: "mp4" },
-                  ]}
+                  items={[{ label: "MP4", value: "mp4" }]}
                   selectedValue={mobileStreamType}
                   onValueChange={mobileStreamTypeChange}
                 />
@@ -914,9 +917,7 @@ const BackendSetup = memo(
               style={{ backgroundColor: theme.colors?.background }}
               color={theme.colors?.default}
               items={[
-                ...(Platform.OS === "web"
-                  ? [{ label: "直接再生", value: "raw" }]
-                  : []),
+                { label: "直接再生", value: "raw" },
                 { label: "MP4", value: "mp4" },
                 { label: "WebM", value: "webm" },
                 { label: "MPEG2-TS", value: "mpegts" }
@@ -947,6 +948,9 @@ const BackendSetup = memo(
                   style={{ backgroundColor: theme.colors?.background }}
                   color={theme.colors?.default}
                   items={[
+                    ...(videoType === "encoded" && streamType === "raw"
+                      ? [{ label: "直接再生", value: "raw" }]
+                      : []),
                     { label: "MP4", value: "mp4" },
                     { label: "WebM", value: "webm" }
                   ]}
