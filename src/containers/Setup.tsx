@@ -842,6 +842,15 @@ const BackendSetup = memo(
         )}
         {backendType === "epgstation" && (
           <>
+            <View style={styles.info}>
+              {Platform.OS === "ios" ? (
+                <Text>EPGStation v1/v2に対応しています。</Text>
+              ) : (
+                <LinkText url={epgstationInfoUrl}>
+                  EPGStation v1/v2に対応しています。
+                </LinkText>
+              )}
+            </View>
             <Input
               label="EPGStationのURL"
               inputContainerStyle={[styles.inputWrapper]}
@@ -971,6 +980,15 @@ const BackendSetup = memo(
         )}
         {backendType === "mirakc" && (
           <>
+            <View style={styles.info}>
+              {Platform.OS === "ios" ? (
+                <Text>mirakcのタイムシフト録画に対応しています。</Text>
+              ) : (
+                <LinkText url={mirakcInfoUrl}>
+                  mirakcのタイムシフト録画に対応しています。
+                </LinkText>
+              )}
+            </View>
             <Input
               label="mirakcのURL"
               inputContainerStyle={[styles.inputWrapper]}
@@ -1317,6 +1335,8 @@ const ViewSetup = memo(
 
 const moritapoEntryUrl = "https://find.moritapo.jp/moritapo/subscribe.php";
 const chinachuInfoUrl = "https://chinachu.moe/";
+const epgstationInfoUrl = "https://github.com/l3tnun/EPGStation";
+const mirakcInfoUrl = "https://github.com/mirakc/mirakc";
 
 const qsStringfyOptions: qs.IStringifyOptions = {
   encode: false,
