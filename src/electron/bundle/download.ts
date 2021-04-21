@@ -46,5 +46,5 @@ ipcMain.handle("download-request", async ({ sender }, { filename, url }) => {
   }
 });
 ipcMain.handle("download-abort", () => {
-  downloadItem.cancel();
+  downloadItem?.cancel();
 });

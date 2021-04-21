@@ -253,7 +253,7 @@ PODS:
     - React-jsi (= 0.64.0)
     - React-perflogger (= 0.64.0)
   - React-jsinspector (0.64.0)
-  - react-native-document-picker (5.0.2):
+  - react-native-document-picker (5.0.3):
     - React-Core
   - react-native-keep-awake (4.0.0):
     - React
@@ -339,13 +339,13 @@ PODS:
     - React
   - RNCPicker (1.8.1):
     - React-Core
-  - RNDateTimePicker (3.4.2):
+  - RNDateTimePicker (3.4.6):
     - React-Core
-  - RNFS (2.16.6):
+  - RNFS (2.17.0):
     - React
   - RNGestureHandler (1.10.3):
     - React-Core
-  - RNReanimated (2.0.0):
+  - RNReanimated (2.1.0):
     - DoubleConversion
     - FBLazyVector
     - FBReactNativeSpec
@@ -374,9 +374,9 @@ PODS:
     - React-RCTVibration
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNScreens (2.18.1):
+  - RNScreens (3.1.1):
     - React-Core
-  - RNSVG (12.1.0):
+  - RNSVG (12.1.1):
     - React
   - RNVectorIcons (8.1.0):
     - React-Core
@@ -590,7 +590,7 @@ SPEC CHECKSUMS:
   React-jsi: 74341196d9547cbcbcfa4b3bbbf03af56431d5a1
   React-jsiexecutor: 06a9c77b56902ae7ffcdd7a4905f664adc5d237b
   React-jsinspector: 0ae35a37b20d5e031eb020a69cc5afdbd6406301
-  react-native-document-picker: cc847dd5fe2fc51c3a98bd8f2fd1e452db795c48
+  react-native-document-picker: 2e6ecd112c48215e36431734d902f35201ffab0a
   react-native-keep-awake: afad8a51dfef9fe9655a6344771be32c8596d774
   react-native-netinfo: e849fc21ca2f4128a5726c801a82fc6f4a6db50d
   react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
@@ -611,12 +611,12 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: b03032fdbdb725bea0bd9e5ec5a7272865ae7398
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
   RNCPicker: 914b557e20b3b8317b084aca9ff4b4edb95f61e4
-  RNDateTimePicker: fd6f6d37ec23f5f16a4870a9891305a75d556001
-  RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
+  RNDateTimePicker: 47e934943a8cc6e6faab372cfd5f8ccd8c1ab338
+  RNFS: 93d5b5535eb39d98e6b19009faa8fe717f7ea45d
   RNGestureHandler: a479ebd5ed4221a810967000735517df0d2db211
-  RNReanimated: 64f6c5789f82818c07ba3c71864b73619cb23c76
-  RNScreens: f7ad633b2e0190b77b6a7aab7f914fad6f198d8d
-  RNSVG: ce9d996113475209013317e48b05c21ee988d42e
+  RNReanimated: b8c8004b43446e3c2709fe64b2b41072f87428ad
+  RNScreens: bd1523c3bde7069b8e958e5a16e1fc7722ad0bdd
+  RNSVG: 551acb6562324b1d52a4e0758f7ca0ec234e278f
   RNVectorIcons: 31cebfcf94e8cf8686eb5303ae0357da64d7a5a4
   toolbar-android: 85f3ef4d691469f2d304e7dee4bca013aa1ba1ff
   Yoga: 8c8436d4171c87504c648ae23b1d81242bdf3bbf
