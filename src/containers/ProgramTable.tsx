@@ -119,8 +119,7 @@ const ProgramTable = memo(() => {
     shallowEqual
   );
   const columns = useSelector<State, ProgramTableColumn[]>(
-    ({ program }) => program.table?.columns || [],
-    shallowEqual
+    ({ program }) => program.table?.columns || []
   );
   const maxDate = useSelector<State, Date | undefined>(
     ({ program }) => program.table?.maxDate
