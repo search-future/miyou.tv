@@ -202,8 +202,10 @@ export default class GaraponV4Service extends BackendService {
       }
     );
 
-    const minTime = new Date(dates[0]).getTime();
-    const maxTime = new Date(dates[dates.length - 1]).getTime();
+    const minTime = new Date(`${dates[0]}T00:00+09:00`).getTime();
+    const maxTime = new Date(
+      `${dates[dates.length - 1]}T24:00+09:00`
+    ).getTime();
     let data: GaraponSiteSearchParams = {};
     data.sort = reverse ? "std" : "sta";
     data.num = view.toString();
