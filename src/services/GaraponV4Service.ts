@@ -277,23 +277,7 @@ export default class GaraponV4Service extends BackendService {
             start: new Date(starttime * 1000),
             end: new Date(endtime * 1000),
             preview: thumbnail_url,
-            stream: `${this.url}${m3u8_url}&gtvsession=${this.gtvsession}`,
-            download: [
-              {
-                name: "TS",
-                uri: `${this.url}/gapi/v4/Program/?${qs.stringify({
-                  gtvsession: this.gtvsession,
-                  action: "download_ts",
-                  starttime: starttime,
-                  endtime: endtime,
-                  tsid10: tsid10,
-                  service_type: service_type
-                })}`,
-                filename: `${moment(new Date(starttime * 1000)).format(
-                  "YYMMDD-HHmm"
-                )}-${bcname}-${series_title || title}.m2ts`
-              }
-            ]
+            stream: `${this.url}${m3u8_url}&gtvsession=${this.gtvsession}`
           })
         )
       };
