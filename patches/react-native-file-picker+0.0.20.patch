@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-file-picker/android/src/main/java/com/filepicker/FilePickerModule.java b/node_modules/react-native-file-picker/android/src/main/java/com/filepicker/FilePickerModule.java
+index b339d42..74737d2 100644
+--- a/node_modules/react-native-file-picker/android/src/main/java/com/filepicker/FilePickerModule.java
++++ b/node_modules/react-native-file-picker/android/src/main/java/com/filepicker/FilePickerModule.java
+@@ -281,7 +281,7 @@ public class FilePickerModule extends ReactContextBaseJavaModule implements Acti
+                 } else {
+                     String prefix = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? "file:///" : "content://";
+                     final Uri contentUri = ContentUris.withAppendedId(
+-                            Uri.parse(prefix + "downloads/public_downloads"), Long.valueOf(id));
++                            Uri.parse(prefix + "downloads/public_downloads"), Long.valueOf(split[1]));
+ 
+                     return getDataColumn(context, contentUri, null, null);
+                 }
