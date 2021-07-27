@@ -77,6 +77,9 @@ const Player = memo(() => {
         mpvRef.current?.property("framedrop", false);
       }
     },
+    seekable: value => {
+      seekable.current = value;
+    },
     duration: null,
     "percent-pos": null,
     "time-pos": null,
@@ -88,9 +91,6 @@ const Player = memo(() => {
       status.current.mute = value;
     },
     "track-list/count": null,
-    seekable: value => {
-      seekable.current = value;
-    },
     "playback-abort": null,
     vid: value => {
       status.current.videoTrack = value;
