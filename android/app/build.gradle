@@ -132,8 +132,8 @@ android {
         applicationId "jp.razil.miyoutv"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1070001
-        versionName "1.7.0"
+        versionCode 1070101
+        versionName "1.7.1"
     }
     splits {
         abi {
