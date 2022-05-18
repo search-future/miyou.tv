@@ -8229,11 +8229,6 @@ react-native-elements@3.4.2:
     react-native-ratings "8.0.4"
     react-native-size-matters "^0.3.1"
 
-react-native-file-picker@^0.0.20:
-  version "0.0.20"
-  resolved "https://registry.yarnpkg.com/react-native-file-picker/-/react-native-file-picker-0.0.20.tgz#b4b56989c048ec32fd9d97f52fb115a6e0c59572"
-  integrity sha512-sXexSVMdIMIiIe3y/AH4fIfSYDbXUbN6OzoBThUlVGvOI/Rs4i1xJzNnhnkXIgx97GRPYU4pE8Y0fd0j4+vgSQ==
-
 react-native-fs@^2.18.0:
   version "2.18.0"
   resolved "https://registry.yarnpkg.com/react-native-fs/-/react-native-fs-2.18.0.tgz#987b99cc90518ef26663a8d60e62104694b41c21"

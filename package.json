@@ -35,7 +35,6 @@
     "react-native": "^0.64.2",
     "react-native-document-picker": "^6.0.2",
     "react-native-elements": "3.4.2",
-    "react-native-file-picker": "^0.0.20",
     "react-native-fs": "^2.18.0",
     "react-native-gesture-handler": "^1.10.3",
     "react-native-immersive": "^2.0.0",
