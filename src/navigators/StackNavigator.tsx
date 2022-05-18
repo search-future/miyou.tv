@@ -22,7 +22,10 @@ import Viewer from "../containers/Viewer";
 const Stack = createStackNavigator();
 
 const StackNavigator = () => (
-  <Stack.Navigator initialRouteName="tabs" mode="modal" headerMode="none">
+  <Stack.Navigator
+    initialRouteName="tabs"
+    screenOptions={{ headerShown: false }}
+  >
     <Stack.Screen name="tabs" component={TabNavigator} />
     <Stack.Screen name="setup" component={Setup} />
     <Stack.Screen name="file" component={FileLoader} />

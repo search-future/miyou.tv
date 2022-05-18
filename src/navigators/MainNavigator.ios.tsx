@@ -16,8 +16,7 @@ import { StatusBar } from "react-native";
 import { ThemeContext } from "react-native-elements";
 import { NavigationContainer } from "@react-navigation/native";
 import { MenuProvider } from "react-native-popup-menu";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import SafeAreaView from "react-native-safe-area-view";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 import StackNavigator from "./StackNavigator";
 import containerStyle from "../styles/container";

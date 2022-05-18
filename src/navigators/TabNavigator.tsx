@@ -53,7 +53,11 @@ const TabNavigator = () => {
   return (
     <>
       <AppHeader route={route} />
-      <Tab.Navigator initialRouteName={routeName} tabBar={tabBar}>
+      <Tab.Navigator
+        initialRouteName={routeName}
+        screenOptions={{ headerShown: false }}
+        tabBar={tabBar}
+      >
         <Tab.Screen name="table" component={ProgramTable} />
         <Tab.Screen name="list" component={ProgramList} />
         <Tab.Screen name="ranking" component={ProgramRanking} />

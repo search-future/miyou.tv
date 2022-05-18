@@ -12,7 +12,7 @@ index 84f0198..09f0be4 100644
      if (!isAsset) {
        isNetwork = true;
 diff --git a/node_modules/react-native-vlc-media-player/android/build.gradle b/node_modules/react-native-vlc-media-player/android/build.gradle
-index fe58e50..9a164bf 100644
+index 72b8a16..490b584 100644
 --- a/node_modules/react-native-vlc-media-player/android/build.gradle
 +++ b/node_modules/react-native-vlc-media-player/android/build.gradle
 @@ -29,8 +29,8 @@ repositories {
