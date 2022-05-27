@@ -19,13 +19,11 @@ import {
   StyleSheet,
   Platform
 } from "react-native";
-import {
-  downloadFile,
-  stopDownload,
-  DocumentDirectoryPath,
-  DownloadDirectoryPath,
-  DownloadProgressCallbackResult
-} from "react-native-fs";
+import ReactNativeBlobUtil, {
+  FetchBlobResponse,
+  ReactNativeBlobUtilConfig,
+  StatefulPromise
+} from "react-native-blob-util";
 
 type Props = {
   title: string;
@@ -65,14 +63,17 @@ const DownloadButton = ({
   onSuccess,
   onFailure
 }: Props) => {
-  const jobIdRef = useRef<number>();
+  const taskRef = useRef<StatefulPromise<FetchBlobResponse>>();
   const [status, setStatus] = useState<"stopped" | "started" | "success">(
     "stopped"
   );
-  const [progress, setProgress] = useState<DownloadProgressCallbackResult>();
+  const [progress, setProgress] = useState<{
+    received: number;
+    total: number;
+  }>();
 
   const total = useMemo(() => {
-    const bytes = progress?.contentLength || source.size;
+    const bytes = progress?.total || source.size;
     if (bytes) {
       if (bytes > 2 ** 30) {
         return `${(bytes / 2 ** 30).toFixed(1)}GB`;
@@ -85,23 +86,23 @@ const DownloadButton = ({
       }
     }
     return "";
-  }, [progress?.contentLength, source.size]);
+  }, [progress?.total, source.size]);
   const current = useMemo(() => {
-    if (progress?.bytesWritten) {
-      if (progress?.bytesWritten > 2 ** 30) {
-        return `${(progress?.bytesWritten / 2 ** 30).toFixed(1)}GB`;
+    if (progress?.received) {
+      if (progress?.received > 2 ** 30) {
+        return `${(progress?.received / 2 ** 30).toFixed(1)}GB`;
       }
-      if (progress?.bytesWritten > 2 ** 20) {
-        return `${(progress?.bytesWritten / 2 ** 20).toFixed(1)}MB`;
+      if (progress?.received > 2 ** 20) {
+        return `${(progress?.received / 2 ** 20).toFixed(1)}MB`;
       }
-      return `${(progress?.bytesWritten / 2 ** 10).toFixed(1)}KB`;
+      return `${(progress?.received / 2 ** 10).toFixed(1)}KB`;
     }
     return `0KB`;
-  }, [progress?.bytesWritten]);
+  }, [progress?.received]);
   const percent = useMemo(
     () =>
-      progress && progress.contentLength > 0
-        ? (progress.bytesWritten * 100) / progress.contentLength
+      progress && progress.received > 0
+        ? (progress.received * 100) / progress.total
         : 0,
     [progress]
   );
@@ -109,18 +110,25 @@ const DownloadButton = ({
   const onPress = useCallback(async () => {
     try {
       const { uri, filename } = source;
-      const { jobId, promise } = downloadFile({
-        fromUrl: uri,
-        toFile: `${DownloadDirectoryPath || DocumentDirectoryPath}/${filename}`,
-        background: true,
-        progressInterval: 1000,
-        progress: progress => {
-          setProgress(progress);
-        }
-      });
+      const config: ReactNativeBlobUtilConfig =
+        Platform.OS === "android"
+          ? { fileCache: true }
+          : { path: `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/${filename}` };
+      taskRef.current = ReactNativeBlobUtil.config(config)
+        .fetch("GET", uri)
+        .progress((received, total) => {
+          setProgress({ received, total });
+        });
       setStatus("started");
-      jobIdRef.current = jobId;
-      await promise;
+      const response = await taskRef.current;
+      ReactNativeBlobUtil.fs.stat(response.path());
+      if (Platform.OS === "android") {
+        await ReactNativeBlobUtil.MediaCollection.copyToMediaStore(
+          { name: filename, parentFolder: "", mimeType: "" },
+          "Video",
+          response.path()
+        );
+      }
       if (onSuccess) {
         onSuccess();
       }
@@ -133,9 +141,7 @@ const DownloadButton = ({
     }
   }, [source]);
   const onCancelPress = useCallback(() => {
-    if (jobIdRef.current) {
-      stopDownload(jobIdRef.current);
-    }
+    taskRef.current?.cancel();
   }, []);
 
   switch (status) {
