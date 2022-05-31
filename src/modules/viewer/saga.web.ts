@@ -30,7 +30,7 @@ import {
 import { ProgramActions } from "../program";
 import { ServiceActions, ServiceState } from "../service";
 import { SettingActions, SettingState, SETTING_UPDATE } from "../setting";
-import { WindowActions } from "../window";
+import { WindowActions, WindowState, WINDOW_UPDATE } from "../window";
 import { toastOptions } from "../../config/constants";
 import { ViewerState } from ".";
 import navigationRef from "../../navigators/navigation";
@@ -223,6 +223,16 @@ function* settingSaga() {
   }
 }
 
+function* windowSaga() {
+  const window: WindowState = yield select(({ window }) => window);
+  const viewer: ViewerState = yield select(({ viewer }) => viewer);
+  const { mode } = viewer;
+
+  if (mode === "stack") {
+    dispatchView(WindowActions.update(window));
+  }
+}
+
 export function* viewerSaga() {
   yield all([
     takeEvery(VIEWER_INIT, initSaga),
@@ -233,6 +243,7 @@ export function* viewerSaga() {
     takeEvery(VIEWER_SEARCH, searchSaga),
     takeEvery(VIEWER_RESIZE, resizeSaga),
     takeEvery(VIEWER_UPDATE, updateSaga),
-    takeEvery(SETTING_UPDATE, settingSaga)
+    takeEvery(SETTING_UPDATE, settingSaga),
+    takeEvery(WINDOW_UPDATE, windowSaga)
   ]);
 }
