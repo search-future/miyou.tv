@@ -69,7 +69,7 @@ function* backendInitSaga() {
       yield delay(reloadIntervalSeconds * 1000);
       yield put(backendInit());
     }
-  } catch (e) {
+  } catch (e: any) {
     yield put(LoadingActions.complete());
     Toast.show(e.message || JSON.stringify(e, null, 2), {
       ...toastOptions,
@@ -120,7 +120,7 @@ function* commentInitSaga() {
     });
     yield put(LoadingActions.complete());
     yield put(commentReady(channels));
-  } catch (e) {
+  } catch (e: any) {
     yield put(LoadingActions.complete());
     Toast.show(e.message || JSON.stringify(e, null, 2), {
       ...toastOptions,

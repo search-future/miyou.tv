@@ -55,7 +55,7 @@ export function* requestIntervals(channel: string, start: number, end: number) {
     if (status === "OK" && Array.isArray(data.intervals)) {
       return data.intervals;
     }
-  } catch (e) {
+  } catch (e: any) {
     Toast.show(e.message || JSON.stringify(e, null, 2), {
       ...toastOptions,
       duration: Toast.durations.SHORT

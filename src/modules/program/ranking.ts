@@ -344,7 +344,7 @@ export function* rankingSaga() {
         }
       }
     }
-  } catch (e) {
+  } catch (e: any) {
     Toast.show(e.message || JSON.stringify(e, null, 2), {
       ...toastOptions,
       duration: Toast.durations.LONG

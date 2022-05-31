@@ -28,7 +28,7 @@ import { toastOptions } from "../../config/constants";
 function dispatchMain(action: AnyAction) {
   try {
     window.ipc.dispatchMain(action);
-  } catch (e) {
+  } catch (e: any) {
     Toast.show(e.message || JSON.stringify(e, null, 2), {
       ...toastOptions,
       duration: Toast.durations.SHORT
@@ -40,7 +40,7 @@ function dispatchViewer(action: AnyAction) {
   try {
     window.ipc.dispatchView(action);
     window.ipc.dispatchChild(action);
-  } catch (e) {
+  } catch (e: any) {
     Toast.show(e.message || JSON.stringify(e, null, 2), {
       ...toastOptions,
       duration: Toast.durations.SHORT

@@ -118,7 +118,7 @@ export default function init(store: Store) {
 function dispatchWindow(action: AnyAction) {
   try {
     window.ipc.dispatchWindow(action);
-  } catch (e) {
+  } catch (e: any) {
     Toast.show(e.message || JSON.stringify(e, null, 2), {
       ...toastOptions,
       duration: Toast.durations.SHORT

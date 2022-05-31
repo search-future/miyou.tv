@@ -38,7 +38,7 @@ import navigationRef from "../../navigators/navigation";
 function dispatchMain(action: AnyAction) {
   try {
     window.ipc.dispatchMain(action);
-  } catch (e) {
+  } catch (e: any) {
     Toast.show(e.message || JSON.stringify(e, null, 2), {
       ...toastOptions,
       duration: Toast.durations.SHORT
@@ -49,7 +49,7 @@ function dispatchMain(action: AnyAction) {
 function dispatchChild(action: AnyAction) {
   try {
     window.ipc.dispatchChild(action);
-  } catch (e) {
+  } catch (e: any) {
     Toast.show(e.message || JSON.stringify(e, null, 2), {
       ...toastOptions,
       duration: Toast.durations.SHORT
@@ -60,7 +60,7 @@ function dispatchChild(action: AnyAction) {
 function dispatchView(action: AnyAction) {
   try {
     window.ipc.dispatchView(action);
-  } catch (e) {
+  } catch (e: any) {
     Toast.show(e.message || JSON.stringify(e, null, 2), {
       ...toastOptions,
       duration: Toast.durations.SHORT
