@@ -321,6 +321,11 @@ app.on("web-contents-created", (e, webContents) => {
   webContents.on("context-menu", (e, params) => {
     buildContextMenu(params).popup();
   });
+
+  webContents.on("select-bluetooth-device", (event, devices, callback) => {
+    event.preventDefault();
+    callback("");
+  });
 });
 
 const path = require("path");
