@@ -1091,7 +1091,7 @@ const BackendSetup = memo(
               )}
             </View>
             <Input
-              label="ガラポンTVのパスワード"
+              label="ガラポンTVのユーザー名"
               inputContainerStyle={[styles.inputWrapper]}
               autoCapitalize="none"
               textContentType="username"
