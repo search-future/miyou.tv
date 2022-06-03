@@ -1,6 +1,6 @@
 appId: "jp.razil.miyoutv"
 productName: "MiyouTV"
-copyright: "Copyright © 2016-2021 Brazil Ltd."
+copyright: "Copyright © 2016-2022 Brazil Ltd."
 directories:
   output: "./build/"
 files:
