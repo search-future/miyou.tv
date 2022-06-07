@@ -289,9 +289,9 @@ PODS:
     - React-Core
   - react-native-keep-awake (4.0.0):
     - React
-  - react-native-netinfo (8.3.0):
+  - react-native-netinfo (9.0.0):
     - React-Core
-  - react-native-safe-area-context (4.2.5):
+  - react-native-safe-area-context (4.3.1):
     - RCT-Folly
     - RCTRequired
     - RCTTypeSafety
@@ -648,8 +648,8 @@ SPEC CHECKSUMS:
   react-native-blob-util: 2d49d135d6fe1410c019fb5bff241dac7f12d73d
   react-native-document-picker: 5663fe4bcdb646200683a41790464d2793307ac8
   react-native-keep-awake: afad8a51dfef9fe9655a6344771be32c8596d774
-  react-native-netinfo: 3671b091c4843fda5e153612866ef4024b8f5d62
-  react-native-safe-area-context: ebf8c413eb8b5f7c392a036a315eb7b46b96845f
+  react-native-netinfo: 5b664b2945a8f02102b296f0f812bddd6827ed9c
+  react-native-safe-area-context: 6c12e3859b6f27b25de4fee8201cfb858432d8de
   react-native-video: a4c2635d0802f983594b7057e1bce8f442f0ad28
   react-native-vlc-media-player: b0716aabd858540b642ee8d76fce515014df03fd
   React-perflogger: a18b4f0bd933b8b24ecf9f3c54f9bf65180f3fe6
