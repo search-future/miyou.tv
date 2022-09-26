@@ -19,7 +19,7 @@ import {
   StyleProp,
   TextStyle
 } from "react-native";
-import { Picker } from "@react-native-community/picker";
+import { Picker } from "@react-native-picker/picker";
 import { IconObject } from "react-native-elements";
 
 type Props = {
