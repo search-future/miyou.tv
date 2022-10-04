@@ -414,7 +414,7 @@ const ProgramRanking = memo(() => {
                   programStyle.headerControl,
                   {
                     backgroundColor: theme.colors?.controlBg,
-                    borderColor: theme.colors?.controlBg
+                    borderColor: theme.colors?.controlBorder
                   }
                 ]}
                 style={[
@@ -443,7 +443,7 @@ const ProgramRanking = memo(() => {
                 programStyle.headerControl,
                 {
                   backgroundColor: theme.colors?.controlBg,
-                  borderColor: theme.colors?.controlBg
+                  borderColor: theme.colors?.controlBorder
                 },
                 styles.targetPicker
               ]}
@@ -511,7 +511,7 @@ const ProgramRanking = memo(() => {
                 programStyle.headerControl,
                 {
                   backgroundColor: theme.colors?.controlBg,
-                  borderColor: theme.colors?.controlBg
+                  borderColor: theme.colors?.controlBorder
                 }
               ]}
               style={[
