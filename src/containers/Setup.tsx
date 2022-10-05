@@ -1370,6 +1370,6 @@ const styles = StyleSheet.create({
   },
   inputWrapper: {
     borderWidth: 1,
-    height: 36
+    height: Platform.OS === "web" ? 36 : 60
   }
 });

@@ -90,8 +90,9 @@ const ProgramList = memo(() => {
   const layoutCallbackId = useRef<number>();
   const scrollPos = useRef(0);
   const headerHeightRef = useRef(256);
-  const headerHeight = useRef(new Animated.Value(headerHeightRef.current))
-    .current;
+  const headerHeight = useRef(
+    new Animated.Value(headerHeightRef.current)
+  ).current;
   const viewX = useRef(new Animated.Value(0)).current;
 
   const dispatch = useDispatch();
@@ -774,9 +775,10 @@ const styles = StyleSheet.create({
   },
   pagePickerWrapper: {
     borderWidth: 1,
-    maxHeight: 32,
+    justifyContent: "center",
     marginLeft: 8,
     marginRight: 8,
+    maxHeight: Platform.OS === "web" ? 32 : 60,
     minWidth: 120
   },
   pagePicker: {
