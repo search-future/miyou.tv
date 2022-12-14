@@ -295,7 +295,7 @@ const HeaderButton = memo(
             <FontAwesome5Icon
               key={routeName}
               style={styles.buttonIcon}
-              color={[isActive ? theme.colors?.primary : theme.colors?.control]}
+              color={isActive ? theme.colors?.primary : theme.colors?.control}
               size={16}
               {...icon}
             />
