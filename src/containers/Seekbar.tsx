@@ -265,6 +265,7 @@ const SeekSlider = memo(
     return (
       <CustomSlider
         style={styles.slider}
+        allowTouchTrack
         maximumValue={1}
         minimumValue={0}
         step={0.00001}

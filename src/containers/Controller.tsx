@@ -168,6 +168,7 @@ const VolumeController = memo(() => {
           </TouchableOpacity>
           <CustomSlider
             style={styles.slider}
+            allowTouchTrack
             maximumValue={100}
             minimumValue={0}
             step={1}
