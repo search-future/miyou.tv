@@ -277,7 +277,11 @@ const Viewer = memo(() => {
                   containerStyle.center
                 ]}
               >
-                <TouchableOpacity style={styles.button} onPress={play}>
+                <TouchableOpacity
+                  style={styles.button}
+                  activeOpacity={0.8}
+                  onPress={play}
+                >
                   <FontAwesome5Icon
                     name="play"
                     solid
@@ -285,7 +289,11 @@ const Viewer = memo(() => {
                     size={24}
                   />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={peakPlay}>
+                <TouchableOpacity
+                  style={styles.button}
+                  activeOpacity={0.8}
+                  onPress={peakPlay}
+                >
                   <FontAwesome5Icon
                     name="star"
                     solid
@@ -381,6 +389,7 @@ const Viewer = memo(() => {
             {(!playing || controlEnabled) && programs[index - 1] && (
               <TouchableOpacity
                 style={[styles.button, styles.buttonPrevious]}
+                activeOpacity={0.8}
                 onPress={previous}
               >
                 <FontAwesome5Icon
@@ -395,6 +404,7 @@ const Viewer = memo(() => {
             {(!playing || controlEnabled) && programs[index + 1] && (
               <TouchableOpacity
                 style={[styles.button, styles.buttonNext]}
+                activeOpacity={0.8}
                 onPress={next}
               >
                 <FontAwesome5Icon

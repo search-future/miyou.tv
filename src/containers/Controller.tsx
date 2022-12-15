@@ -150,7 +150,12 @@ const VolumeController = memo(() => {
 
   return (
     <Menu>
-      <MenuTrigger customStyles={{ triggerWrapper: styles.button }}>
+      <MenuTrigger
+        customStyles={{
+          triggerWrapper: styles.button,
+          triggerTouchable: { activeOpacity: 0.5 }
+        }}
+      >
         <ControlIcon name={volumeIcon} solid />
       </MenuTrigger>
       <MenuOptions>

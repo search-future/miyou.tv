@@ -324,7 +324,7 @@ const PlayerContainer = memo(
       <View {...props} {...panResponder.panHandlers}>
         <TouchableOpacity
           style={styles.touchable}
-          activeOpacity={1}
+          activeOpacity={0.8}
           onPress={onPress}
         >
           {children}
