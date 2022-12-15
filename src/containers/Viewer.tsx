@@ -26,7 +26,8 @@ import {
   StyleSheet,
   Platform,
   LayoutChangeEvent,
-  ImageSourcePropType
+  ImageSourcePropType,
+  BackHandler
 } from "react-native";
 import { ButtonGroup, Image, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
@@ -150,6 +151,21 @@ const Viewer = memo(() => {
       }
     }
   }, [program]);
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        if (playing && controlEnabled) {
+          dispatch(ViewerActions.update({ control: false }));
+          return true;
+        }
+        return false;
+      }
+    );
+    return () => {
+      subscription.remove();
+    };
+  }, [playing, controlEnabled]);
 
   const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
     if (layoutCallbackId.current != null) {
