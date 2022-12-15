@@ -95,8 +95,9 @@ const ProgramTable = memo(() => {
   const layoutCallbackId = useRef<number>();
   const scrollPos = useRef(0);
   const headerHeightRef = useRef(256);
-  const headerHeight = useRef(new Animated.Value(headerHeightRef.current))
-    .current;
+  const headerHeight = useRef(
+    new Animated.Value(headerHeightRef.current)
+  ).current;
   const viewX = useRef(new Animated.Value(0)).current;
 
   const navigation = useNavigation();
