@@ -23,6 +23,7 @@ import React, {
 import {
   TouchableOpacity,
   View,
+  TextInput,
   StyleSheet,
   Platform,
   LayoutChangeEvent
@@ -31,6 +32,7 @@ import {
   Button,
   ButtonProps,
   Image,
+  InputProps,
   SearchBar,
   Text,
   ThemeContext
@@ -311,6 +313,7 @@ const HeaderButton = memo(
 
 const HeaderSearchBar = memo(() => {
   const navigation = useNavigation();
+  const searchRef = useRef<TextInput | undefined>();
 
   const dispatch = useDispatch();
   const listQuery = useSelector<{ program: ProgramState }, string>(
@@ -335,15 +338,22 @@ const HeaderSearchBar = memo(() => {
   }, []);
 
   return (
-    <SearchBar
-      inputContainerStyle={[styles.searchInputContainer]}
-      round
-      placeholder="Search"
-      value={query}
-      onChangeText={onChangeQuery}
-      onSubmitEditing={onSubmitQuery}
-      onClear={onClearQuery}
-    />
+    <TouchableOpacity
+      onPress={() => {
+        searchRef.current?.focus();
+      }}
+    >
+      <SearchBar
+        ref={searchRef}
+        inputContainerStyle={[styles.searchInputContainer]}
+        round
+        placeholder="Search"
+        value={query}
+        onChangeText={onChangeQuery}
+        onSubmitEditing={onSubmitQuery}
+        onClear={onClearQuery}
+      />
+    </TouchableOpacity>
   );
 });
 
