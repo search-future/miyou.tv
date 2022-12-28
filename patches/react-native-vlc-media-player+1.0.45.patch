@@ -11,25 +11,6 @@ index 84f0198..09f0be4 100644
      );
      if (!isAsset) {
        isNetwork = true;
-diff --git a/node_modules/react-native-vlc-media-player/android/build.gradle b/node_modules/react-native-vlc-media-player/android/build.gradle
-index 72b8a16..8229766 100644
---- a/node_modules/react-native-vlc-media-player/android/build.gradle
-+++ b/node_modules/react-native-vlc-media-player/android/build.gradle
-@@ -25,12 +25,11 @@ repositories {
-         url "https://mvnrepository.com/artifact/org.videolan.android"
-     }
-     google()
--    jcenter()
- }
- 
- dependencies {
--    provided fileTree(dir: 'libs', include: ['*.jar'])
--    compile "com.facebook.react:react-native:+"
-+    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
-+    implementation "com.facebook.react:react-native:+"
-     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-     implementation 'org.videolan.android:libvlc-all:3.1.12'
- }
 diff --git a/node_modules/react-native-vlc-media-player/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerViewManager.java b/node_modules/react-native-vlc-media-player/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerViewManager.java
 index c59fc1d..01dbb1a 100644
 --- a/node_modules/react-native-vlc-media-player/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerViewManager.java

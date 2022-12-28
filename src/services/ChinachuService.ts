@@ -166,7 +166,6 @@ export default class ChinachuService extends BackendService {
       headers: this.getAuthHeaders(),
       params: {},
       data: {},
-      paramsSerializer: qs.stringify,
       transformRequest: data => qs.stringify(data),
       responseType: "json",
       ...config
@@ -516,7 +515,11 @@ export default class ChinachuService extends BackendService {
     const recorded: RecordedProgram[] = await this.request(
       "/api/recorded.json"
     );
-    const channels = [];
+    const channels: {
+      type: string;
+      channel: string;
+      channelName: string;
+    }[] = [];
     for (const program of recorded) {
       const channel = channels.find(
         ({ type, channel, channelName }) =>
