@@ -60,7 +60,7 @@ type State = RootState & {
 };
 
 const Viewer = memo(() => {
-  const layoutCallbackId = useRef<number>();
+  const layoutCallbackId = useRef<NodeJS.Timeout>();
 
   const dispatch = useDispatch();
   const expand = useSelector<State, boolean>(
@@ -452,6 +452,7 @@ const Viewer = memo(() => {
                   { backgroundColor: theme.colors?.controlBgActive }
                 ]}
                 containerBorderRadius={0}
+                // @ts-ignore
                 buttons={tabButtons}
                 selectedIndex={tabIndex}
                 onPress={selectedIndexChange}

@@ -144,7 +144,7 @@ const VolumeController = memo(() => {
   const toggleMute = useCallback(() => {
     dispatch(SettingActions.update("player", { mute: !mute }));
   }, [mute]);
-  const volumeChange = useCallback(volume => {
+  const volumeChange = useCallback((volume: number) => {
     dispatch(SettingActions.update("player", { volume }));
   }, []);
 

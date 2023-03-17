@@ -93,8 +93,8 @@ const open = (programs: ProgramRankingProgram[], index: number) => {
 
 const ProgramRanking = memo(() => {
   const listRef = useRef<FlatList<ProgramRankingProgram>>(null);
-  const layoutCallbackId = useRef<number>();
-  const updaterId = useRef<number>();
+  const layoutCallbackId = useRef<NodeJS.Timeout>();
+  const updaterId = useRef<NodeJS.Timeout>();
   const lastUpdate = useRef(Date.now());
   const scrollPos = useRef(0);
   const headerHeightRef = useRef(256);

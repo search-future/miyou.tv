@@ -74,7 +74,7 @@ const Seekbar = () => {
   const timePress = useCallback(() => {
     dispatch(PlayerActions.useClock(!useClock));
   }, [useClock]);
-  const positionChange = useCallback(position => {
+  const positionChange = useCallback((position: number) => {
     dispatch(PlayerActions.position(position));
   }, []);
   const next = useCallback(() => {

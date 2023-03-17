@@ -49,7 +49,7 @@ import { ProgramActions, ProgramState } from "../modules/program";
 import { appName } from "../config/constants";
 
 const AppHeader = memo(({ route }: { route?: NavigationState }) => {
-  const layoutCallbackId = useRef<number>();
+  const layoutCallbackId = useRef<NodeJS.Timeout>();
 
   const [containerWidth, setContainerWidth] = useState(0);
 
@@ -98,19 +98,24 @@ const WideHeader = memo(({ route }: { route?: NavigationState }) => {
   }, [route]);
 
   const showTable = useCallback(() => {
+    // @ts-ignore
     navigation.navigate("table");
   }, []);
   const showList = useCallback(() => {
     dispatch(ProgramActions.update("list", { query: "" }));
+    // @ts-ignore
     navigation.navigate("list");
   }, []);
   const showRanking = useCallback(() => {
+    // @ts-ignore
     navigation.navigate("ranking");
   }, []);
   const openSetup = useCallback(() => {
+    // @ts-ignore
     navigation.navigate("setup");
   }, []);
   const openFile = useCallback(() => {
+    // @ts-ignore
     navigation.navigate("file");
   }, []);
   const reload = useCallback(() => {
@@ -192,9 +197,11 @@ const NarrowHeader = memo(() => {
   const { theme } = useContext(ThemeContext);
 
   const openSetup = useCallback(() => {
+    // @ts-ignore
     navigation.navigate("setup");
   }, []);
   const openFile = useCallback(() => {
+    // @ts-ignore
     navigation.navigate("file");
   }, []);
   const reload = useCallback(() => {
@@ -293,7 +300,7 @@ const HeaderButton = memo(
           { color: isActive ? theme.colors?.primary : theme.colors?.control }
         ]}
         icon={
-          icon && (
+          typeof icon === "object" && (
             <FontAwesome5Icon
               key={routeName}
               style={styles.buttonIcon}
@@ -331,6 +338,7 @@ const HeaderSearchBar = memo(() => {
   }, []);
   const onSubmitQuery = useCallback(() => {
     dispatch(ProgramActions.update("list", { query }));
+    // @ts-ignore
     navigation.navigate("list");
   }, [query]);
   const onClearQuery = useCallback(() => {
@@ -344,11 +352,13 @@ const HeaderSearchBar = memo(() => {
       }}
     >
       <SearchBar
+        // @ts-ignore
         ref={searchRef}
         inputContainerStyle={[styles.searchInputContainer]}
         round
         placeholder="Search"
         value={query}
+        // @ts-ignore
         onChangeText={onChangeQuery}
         onSubmitEditing={onSubmitQuery}
         onClear={onClearQuery}

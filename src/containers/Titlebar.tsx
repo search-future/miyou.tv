@@ -36,7 +36,7 @@ import { WindowActions } from "../modules/window";
 import { appName } from "../config/constants";
 
 const Titlebar = memo(() => {
-  const layoutCallbackId = useRef<number>();
+  const layoutCallbackId = useRef<NodeJS.Timeout>();
 
   const dispatch = useDispatch();
   const alwaysOnTop = useSelector<RootState, boolean>(

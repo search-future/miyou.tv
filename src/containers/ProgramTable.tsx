@@ -92,7 +92,7 @@ function roundOffset(offset: number, max: number) {
 
 const ProgramTable = memo(() => {
   const viewRef = useRef<ScrollView>(null);
-  const layoutCallbackId = useRef<number>();
+  const layoutCallbackId = useRef<NodeJS.Timeout>();
   const scrollPos = useRef(0);
   const headerHeightRef = useRef(256);
   const headerHeight = useRef(
@@ -482,6 +482,7 @@ const ProgramTable = memo(() => {
           query: `type:${type} channel:${channel}`
         })
       );
+      // @ts-ignore
       navigation.navigate("list");
     },
     []

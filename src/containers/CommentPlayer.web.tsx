@@ -271,7 +271,7 @@ const CommentPlayer = memo(() => {
     }
   }, []);
   const commentRenderer = useCallback(
-    key => <CommentText key={String(key)} />,
+    (key: number | null) => <CommentText key={String(key)} />,
     []
   );
 
