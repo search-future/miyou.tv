@@ -1,8 +1,8 @@
 diff --git a/node_modules/react-native-vlc-media-player/VLCPlayer.js b/node_modules/react-native-vlc-media-player/VLCPlayer.js
-index 84f0198..09f0be4 100644
+index b7fe1ea..1b5e2fc 100644
 --- a/node_modules/react-native-vlc-media-player/VLCPlayer.js
 +++ b/node_modules/react-native-vlc-media-player/VLCPlayer.js
-@@ -126,7 +126,7 @@ export default class VLCPlayer extends Component {
+@@ -133,7 +133,7 @@ export default class VLCPlayer extends Component {
  
      let isNetwork = !!(uri && uri.match(/^https?:/));
      const isAsset = !!(
@@ -12,10 +12,10 @@ index 84f0198..09f0be4 100644
      if (!isAsset) {
        isNetwork = true;
 diff --git a/node_modules/react-native-vlc-media-player/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerViewManager.java b/node_modules/react-native-vlc-media-player/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerViewManager.java
-index c59fc1d..01dbb1a 100644
+index 7833b57..95d546d 100644
 --- a/node_modules/react-native-vlc-media-player/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerViewManager.java
 +++ b/node_modules/react-native-vlc-media-player/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerViewManager.java
-@@ -109,7 +109,8 @@ public class ReactVlcPlayerViewManager extends SimpleViewManager<ReactVlcPlayerV
+@@ -117,7 +117,8 @@ public class ReactVlcPlayerViewManager extends SimpleViewManager<ReactVlcPlayerV
  
      @ReactProp(name = PROP_SEEK)
      public void setSeek(final ReactVlcPlayerView videoView, final float seek) {
@@ -26,10 +26,10 @@ index c59fc1d..01dbb1a 100644
      }
  
 diff --git a/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m b/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m
-index f84bd7a..910ca3b 100644
+index 535d662..7a86d0d 100644
 --- a/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m
 +++ b/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m
-@@ -231,7 +231,7 @@ static NSString *const playbackRate = @"rate";
+@@ -282,7 +282,7 @@ static NSString *const playbackRate = @"rate";
          int remainingTime = [[_player remainingTime] intValue];
          int duration      = [_player.media.length intValue];
  
@@ -38,8 +38,8 @@ index f84bd7a..910ca3b 100644
              self.onVideoProgress(@{
                                     @"target": self.reactTag,
                                     @"currentTime": [NSNumber numberWithInt:currentTime],
-@@ -255,6 +255,16 @@ static NSString *const playbackRate = @"rate";
-         [_player jumpForward:interval];
+@@ -364,6 +364,16 @@ static NSString *const playbackRate = @"rate";
+     [_player setRate:rate];
  }
  
 +-(void)setVolume:(int)volume
@@ -52,14 +52,14 @@ index f84bd7a..910ca3b 100644
 +    }
 +}
 +
- -(void)setSeek:(float)pos
+ -(void)setAudioTrack:(int)track
  {
-     if([_player isSeekable]){
+     [_player setCurrentAudioTrackIndex: track];
 diff --git a/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayerManager.m b/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayerManager.m
-index 7f40f9c..8c5a60d 100644
+index f376be9..0eeadf5 100644
 --- a/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayerManager.m
 +++ b/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayerManager.m
-@@ -33,6 +33,7 @@ RCT_EXPORT_VIEW_PROPERTY(source, NSDictionary);
+@@ -35,6 +35,7 @@ RCT_EXPORT_VIEW_PROPERTY(subtitleUri, NSString);
  RCT_EXPORT_VIEW_PROPERTY(paused, BOOL);
  RCT_EXPORT_VIEW_PROPERTY(seek, float);
  RCT_EXPORT_VIEW_PROPERTY(rate, float);
