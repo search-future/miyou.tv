@@ -8339,10 +8339,10 @@ react-native-video@^5.2.1:
     prop-types "^15.7.2"
     shaka-player "^2.5.9"
 
-react-native-vlc-media-player@^1.0.51:
-  version "1.0.51"
-  resolved "https://registry.yarnpkg.com/react-native-vlc-media-player/-/react-native-vlc-media-player-1.0.51.tgz#197eeb00c0551e8da9149c086c2a1b79eb99a344"
-  integrity sha512-cZ3D0I/VSfLzUc8k+ZYEWWzFKkOkRx5GXLlMreseqaHJQQ4GFeCskJUkdKxw9XNX93JuZbv90viJYXcylz3FYg==
+react-native-vlc-media-player@1.0.48:
+  version "1.0.48"
+  resolved "https://registry.yarnpkg.com/react-native-vlc-media-player/-/react-native-vlc-media-player-1.0.48.tgz#5c0cae43e1053eb08429507a85854949e1859adc"
+  integrity sha512-tabHVHZRm/1Xv6Pyjkrqu0CPRkwjZHqrCT/a5CBIhU76itFa7YV6Q2WhQ2XGX6iS2ScPhSi1zjhLS06izVj/KQ==
   dependencies:
     react-native-slider "^0.11.0"
     react-native-vector-icons "^9.2.0"
