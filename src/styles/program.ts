@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 const programStyle = StyleSheet.create({
   headerRow: {},
@@ -33,6 +33,8 @@ const programStyle = StyleSheet.create({
   },
   headerControl: {
     borderWidth: 1,
+    height: Platform.OS === "web" ? 32 : 60,
+    justifyContent: "center",
     margin: 1,
     minWidth: 200
   },

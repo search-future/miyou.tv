@@ -21,14 +21,14 @@ import {
   TextStyle,
   ActionSheetIOS
 } from "react-native";
-import { IconObject, Text } from "react-native-elements";
+import { Text } from "react-native-elements";
 
 type Props = {
   containerStyle?: StyleProp<ViewStyle>;
   style?: StyleProp<ViewStyle>;
   itemStyle?: StyleProp<TextStyle>;
   color?: string;
-  icon?: IconObject;
+  icon?: JSX.Element;
   items?: { label: string; value: number | string }[];
   selectedValue?: number | string;
   onValueChange?: (value: number | string) => void;
@@ -63,33 +63,35 @@ const IconSelector = ({
   }, [items, onValueChange]);
 
   return (
-    <View style={[styles.container, containerStyle]}>
+    <TouchableOpacity
+      style={[styles.container, containerStyle]}
+      onPress={onPress}
+    >
       {icon && <View style={styles.iconWrapper}>{icon}</View>}
-      <TouchableOpacity style={[styles.button, style]} onPress={onPress}>
+      <View style={[styles.textWrapper, style]}>
         <Text style={[{ color }, itemStyle]}>
           {selected ? selected.label : selectedValue}
         </Text>
-      </TouchableOpacity>
-    </View>
+      </View>
+    </TouchableOpacity>
   );
 };
 export default IconSelector;
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: "center",
+    alignItems: "stretch",
     backgroundColor: "#ffffff",
     flexDirection: "row"
   },
   iconWrapper: {
     alignItems: "center",
-    width: 32
+    justifyContent: "center",
+    paddingRight: 8,
+    width: 40
   },
-  button: {
-    alignItems: "center",
-    flexDirection: "row",
-    borderWidth: 0,
-    flex: 1,
-    height: 32
+  textWrapper: {
+    justifyContent: "center",
+    flex: 1
   }
 });

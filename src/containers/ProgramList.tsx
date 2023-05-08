@@ -34,7 +34,7 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent
 } from "react-native";
-import { Picker } from "@react-native-community/picker";
+import { Picker } from "@react-native-picker/picker";
 import { Badge, ListItem, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useDispatch, useSelector } from "react-redux";
@@ -87,11 +87,12 @@ function open(programs: ProgramListProgram[], index: number) {
 
 const ProgramList = memo(() => {
   const listRef = useRef<FlatList<ProgramListProgram>>(null);
-  const layoutCallbackId = useRef<number>();
+  const layoutCallbackId = useRef<NodeJS.Timeout>();
   const scrollPos = useRef(0);
   const headerHeightRef = useRef(256);
-  const headerHeight = useRef(new Animated.Value(headerHeightRef.current))
-    .current;
+  const headerHeight = useRef(
+    new Animated.Value(headerHeightRef.current)
+  ).current;
   const viewX = useRef(new Animated.Value(0)).current;
 
   const dispatch = useDispatch();
@@ -774,9 +775,10 @@ const styles = StyleSheet.create({
   },
   pagePickerWrapper: {
     borderWidth: 1,
-    maxHeight: 32,
+    justifyContent: "center",
     marginLeft: 8,
     marginRight: 8,
+    maxHeight: Platform.OS === "web" ? 32 : 60,
     minWidth: 120
   },
   pagePicker: {

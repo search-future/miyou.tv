@@ -13,12 +13,14 @@ limitations under the License.
 
 import React from "react";
 import { Platform } from "react-native";
-import { Colors, Theme } from "react-native-elements";
+import { Colors, FullTheme } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { DefaultTheme } from "@react-navigation/native";
 
 import dark from "./dark";
 import light from "./light";
+
+type RecursivePartial<T> = { [P in keyof T]?: RecursivePartial<T[P]> };
 
 const colorSchemes: { [key: string]: Partial<Colors> } = {
   dark,
@@ -27,7 +29,7 @@ const colorSchemes: { [key: string]: Partial<Colors> } = {
 
 function getTheme(colorScheme: string | null = "") {
   const colors = colorSchemes[colorScheme || ""] || light;
-  const theme: Theme = {
+  const theme: RecursivePartial<FullTheme> = {
     colors,
     Navigation: {
       dark: false,

@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-vlc-media-player/VLCPlayer.js b/node_modules/react-native-vlc-media-player/VLCPlayer.js
-index 84f0198..09f0be4 100644
+index 0807060..f2aa4dc 100644
 --- a/node_modules/react-native-vlc-media-player/VLCPlayer.js
 +++ b/node_modules/react-native-vlc-media-player/VLCPlayer.js
 @@ -126,7 +126,7 @@ export default class VLCPlayer extends Component {
@@ -11,25 +11,6 @@ index 84f0198..09f0be4 100644
      );
      if (!isAsset) {
        isNetwork = true;
-diff --git a/node_modules/react-native-vlc-media-player/android/build.gradle b/node_modules/react-native-vlc-media-player/android/build.gradle
-index 72b8a16..8229766 100644
---- a/node_modules/react-native-vlc-media-player/android/build.gradle
-+++ b/node_modules/react-native-vlc-media-player/android/build.gradle
-@@ -25,12 +25,11 @@ repositories {
-         url "https://mvnrepository.com/artifact/org.videolan.android"
-     }
-     google()
--    jcenter()
- }
- 
- dependencies {
--    provided fileTree(dir: 'libs', include: ['*.jar'])
--    compile "com.facebook.react:react-native:+"
-+    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
-+    implementation "com.facebook.react:react-native:+"
-     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-     implementation 'org.videolan.android:libvlc-all:3.1.12'
- }
 diff --git a/node_modules/react-native-vlc-media-player/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerViewManager.java b/node_modules/react-native-vlc-media-player/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerViewManager.java
 index c59fc1d..01dbb1a 100644
 --- a/node_modules/react-native-vlc-media-player/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerViewManager.java
@@ -45,10 +26,10 @@ index c59fc1d..01dbb1a 100644
      }
  
 diff --git a/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m b/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m
-index f84bd7a..910ca3b 100644
+index 76fc113..cbcc22e 100644
 --- a/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m
 +++ b/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayer.m
-@@ -231,7 +231,7 @@ static NSString *const playbackRate = @"rate";
+@@ -249,7 +249,7 @@ static NSString *const playbackRate = @"rate";
          int remainingTime = [[_player remainingTime] intValue];
          int duration      = [_player.media.length intValue];
  
@@ -57,7 +38,7 @@ index f84bd7a..910ca3b 100644
              self.onVideoProgress(@{
                                     @"target": self.reactTag,
                                     @"currentTime": [NSNumber numberWithInt:currentTime],
-@@ -255,6 +255,16 @@ static NSString *const playbackRate = @"rate";
+@@ -273,6 +273,16 @@ static NSString *const playbackRate = @"rate";
          [_player jumpForward:interval];
  }
  
@@ -75,10 +56,10 @@ index f84bd7a..910ca3b 100644
  {
      if([_player isSeekable]){
 diff --git a/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayerManager.m b/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayerManager.m
-index 7f40f9c..8c5a60d 100644
+index a118158..cc9877a 100644
 --- a/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayerManager.m
 +++ b/node_modules/react-native-vlc-media-player/ios/RCTVLCPlayer/RCTVLCPlayerManager.m
-@@ -33,6 +33,7 @@ RCT_EXPORT_VIEW_PROPERTY(source, NSDictionary);
+@@ -34,6 +34,7 @@ RCT_EXPORT_VIEW_PROPERTY(subtitleUri, NSString);
  RCT_EXPORT_VIEW_PROPERTY(paused, BOOL);
  RCT_EXPORT_VIEW_PROPERTY(seek, float);
  RCT_EXPORT_VIEW_PROPERTY(rate, float);

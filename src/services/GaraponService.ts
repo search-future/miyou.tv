@@ -260,7 +260,6 @@ export default class GaraponService extends BackendService {
         md5passwd: md5(this.password),
         dev_id: GaraponService.devId
       },
-      paramsSerializer: qs.stringify,
       transformRequest: data => qs.stringify(data)
     };
 
@@ -306,7 +305,6 @@ export default class GaraponService extends BackendService {
       url: `${this.url}/gapi/v${this.version}/${path}`,
       params: {},
       data: {},
-      paramsSerializer: qs.stringify,
       transformRequest: data => qs.stringify(data),
       ...config
     };
@@ -333,7 +331,6 @@ export default class GaraponService extends BackendService {
         loginid: this.user,
         md5pswd: md5(this.password)
       },
-      paramsSerializer: qs.stringify,
       transformRequest: data => qs.stringify(data)
     };
     const result: GaraponAuthResult = await this.request("auth", conf, false);
@@ -359,7 +356,6 @@ export default class GaraponService extends BackendService {
     }
     const conf: AxiosRequestConfig = {
       data: { type: "logout" },
-      paramsSerializer: qs.stringify,
       transformRequest: data => qs.stringify(data)
     };
     const result: GaraponAuthResult = await this.request("auth", conf, false);

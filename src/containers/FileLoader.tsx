@@ -18,19 +18,18 @@ import React, {
   useContext,
   useCallback,
   useRef,
-  ReactText,
   useMemo
 } from "react";
 import {
   FlatList,
-  TextInput,
   TouchableOpacity,
   View,
   StyleSheet,
   Platform,
-  ListRenderItem
+  ListRenderItem,
+  LayoutChangeEvent
 } from "react-native";
-import { Text, ListItem, ThemeContext } from "react-native-elements";
+import { Input, ListItem, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import DocumentPicker from "react-native-document-picker";
 import { useNavigation } from "@react-navigation/native";
@@ -58,7 +57,7 @@ type State = RootState & {
 
 const FileLoader = memo(() => {
   const listRef = useRef<FlatList<FileProgram>>(null);
-  const layoutCallbackId = useRef<number>();
+  const layoutCallbackId = useRef<NodeJS.Timeout>();
   const count = useRef(0);
 
   const navigation = useNavigation();
@@ -86,17 +85,17 @@ const FileLoader = memo(() => {
 
   const { theme } = useContext(ThemeContext);
 
-  const selectedId = useMemo(() => viewerPrograms[viewerIndex]?.id, [
-    viewerPrograms,
-    viewerIndex
-  ]);
+  const selectedId = useMemo(
+    () => viewerPrograms[viewerIndex]?.id,
+    [viewerPrograms, viewerIndex]
+  );
   const itemDirection = useMemo(
     () => (containerWidth > breakpoint ? "row" : "column"),
     [containerWidth]
   );
   const extraData = useMemo(
     () => [commentChannels, selectedId, itemDirection],
-    [commentChannels, selectedId, itemDirection]
+    [commentChannels, selectedId, itemDirection, containerWidth]
   );
 
   useEffect(
@@ -123,7 +122,7 @@ const FileLoader = memo(() => {
     }
   }, [selectedId]);
 
-  const onLayout = useCallback(({ nativeEvent }) => {
+  const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
     if (layoutCallbackId.current != null) {
       clearTimeout(layoutCallbackId.current);
     }
@@ -187,7 +186,7 @@ const FileLoader = memo(() => {
     },
     [programs]
   );
-  const keyExtractor = useCallback(({ id }) => id, []);
+  const keyExtractor = useCallback(({ id }: { id: string }) => id, []);
   const listRenderer: ListRenderItem<FileProgram> = useCallback(
     ({ item }) => (
       <ListProgram
@@ -260,7 +259,8 @@ const FileLoader = memo(() => {
           style={[
             containerStyle.row,
             containerStyle.right,
-            containerStyle.wrap
+            containerStyle.wrap,
+            styles.footer
           ]}
         >
           <Text>日時取得フォーマット</Text>
@@ -273,7 +273,7 @@ const FileLoader = memo(() => {
               }
             ]}
           >
-            <TextInput
+            <Input
               style={[styles.input]}
               placeholder="YYMMDDHHmm"
               value={dateFormat}
@@ -330,7 +330,7 @@ const ListProgram = memo(
       [props, onDateChange]
     );
     const channelChange = useCallback(
-      (channel: ReactText) => {
+      (channel: string | number) => {
         if (onChannelChange) {
           onChannelChange(props, channel.toString());
         }
@@ -357,89 +357,75 @@ const ListProgram = memo(
       >
         <ListItem.Content>
           <ListItem.Title>{title}</ListItem.Title>
-          <ListItem.Subtitle>
-            <View
-              style={[
-                direction === "row" && containerStyle.row,
-                direction === "column" && containerStyle.column,
-                styles.row
+          <View
+            style={[
+              direction === "row" && containerStyle.row,
+              direction === "column" && containerStyle.column,
+              styles.row
+            ]}
+          >
+            <DatePicker
+              containerStyle={[
+                styles.inputWrapper,
+                { borderColor: theme.colors?.border }
               ]}
-            >
-              <View
-                style={[
-                  styles.inputWrapper,
-                  { borderColor: theme.colors?.border }
-                ]}
-              >
-                <DatePicker
-                  color={theme.colors?.default}
-                  backgroundColor={theme.colors?.background}
-                  value={start}
-                  onChange={dateChange}
-                />
-              </View>
-              <View
-                style={[
-                  styles.inputWrapper,
-                  { borderColor: theme.colors?.border }
-                ]}
-              >
-                <TimePicker
-                  color={theme.colors?.default}
-                  backgroundColor={theme.colors?.background}
-                  value={start}
-                  onChange={dateChange}
-                />
-              </View>
-              <View
-                style={[
-                  styles.inputWrapper,
-                  {
-                    backgroundColor: theme.colors?.background,
-                    borderColor: theme.colors?.border
-                  }
-                ]}
-              >
-                <IconSelector
-                  icon={
-                    <FontAwesome5Icon
-                      name="tv"
-                      solid
-                      color={theme.colors?.default}
-                    />
-                  }
-                  containerStyle={[
-                    { backgroundColor: theme.colors?.background }
-                  ]}
-                  itemStyle={[styles.input]}
-                  style={[{ backgroundColor: theme.colors?.background }]}
-                  color={theme.colors?.default}
-                  items={channelItems}
-                  selectedValue={channelName}
-                  onValueChange={channelChange}
-                />
-              </View>
-            </View>
-            <View style={[containerStyle.row, styles.row]}>
-              <TouchableOpacity style={[styles.button]} onPress={onRemovePress}>
+              color={theme.colors?.default}
+              backgroundColor={theme.colors?.background}
+              value={start}
+              onChange={dateChange}
+            />
+            <TimePicker
+              containerStyle={[
+                styles.inputWrapper,
+                { borderColor: theme.colors?.border }
+              ]}
+              color={theme.colors?.default}
+              backgroundColor={theme.colors?.background}
+              value={start}
+              onChange={dateChange}
+            />
+            <IconSelector
+              icon={
                 <FontAwesome5Icon
-                  name="minus"
+                  name="tv"
                   solid
-                  size={24}
                   color={theme.colors?.default}
                 />
-              </TouchableOpacity>
-              <View style={styles.spacer} />
-              <TouchableOpacity style={[styles.button]} onPress={onPlayPress}>
-                <FontAwesome5Icon
-                  name="play"
-                  solid
-                  size={24}
-                  color={theme.colors?.default}
-                />
-              </TouchableOpacity>
-            </View>
-          </ListItem.Subtitle>
+              }
+              containerStyle={[
+                styles.inputWrapper,
+                {
+                  backgroundColor: theme.colors?.background,
+                  borderColor: theme.colors?.border
+                }
+              ]}
+              itemStyle={[styles.input]}
+              style={[{ backgroundColor: theme.colors?.background }]}
+              color={theme.colors?.default}
+              items={channelItems}
+              selectedValue={channelName}
+              onValueChange={channelChange}
+            />
+          </View>
+          <View style={[containerStyle.row, styles.row]}>
+            <TouchableOpacity style={[styles.button]} onPress={onRemovePress}>
+              <FontAwesome5Icon
+                name="minus"
+                solid
+                size={24}
+                color={theme.colors?.default}
+              />
+            </TouchableOpacity>
+            <View style={styles.spacer} />
+            <TouchableOpacity style={[styles.button]} onPress={onPlayPress}>
+              <FontAwesome5Icon
+                name="play"
+                solid
+                size={24}
+                color={theme.colors?.default}
+              />
+            </TouchableOpacity>
+          </View>
         </ListItem.Content>
       </ListItem>
     );
@@ -472,12 +458,18 @@ const styles = StyleSheet.create({
   spacer: {
     flex: 1
   },
+  footer: {
+    padding: 4
+  },
   inputWrapper: {
     borderWidth: 1,
+    height: Platform.OS === "web" ? 36 : 60,
+    justifyContent: "center",
     minWidth: 180
   },
   input: {
     borderWidth: 0,
-    fontSize: 16
+    fontSize: 16,
+    height: Platform.OS === "web" ? "auto" : 58
   }
 });

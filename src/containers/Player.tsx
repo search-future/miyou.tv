@@ -57,7 +57,7 @@ const Player = () => {
   const vlcRef = useRef<VLCPlayer>(null);
   const preseek = useRef(0);
   const seekable = useRef(true);
-  const seekId = useRef<number | null>(null);
+  const seekId = useRef<NodeJS.Timeout | null>(null);
   const initializing = useRef(true);
   const retryCount = useRef(0);
 
