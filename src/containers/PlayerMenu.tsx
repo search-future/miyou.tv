@@ -260,7 +260,7 @@ const DeinterlaceSwitch = memo(() => {
       setting.player?.deinterlace == null || setting.player?.deinterlace
   );
 
-  const onChange = useCallback(deinterlace => {
+  const onChange = useCallback((deinterlace: boolean) => {
     dispatch(SettingActions.update("player", { deinterlace }));
   }, []);
 

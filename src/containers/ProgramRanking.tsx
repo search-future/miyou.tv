@@ -93,8 +93,8 @@ const open = (programs: ProgramRankingProgram[], index: number) => {
 
 const ProgramRanking = memo(() => {
   const listRef = useRef<FlatList<ProgramRankingProgram>>(null);
-  const layoutCallbackId = useRef<number>();
-  const updaterId = useRef<number>();
+  const layoutCallbackId = useRef<NodeJS.Timeout>();
+  const updaterId = useRef<NodeJS.Timeout>();
   const lastUpdate = useRef(Date.now());
   const scrollPos = useRef(0);
   const headerHeightRef = useRef(256);
@@ -414,7 +414,7 @@ const ProgramRanking = memo(() => {
                   programStyle.headerControl,
                   {
                     backgroundColor: theme.colors?.controlBg,
-                    borderColor: theme.colors?.controlBg
+                    borderColor: theme.colors?.controlBorder
                   }
                 ]}
                 style={[
@@ -443,7 +443,7 @@ const ProgramRanking = memo(() => {
                 programStyle.headerControl,
                 {
                   backgroundColor: theme.colors?.controlBg,
-                  borderColor: theme.colors?.controlBg
+                  borderColor: theme.colors?.controlBorder
                 },
                 styles.targetPicker
               ]}
@@ -511,7 +511,7 @@ const ProgramRanking = memo(() => {
                 programStyle.headerControl,
                 {
                   backgroundColor: theme.colors?.controlBg,
-                  borderColor: theme.colors?.controlBg
+                  borderColor: theme.colors?.controlBorder
                 }
               ]}
               style={[
