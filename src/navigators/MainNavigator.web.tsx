@@ -80,7 +80,7 @@ const ChildWindow = () => (
 );
 
 const MainWindow = () => {
-  const layoutCallbackId = useRef<number>();
+  const layoutCallbackId = useRef<NodeJS.Timeout>();
 
   const dispatch = useDispatch();
   const docking = useSelector<State, boolean>(

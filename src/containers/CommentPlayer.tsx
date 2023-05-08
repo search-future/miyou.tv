@@ -58,7 +58,7 @@ type State = RootState & {
 };
 
 const CommentPlayer = memo(() => {
-  const layoutCallbackId = useRef<number>();
+  const layoutCallbackId = useRef<NodeJS.Timeout>();
   const lines = useRef<(Comment | null)[]>([]);
   const queue = useRef<{ index: number; width: number }[]>([]);
   const cp = useRef(0);

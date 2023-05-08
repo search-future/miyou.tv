@@ -144,13 +144,18 @@ const VolumeController = memo(() => {
   const toggleMute = useCallback(() => {
     dispatch(SettingActions.update("player", { mute: !mute }));
   }, [mute]);
-  const volumeChange = useCallback(volume => {
+  const volumeChange = useCallback((volume: number) => {
     dispatch(SettingActions.update("player", { volume }));
   }, []);
 
   return (
     <Menu>
-      <MenuTrigger customStyles={{ triggerWrapper: styles.button }}>
+      <MenuTrigger
+        customStyles={{
+          triggerWrapper: styles.button,
+          triggerTouchable: { activeOpacity: 0.5 }
+        }}
+      >
         <ControlIcon name={volumeIcon} solid />
       </MenuTrigger>
       <MenuOptions>
@@ -168,6 +173,7 @@ const VolumeController = memo(() => {
           </TouchableOpacity>
           <CustomSlider
             style={styles.slider}
+            allowTouchTrack
             maximumValue={100}
             minimumValue={0}
             step={1}

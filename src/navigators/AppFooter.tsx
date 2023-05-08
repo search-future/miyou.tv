@@ -35,7 +35,7 @@ import containerStyle from "../styles/container";
 import { ProgramActions, ProgramState } from "../modules/program";
 
 const AppFooter = memo(({ route }: { route?: NavigationState }) => {
-  const layoutCallbackId = useRef<number>();
+  const layoutCallbackId = useRef<NodeJS.Timeout>();
 
   const [containerWidth, setContainerWidth] = useState(0);
   const [searchBarVisible, setSearchBarVisible] = useState(false);
@@ -169,6 +169,7 @@ const FooterButtons = memo(({ route }: { route?: NavigationState }) => {
     (index: number) => {
       const name = route?.routeNames[index];
       if (name) {
+        // @ts-ignore
         navigation.navigate(name);
       }
     },
@@ -187,6 +188,7 @@ const FooterButtons = memo(({ route }: { route?: NavigationState }) => {
       innerBorderStyle={{ color: theme.colors?.controlBorder }}
       selectedButtonStyle={[{ backgroundColor: theme.colors?.controlBgActive }]}
       containerBorderRadius={0}
+      // @ts-ignore
       buttons={buttons}
       selectedIndex={selectedIndex}
       onPress={navigate}
@@ -213,6 +215,7 @@ const FooterSearchBar = memo(() => {
   }, []);
   const onSubmitQuery = useCallback(() => {
     dispatch(ProgramActions.update("list", { query }));
+    // @ts-ignore
     navigation.navigate("list");
   }, [query]);
   const onClearQuery = useCallback(() => {
@@ -225,6 +228,7 @@ const FooterSearchBar = memo(() => {
       round
       placeholder="Search"
       value={query}
+      // @ts-ignore
       onChangeText={onChangeQuery}
       onSubmitEditing={onSubmitQuery}
       onClear={onClearQuery}

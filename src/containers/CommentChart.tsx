@@ -20,7 +20,7 @@ import React, {
   useRef,
   useMemo
 } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, LayoutChangeEvent } from "react-native";
 import { ThemeContext } from "react-native-elements";
 import { Svg, Path } from "react-native-svg";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
@@ -42,7 +42,7 @@ type State = RootState & {
 };
 
 const CommentChart = memo(() => {
-  const layoutCallbackId = useRef<number>();
+  const layoutCallbackId = useRef<NodeJS.Timeout>();
 
   const dispatch = useDispatch();
   const start = useSelector<State, number>(
@@ -102,7 +102,7 @@ const CommentChart = memo(() => {
     []
   );
 
-  const onLayout = useCallback(({ nativeEvent }) => {
+  const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
     if (layoutCallbackId.current != null) {
       clearTimeout(layoutCallbackId.current);
     }

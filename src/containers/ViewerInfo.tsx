@@ -89,6 +89,7 @@ const FileCard = memo(
     const { theme } = useContext(ThemeContext);
 
     return (
+      // @ts-ignore
       <Card
         containerStyle={[
           {
@@ -238,6 +239,7 @@ const ProgramCard = memo(
     );
 
     return (
+      // @ts-ignore
       <Card
         containerStyle={[
           {
@@ -412,6 +414,7 @@ const ExtraProgramCard = memo(
     const { theme } = useContext(ThemeContext);
 
     return (
+      // @ts-ignore
       <Card
         containerStyle={[
           {

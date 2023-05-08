@@ -375,7 +375,6 @@ export default class GaraponV4Service extends BackendService {
         passwd: this.password,
         response_type: "json"
       },
-      paramsSerializer: qs.stringify,
       transformRequest: data => qs.stringify(data)
     };
 
@@ -392,7 +391,6 @@ export default class GaraponV4Service extends BackendService {
         authkey: this.authkey,
         response_type: "json"
       },
-      paramsSerializer: qs.stringify,
       transformRequest: data => qs.stringify(data)
     };
 
@@ -410,8 +408,6 @@ export default class GaraponV4Service extends BackendService {
       method: "POST",
       params: {},
       data: {},
-      paramsSerializer: qs.stringify,
-      transformRequest: data => qs.stringify(data),
       ...config
     };
     const key = `${conf.url}?${qs.stringify(conf.params)}?${qs.stringify(
@@ -455,7 +451,6 @@ export default class GaraponV4Service extends BackendService {
         gid: this.user,
         passwd: this.password
       },
-      paramsSerializer: qs.stringify,
       transformRequest: data => qs.stringify(data)
     };
     const { data }: AxiosResponse<GaraponLoginResult> = await Axios(conf);
@@ -471,7 +466,6 @@ export default class GaraponV4Service extends BackendService {
         gid: this.user,
         gtvsession: this.gtvsession
       },
-      paramsSerializer: qs.stringify,
       transformRequest: data => qs.stringify(data)
     };
     const { data }: AxiosResponse<GaraponLoginResult> = await Axios(conf);
@@ -488,7 +482,6 @@ export default class GaraponV4Service extends BackendService {
       method: "POST",
       params: {},
       data: {},
-      paramsSerializer: qs.stringify,
       transformRequest: data => qs.stringify(data),
       ...config
     };
