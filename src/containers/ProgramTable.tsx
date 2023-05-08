@@ -92,11 +92,12 @@ function roundOffset(offset: number, max: number) {
 
 const ProgramTable = memo(() => {
   const viewRef = useRef<ScrollView>(null);
-  const layoutCallbackId = useRef<number>();
+  const layoutCallbackId = useRef<NodeJS.Timeout>();
   const scrollPos = useRef(0);
   const headerHeightRef = useRef(256);
-  const headerHeight = useRef(new Animated.Value(headerHeightRef.current))
-    .current;
+  const headerHeight = useRef(
+    new Animated.Value(headerHeightRef.current)
+  ).current;
   const viewX = useRef(new Animated.Value(0)).current;
 
   const navigation = useNavigation();
@@ -481,6 +482,7 @@ const ProgramTable = memo(() => {
           query: `type:${type} channel:${channel}`
         })
       );
+      // @ts-ignore
       navigation.navigate("list");
     },
     []
@@ -1155,7 +1157,8 @@ const styles = StyleSheet.create({
     overflow: "hidden"
   },
   menuButton: {
-    height: 32
+    height: 32,
+    flex: 1
   },
   menuButtonIcon: {
     alignItems: "center",

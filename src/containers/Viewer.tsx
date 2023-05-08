@@ -26,7 +26,8 @@ import {
   StyleSheet,
   Platform,
   LayoutChangeEvent,
-  ImageSourcePropType
+  ImageSourcePropType,
+  BackHandler
 } from "react-native";
 import { ButtonGroup, Image, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
@@ -59,7 +60,7 @@ type State = RootState & {
 };
 
 const Viewer = memo(() => {
-  const layoutCallbackId = useRef<number>();
+  const layoutCallbackId = useRef<NodeJS.Timeout>();
 
   const dispatch = useDispatch();
   const expand = useSelector<State, boolean>(
@@ -150,6 +151,21 @@ const Viewer = memo(() => {
       }
     }
   }, [program]);
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        if (playing && controlEnabled) {
+          dispatch(ViewerActions.update({ control: false }));
+          return true;
+        }
+        return false;
+      }
+    );
+    return () => {
+      subscription.remove();
+    };
+  }, [playing, controlEnabled]);
 
   const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
     if (layoutCallbackId.current != null) {
@@ -277,7 +293,11 @@ const Viewer = memo(() => {
                   containerStyle.center
                 ]}
               >
-                <TouchableOpacity style={styles.button} onPress={play}>
+                <TouchableOpacity
+                  style={styles.button}
+                  activeOpacity={0.8}
+                  onPress={play}
+                >
                   <FontAwesome5Icon
                     name="play"
                     solid
@@ -285,7 +305,11 @@ const Viewer = memo(() => {
                     size={24}
                   />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={peakPlay}>
+                <TouchableOpacity
+                  style={styles.button}
+                  activeOpacity={0.8}
+                  onPress={peakPlay}
+                >
                   <FontAwesome5Icon
                     name="star"
                     solid
@@ -381,6 +405,7 @@ const Viewer = memo(() => {
             {(!playing || controlEnabled) && programs[index - 1] && (
               <TouchableOpacity
                 style={[styles.button, styles.buttonPrevious]}
+                activeOpacity={0.8}
                 onPress={previous}
               >
                 <FontAwesome5Icon
@@ -395,6 +420,7 @@ const Viewer = memo(() => {
             {(!playing || controlEnabled) && programs[index + 1] && (
               <TouchableOpacity
                 style={[styles.button, styles.buttonNext]}
+                activeOpacity={0.8}
                 onPress={next}
               >
                 <FontAwesome5Icon
@@ -426,6 +452,7 @@ const Viewer = memo(() => {
                   { backgroundColor: theme.colors?.controlBgActive }
                 ]}
                 containerBorderRadius={0}
+                // @ts-ignore
                 buttons={tabButtons}
                 selectedIndex={tabIndex}
                 onPress={selectedIndexChange}

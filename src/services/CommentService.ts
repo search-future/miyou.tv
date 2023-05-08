@@ -59,7 +59,6 @@ export default class CommentService {
         email: this.email,
         password: this.password
       },
-      paramsSerializer: qs.stringify,
       transformRequest: data => qs.stringify(data)
     };
 
@@ -86,7 +85,6 @@ export default class CommentService {
         url: `${CommentService.apiUrl}/${path}`,
         params: {},
         data: {},
-        paramsSerializer: qs.stringify,
         transformRequest: data => qs.stringify(data),
         headers: {
           "X-MITEYOU-AUTH-TOKEN": this.token

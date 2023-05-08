@@ -80,15 +80,15 @@ const Setup = () => {
   const back = useCallback(() => {
     navigation.goBack();
   }, []);
-  const onBackendChanged = useCallback(data => {
+  const onBackendChanged = useCallback((data: any) => {
     dispatch(SettingActions.update("backend", data));
     hasBackendChanges.current = true;
   }, []);
-  const onMoritapoChanged = useCallback(data => {
+  const onMoritapoChanged = useCallback((data: any) => {
     dispatch(SettingActions.update("comment", data));
     hasMoritapoChanges.current = true;
   }, []);
-  const onViewChanged = useCallback(data => {
+  const onViewChanged = useCallback((data: any) => {
     dispatch(SettingActions.update("view", data));
   }, []);
 
@@ -1370,6 +1370,6 @@ const styles = StyleSheet.create({
   },
   inputWrapper: {
     borderWidth: 1,
-    height: 36
+    height: Platform.OS === "web" ? 36 : 60
   }
 });

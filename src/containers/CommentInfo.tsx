@@ -66,7 +66,7 @@ type State = RootState & {
 
 const CommentInfo = memo(() => {
   const listRef = useRef<FlatList<CommentData>>(null);
-  const updaterId = useRef<number>();
+  const updaterId = useRef<NodeJS.Timeout>();
   const lastUpdate = useRef(0);
 
   const dispatch = useDispatch();
@@ -464,7 +464,7 @@ const CommentListItem = memo(
       }
     }, [props, onSelect]);
     const anchorRenderer = useCallback(
-      ({ index, comment }) => (
+      ({ index, comment }: {index: number, comment: CommentData}) => (
         <TouchableOpacity
           key={index}
           style={[

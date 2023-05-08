@@ -19,15 +19,14 @@ import {
   StyleProp,
   TextStyle
 } from "react-native";
-import { Picker } from "@react-native-community/picker";
-import { IconObject } from "react-native-elements";
+import { Picker } from "@react-native-picker/picker";
 
 type Props = {
   containerStyle?: StyleProp<ViewStyle>;
   style?: StyleProp<ViewStyle>;
   itemStyle?: StyleProp<TextStyle>;
   color?: string;
-  icon?: IconObject;
+  icon?: JSX.Element;
   items?: { label: string; value: number | string }[];
   selectedValue?: number | string;
   onValueChange?: (value: number | string) => void;
@@ -63,17 +62,16 @@ const itemRenderer = (
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: "center",
     backgroundColor: "#ffffff",
     flexDirection: "row"
   },
   iconWrapper: {
     alignItems: "center",
+    justifyContent: "center",
     width: 32
   },
   picker: {
     borderWidth: 0,
-    flex: 1,
-    height: 32
+    flex: 1
   }
 });

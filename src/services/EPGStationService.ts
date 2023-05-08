@@ -539,7 +539,6 @@ export default class EPGStationService extends BackendService {
       headers: this.getAuthHeaders(),
       params: {},
       data: {},
-      paramsSerializer: qs.stringify,
       transformRequest: data => qs.stringify(data),
       responseType: "json",
       ...config
