@@ -31,7 +31,6 @@ import {
 } from "react-native";
 import { Input, ListItem, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
-import DocumentPicker from "react-native-document-picker";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
@@ -149,7 +148,9 @@ const FileLoader = memo(() => {
           },
           { name: "All", extensions: ["*"] }
         ],
-        default: [DocumentPicker.types.video, DocumentPicker.types.allFiles]
+        ios: ["video/*", "*/*"],
+        android: ["public.movie", "public.item"],
+        default: ["mp4", "*"]
       })
     });
     if (uris) {
