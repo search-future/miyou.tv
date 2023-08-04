@@ -140,18 +140,16 @@ const FileLoader = memo(() => {
   const selectFile = useCallback(async () => {
     const uris = await fileSelector({
       multiSelections: true,
-      type: Platform.select({
-        web: [
-          {
-            name: "Movies",
-            extensions: ["mp4", "mkv", "m2ts", "ts"]
-          },
-          { name: "All", extensions: ["*"] }
-        ],
-        ios: ["video/*", "*/*"],
-        android: ["public.movie", "public.item"],
-        default: ["mp4", "*"]
-      })
+      type:
+        Platform.OS === "web"
+          ? [
+              {
+                name: "Movies",
+                extensions: ["mp4", "mkv", "m2ts", "ts"]
+              },
+              { name: "All", extensions: ["*"] }
+            ]
+          : ["video/*", "*/*"]
     });
     if (uris) {
       dispatch(FileActions.add(uris));
