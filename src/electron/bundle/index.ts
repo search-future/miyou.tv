@@ -12,7 +12,6 @@ limitations under the License.
 */
 
 import { ipcMain, shell } from "electron";
-import ElectronStore from "electron-store";
 
 import "./dialog";
 import "./win";
@@ -32,5 +31,3 @@ ipcMain.handle("devtool-toggle", ({ sender }) => {
 ipcMain.handle("open-external", (event, url: string) => {
   shell.openExternal(url);
 });
-
-ElectronStore.initRenderer();

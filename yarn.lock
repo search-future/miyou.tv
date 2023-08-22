@@ -8353,11 +8353,6 @@ rechoir@^0.7.0:
   dependencies:
     resolve "^1.9.0"
 
-redux-persist-electron-storage@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/redux-persist-electron-storage/-/redux-persist-electron-storage-2.1.0.tgz#8e9c2d4aeb451a5e00786456efed2f3d3f03dfa8"
-  integrity sha512-8VhAttDPqrwZlGIiHB3/PzZZChCliom8qcex8Q+eW3lHpSMkbqAaYpoedRm29e3FoVnan3VT+UV22NGFXKPmCg==
-
 redux-persist-transform-encrypt@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/redux-persist-transform-encrypt/-/redux-persist-transform-encrypt-4.0.0.tgz#f635268667b5a047930e48a9fe52a9207a2eef75"

@@ -13,7 +13,6 @@ limitations under the License.
 
 import { existsSync } from "fs";
 import { ipcRenderer } from "electron";
-import createElectronStorage from "redux-persist-electron-storage";
 
 const utils = {
   fileExists: existsSync,
@@ -30,7 +29,6 @@ const utils = {
   openExternal: (url: string) => {
     ipcRenderer.invoke("open-external", url);
   },
-  createElectronStorage
 };
 
 export default utils;

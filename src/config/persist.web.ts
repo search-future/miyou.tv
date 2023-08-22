@@ -11,17 +11,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { persistSecretKey } from "../config/constants";
+import localStorage from "redux-persist/es/storage";
+import { encryptTransform } from "redux-persist-transform-encrypt";
 
-const storage = window.utils.createElectronStorage({
-  electronStoreOpts: {
-    encryptionKey: persistSecretKey
-  }
-});
+import { persistSecretKey } from "../config/constants";
 
 export const persistConfig = {
   key: "root",
-  storage,
-  whitelist: ["nav", "setting"]
+  storage: localStorage,
+  whitelist: ["nav", "setting"],
+  transforms: [
+    encryptTransform({
+      secretKey: persistSecretKey
+    })
+  ]
 };
 export default persistConfig;
