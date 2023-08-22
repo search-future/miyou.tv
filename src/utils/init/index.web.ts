@@ -47,9 +47,15 @@ export default function init(store: Store) {
 
     (async () => {
       const argv = await window.utils.getArgv();
-      const paths = argv
-        .slice(1)
-        .filter(a => a !== "." && window.utils.fileExists(a));
+      const paths: string[] = [];
+      for (let i = 1; i < argv.length; i++) {
+        const path = argv[i];
+        if (path !== ".") {
+          if (await window.utils.fileExists(path)) {
+            paths.push(path);
+          }
+        }
+      }
       if (paths.length > 0) {
         store.dispatch(FileActions.add(paths.map(path => `file://${path}`)));
       }
@@ -73,7 +79,7 @@ export default function init(store: Store) {
 
   if (boundsSettingName) {
     const { setting } = store.getState();
-    let boundsDispatcherId: number;
+    let boundsDispatcherId: NodeJS.Timeout;
     const windowBoundsDispatcher = async () => {
       if (boundsDispatcherId != null) {
         clearTimeout(boundsDispatcherId);

@@ -11,11 +11,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { existsSync } from "fs";
 import { ipcRenderer } from "electron";
 
 const utils = {
-  fileExists: existsSync,
+  fileExists: (path: string) => ipcRenderer.invoke("file-exists", path),
   getArgv: () => ipcRenderer.invoke("argv") as Promise<string[]>,
   toggleDevTools: () => {
     ipcRenderer.invoke("devtool-toggle");

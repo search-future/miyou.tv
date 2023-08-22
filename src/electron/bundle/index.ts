@@ -19,6 +19,11 @@ import "./powerSaveBlocker";
 import "./download";
 import "./ipc";
 import "./viewer";
+import { existsSync } from "fs";
+
+ipcMain.handle("file-exists", (event, path: string) => {
+  return existsSync(path);
+});
 
 ipcMain.handle("argv", () => {
   return process.argv;
