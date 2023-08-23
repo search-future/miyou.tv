@@ -369,7 +369,7 @@ app.commandLine.appendSwitch("no-sandbox");
 app.commandLine.appendSwitch("ignore-gpu-blacklist");
 app.commandLine.appendSwitch(
   "register-pepper-plugins",
-  `${pluginPath};application/x-mpvjs`
+  `${pluginPath};application/x-ppapi-tests`
 );
 app.commandLine.appendSwitch(
   "js-flags",

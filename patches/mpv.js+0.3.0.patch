@@ -1,15 +1,23 @@
 diff --git a/node_modules/mpv.js/index.js b/node_modules/mpv.js/index.js
-index f67ceaa..fc8bfb9 100644
+index f67ceaa..209ac5e 100644
 --- a/node_modules/mpv.js/index.js
 +++ b/node_modules/mpv.js/index.js
-@@ -5,7 +5,6 @@
-
+@@ -5,14 +5,13 @@
+ 
  "use strict";
-
+ 
 -const path = require("path");
  const React = require("react");
  const PropTypes = require("prop-types");
-
+ 
+ /**
+  * The MIME type associated with mpv.js plugin.
+  */
+-const PLUGIN_MIME_TYPE = "application/x-mpvjs";
++const PLUGIN_MIME_TYPE = "application/x-ppapi-tests";
+ 
+ function containsNonASCII(str) {
+   for (let i = 0; i < str.length; i++) {
 @@ -31,6 +30,7 @@ function containsNonASCII(str) {
   * @throws {Error} Resulting path contains non-ASCII characters.
   */
