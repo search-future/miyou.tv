@@ -1,54 +1,53 @@
 # MiyouTV
 
-MiyouTV は録画した地上波/BS/CS テレビ放送と２ちゃんねるの実況スレのコメントを同期して再生できるシステムです。
+MiyouTVは録画した地上波/BS/CSテレビ放送と２ちゃんねるの実況スレのコメントを同期して再生できるシステムです。
 
 ## Description
 
-MiyouTV のシステムは録画バックエンドと番組データを取得して再生するアプリケーションから構成されます。
+MiyouTVのシステムは録画バックエンドと番組データを取得して再生するアプリケーションから構成されます。
 
 ### 録画バックエンド
 
-ガラポン TV、または Chinachu や EPGStation と Mirakurun が導入されている Linux 環境が必須です。
+ガラポンTV、またはChinachuやEPGStationとMirakurun(またはmirackのタイムシフト録画)が導入されているLinux環境が必須です。
 
-### 再生アプリケーション miyoutv が動作するクライアント PC(以降「クライアント PC」)
+### 再生アプリケーションmiyoutvが動作するクライアント端末(以降「クライアント端末」)
 
-Linux、Windows、macOS に対応しています。モリタポアカウントを設定することでコメントを再生することができます。
+Linux、Windows、macOS、Android、iOSに対応しています。モリタポアカウントを設定することでコメントを再生することができます。
 
-クライアント PC は Chinachu が実行されている PC でも大丈夫です。また、全録サーバーを LAN の何処かに置き、クライアント PC で再生するといった使い方ができます。
+クライアント端末はChinachuやEPGStationが実行されているPCでも大丈夫です。また、全録サーバーをLANの何処かに置き、クライアント端末で再生するといった使い方ができます。
 
 ## Demo
 
 | ![](https://search-future.github.io/miyou.tv/demo-player.png) | ![](https://search-future.github.io/miyou.tv/demo-search.png) | ![](https://search-future.github.io/miyou.tv/demo-programs.png) | ![](https://search-future.github.io/miyou.tv/demo-recorded.png) |
-| ------------------------------------------------------------- | ------------------------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------- |
-
+| --- | --- | --- | --- |
 
 ## Software which this repository includes
 
 ### miyoutv
 
-コメントを表示できるテレビ番組再生フロントエンドアプリケーションです。
-バックエンドが録画した番組情報、または、miyoutv-agent が収集した番組表を利用できます。
+コメントを表示できるテレビ番組再生フロントエンドアプリケーションです。バックエンドが録画した番組情報、または、miyoutv-agentが収集した番組表を利用できます。
 
 ### miyoutv-agent
 
-Chinachu beta での全録を支援するプログラムです。以下の機能を持ちます。
+Chinachu betaでの全録を支援するプログラムです。以下の機能を持ちます。
 
-- Mirakurun から番組表を収集
+- Mirakurunから番組表を収集
 - 時間単位での全録予約
 - 古くなったファイルの削除
-- Chinachu スケジューラーの実行
+- Chinachuスケジューラーの実行
 
-**Chinachu gamma では使用できません。Chinachu gamma ではルール作成で全録できるルールを設定してください。その場合、EPG ベースの全録となります。**
+**Chinachu gammaでは使用できません。Chinachu gammaではルール作成で全録できるルールを設定してください。その場合、EPGベースの全録となります。**
 
 ## Requirement
 
 ### miyoutv
 
-- [ガラポン TV](http://garapon.tv/)
+- [ガラポンTV](http://garapon.tv/)
 - [Chinachu](https://github.com/Chinachu/Chinachu)
 - [EPGStation](https://github.com/l3tnun/EPGStation)
+- [Mirakc](https://github.com/mirakc/mirakc)(タイムシフト録画)
 
-バックエンドとして、ガラポン TV、Chinachu(β/γ)、EPGStation のいずれかが必要です。
+バックエンドとして、ガラポン TV、Chinachu(β/γ)、EPGStation、mirakc(タイムシフト録画)のいずれかが必要です。
 
 ### miyoutv(Linux)
 
@@ -56,7 +55,7 @@ Chinachu beta での全録を支援するプログラムです。以下の機能
 - `$ sudo dnf install mpv-libs # CentOS8/Fedora`
 - `$ sudo yum install mpv-libs # CentOS7`
 
-libmpv のインストールが必要です。CentOS や Fedora では事前に[RPM Fusion リポジトリを導入する](https://rpmfusion.org/Configuration)などの対応を行ってください。
+libmpvのインストールが必要です。CentOSやFedoraでは事前に[RPM Fusionリポジトリを導入する](https://rpmfusion.org/Configuration)などの対応を行ってください。
 
 ### miyoutv-agent
 
@@ -65,12 +64,11 @@ libmpv のインストールが必要です。CentOS や Fedora では事前に[
 - [Node.js](http://nodejs.org/) `>=6.2.0`
 - [PM2](http://pm2.keymetrics.io/) `>=2.0.12`
 
-Chinachu *beta*と Mirakurun が導入されている環境で動作します。
+Chinachu *beta*とMirakurunが導入されている環境で動作します。
 
 ## Installation
 
-MiyouTV のシステムは**番組再生アプリケーションの miyoutv**と**録画バックエンド**から構成されています。
-miyoutv はガラポン TV と Chinachu と EPGStation のクライアントとして動作します。EPG に依存しない全録システムを構築するには Chinachu beta と miyoutv-agent が必要です。
+MiyouTVのシステムは**番組再生アプリケーションのmiyoutv**と**録画バックエンド**から構成されています。miyoutvはガラポンTVとChinachuとEPGStationのクライアントとして動作します。EPGに依存しない全録システムを構築するにはChinachu betaとmiyoutv-agentが必要です。
 
 ### Download
 
@@ -78,11 +76,11 @@ miyoutv はガラポン TV と Chinachu と EPGStation のクライアントと�
 
 ### miyoutv(Linux, AppImage)
 
-ダウンロードした AppImage ファイルを実行してください。事前に libmpv のインストールが必要です。
+ダウンロードしたAppImageファイルを実行してください。事前にlibmpvのインストールが必要です。
 
 ### miyoutv(Linux, tar.gz)
 
-アーカイブファイルを展開されたディレクトリ内の miyoutv を実行してください。
+アーカイブファイルを展開されたディレクトリ内のmiyoutvを実行してください。
 
 ```
 $ tar xzf miyoutv-v*.*.*.tar.gz
@@ -99,11 +97,11 @@ $ mv miyoutv-v*.*.* miyoutv
 
 ### miyoutv-agent(Linux)
 
-**miyoutv-agent は Chinachu beta 専用です。Chinachu gamma で全録するにはルールを作成してください。**
+**miyoutv-agentはChinachu beta専用です。Chinachu gammaで全録するにはルールを作成してください。**
 
-1. miyoutv-agent パッケージを任意のディレクトリに展開してください。
-2. config.sample.json を config.json にコピーして、編集します。
-3. pm2-install を実行します。
+1. miyoutv-agentパッケージを任意のディレクトリに展開してください。
+2. config.sample.jsonをconfig.jsonにコピーして、編集します。
+3. pm2-installを実行します。
 
 ```
 $ cd miyoutv-agent
@@ -149,10 +147,9 @@ channel: 27
 ## Usage
 
 1. インストーラーを実行、またはアーカイブを展開します。
-2. 展開された MiyouTV を実行します。
+2. 展開されたMiyouTVを実行します。
 3. バックエンドの設定をします。
-4. コメントを表示するにはモリタポアカウントを設定します。
-   モリタポアカウントは<http://moritapo.jp/>から取得できます。
+4. コメントを表示するにはモリタポアカウントを設定します。モリタポアカウントは<http://moritapo.jp/>から取得できます。
 5. 次回以降の設定は上部ナビゲーションの設定ボタンから開きます。
 6. 番組表にコメントカウントが表示されます。上部ナビゲーションから番組一覧やランキングへの切り替えができます。
 7. 番組を選択すると番組詳細が表示されます。
@@ -160,9 +157,9 @@ channel: 27
 
 ## Build
 
-ビルドには Node.js と Yarn のインストールが必要です。
+ビルドにはNode.jsとYarnのインストールが必要です。
 
-ガラポン TV 機能を有効にするにはガラポン API のデベロッパー ID が必要です。
+ガラポンTV機能を有効にするにはガラポンAPIのデベロッパーIDが必要です。
 
 ```
 $ echo GARAPON_DEVID=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX >> .env.local
@@ -170,13 +167,13 @@ $ echo GARAPON_DEVID=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX >> .env.local
 
 ### for Desktop
 
-macOS は Homebrew で mpv をインストールしてください。
+macOSはHomebrewでmpvをインストールしてください。
 
 ```
 $ brew install mpv
 ```
 
-Windows は libmpv をダウンロードしてください。
+Windowsはlibmpvをダウンロードしてください。
 
 ```
 $ yarn download-mpv
@@ -186,6 +183,16 @@ $ yarn download-mpv
 $ yarn
 $ yarn collect-mpv
 $ yarn dist-electron
+```
+
+最新版の[mpv.js](https://github.com/Kagami/mpv.js/)を利用する場合は環境に合わせたディレクトリにビルドしたmpvjs.nodeを配置します。
+
+```
+$ mkdir -p mpv/<platform>-<arch>/ # win-x64 or win-ia32 or linux-x64 or darwin-x64 or darwin-arm64
+$ cp -a /path/to/mpvjs.node mpv/<platform>-<arch>/
+$ yarn download-mpv latest # for Windows
+$ yarn collect-mpv
+$ ./collect-dylib-deps.sh # Apple silicon
 ```
 
 ### for Android
