@@ -22,18 +22,30 @@ for (const filename of prebuilds) {
       throw e;
     }
   }
-  tar.x({ cwd, file, strip: 2, sync: true });
+  if (!fs.existsSync(`${cwd}/mpvjs.node`)) {
+    tar.x({ cwd, file, strip: 2, sync: true });
+  }
 }
 
-if (fs.existsSync("mpv/libmpv/x64/mpv-1.dll") && fs.existsSync("mpv/win-x64")) {
-  fs.copyFileSync("mpv/libmpv/x64/mpv-1.dll", "mpv/win-x64/mpv-1.dll");
+if (fs.existsSync("mpv/win-x64")) {
+  if (fs.existsSync("mpv/libmpv/x64/mpv-1.dll")) {
+    fs.copyFileSync("mpv/libmpv/x64/mpv-1.dll", "mpv/win-x64/mpv-1.dll");
+  }
+  if (fs.existsSync("mpv/libmpv/x64/libmpv-2.dll")) {
+    fs.copyFileSync("mpv/libmpv/x64/libmpv-2.dll", "mpv/win-x64/libmpv-2.dll");
+  }
 }
 
-if (
-  fs.existsSync("mpv/libmpv/ia32/mpv-1.dll") &&
-  fs.existsSync("mpv/win-ia32/")
-) {
-  fs.copyFileSync("mpv/libmpv/ia32/mpv-1.dll", "mpv/win-ia32/mpv-1.dll");
+if (fs.existsSync("mpv/win-ia32/")) {
+  if (fs.existsSync("mpv/libmpv/ia32/mpv-1.dll")) {
+    fs.copyFileSync("mpv/libmpv/ia32/mpv-1.dll", "mpv/win-ia32/mpv-1.dll");
+  }
+  if (fs.existsSync("mpv/libmpv/ia32/libmpv-2.dll")) {
+    fs.copyFileSync(
+      "mpv/libmpv/ia32/libmpv-2.dll",
+      "mpv/win-ia32/libmpv-2.dll"
+    );
+  }
 }
 
 if (process.platform === "win32") {
@@ -42,7 +54,9 @@ if (process.platform === "win32") {
     __dirname,
     "node_modules/mpv.js/build/Release/mpv-1.dll"
   );
-  fs.copyFileSync(src, dest);
+  if (fs.existsSync(src)) {
+    fs.copyFileSync(src, dest);
+  }
 }
 
 if (process.platform === "darwin") {

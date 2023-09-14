@@ -355,6 +355,13 @@ try {
   }
   if (!fs.existsSync(pluginPath)) {
     pluginPath = path.resolve(
+      `mpv/${process.platform.replace("win32", "win")}-${
+        process.arch
+      }/mpvjs.node`
+    );
+  }
+  if (!fs.existsSync(pluginPath)) {
+    pluginPath = path.resolve(
       path.dirname(require.resolve("mpv.js")) || "node_modules/mpv.js/",
       "build/Release/mpvjs.node"
     );
