@@ -30,7 +30,7 @@ const App = () => (
     <PersistGate
       loading={<Splash />}
       onBeforeLift={onBeforeLift}
-      persistor={persistor as any}
+      persistor={persistor}
     >
       <ThemeProvider>
         <AppNavigator />

@@ -120,10 +120,10 @@ const CommentPlayer = memo(() => {
     () => program.recorded?.[extraIndex] || program,
     [program, extraIndex]
   );
-  const height = useMemo(() => containerHeight / (lines.current.length + 1), [
-    containerHeight,
-    lines.current.length
-  ]);
+  const height = useMemo(
+    () => containerHeight / (lines.current.length + 1),
+    [containerHeight, lines.current.length]
+  );
   const fontSize = useMemo(() => (height * 2) / 3, [height]);
 
   useEffect(

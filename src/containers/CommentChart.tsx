@@ -20,7 +20,12 @@ import React, {
   useRef,
   useMemo
 } from "react";
-import { View, StyleSheet, LayoutChangeEvent } from "react-native";
+import {
+  View,
+  StyleSheet,
+  DimensionValue,
+  LayoutChangeEvent
+} from "react-native";
 import { ThemeContext } from "react-native-elements";
 import { Svg, Path } from "react-native-svg";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
@@ -171,7 +176,7 @@ const PeakBalloon = memo(
   }: {
     count: number;
     time: number;
-    left: string | number;
+    left: DimensionValue;
     onPress?: (time: number) => void;
   }) => {
     const onPressHandler = useCallback(() => {

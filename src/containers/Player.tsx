@@ -272,7 +272,7 @@ const Player = () => {
     if (reset) {
       setReset(false);
       if (time > 0) {
-        preseek.current = time
+        preseek.current = time;
       }
     }
   }, [reset]);

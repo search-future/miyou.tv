@@ -112,9 +112,8 @@ export default class MirakcTimeshiftService extends BackendService {
   }
 
   async getChannels() {
-    const recorders: MirakcTimeshiftRecorder[] = await this.request(
-      "/api/timeshift"
-    );
+    const recorders: MirakcTimeshiftRecorder[] =
+      await this.request("/api/timeshift");
     return recorders.map(({ service: { channel, name, serviceId } }) => ({
       type: channel.type,
       channel: String(serviceId),
@@ -134,9 +133,8 @@ export default class MirakcTimeshiftService extends BackendService {
     end
   }: SearchOptions) {
     const programs: Program[] = [];
-    const recorders: MirakcTimeshiftRecorder[] = await this.request(
-      "/api/timeshift"
-    );
+    const recorders: MirakcTimeshiftRecorder[] =
+      await this.request("/api/timeshift");
     for (const { name: recorderName, service } of recorders) {
       if (
         (type == null || service.channel.type === type) &&

@@ -254,9 +254,8 @@ export default class ChinachuService extends BackendService {
     start,
     end
   }: SearchOptions = {}) {
-    const recorded: RecordedProgram[] = await this.request(
-      "/api/recorded.json"
-    );
+    const recorded: RecordedProgram[] =
+      await this.request("/api/recorded.json");
     const archive: {
       channels: ArchiveChannel[];
       programs: ArchiveProgram[];
@@ -444,9 +443,8 @@ export default class ChinachuService extends BackendService {
     start,
     end
   }: SearchOptions = {}) {
-    const recorded: RecordedProgram[] = await this.request(
-      "/api/recorded.json"
-    );
+    const recorded: RecordedProgram[] =
+      await this.request("/api/recorded.json");
     const programs = recorded.filter(
       program =>
         (keyword == null ||
@@ -474,9 +472,8 @@ export default class ChinachuService extends BackendService {
   }
 
   async getArchiveChannels() {
-    const recorded: RecordedProgram[] = await this.request(
-      "/api/recorded.json"
-    );
+    const recorded: RecordedProgram[] =
+      await this.request("/api/recorded.json");
     const {
       channels: archiveChannels
     }: {
@@ -512,9 +509,8 @@ export default class ChinachuService extends BackendService {
   }
 
   async getRecordedChannels() {
-    const recorded: RecordedProgram[] = await this.request(
-      "/api/recorded.json"
-    );
+    const recorded: RecordedProgram[] =
+      await this.request("/api/recorded.json");
     const channels: {
       type: string;
       channel: string;

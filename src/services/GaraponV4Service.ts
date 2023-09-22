@@ -20,7 +20,6 @@ import BackendService, {
   Channel,
   Program
 } from "./BackendService";
-import moment from "../utils/moment-with-locale";
 
 type GaraponSiteLoginResult = {
   status: GaraponStatusCode;
@@ -286,13 +285,12 @@ export default class GaraponV4Service extends BackendService {
   }
 
   async getChannels({} = {}) {
-    const {
-      data: recordedChannels
-    }: GaraponRecordedChannelResult = await this.request("Tuner/", {
-      data: {
-        action: "getrecch"
-      }
-    });
+    const { data: recordedChannels }: GaraponRecordedChannelResult =
+      await this.request("Tuner/", {
+        data: {
+          action: "getrecch"
+        }
+      });
     const results: {
       hits: number;
       programs: Program[];

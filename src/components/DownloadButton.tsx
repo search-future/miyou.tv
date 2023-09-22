@@ -117,7 +117,7 @@ const DownloadButton = ({
       taskRef.current = ReactNativeBlobUtil.config(config)
         .fetch("GET", uri)
         .progress((received, total) => {
-          setProgress({ received, total });
+          setProgress({ received: parseInt(received), total: parseInt(total) });
         });
       setStatus("started");
       const response = await taskRef.current;

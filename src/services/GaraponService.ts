@@ -198,15 +198,8 @@ export default class GaraponService extends BackendService {
       return {
         hits: parseInt(result.hit, 10),
         programs: result.program.map(program => {
-          const {
-            gtvid,
-            startdate,
-            ch,
-            title,
-            description,
-            genre,
-            bc
-          } = program;
+          const { gtvid, startdate, ch, title, description, genre, bc } =
+            program;
           const duration = GaraponService.parseDuration(program.duration);
           const start = new Date(startdate.replace(" ", "T") + "+09:00");
           const end = new Date(start.getTime() + duration);

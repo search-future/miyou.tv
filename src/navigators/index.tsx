@@ -30,10 +30,10 @@ const AppNavigator = () => {
 
   const { replaceTheme } = useContext(ThemeContext);
 
-  const colorScheme = useMemo(() => configColorScheme || systemColorScheme, [
-    configColorScheme,
-    systemColorScheme
-  ]);
+  const colorScheme = useMemo(
+    () => configColorScheme || systemColorScheme,
+    [configColorScheme, systemColorScheme]
+  );
 
   useEffect(() => {
     replaceTheme(getTheme(colorScheme));

@@ -121,7 +121,7 @@ const Player = memo(() => {
   const path = useRef("");
   const seekable = useRef(false);
   const pcrWraparound = useRef(true);
-  const seekId = useRef<number | null>(null);
+  const seekId = useRef<NodeJS.Timeout | null>(null);
 
   const dispatch = useDispatch();
   const backendType = useSelector<State, string>(

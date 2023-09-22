@@ -12,7 +12,10 @@ limitations under the License.
 */
 
 import { createRef } from "react";
-import { NavigationContainerRef } from "@react-navigation/native";
+import {
+  NavigationContainerRef,
+  ParamListBase
+} from "@react-navigation/native";
 
-const navigationRef = createRef<NavigationContainerRef<{}>>();
+const navigationRef = createRef<NavigationContainerRef<ParamListBase>>();
 export default navigationRef;

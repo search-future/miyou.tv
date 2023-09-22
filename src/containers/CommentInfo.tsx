@@ -211,7 +211,7 @@ const CommentInfo = memo(() => {
     [filters]
   );
   const getListItemLayout = useCallback(
-    (data: CommentData[] | null | undefined, index: number) => ({
+    (data: ArrayLike<CommentData> | null | undefined, index: number) => ({
       index,
       length: 58,
       offset: index * 58
@@ -464,7 +464,7 @@ const CommentListItem = memo(
       }
     }, [props, onSelect]);
     const anchorRenderer = useCallback(
-      ({ index, comment }: {index: number, comment: CommentData}) => (
+      ({ index, comment }: { index: number; comment: CommentData }) => (
         <TouchableOpacity
           key={index}
           style={[

@@ -26,7 +26,7 @@ ipcMain.handle("dispatch-main", (event, data: string) => {
 ipcMain.handle("dispatch-child", (event, data: string) => {
   const [win = null] = BrowserWindow.getAllWindows()
     .sort(({ id: a }, { id: b }) => a - b)
-    .slice(1)
+    .slice(1);
   win?.webContents.send("dispatch", data);
 });
 ipcMain.handle("dispatch-view", ({ sender }, data: string) => {

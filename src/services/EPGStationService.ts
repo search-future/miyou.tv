@@ -217,9 +217,8 @@ export default class EPGStationService extends BackendService {
       ...BackendService.parseQuery(query),
       ...options
     };
-    const channels: EPGStationServiceItem[] = await this.request(
-      "/api/channels"
-    );
+    const channels: EPGStationServiceItem[] =
+      await this.request("/api/channels");
 
     const params: EPGStationSearchParams = {};
     params.limit = 2 ** 31 - 1;
@@ -360,9 +359,8 @@ export default class EPGStationService extends BackendService {
       ...BackendService.parseQuery(query),
       ...options
     };
-    const channels: EPGStationV2ChannnelItem[] = await this.request(
-      "/api/channels"
-    );
+    const channels: EPGStationV2ChannnelItem[] =
+      await this.request("/api/channels");
 
     const params: EPGStationV2SearchParams = {
       isHalfWidth: true,
@@ -502,9 +500,8 @@ export default class EPGStationService extends BackendService {
         }
       }
     } else {
-      const result: EPGStationServiceItem[] = await this.request(
-        "/api/channels"
-      );
+      const result: EPGStationServiceItem[] =
+        await this.request("/api/channels");
       for (const { id, channelType, name } of result) {
         const { total }: EPGStationRecordedPrograms = await this.request(
           "/api/recorded",

@@ -23,7 +23,6 @@ import React, {
 import {
   FlatList,
   Switch,
-  TouchableOpacity,
   View,
   StyleSheet,
   Platform,
@@ -34,13 +33,7 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent
 } from "react-native";
-import {
-  Badge,
-  colors,
-  ListItem,
-  Text,
-  ThemeContext
-} from "react-native-elements";
+import { Badge, ListItem, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
@@ -98,8 +91,9 @@ const ProgramRanking = memo(() => {
   const lastUpdate = useRef(Date.now());
   const scrollPos = useRef(0);
   const headerHeightRef = useRef(256);
-  const headerHeight = useRef(new Animated.Value(headerHeightRef.current))
-    .current;
+  const headerHeight = useRef(
+    new Animated.Value(headerHeightRef.current)
+  ).current;
   const viewX = useRef(new Animated.Value(0)).current;
 
   const dispatch = useDispatch();

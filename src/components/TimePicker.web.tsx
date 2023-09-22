@@ -44,12 +44,14 @@ const TimePicker = ({
   const [className] = useState(`timepicker-${Date.now().toString(36)}`);
 
   const inputValue = useMemo(() => moment(value).format("HH:mm"), [value]);
-  const inputMin = useMemo(() => minDate && moment(minDate).format("HH:mm"), [
-    minDate
-  ]);
-  const inputMax = useMemo(() => maxDate && moment(maxDate).format("HH:mm"), [
-    maxDate
-  ]);
+  const inputMin = useMemo(
+    () => minDate && moment(minDate).format("HH:mm"),
+    [minDate]
+  );
+  const inputMax = useMemo(
+    () => maxDate && moment(maxDate).format("HH:mm"),
+    [maxDate]
+  );
   const cssStyles = useMemo(
     () => `
     .${className}::-webkit-calendar-picker-indicator {

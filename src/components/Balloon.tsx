@@ -65,7 +65,7 @@ const Balloon = ({
       onPress || onLongPress ? (
         <TouchableOpacity {...props} />
       ) : (
-        <View {...props} />
+        <View {...(props as ViewProps)} />
       ),
     [onPress, onLongPress]
   );

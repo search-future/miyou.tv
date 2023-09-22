@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import { Platform, NativeModules } from "react-native";
-import "moment/locale/ja"
+import "moment/locale/ja";
 import m from "moment";
 
 const moment = m;

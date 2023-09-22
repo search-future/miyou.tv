@@ -13,7 +13,6 @@ limitations under the License.
 
 import { Colors } from "react-native-elements";
 
-
 const light: Partial<Colors> = {
   primary: "#9991ff",
   disabled: "#808080",

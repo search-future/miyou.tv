@@ -27,7 +27,7 @@ const utils = {
   },
   openExternal: (url: string) => {
     ipcRenderer.invoke("open-external", url);
-  },
+  }
 };
 
 export default utils;

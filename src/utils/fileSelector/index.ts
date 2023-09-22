@@ -29,7 +29,10 @@ export default async function fileSelector({
       allowMultiSelection: multiSelections
     });
 
-    return result.map(({ fileCopyUri, uri }) => fileCopyUri?.replace(/file:\/*/, "file:///") || uri);
+    return result.map(
+      ({ fileCopyUri, uri }) =>
+        fileCopyUri?.replace(/file:\/*/, "file:///") || uri
+    );
   } catch (e) {
     if (DocumentPicker.isCancel(e)) {
       return;
