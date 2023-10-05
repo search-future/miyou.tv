@@ -86,7 +86,7 @@
     "babel-plugin-transform-inline-environment-variables": "^0.4.4",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "cross-env": "^7.0.3",
-    "electron": "^22.3.24",
+    "electron": "^22.3.25",
     "electron-builder": "^24.6.5",
     "electron-notarize": "^1.2.1",
     "electron-reload": "^1.5.0",
