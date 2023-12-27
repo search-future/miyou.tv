@@ -1157,8 +1157,7 @@ const styles = StyleSheet.create({
     overflow: "hidden"
   },
   menuButton: {
-    height: 32,
-    flex: 1
+    height: "100%"
   },
   menuButtonIcon: {
     alignItems: "center",

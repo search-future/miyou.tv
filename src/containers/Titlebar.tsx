@@ -230,8 +230,8 @@ const styles = StyleSheet.create({
     width: 24
   },
   icon: {
-    height: 16,
-    width: 16
+    height: "100%",
+    width: "100%"
   },
   title: {
     height: 19,

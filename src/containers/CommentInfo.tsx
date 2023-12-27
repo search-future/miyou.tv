@@ -333,8 +333,8 @@ const CommentInfo = memo(() => {
           containerStyle.container,
           styles.list,
           {
-            backgroundColor: theme.colors?.controlBgActive,
-            borderColor: theme.colors?.controlBorder
+            backgroundColor: theme.colors?.background,
+            borderColor: theme.colors?.border
           }
         ]}
         data={filteredData}
