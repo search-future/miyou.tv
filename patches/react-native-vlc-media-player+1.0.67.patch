@@ -12,10 +12,10 @@ index 146458c..6ea08f7 100644
      if (!isAsset) {
        isNetwork = true;
 diff --git a/node_modules/react-native-vlc-media-player/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerView.java b/node_modules/react-native-vlc-media-player/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerView.java
-index 4a25e2b..6dc9fc6 100644
+index 63ebf81..dbd6a65 100644
 --- a/node_modules/react-native-vlc-media-player/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerView.java
 +++ b/node_modules/react-native-vlc-media-player/android/src/main/java/com/yuanzhou/vlc/vlcplayer/ReactVlcPlayerView.java
-@@ -437,6 +437,7 @@ class ReactVlcPlayerView extends TextureView implements
+@@ -438,6 +438,7 @@ class ReactVlcPlayerView extends TextureView implements
      private void releasePlayer() {
          if (libvlc == null)
              return;
