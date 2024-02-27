@@ -329,7 +329,6 @@ app.on("web-contents-created", (e, webContents) => {
 });
 
 const path = require("path");
-process.mainModule.paths.push(path.join(app.getPath("exe"), "../node_modules"));
 
 require("./dist/bundle.js");
 
@@ -374,6 +373,7 @@ if (process.platform !== "linux") {
 }
 app.commandLine.appendSwitch("no-sandbox");
 app.commandLine.appendSwitch("ignore-gpu-blacklist");
+app.commandLine.appendSwitch("allow-command-line-plugins");
 app.commandLine.appendSwitch(
   "register-pepper-plugins",
   `${pluginPath};application/x-ppapi-tests`
