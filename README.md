@@ -185,6 +185,14 @@ $ yarn collect-mpv
 $ yarn dist-electron
 ```
 
+macOSはパラメータを設定します。
+
+```
+$ echo APPLE_ID=example@example.com >> .env.local
+$ echo APPLE_APP_SPECIFIC_PASSWORD=xxxx-xxxx-xxxx-xxxx >> .env.local
+$ yarn dist-electron -c.mac.notarize.teamId=XXXXXXXX
+```
+
 最新版の[mpv.js](https://github.com/Kagami/mpv.js/)を利用する場合は環境に合わせたディレクトリにビルドしたmpvjs.nodeを配置します。
 
 ```
