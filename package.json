@@ -110,6 +110,7 @@
   "engines": {
     "node": ">=18"
   },
+  "packageManager": "yarn@3.6.4",
   "keywords": [
     "chinachu",
     "dtv",
@@ -132,26 +133,23 @@
     "react-native-root-siblings": "4.0.4"
   },
   "scripts": {
-    "start": "npm run env-cmd -- node node_modules/react-native/local-cli/cli.js start",
-    "android": "npm run env-cmd -- node node_modules/react-native/local-cli/cli.js run-android",
-    "ios": "npm run env-cmd -- node node_modules/react-native/local-cli/cli.js run-ios",
-    "electron": "cross-env NODE_ENV=\"development\" npm run env-cmd -- electron .",
-    "start-web": "npm run env-cmd -- webpack --mode development --color -w",
+    "start": "yarn env-cmd node node_modules/react-native/local-cli/cli.js start",
+    "android": "yarn env-cmd node node_modules/react-native/local-cli/cli.js run-android",
+    "ios": "yarn env-cmd node node_modules/react-native/local-cli/cli.js run-ios",
+    "electron": "cross-env NODE_ENV=\"development\" yarn env-cmd electron .",
+    "start-web": "yarn env-cmd webpack --mode development --color -w",
     "download-mpv": "node download-mpv.js",
     "collect-mpv": "node collect-mpv.js",
     "env-cmd": "env-cmd -f .env.local --fallback",
-    "electron-builder": "npm run env-cmd -- electron-builder",
+    "electron-builder": "yarn env-cmd electron-builder",
     "postinstall": "patch-package",
-    "prepack-electron": "npm run env-cmd -- webpack --mode production --color",
-    "pack-electron": "npm run electron-builder -- --dir",
-    "predist-electron": "npm run env-cmd -- webpack --mode production --color",
-    "dist-electron": "npm run electron-builder --",
+    "pack-electron": "yarn env-cmd webpack --mode production --color && yarn electron-builder --dir",
+    "dist-electron": "yarn env-cmd webpack --mode production --color && yarn electron-builder",
     "pack-android": "cd android/ && env-cmd -f ../.env.local --fallback ./gradlew assembleRelease",
     "dist-android": "cd android/ && env-cmd -f ../.env.local --fallback ./gradlew bundleRelease",
-    "build-agent": "npm run env-cmd -- webpack --mode production --color --config miyoutv-agent/webpack.config.js",
-    "predist-agent": "npm run build-agent",
-    "dist-agent": "node dist-agent.js",
-    "test": "npm run env-cmd -- jest",
-    "tsc": "npm run env-cmd -- tsc"
+    "build-agent": "yarn env-cmd webpack --mode production --color --config miyoutv-agent/webpack.config.js",
+    "dist-agent": "yarn build-agent && node dist-agent.js",
+    "test": "yarn env-cmd jest",
+    "tsc": "yarn env-cmd tsc"
   }
 }
