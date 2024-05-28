@@ -529,7 +529,7 @@ const ProgramTable = memo(() => {
     []
   );
   const useArchiveChange = useCallback((value: string | number) => {
-    dispatch(SettingActions.update("useArchive", value > 0));
+    dispatch(SettingActions.update("useArchive", (value as number) > 0));
   }, []);
   const startChange = useCallback((start: Date) => {
     dispatch(setStart(start));

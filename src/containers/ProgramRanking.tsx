@@ -334,7 +334,7 @@ const ProgramRanking = memo(() => {
     []
   );
   const useArchiveChange = useCallback((value: string | number) => {
-    dispatch(SettingActions.update("useArchive", value > 0));
+    dispatch(SettingActions.update("useArchive", (value as number) > 0));
   }, []);
   const targetChange = useCallback((target: string | number) => {
     dispatch(setTarget(String(target)));

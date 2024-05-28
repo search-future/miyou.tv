@@ -33,9 +33,9 @@ export {
   VIEWER_SEARCH,
   VIEWER_RESIZE,
   VIEWER_UPDATE,
-  ViewerProgram,
   ViewerActions
 } from "./actions";
+export type { ViewerProgram } from "./actions";
 export { viewerSaga } from "./saga";
 
 export type ViewerState = {

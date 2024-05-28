@@ -335,10 +335,10 @@ const ProgramList = memo(() => {
     []
   );
   const useArchiveChange = useCallback((value: string | number) => {
-    dispatch(SettingActions.update("useArchive", value > 0));
+    dispatch(SettingActions.update("useArchive", (value as number) > 0));
   }, []);
   const reverseChange = useCallback((value: string | number) => {
-    dispatch(save({ reverse: value > 0 }));
+    dispatch(save({ reverse: (value as number) > 0 }));
   }, []);
   const viewChange = useCallback((view: string | number) => {
     dispatch(save({ view: String(view) }));

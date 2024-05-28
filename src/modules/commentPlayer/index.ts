@@ -32,10 +32,9 @@ export {
   COMMENT_PLAYER_SEEK,
   COMMENT_PLAYER_FILTERS,
   COMMENT_PLAYER_AUTOSCROLL,
-  CommentPlayerActions,
-  CommentInterval,
-  CommentData
+  CommentPlayerActions
 } from "./actions";
+export type { CommentInterval, CommentData } from "./actions";
 export { commentPlayerSaga } from "./saga";
 
 export type CommentPlayerState = {

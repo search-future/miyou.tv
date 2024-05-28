@@ -24,7 +24,6 @@ import KeepAwake from "react-native-keep-awake";
 import Toast from "react-native-root-toast";
 import { useDispatch, useSelector } from "react-redux";
 import qs from "qs";
-// @ts-ignore
 import { VLCPlayer } from "react-native-vlc-media-player";
 // @ts-ignore
 import { Immersive } from "react-native-immersive";
@@ -338,6 +337,7 @@ const Player = () => {
   useEffect(() => {
     if (seekPosition != null) {
       if (vlcRef.current && seekable.current) {
+        // @ts-ignore
         vlcRef.current.seek(seekPosition);
       } else {
         dispatch(PlayerActions.time(seekPosition * duration));
@@ -484,6 +484,7 @@ const Player = () => {
         volume={volume}
         source={{
           uri,
+          // @ts-ignore
           initType: 0,
           initOptions: [...initOptions]
         }}
@@ -504,7 +505,7 @@ const Player = () => {
       rate={speed}
       muted={mute}
       volume={volume / 100}
-      source={{ uri, type: "m3u8" } as any}
+      source={{ uri, type: "m3u8" }}
       selectedAudioTrack={{ type: "index", value: audioTrack }}
       stereoPan={stereoPan}
       ref={videoRef}

@@ -33,13 +33,13 @@ import { tableSaga } from "./table";
 import { listSaga } from "./list";
 import { rankingSaga } from "./ranking";
 
-export {
+export type {
   ProgramTableData,
   ProgramTableProgram,
   ProgramTableColumn
 } from "./table";
-export { ProgramListData, ProgramListProgram } from "./list";
-export { ProgramRankingData, ProgramRankingProgram } from "./ranking";
+export type { ProgramListData, ProgramListProgram } from "./list";
+export type { ProgramRankingData, ProgramRankingProgram } from "./ranking";
 
 export {
   PROGRAM_INIT,
