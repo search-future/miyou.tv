@@ -131,7 +131,7 @@ const Player = memo(() => {
     parseInt(setting.commentPlayer?.delay || "0", 10)
   );
   const mute = useSelector<State, boolean>(
-    ({ setting }) => setting.player?.mute
+    ({ setting }) => !!setting.player?.mute
   );
   const volume = useSelector<State, number>(({ setting }) =>
     parseInt(

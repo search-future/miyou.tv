@@ -111,7 +111,7 @@ const ProgramList = memo(() => {
   const view = useSelector<State, number>(({ setting }) =>
     parseInt(setting.listOptions?.view || "25", 10)
   );
-  const reverse = useSelector<State, number>(
+  const reverse = useSelector<State, boolean>(
     ({ setting }) =>
       setting.listOptions?.reverse == null || setting.listOptions?.reverse
   );
@@ -127,7 +127,7 @@ const ProgramList = memo(() => {
   const query = useSelector<State, string>(
     ({ program }) => program.list?.query || ""
   );
-  const archiveActive = useSelector<State, SettingState>(
+  const archiveActive = useSelector<State, boolean>(
     ({ service }) => service.archiveActive
   );
   const selectedId = useSelector<State, string | undefined>(

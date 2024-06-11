@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { AnyAction } from "redux";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
   all,
   delay,
@@ -25,19 +25,56 @@ import { Platform } from "react-native";
 
 import { SettingState } from "./setting";
 import navigationRef from "../navigators/navigation";
-import { ServiceState, COMMENT_READY } from "./service";
+import { ServiceState } from "./service";
 import { Program } from "../services/BackendService";
 import moment from "../utils/moment-with-locale";
 
-export const FILE_ADD = "FILE_ADD";
-function add(uris: string[]) {
-  return {
-    type: FILE_ADD,
-    uris
-  };
-}
-function* addSaga(action: AnyAction & { uris: string[] }) {
-  const { uris } = action;
+export type FileProgram = Program;
+export type FileState = {
+  programs: FileProgram[];
+  count: number;
+};
+const initialState: FileState = {
+  programs: [],
+  count: 0
+};
+const fileSlice = createSlice({
+  name: "file",
+  initialState,
+  reducers: {
+    add: (state, action: PayloadAction<string[]>) => state,
+    append: (state, action: PayloadAction<FileProgram[]>) => {
+      const programs = [...state.programs, ...action.payload];
+      const count = state.count + action.payload.length;
+      return { programs, count };
+    },
+    update: {
+      reducer: (state, action) => {
+        const programs = [...state.programs];
+        const { id, data } = action.payload;
+        const index = programs.findIndex(a => a.id === id);
+        programs[index] = { ...programs[index], ...data };
+        return { ...state, programs };
+      },
+      prepare: (id: string, data: Partial<FileProgram>) => ({
+        payload: { id, data },
+        meta: null,
+        error: null
+      })
+    },
+    remove: (state, action: PayloadAction<string>) => {
+      const id = action.payload;
+      const programs = state.programs.filter(a => a.id !== id);
+      return { ...state, programs };
+    }
+  }
+});
+
+export const FileActions = fileSlice.actions;
+export default fileSlice.reducer;
+
+function* addSaga(action: PayloadAction<string[]>) {
+  const uris = action.payload;
   const { commentChannels }: ServiceState = yield select(
     ({ service }) => service
   );
@@ -79,17 +116,10 @@ function* addSaga(action: AnyAction & { uris: string[] }) {
     count++;
   }
   if (programs.length > 0) {
-    yield put(append(programs));
+    yield put(FileActions.append(programs));
   }
 }
 
-export const FILE_APPEND = "FILE_APPEND";
-function append(programs: FileProgram[]) {
-  return {
-    type: FILE_APPEND,
-    programs
-  };
-}
 function* appendSaga() {
   yield delay(500);
   if (navigationRef.current?.getCurrentRoute()?.name !== "file") {
@@ -97,73 +127,16 @@ function* appendSaga() {
   }
 }
 
-export const FILE_UPDATE = "FILE_UPDATE";
-function update(id: string, data: any) {
-  return {
-    type: FILE_UPDATE,
-    id,
-    data
-  };
-}
-
-export const FILE_REMOVE = "FILE_REMOVE";
-function remove(id: string) {
-  return {
-    type: FILE_REMOVE,
-    id
-  };
-}
-
-export const FileActions = {
-  add,
-  append,
-  update,
-  remove
-};
-
-export type FileProgram = Program;
-export type FileState = {
-  programs: FileProgram[];
-  count: number;
-};
-const initilalState: FileState = {
-  programs: [],
-  count: 0
-};
-export default function fileReducer(state = initilalState, action: AnyAction) {
-  switch (action.type) {
-    case FILE_APPEND: {
-      const programs = [...state.programs, ...action.programs];
-      const count = state.count + action.programs.length;
-      return { ...state, programs, count };
-    }
-    case FILE_UPDATE: {
-      const programs = [...state.programs];
-      const { id, data } = action;
-      const index = programs.findIndex(a => a.id === id);
-      programs[index] = { ...programs[index], ...data };
-      return { ...state, programs };
-    }
-    case FILE_REMOVE: {
-      const { id } = action;
-      const programs = state.programs.filter(a => a.id !== id);
-      return { ...state, programs };
-    }
-    default:
-      return state;
-  }
-}
-
 export function* fileSaga() {
   yield all([
-    takeEvery(FILE_ADD, addSaga),
-    takeLatest(FILE_APPEND, appendSaga)
+    takeEvery("file/add", addSaga),
+    takeLatest("file/append", appendSaga)
   ]);
   const { commentActive }: ServiceState = yield select(
     ({ service }) => service
   );
   if (!commentActive) {
-    yield take(COMMENT_READY);
+    yield take("service/commentReady");
     const { commentChannels }: ServiceState = yield select(
       ({ service }) => service
     );

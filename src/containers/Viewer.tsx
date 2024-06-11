@@ -64,7 +64,7 @@ const Viewer = memo(() => {
 
   const dispatch = useDispatch();
   const expand = useSelector<State, boolean>(
-    ({ setting }) => setting.viewer?.expand
+    ({ setting }) => !!setting.viewer?.expand
   );
   const commentEnabled = useSelector<State, boolean>(
     ({ setting }) =>

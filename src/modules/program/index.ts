@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { AnyAction } from "redux";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
   all,
   call,
@@ -22,13 +22,7 @@ import {
   takeLatest
 } from "redux-saga/effects";
 
-import { BACKEND_READY, COMMENT_READY, ServiceState } from "../service";
-import {
-  PROGRAM_INIT,
-  PROGRAM_LOAD,
-  PROGRAM_UPDATE,
-  ProgramActions
-} from "./actions";
+import { ServiceState } from "../service";
 import { tableSaga } from "./table";
 import { listSaga } from "./list";
 import { rankingSaga } from "./ranking";
@@ -40,13 +34,6 @@ export type {
 } from "./table";
 export type { ProgramListData, ProgramListProgram } from "./list";
 export type { ProgramRankingData, ProgramRankingProgram } from "./ranking";
-
-export {
-  PROGRAM_INIT,
-  PROGRAM_LOAD,
-  PROGRAM_UPDATE,
-  ProgramActions
-} from "./actions";
 
 const modules: {
   [key: string]: () => void;
@@ -65,7 +52,7 @@ function* loadSaga() {
     ({ service }) => service
   );
   if (!backendActive) {
-    yield take(BACKEND_READY);
+    yield take("service/backendReady");
   }
 
   const { module: name }: { module: string } = yield select(
@@ -84,45 +71,43 @@ export type ProgramState = {
 const initialState: ProgramState = {
   initialized: false
 };
-export default function programReducer(
-  state = initialState,
-  action: AnyAction
-) {
-  switch (action.type) {
-    case PROGRAM_INIT: {
-      return {
-        ...state,
-        initialized: false
-      };
-    }
-    case PROGRAM_LOAD: {
-      const { module = state.module } = action;
-      return {
-        ...state,
-        module
-      };
-    }
-    case PROGRAM_UPDATE: {
-      const { key, data = {} } = action;
-      return {
+const programSlice = createSlice({
+  name: "program",
+  initialState,
+  reducers: {
+    init: state => ({ ...state, initialized: false }),
+    load: (state, action: PayloadAction<string | undefined>) => ({
+      ...state,
+      module: action.payload || state.module
+    }),
+    update: {
+      reducer: (state, action: PayloadAction<{ [key: string]: any }>) => ({
         ...state,
         initialized: true,
-        [key]: { ...state[key], ...data }
-      };
+        [action.payload.key]: {
+          ...state[action.payload.key],
+          ...action.payload.data
+        }
+      }),
+      prepare: (key: string, data: any) => ({
+        payload: { key, data },
+        meta: null,
+        error: null
+      })
     }
-    default:
-      return state;
   }
-}
+});
+export const ProgramActions = programSlice.actions;
+export default programSlice.reducer;
 
 export function* programSaga() {
   let tasks = [];
   while (true) {
-    yield take(BACKEND_READY);
+    yield take("service/backendReady");
     yield cancel(tasks);
     tasks = yield all([
-      takeLatest(PROGRAM_INIT, initSaga),
-      takeLatest([COMMENT_READY, PROGRAM_LOAD], loadSaga)
+      takeLatest("program/init", initSaga),
+      takeLatest(["service/commentReady", "program/load"], loadSaga)
     ]);
     yield put(ProgramActions.init());
   }

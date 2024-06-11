@@ -46,6 +46,7 @@ type Setting = SettingState & {
     volume?: string;
     speed?: string;
     repeat?: string;
+    deinterlace?: boolean;
   };
 };
 type State = RootState & {
@@ -71,7 +72,7 @@ const Player = () => {
     ({ setting }) => setting.backend?.mobileStreamParams || ""
   );
   const mute = useSelector<State, boolean>(
-    ({ setting }) => setting.player?.mute
+    ({ setting }) => !!setting.player?.mute
   );
   const volume = useSelector<State, number>(({ setting }) =>
     parseInt(
@@ -99,8 +100,10 @@ const Player = () => {
   const dualMonoMode = useSelector<State, string>(
     ({ player }) => player.dualMonoMode
   );
-  const seekTime = useSelector<State, number>(({ player }) => player.seekTime);
-  const seekPosition = useSelector<State, number>(
+  const seekTime = useSelector<State, number | null | undefined>(
+    ({ player }) => player.seekTime
+  );
+  const seekPosition = useSelector<State, number | null | undefined>(
     ({ player }) => player.seekPosition
   );
   const programs = useSelector<State, ViewerProgram[]>(

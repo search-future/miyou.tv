@@ -11,21 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { AnyAction } from "redux";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
-import { WINDOW_UPDATE, WINDOW_TITLE } from "./actions";
-
-export {
-  WINDOW_ALWAYSONTOP,
-  WINDOW_FULLSCREEN,
-  WINDOW_MAXIMIZE,
-  WINDOW_MINIMIZE,
-  WINDOW_RESTORE,
-  WINDOW_CLOSE,
-  WINDOW_UPDATE,
-  WINDOW_TITLE,
-  WindowActions
-} from "./actions";
 export { windowSaga } from "./saga";
 
 export type WindowState = {
@@ -42,16 +29,34 @@ const initialState: WindowState = {
   minimized: false,
   title: ""
 };
-export default function windowReducer(state = initialState, action: AnyAction) {
-  switch (action.type) {
-    case WINDOW_UPDATE: {
-      return { ...state, ...action.state };
-    }
-    case WINDOW_TITLE: {
-      const { title } = action;
-      return { ...state, title };
-    }
-    default:
-      return state;
+const windowSlice = createSlice({
+  name: "window",
+  initialState,
+  reducers: {
+    setAlwaysOnTop: (state, action: PayloadAction<boolean>) => state,
+    setFullScreen: (state, action: PayloadAction<boolean>) => state,
+    maximize: state => state,
+    minimize: state => state,
+    restore: state => state,
+    close: state => state,
+    update: (
+      state,
+      action: PayloadAction<{
+        alwaysOnTop?: boolean;
+        fullScreen?: boolean;
+        maximized?: boolean;
+        minimized?: boolean;
+      }>
+    ) => ({
+      ...state,
+      ...action.payload
+    }),
+    setTitle: (state, action: PayloadAction<string>) => ({
+      ...state,
+      title: action.payload
+    })
   }
-}
+});
+
+export const WindowActions = windowSlice.actions;
+export default windowSlice.reducer;

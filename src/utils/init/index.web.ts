@@ -11,7 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { Store, AnyAction } from "redux";
+import { Store } from "redux";
+import { PayloadAction } from "@reduxjs/toolkit";
 import Toast from "react-native-root-toast";
 import Mousetrap from "mousetrap";
 
@@ -121,7 +122,7 @@ export default function init(store: Store) {
   });
 }
 
-function dispatchWindow(action: AnyAction) {
+function dispatchWindow(action: PayloadAction<any>) {
   try {
     window.ipc.dispatchWindow(action);
   } catch (e: any) {

@@ -78,10 +78,10 @@ const PlayerContainer = memo(
     const dualMonoMode = useSelector<State, string>(
       ({ player }) => player.dualMonoMode
     );
-    const seekTime = useSelector<State, number>(
+    const seekTime = useSelector<State, number | null | undefined>(
       ({ player }) => player.seekTime
     );
-    const seekPosition = useSelector<State, number>(
+    const seekPosition = useSelector<State, number | null | undefined>(
       ({ player }) => player.seekPosition
     );
     const commentDelay = useSelector<State, number>(({ setting }) =>
@@ -97,7 +97,7 @@ const PlayerContainer = memo(
       parseInt(setting.commentPlayer?.maxLines || "10", 10)
     );
     const mute = useSelector<State, boolean>(
-      ({ setting }) => setting.player?.mute
+      ({ setting }) => !!setting.player?.mute
     );
     const repeat = useSelector<State, string>(
       ({ setting }) => setting.player?.repeat || "repeat"

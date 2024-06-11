@@ -12,9 +12,8 @@ limitations under the License.
 */
 
 import { all, put, takeLatest } from "redux-saga/effects";
-import { AnyAction } from "redux";
+import { PayloadAction } from "@reduxjs/toolkit";
 
-import { VIEWER_OPEN, VIEWER_CLOSE, VIEWER_SEARCH } from "./actions";
 import { ProgramActions } from "../program";
 import navigationRef from "../../navigators/navigation";
 
@@ -28,16 +27,15 @@ function closeSaga() {
   navigationRef.current?.goBack();
 }
 
-function* searchSaga(action: AnyAction) {
-  const { query = "" } = action;
-  yield put(ProgramActions.update("list", { query }));
+function* searchSaga(action: PayloadAction<string>) {
+  yield put(ProgramActions.update("list", { query: action.payload }));
   navigationRef.current?.navigate("list");
 }
 
 export function* viewerSaga() {
   yield all([
-    takeLatest(VIEWER_OPEN, openSaga),
-    takeLatest(VIEWER_CLOSE, closeSaga),
-    takeLatest(VIEWER_SEARCH, searchSaga)
+    takeLatest("viewer/open", openSaga),
+    takeLatest("viewer/close", closeSaga),
+    takeLatest("viewer/search", searchSaga)
   ]);
 }

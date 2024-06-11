@@ -11,26 +11,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { AnyAction } from "redux";
 import { all, takeLatest } from "redux-saga/effects";
+import { PayloadAction } from "@reduxjs/toolkit";
 
-import {
-  WINDOW_ALWAYSONTOP,
-  WINDOW_FULLSCREEN,
-  WINDOW_MAXIMIZE,
-  WINDOW_MINIMIZE,
-  WINDOW_RESTORE,
-  WINDOW_CLOSE
-} from "./actions";
-
-function setAlwaysOnTopSaga(action: AnyAction) {
-  const { enabled = true } = action;
-  window.win.setAlwaysOnTop(enabled);
+function setAlwaysOnTopSaga(action: PayloadAction<boolean>) {
+  window.win.setAlwaysOnTop(action.payload);
 }
 
-function setFullScreenSaga(action: AnyAction) {
-  const { enabled = true } = action;
-  window.win.setFullScreen(enabled);
+function setFullScreenSaga(action: PayloadAction<boolean>) {
+  window.win.setFullScreen(action.payload);
 }
 
 function maximizeSaga() {
@@ -51,11 +40,11 @@ function closeSaga() {
 
 export function* windowSaga() {
   yield all([
-    takeLatest(WINDOW_ALWAYSONTOP, setAlwaysOnTopSaga),
-    takeLatest(WINDOW_FULLSCREEN, setFullScreenSaga),
-    takeLatest(WINDOW_MAXIMIZE, maximizeSaga),
-    takeLatest(WINDOW_MINIMIZE, minimizeSaga),
-    takeLatest(WINDOW_RESTORE, restoreSaga),
-    takeLatest(WINDOW_CLOSE, closeSaga)
+    takeLatest("window/setAlwaysOnTop", setAlwaysOnTopSaga),
+    takeLatest("window/setFullScreen", setFullScreenSaga),
+    takeLatest("window/maximize", maximizeSaga),
+    takeLatest("window/minimize", minimizeSaga),
+    takeLatest("window/restore", restoreSaga),
+    takeLatest("window/close", closeSaga)
   ]);
 }

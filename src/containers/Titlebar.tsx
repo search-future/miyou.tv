@@ -48,7 +48,7 @@ const Titlebar = memo(() => {
   const maximized = useSelector<RootState, boolean>(
     ({ window }) => window.maximized
   );
-  const title = useSelector<RootState, string>(({ window }) => window.title);
+  const title = useSelector<RootState, string>(({ window }) => window.title || "");
 
   const [containerWidth, setContainerWidth] = useState(0);
 

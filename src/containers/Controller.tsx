@@ -117,7 +117,7 @@ const JumpButton = memo(({ seconds }: { seconds: number }) => {
 const VolumeController = memo(() => {
   const dispatch = useDispatch();
   const mute = useSelector<State, boolean>(
-    ({ setting }) => setting.player?.mute
+    ({ setting }) => !!setting.player?.mute
   );
   const volume = useSelector<State, number>(({ setting }) =>
     parseInt(
@@ -210,7 +210,7 @@ const ToggleCommentButton = memo(() => {
 const ToggleExpandButton = memo(() => {
   const dispatch = useDispatch();
   const expand = useSelector<State, boolean>(
-    ({ setting }) => setting.viewer?.expand
+    ({ setting }) => !!setting.viewer?.expand
   );
 
   const onPress = useCallback(() => {

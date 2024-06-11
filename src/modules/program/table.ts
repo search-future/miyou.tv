@@ -14,7 +14,7 @@ limitations under the License.
 import { call, delay, put, select } from "redux-saga/effects";
 import Toast from "react-native-root-toast";
 
-import { ProgramActions } from "./actions";
+import { ProgramActions, ProgramState } from ".";
 import { LoadingActions } from "../loading";
 import { ServiceState } from "../service";
 import { getBackendService, getCommentService } from "../../services";
@@ -98,8 +98,10 @@ function* init() {
 export function* tableSaga() {
   try {
     yield put(LoadingActions.start(true));
+    yield put(ProgramActions.update("table", { columns: [] }));
+    yield delay(0);
 
-    const { initilized }: { initilized: boolean } = yield select(
+    const { initilized }: ProgramState = yield select(
       ({ program = {} }) => program
     );
     let { table: data }: { table: ProgramTableData } = yield select(
@@ -125,7 +127,6 @@ export function* tableSaga() {
     const { countMode = "speed" } = viewSetting;
     const hourFirst = parseInt(viewSetting.hourFirst || "4", 10);
 
-    const { columns = [] } = data;
     const maxDate = new Date(data.maxDate || Date.now());
     const minDate = new Date(data.minDate || Date.now() - 86400000);
     const date = data.start
@@ -163,12 +164,14 @@ export function* tableSaga() {
       getBackendService(backendSetting)
     );
 
-    for (const column of columns) {
+    let baseColumns = data.columns || [];
+    let columns: ProgramTableColumn[] = [];
+    for (const column of baseColumns) {
       const { type, channel } = column;
       const view = 100;
       let page = 0;
       let hits = view;
-      column.programs = [];
+      const programs: ProgramTableProgram[] = [];
       while (hits > page * view) {
         page++;
         const result: SearchResult = yield call(() =>
@@ -183,9 +186,8 @@ export function* tableSaga() {
           })
         );
         hits = result.hits;
-        const programs: ProgramTableProgram[] = result.programs;
-        column.programs.push(
-          ...programs.map(program => {
+        programs.push(
+          ...result.programs.map(program => {
             let position = (program.start.getTime() - start) / 3600000;
             let size = program.duration / 3600000;
             if (position < 0) {
@@ -200,8 +202,9 @@ export function* tableSaga() {
           })
         );
       }
+      columns.push({ ...column, programs });
     }
-    yield put(ProgramActions.update("table", { columns: [...columns] }));
+    yield put(ProgramActions.update("table", { columns }));
     yield delay(0);
 
     const { commentActive }: ServiceState = yield select(
@@ -216,7 +219,10 @@ export function* tableSaga() {
       const commentService: CommentService = yield call(() =>
         getCommentService(commentSetting)
       );
-      for (const column of columns) {
+
+      baseColumns = columns;
+      columns = [];
+      for (const column of baseColumns) {
         const {
           data: result
         }: {
@@ -240,8 +246,9 @@ export function* tableSaga() {
             }
           })
         );
+        let programs: ProgramTableProgram[] = column.programs;
         if (result.n_hits > 0) {
-          column.programs = column.programs.map(program => {
+          programs = column.programs.map(program => {
             const start = program.start.getTime();
             const end = program.end.getTime();
             const minutes = (end - start) / 60000;
@@ -259,18 +266,19 @@ export function* tableSaga() {
             const commentMaxSpeedTime =
               maxInterval && new Date(maxInterval.start);
             return {
+              ...program,
               commentCount,
               commentSpeed,
               commentMaxSpeed,
-              commentMaxSpeedTime,
-              ...program
+              commentMaxSpeedTime
             };
           });
         }
+        columns.push({ ...column, programs });
       }
       yield put(
         ProgramActions.update("table", {
-          columns: [...columns],
+          columns,
           start: new Date(start)
         })
       );
