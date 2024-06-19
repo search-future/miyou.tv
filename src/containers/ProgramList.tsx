@@ -37,6 +37,7 @@ import {
 import { Picker } from "@react-native-picker/picker";
 import { Badge, ListItem, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
+import { useIsFocused } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 
 import Balloon from "../components/Balloon";
@@ -94,6 +95,8 @@ const ProgramList = memo(() => {
     new Animated.Value(headerHeightRef.current)
   ).current;
   const viewX = useRef(new Animated.Value(0)).current;
+
+  const isFocused = useIsFocused();
 
   const dispatch = useDispatch();
   const useArchive = useSelector<State, boolean>(
@@ -237,7 +240,10 @@ const ProgramList = memo(() => {
           dispatch(open(programs, 0));
         }
       },
-      { preventDefault: true },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
       [programs, selectedId]
     );
     useHotkeys(
@@ -256,7 +262,10 @@ const ProgramList = memo(() => {
           dispatch(open(programs, 0));
         }
       },
-      { preventDefault: true },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
       [programs, selectedId]
     );
     useHotkeys(
@@ -267,7 +276,10 @@ const ProgramList = memo(() => {
           dispatch(setPage(p));
         }
       },
-      { preventDefault: true },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
       [page]
     );
     useHotkeys(
@@ -278,7 +290,10 @@ const ProgramList = memo(() => {
           dispatch(setPage(p));
         }
       },
-      { preventDefault: true },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
       [page, pageCount]
     );
   }

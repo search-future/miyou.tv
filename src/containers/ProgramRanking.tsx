@@ -35,6 +35,7 @@ import {
 } from "react-native";
 import { Badge, ListItem, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
+import { useIsFocused } from "@react-navigation/native";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
 import DatePicker from "../components/DatePicker";
@@ -95,6 +96,8 @@ const ProgramRanking = memo(() => {
     new Animated.Value(headerHeightRef.current)
   ).current;
   const viewX = useRef(new Animated.Value(0)).current;
+
+  const isFocused = useIsFocused();
 
   const dispatch = useDispatch();
   const useArchive = useSelector<State, boolean>(
@@ -242,7 +245,10 @@ const ProgramRanking = memo(() => {
           dispatch(open(programs, 0));
         }
       },
-      { preventDefault: true },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
       [programs, viewerIndex, selectedId]
     );
     useHotkeys(
@@ -259,7 +265,10 @@ const ProgramRanking = memo(() => {
           dispatch(open(programs, 0));
         }
       },
-      { preventDefault: true },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
       [programs, viewerIndex, selectedId]
     );
     useHotkeys(
@@ -269,7 +278,10 @@ const ProgramRanking = memo(() => {
         start.setDate(start.getDate() - parseInt(days, 10));
         dispatch(setStart(start));
       },
-      { preventDefault: true },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
       [target]
     );
     useHotkeys(
@@ -279,7 +291,10 @@ const ProgramRanking = memo(() => {
         start.setDate(start.getDate() + parseInt(days, 10));
         dispatch(setStart(start));
       },
-      { preventDefault: true },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
       [target]
     );
   }

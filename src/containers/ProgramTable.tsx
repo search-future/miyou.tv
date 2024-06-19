@@ -35,7 +35,7 @@ import {
 import { Badge, CheckBox, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { Menu, MenuTrigger, MenuOptions } from "react-native-popup-menu";
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
 import Balloon from "../components/Balloon";
@@ -100,6 +100,7 @@ const ProgramTable = memo(() => {
   ).current;
   const viewX = useRef(new Animated.Value(0)).current;
 
+  const isFocused = useIsFocused();
   const navigation = useNavigation();
 
   const dispatch = useDispatch();
@@ -293,7 +294,10 @@ const ProgramTable = memo(() => {
           }
         }
       },
-      { preventDefault: true },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
       [tableColumns, minDate, viewerProgram, start.toDateString()]
     );
     useHotkeys(
@@ -330,7 +334,10 @@ const ProgramTable = memo(() => {
           }
         }
       },
-      { preventDefault: true },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
       [tableColumns, maxDate, viewerProgram, start.toDateString()]
     );
     useHotkeys(
@@ -366,7 +373,10 @@ const ProgramTable = memo(() => {
         dispatch(setOffset(roundOffset(offset - 1, columns.length)));
         return false;
       },
-      { preventDefault: true },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
       [offset, tableColumns, viewerProgram, columns.length]
     );
     useHotkeys(
@@ -401,7 +411,10 @@ const ProgramTable = memo(() => {
         }
         dispatch(setOffset(roundOffset(offset + 1, columns.length)));
       },
-      { preventDefault: true },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
       [offset, tableColumns, viewerProgram, columns.length]
     );
   }
