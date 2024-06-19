@@ -10818,6 +10818,7 @@ __metadata:
     react: 18.3.1
     react-art: ^18.3.1
     react-dom: ^18.3.1
+    react-hotkeys-hook: ^4.5.0
     react-native: ^0.74.1
     react-native-blob-util: ^0.19.9
     react-native-document-picker: ^9.2.0
@@ -12188,6 +12189,16 @@ __metadata:
   peerDependencies:
     react: ">=17.0.0"
   checksum: 6b4d93209dff04a1f25d9f8e0c56a9a8a80e7889e8e8267299f34449c7e41a9ab90cad24569d03dd7173b56b7496576dba68f71f1d4e5c8be72f0633023668bc
+  languageName: node
+  linkType: hard
+
+"react-hotkeys-hook@npm:^4.5.0":
+  version: 4.5.0
+  resolution: "react-hotkeys-hook@npm:4.5.0"
+  peerDependencies:
+    react: ">=16.8.1"
+    react-dom: ">=16.8.1"
+  checksum: 38e331c729606ad427c852aa45bfa43fe6090c35bf7c98f202599680b81f2614d4a4f565c11c9f4cf41ccc497c1e8001fff0ad2d3a7af78a2cc8e251e30143e0
   languageName: node
   linkType: hard
 

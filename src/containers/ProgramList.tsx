@@ -208,90 +208,6 @@ const ProgramList = memo(() => {
     dispatch(setPage(1));
   }, [useArchive, view, reverse, query]);
   useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "up";
-      Mousetrap.bind(key, () => {
-        if (selectedId) {
-          const index = programs.findIndex(({ id }) => id === selectedId);
-          if (index >= 0) {
-            if (programs[index - 1]) {
-              dispatch(open(programs, index - 1));
-            }
-            return false;
-          }
-        }
-        if (programs[0]) {
-          dispatch(open(programs, 0));
-          return false;
-        }
-        return true;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [programs, selectedId]);
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "down";
-      Mousetrap.bind(key, () => {
-        if (selectedId) {
-          const index = programs.findIndex(({ id }) => id === selectedId);
-          if (index >= 0) {
-            if (programs[index + 1]) {
-              dispatch(open(programs, index + 1));
-            }
-            return false;
-          }
-        }
-        if (programs[0]) {
-          dispatch(open(programs, 0));
-          return false;
-        }
-        return true;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [programs, selectedId]);
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "left";
-      Mousetrap.bind(key, () => {
-        const p = page - 1;
-        if (p > 0) {
-          dispatch(setPage(p));
-          return false;
-        }
-        return true;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [page]);
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "right";
-      Mousetrap.bind(key, () => {
-        const p = page + 1;
-        if (p <= pageCount) {
-          dispatch(setPage(p));
-          return false;
-        }
-        return true;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [page, pageCount]);
-  useEffect(() => {
     listRef.current?.scrollToOffset({ offset: 0, animated: false });
   }, [page]);
   useEffect(() => {
@@ -302,6 +218,70 @@ const ProgramList = memo(() => {
       }
     }
   }, [selectedId]);
+
+  if (Platform.OS === "web") {
+    const { useHotkeys } = require("react-hotkeys-hook");
+    useHotkeys(
+      "up",
+      () => {
+        if (selectedId) {
+          const index = programs.findIndex(({ id }) => id === selectedId);
+          if (index >= 0) {
+            if (programs[index - 1]) {
+              dispatch(open(programs, index - 1));
+            }
+            return;
+          }
+        }
+        if (programs[0]) {
+          dispatch(open(programs, 0));
+        }
+      },
+      { preventDefault: true },
+      [programs, selectedId]
+    );
+    useHotkeys(
+      "down",
+      () => {
+        if (selectedId) {
+          const index = programs.findIndex(({ id }) => id === selectedId);
+          if (index >= 0) {
+            if (programs[index + 1]) {
+              dispatch(open(programs, index + 1));
+            }
+            return;
+          }
+        }
+        if (programs[0]) {
+          dispatch(open(programs, 0));
+        }
+      },
+      { preventDefault: true },
+      [programs, selectedId]
+    );
+    useHotkeys(
+      "left",
+      () => {
+        const p = page - 1;
+        if (p > 0) {
+          dispatch(setPage(p));
+        }
+      },
+      { preventDefault: true },
+      [page]
+    );
+    useHotkeys(
+      "right",
+      () => {
+        const p = page + 1;
+        if (p <= pageCount) {
+          dispatch(setPage(p));
+        }
+      },
+      { preventDefault: true },
+      [page, pageCount]
+    );
+  }
 
   const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
     if (layoutCallbackId.current != null) {

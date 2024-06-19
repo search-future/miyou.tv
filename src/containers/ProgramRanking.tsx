@@ -204,82 +204,6 @@ const ProgramRanking = memo(() => {
     listRef.current?.scrollToOffset({ offset: 0, animated: false });
   }, [useArchive, unique, view, target, start.toDateString()]);
   useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "up";
-      Mousetrap.bind(key, () => {
-        if (programs[viewerIndex]?.id === selectedId) {
-          const index = viewerIndex - 1;
-          if (programs[index]) {
-            dispatch(open(programs, index));
-          }
-          return false;
-        }
-        if (programs[0]) {
-          dispatch(open(programs, 0));
-          return false;
-        }
-        return true;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [programs, viewerIndex, selectedId]);
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "down";
-      Mousetrap.bind(key, () => {
-        if (programs[viewerIndex]?.id === selectedId) {
-          const index = viewerIndex + 1;
-          if (programs[index]) {
-            dispatch(open(programs, index));
-          }
-          return false;
-        }
-        if (programs[0]) {
-          dispatch(open(programs, 0));
-          return false;
-        }
-        return true;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [programs, viewerIndex, selectedId]);
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "left";
-      Mousetrap.bind(key, () => {
-        const [, , days] = target.split(",");
-        start.setDate(start.getDate() - parseInt(days, 10));
-        dispatch(setStart(start));
-        return false;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [target]);
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "right";
-      Mousetrap.bind(key, () => {
-        const [, , days] = target.split(",");
-        start.setDate(start.getDate() + parseInt(days, 10));
-        dispatch(setStart(start));
-        return false;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [target]);
-  useEffect(() => {
     if (isOpened && !playing && programs[viewerIndex]?.id === selectedId) {
       const updater = () => {
         dispatch(open(programs, viewerIndex));
@@ -301,6 +225,64 @@ const ProgramRanking = memo(() => {
       });
     }
   }, [viewerIndex]);
+
+  if (Platform.OS === "web") {
+    const { useHotkeys } = require("react-hotkeys-hook");
+    useHotkeys(
+      "up",
+      () => {
+        if (programs[viewerIndex]?.id === selectedId) {
+          const index = viewerIndex - 1;
+          if (programs[index]) {
+            dispatch(open(programs, index));
+          }
+          return;
+        }
+        if (programs[0]) {
+          dispatch(open(programs, 0));
+        }
+      },
+      { preventDefault: true },
+      [programs, viewerIndex, selectedId]
+    );
+    useHotkeys(
+      "down",
+      () => {
+        if (programs[viewerIndex]?.id === selectedId) {
+          const index = viewerIndex + 1;
+          if (programs[index]) {
+            dispatch(open(programs, index));
+          }
+          return;
+        }
+        if (programs[0]) {
+          dispatch(open(programs, 0));
+        }
+      },
+      { preventDefault: true },
+      [programs, viewerIndex, selectedId]
+    );
+    useHotkeys(
+      "left",
+      () => {
+        const [, , days] = target.split(",");
+        start.setDate(start.getDate() - parseInt(days, 10));
+        dispatch(setStart(start));
+      },
+      { preventDefault: true },
+      [target]
+    );
+    useHotkeys(
+      "right",
+      () => {
+        const [, , days] = target.split(",");
+        start.setDate(start.getDate() + parseInt(days, 10));
+        dispatch(setStart(start));
+      },
+      { preventDefault: true },
+      [target]
+    );
+  }
 
   const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
     if (layoutCallbackId.current != null) {

@@ -241,182 +241,6 @@ const ProgramTable = memo(() => {
     dispatch(ProgramActions.load("table"));
   }, [useArchive, start.toDateString()]);
   useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "up";
-      Mousetrap.bind(key, () => {
-        if (viewerProgram) {
-          const { type, channel } = viewerProgram;
-          const column = tableColumns.find(
-            a => a.type === type && a.channel === channel
-          );
-          if (column) {
-            const { id } = viewerProgram;
-            const index = column.programs.findIndex(a => a.id === id);
-            if (index >= 0) {
-              const prevIndex = index - 1;
-              if (column.programs[prevIndex]) {
-                dispatch(open(column.programs, prevIndex));
-                return false;
-              }
-              const date = new Date(start);
-              date.setDate(date.getDate() - 1);
-              if (!minDate || date.getTime() > new Date(minDate).getTime()) {
-                dispatch(setStart(date));
-                viewRef.current?.scrollToEnd({ animated: false });
-              }
-              return false;
-            }
-          }
-        }
-        for (const column of tableColumns) {
-          if (column.programs[column.programs.length - 1]) {
-            dispatch(open(column.programs, column.programs.length - 1));
-            return false;
-          }
-        }
-        return true;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [
-    tableColumns,
-    minDate,
-    tableColumns,
-    viewerProgram,
-    start.toDateString()
-  ]);
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "down";
-      Mousetrap.bind(key, () => {
-        if (viewerProgram) {
-          const { type, channel } = viewerProgram;
-          const column = tableColumns.find(
-            a => a.type === type && a.channel === channel
-          );
-          if (column) {
-            const { id } = viewerProgram;
-            const index = column.programs.findIndex(a => a.id === id);
-            if (index >= 0) {
-              const nextIndex = index + 1;
-              if (column.programs[nextIndex]) {
-                dispatch(open(column.programs, nextIndex));
-                return false;
-              }
-              const date = new Date(start);
-              date.setDate(date.getDate() + 1);
-              if (!maxDate || date.getTime() < new Date(maxDate).getTime()) {
-                dispatch(setStart(date));
-                viewRef.current?.scrollTo({ y: 0, animated: false });
-              }
-              return false;
-            }
-          }
-        }
-        for (const column of tableColumns) {
-          if (column.programs[0]) {
-            dispatch(open(column.programs, 0));
-            return false;
-          }
-        }
-        return true;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [
-    tableColumns,
-    maxDate,
-    tableColumns,
-    viewerProgram,
-    start.toDateString()
-  ]);
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "left";
-      Mousetrap.bind(key, () => {
-        if (viewerProgram) {
-          const { type, channel } = viewerProgram;
-          const columnIndex = tableColumns.findIndex(
-            a => a.type === type && a.channel === channel
-          );
-          if (columnIndex >= 0) {
-            const prevColumn = tableColumns[columnIndex - 1];
-            if (prevColumn?.programs?.length > 0) {
-              const startTime = new Date(viewerProgram.start).getTime();
-              const nextIndex = prevColumn.programs.findIndex(
-                a => new Date(a.end).getTime() > startTime
-              );
-              if (prevColumn.programs[nextIndex]) {
-                dispatch(open(prevColumn.programs, nextIndex));
-                return false;
-              }
-            }
-            dispatch(setOffset(roundOffset(offset - 1, columns.length)));
-            return false;
-          }
-        }
-        for (const column of tableColumns) {
-          if (column.programs[0]) {
-            dispatch(open(column.programs, 0));
-            return false;
-          }
-        }
-        dispatch(setOffset(roundOffset(offset - 1, columns.length)));
-        return false;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [offset, tableColumns, viewerProgram, columns.length]);
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "right";
-      Mousetrap.bind(key, () => {
-        if (viewerProgram) {
-          const { type, channel } = viewerProgram;
-          const columnIndex = tableColumns.findIndex(
-            a => a.type === type && a.channel === channel
-          );
-          if (columnIndex >= 0) {
-            const nextColumn = tableColumns[columnIndex + 1];
-            if (nextColumn?.programs?.length > 0) {
-              const startTime = new Date(viewerProgram.start).getTime();
-              const nextIndex = nextColumn.programs.findIndex(
-                a => new Date(a.end).getTime() > startTime
-              );
-              if (nextColumn.programs[nextIndex]) {
-                dispatch(open(nextColumn.programs, nextIndex));
-                return false;
-              }
-            }
-            dispatch(setOffset(roundOffset(offset + 1, columns.length)));
-            return false;
-          }
-        }
-        for (const column of tableColumns) {
-          if (column.programs[0]) {
-            dispatch(open(column.programs, 0));
-            return false;
-          }
-        }
-        dispatch(setOffset(roundOffset(offset + 1, columns.length)));
-        return false;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [offset, tableColumns, viewerProgram, columns.length]);
-  useEffect(() => {
     if (viewerProgram && viewRef.current) {
       const { type, channel } = viewerProgram;
       const columnIndex = tableColumns.findIndex(
@@ -432,6 +256,155 @@ const ProgramTable = memo(() => {
       }
     }
   }, [selectedId]);
+
+  if (Platform.OS === "web") {
+    const { useHotkeys } = require("react-hotkeys-hook");
+    useHotkeys(
+      "up",
+      () => {
+        if (viewerProgram) {
+          const { type, channel } = viewerProgram;
+          const column = tableColumns.find(
+            a => a.type === type && a.channel === channel
+          );
+          if (column) {
+            const { id } = viewerProgram;
+            const index = column.programs.findIndex(a => a.id === id);
+            if (index >= 0) {
+              const prevIndex = index - 1;
+              if (column.programs[prevIndex]) {
+                dispatch(open(column.programs, prevIndex));
+                return;
+              }
+              const date = new Date(start);
+              date.setDate(date.getDate() - 1);
+              if (!minDate || date.getTime() > new Date(minDate).getTime()) {
+                dispatch(setStart(date));
+                viewRef.current?.scrollToEnd({ animated: false });
+              }
+              return;
+            }
+          }
+        }
+        for (const column of tableColumns) {
+          if (column.programs[column.programs.length - 1]) {
+            dispatch(open(column.programs, column.programs.length - 1));
+            return;
+          }
+        }
+      },
+      { preventDefault: true },
+      [tableColumns, minDate, viewerProgram, start.toDateString()]
+    );
+    useHotkeys(
+      "down",
+      () => {
+        if (viewerProgram) {
+          const { type, channel } = viewerProgram;
+          const column = tableColumns.find(
+            a => a.type === type && a.channel === channel
+          );
+          if (column) {
+            const { id } = viewerProgram;
+            const index = column.programs.findIndex(a => a.id === id);
+            if (index >= 0) {
+              const nextIndex = index + 1;
+              if (column.programs[nextIndex]) {
+                dispatch(open(column.programs, nextIndex));
+                return;
+              }
+              const date = new Date(start);
+              date.setDate(date.getDate() + 1);
+              if (!maxDate || date.getTime() < new Date(maxDate).getTime()) {
+                dispatch(setStart(date));
+                viewRef.current?.scrollTo({ y: 0, animated: false });
+              }
+              return;
+            }
+          }
+        }
+        for (const column of tableColumns) {
+          if (column.programs[0]) {
+            dispatch(open(column.programs, 0));
+            return;
+          }
+        }
+      },
+      { preventDefault: true },
+      [tableColumns, maxDate, viewerProgram, start.toDateString()]
+    );
+    useHotkeys(
+      "left",
+      () => {
+        if (viewerProgram) {
+          const { type, channel } = viewerProgram;
+          const columnIndex = tableColumns.findIndex(
+            a => a.type === type && a.channel === channel
+          );
+          if (columnIndex >= 0) {
+            const prevColumn = tableColumns[columnIndex - 1];
+            if (prevColumn?.programs?.length > 0) {
+              const startTime = new Date(viewerProgram.start).getTime();
+              const nextIndex = prevColumn.programs.findIndex(
+                a => new Date(a.end).getTime() > startTime
+              );
+              if (prevColumn.programs[nextIndex]) {
+                dispatch(open(prevColumn.programs, nextIndex));
+                return;
+              }
+            }
+            dispatch(setOffset(roundOffset(offset - 1, columns.length)));
+            return;
+          }
+        }
+        for (const column of tableColumns) {
+          if (column.programs[0]) {
+            dispatch(open(column.programs, 0));
+            return false;
+          }
+        }
+        dispatch(setOffset(roundOffset(offset - 1, columns.length)));
+        return false;
+      },
+      { preventDefault: true },
+      [offset, tableColumns, viewerProgram, columns.length]
+    );
+    useHotkeys(
+      "right",
+      () => {
+        if (viewerProgram) {
+          const { type, channel } = viewerProgram;
+          const columnIndex = tableColumns.findIndex(
+            a => a.type === type && a.channel === channel
+          );
+          if (columnIndex >= 0) {
+            const nextColumn = tableColumns[columnIndex + 1];
+            if (nextColumn?.programs?.length > 0) {
+              const startTime = new Date(viewerProgram.start).getTime();
+              const nextIndex = nextColumn.programs.findIndex(
+                a => new Date(a.end).getTime() > startTime
+              );
+              if (nextColumn.programs[nextIndex]) {
+                dispatch(open(nextColumn.programs, nextIndex));
+                return;
+              }
+            }
+            dispatch(setOffset(roundOffset(offset + 1, columns.length)));
+            return;
+          }
+        }
+        for (const column of tableColumns) {
+          if (column.programs[0]) {
+            dispatch(open(column.programs, 0));
+            return;
+          }
+        }
+        dispatch(setOffset(roundOffset(offset + 1, columns.length)));
+      },
+      { preventDefault: true },
+      [offset, tableColumns, viewerProgram, columns.length]
+    );
+  }
 
   const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
     if (layoutCallbackId.current != null) {

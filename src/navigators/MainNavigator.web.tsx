@@ -28,12 +28,15 @@ import {
 import { ThemeContext } from "react-native-elements";
 import { useDispatch, useSelector } from "react-redux";
 import { MenuProvider } from "react-native-popup-menu";
+import { useHotkeys } from "react-hotkeys-hook";
 
 import Titlebar from "../containers/Titlebar";
 import Viewer from "../containers/Viewer";
 import { RootState } from "../modules";
+import { ServiceActions } from "../modules/service";
 import { SettingState } from "../modules/setting";
 import { ViewerActions } from "../modules/viewer";
+import { WindowActions } from "../modules/window";
 import { toastOptions } from "../config/constants";
 import { NavigationContainer } from "@react-navigation/native";
 import navigationRef from "./navigation";
@@ -49,6 +52,27 @@ type State = RootState & {
 
 const MainNavigator = () => {
   const mode = useSelector<State, string>(({ viewer: { mode } }) => mode);
+
+  const dispatch = useDispatch();
+
+  useHotkeys("esc", () => {
+    dispatch(WindowActions.setFullScreen(false));
+  });
+  useHotkeys("mod+I", () => {
+    window.utils.toggleDevTools();
+  });
+  useHotkeys(
+    "mod+r",
+    () => {
+      if (mode === "stack") {
+        dispatch(ServiceActions.backendInit());
+        dispatch(ServiceActions.commentInit());
+      }
+    },
+    { preventDefault: true },
+    [mode]
+  );
+
   switch (mode) {
     case "view": {
       return <ChildView />;
