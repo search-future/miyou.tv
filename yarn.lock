@@ -10809,7 +10809,6 @@ __metadata:
     js-base64: ^3.7.7
     md5: ^2.3.0
     moment: ^2.30.1
-    mousetrap: ^1.6.5
     mpv.js: ^0.3.0
     patch-package: ^8.0.0
     postinstall-postinstall: ^2.1.0
@@ -10887,13 +10886,6 @@ __metadata:
   version: 2.30.1
   resolution: "moment@npm:2.30.1"
   checksum: 859236bab1e88c3e5802afcf797fc801acdbd0ee509d34ea3df6eea21eb6bcc2abd4ae4e4e64aa7c986aa6cba563c6e62806218e6412a765010712e5fa121ba6
-  languageName: node
-  linkType: hard
-
-"mousetrap@npm:^1.6.5":
-  version: 1.6.5
-  resolution: "mousetrap@npm:1.6.5"
-  checksum: 1ce36af5ac57e1fab687e3da004cc18914275f8ceef33f16d01110edc5126a5dbaace578b1e61179f93a506e71a88fe886f305db537a3673cf9f73affd1dffa6
   languageName: node
   linkType: hard
 
