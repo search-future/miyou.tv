@@ -38,6 +38,7 @@ import {
   MenuOption
 } from "react-native-popup-menu";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
+import Toast from "react-native-root-toast";
 
 import containerStyle from "../styles/container";
 import textStyle from "../styles/text";
@@ -150,7 +151,14 @@ const CommentInfo = memo(() => {
     if (autoScroll) {
       const updater = () => {
         if (data[pointer]) {
-          listRef.current?.scrollToIndex({ index: pointer, viewPosition: 1 });
+          try {
+            listRef.current?.scrollToIndex({
+              index: pointer,
+              viewPosition: 1
+            });
+          } catch (e: any) {
+            Toast.show(e.message);
+          }
         }
         lastUpdate.current = Date.now();
       };

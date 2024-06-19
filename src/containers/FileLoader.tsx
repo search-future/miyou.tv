@@ -33,6 +33,7 @@ import { Input, ListItem, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
+import Toast from "react-native-root-toast";
 
 import DatePicker from "../components/DatePicker";
 import IconSelector from "../components/IconSelector";
@@ -116,7 +117,11 @@ const FileLoader = memo(() => {
     if (selectedId && listRef.current) {
       const index = programs.findIndex(({ id }) => id === selectedId);
       if (index >= 0) {
-        listRef.current.scrollToIndex({ index, viewPosition: 0.5 });
+        try {
+          listRef.current.scrollToIndex({ index, viewPosition: 0.5 });
+        } catch (e: any) {
+          Toast.show(e.message);
+        }
       }
     }
   }, [selectedId]);

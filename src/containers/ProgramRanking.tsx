@@ -37,6 +37,7 @@ import { Badge, ListItem, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useIsFocused } from "@react-navigation/native";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
+import Toast from "react-native-root-toast";
 
 import DatePicker from "../components/DatePicker";
 import IconSelector from "../components/IconSelector";
@@ -222,10 +223,14 @@ const ProgramRanking = memo(() => {
   }, [programs, isOpened, playing]);
   useEffect(() => {
     if (listRef.current && programs[viewerIndex]?.id === selectedId) {
-      listRef.current.scrollToIndex({
-        index: viewerIndex,
-        viewPosition: 0.5
-      });
+      try {
+        listRef.current.scrollToIndex({
+          index: viewerIndex,
+          viewPosition: 0.5
+        });
+      } catch (e: any) {
+        Toast.show(e.message);
+      }
     }
   }, [viewerIndex]);
 
