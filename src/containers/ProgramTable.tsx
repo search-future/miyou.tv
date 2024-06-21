@@ -244,11 +244,28 @@ const ProgramTable = memo(() => {
   useEffect(() => {
     if (viewerProgram && viewRef.current) {
       const { type, channel } = viewerProgram;
-      const columnIndex = tableColumns.findIndex(
+      let column = tableColumns.find(
         a => a.type === type && a.channel === channel
       );
-      if (columnIndex >= 0) {
-        const column = tableColumns[columnIndex];
+      if (!column) {
+        const columnIndex = columns.findIndex(
+          a => a.type === type && a.channel === channel
+        );
+        if (columnIndex >= 0) {
+          column = columns[columnIndex];
+          const end = offset + tableColumns.length - 1;
+          const leftDiff = roundOffset(offset - columnIndex, columns.length);
+          const rightDiff = roundOffset(columnIndex - end, columns.length);
+          if (rightDiff > leftDiff) {
+            dispatch(setOffset(roundOffset(offset - leftDiff, columns.length)));
+          } else {
+            dispatch(
+              setOffset(roundOffset(offset + rightDiff, columns.length))
+            );
+          }
+        }
+      }
+      if (column) {
         const program = column.programs.find(a => a.id === selectedId);
         if (program?.position) {
           const y = (program.position - 0.5) * hourHeight;
@@ -256,7 +273,7 @@ const ProgramTable = memo(() => {
         }
       }
     }
-  }, [selectedId]);
+  }, [viewerProgram, selectedId, containerWidth]);
 
   if (Platform.OS === "web") {
     const { useHotkeys } = require("react-hotkeys-hook");
