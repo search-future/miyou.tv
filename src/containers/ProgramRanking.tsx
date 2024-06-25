@@ -237,6 +237,14 @@ const ProgramRanking = memo(() => {
   if (Platform.OS === "web") {
     const { useHotkeys } = require("react-hotkeys-hook");
     useHotkeys(
+      "tab",
+      () => {
+        headerHeightRef.current = 256;
+        headerHeight.setValue(headerHeightRef.current);
+      },
+      { enabled: isFocused }
+    );
+    useHotkeys(
       "up",
       () => {
         let index = programs.findIndex(({ id }) => id === selectedId);
