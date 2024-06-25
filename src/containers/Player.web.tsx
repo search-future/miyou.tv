@@ -521,7 +521,7 @@ const Player = memo(() => {
     { preventDefault: true }
   );
   useHotkeys(
-    ["+", "pageup"],
+    "+",
     () => {
       let value = speed + 0.1;
       if (value > 8) {
@@ -533,7 +533,7 @@ const Player = memo(() => {
     [speed]
   );
   useHotkeys(
-    ["-", "pagedown"],
+    "-",
     () => {
       let value = speed - 0.1;
       if (value <= 0) {
@@ -626,7 +626,7 @@ const Player = memo(() => {
     [fullScreen]
   );
   useHotkeys(
-    ["up", "mod+up"],
+    "mod+up",
     () => {
       let value = volume + 5;
       if (value > 100) {
@@ -638,7 +638,7 @@ const Player = memo(() => {
     [volume]
   );
   useHotkeys(
-    ["down", "mod+down"],
+    "mod+down",
     () => {
       let newVolume = volume - 5;
       if (newVolume < 0) {
@@ -650,7 +650,7 @@ const Player = memo(() => {
     [volume]
   );
   useHotkeys(
-    ["left", "mod+left"],
+    "mod+left",
     () => {
       dispatch(PlayerActions.time(time - 10000));
     },
@@ -658,7 +658,7 @@ const Player = memo(() => {
     [time]
   );
   useHotkeys(
-    ["right", "mod+right"],
+    "mod+right",
     () => {
       dispatch(PlayerActions.time(time + 30000));
     },
@@ -666,7 +666,7 @@ const Player = memo(() => {
     [time]
   );
   useHotkeys(
-    ["shift+left", "["],
+    "[",
     () => {
       const delay = commentDelay - 500;
       dispatch(SettingActions.update("commentPlayer", { delay }));
@@ -675,7 +675,7 @@ const Player = memo(() => {
     [commentDelay]
   );
   useHotkeys(
-    ["shift+right", "]"],
+    "]",
     () => {
       const delay = commentDelay + 500;
       dispatch(SettingActions.update("commentPlayer", { delay }));
@@ -684,7 +684,7 @@ const Player = memo(() => {
     [commentDelay]
   );
   useHotkeys(
-    ["o", "mod+s"],
+    "mod+s",
     () => {
       dispatch(SettingActions.update("viewer", { expand: !expand }));
     },

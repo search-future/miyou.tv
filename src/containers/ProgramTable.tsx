@@ -281,17 +281,17 @@ const ProgramTable = memo(() => {
       "up",
       () => {
         if (viewerProgram) {
-          const { type, channel } = viewerProgram;
-          const column = tableColumns.find(
+          const { type, channel, id } = viewerProgram;
+          const column = columns.find(
             a => a.type === type && a.channel === channel
           );
           if (column) {
-            const { id } = viewerProgram;
-            const index = column.programs.findIndex(a => a.id === id);
+            const { programs } = column;
+            let index = programs.findIndex(a => a.id === id);
             if (index >= 0) {
-              const prevIndex = index - 1;
-              if (column.programs[prevIndex]) {
-                dispatch(open(column.programs, prevIndex));
+              index--;
+              if (programs[index]) {
+                dispatch(open(programs, index));
                 return;
               }
               const date = new Date(start);
@@ -302,11 +302,17 @@ const ProgramTable = memo(() => {
               }
               return;
             }
+            index = programs.length - 1;
+            if (programs[index]) {
+              dispatch(open(programs, index));
+              return;
+            }
           }
         }
-        for (const column of tableColumns) {
-          if (column.programs[column.programs.length - 1]) {
-            dispatch(open(column.programs, column.programs.length - 1));
+        for (let i = 0; i < columns.length; i++) {
+          const { programs } = columns[i];
+          if (programs[0]) {
+            dispatch(open(programs, 0));
             return;
           }
         }
@@ -315,23 +321,23 @@ const ProgramTable = memo(() => {
         enabled: isFocused,
         preventDefault: true
       },
-      [tableColumns, minDate, viewerProgram, start.toDateString()]
+      [columns, minDate, viewerProgram, start.toDateString()]
     );
     useHotkeys(
       "down",
       () => {
         if (viewerProgram) {
-          const { type, channel } = viewerProgram;
-          const column = tableColumns.find(
+          const { type, channel, id } = viewerProgram;
+          const column = columns.find(
             a => a.type === type && a.channel === channel
           );
           if (column) {
-            const { id } = viewerProgram;
-            const index = column.programs.findIndex(a => a.id === id);
+            const { programs } = column;
+            let index = programs.findIndex(a => a.id === id);
             if (index >= 0) {
-              const nextIndex = index + 1;
-              if (column.programs[nextIndex]) {
-                dispatch(open(column.programs, nextIndex));
+              index++;
+              if (programs[index]) {
+                dispatch(open(programs, index));
                 return;
               }
               const date = new Date(start);
@@ -342,11 +348,17 @@ const ProgramTable = memo(() => {
               }
               return;
             }
+            index = 0;
+            if (programs[index]) {
+              dispatch(open(programs, index));
+              return;
+            }
           }
         }
-        for (const column of tableColumns) {
-          if (column.programs[0]) {
-            dispatch(open(column.programs, 0));
+        for (let i = 0; i < columns.length; i++) {
+          const { programs } = columns[i];
+          if (programs[0]) {
+            dispatch(open(programs, 0));
             return;
           }
         }
@@ -355,84 +367,89 @@ const ProgramTable = memo(() => {
         enabled: isFocused,
         preventDefault: true
       },
-      [tableColumns, maxDate, viewerProgram, start.toDateString()]
+      [columns, maxDate, viewerProgram, start.toDateString()]
     );
     useHotkeys(
       "left",
       () => {
         if (viewerProgram) {
-          const { type, channel } = viewerProgram;
-          const columnIndex = tableColumns.findIndex(
+          const { type, channel, start } = viewerProgram;
+          const columnIndex = columns.findIndex(
             a => a.type === type && a.channel === channel
           );
           if (columnIndex >= 0) {
-            const prevColumn = tableColumns[columnIndex - 1];
-            if (prevColumn?.programs?.length > 0) {
-              const startTime = new Date(viewerProgram.start).getTime();
-              const nextIndex = prevColumn.programs.findIndex(
-                a => new Date(a.end).getTime() > startTime
+            for (let i = 1; i < columns.length; i++) {
+              const { programs } =
+                columns[roundOffset(columnIndex - i, columns.length)];
+              let index = programs.findIndex(
+                a => new Date(a.end).getTime() > new Date(start).getTime()
               );
-              if (prevColumn.programs[nextIndex]) {
-                dispatch(open(prevColumn.programs, nextIndex));
+              if (index >= 0) {
+                dispatch(open(programs, index));
+                return;
+              }
+              index = programs.length - 1;
+              if (programs[index]) {
+                dispatch(open(programs, index));
                 return;
               }
             }
-            dispatch(setOffset(roundOffset(offset - 1, columns.length)));
+          }
+        }
+        for (let i = 0; i < columns.length; i++) {
+          const { programs } = columns[i];
+          if (programs[0]) {
+            dispatch(open(programs, 0));
             return;
           }
         }
-        for (const column of tableColumns) {
-          if (column.programs[0]) {
-            dispatch(open(column.programs, 0));
-            return false;
-          }
-        }
-        dispatch(setOffset(roundOffset(offset - 1, columns.length)));
-        return false;
       },
       {
         enabled: isFocused,
         preventDefault: true
       },
-      [offset, tableColumns, viewerProgram, columns.length]
+      [columns, offset, viewerProgram, columns.length]
     );
     useHotkeys(
       "right",
       () => {
         if (viewerProgram) {
-          const { type, channel } = viewerProgram;
-          const columnIndex = tableColumns.findIndex(
+          const { type, channel, start } = viewerProgram;
+          const columnIndex = columns.findIndex(
             a => a.type === type && a.channel === channel
           );
           if (columnIndex >= 0) {
-            const nextColumn = tableColumns[columnIndex + 1];
-            if (nextColumn?.programs?.length > 0) {
-              const startTime = new Date(viewerProgram.start).getTime();
-              const nextIndex = nextColumn.programs.findIndex(
-                a => new Date(a.end).getTime() > startTime
+            for (let i = 1; i < columns.length; i++) {
+              const { programs } =
+                columns[roundOffset(columnIndex + i, columns.length)];
+              let index = programs.findIndex(
+                a => new Date(a.end).getTime() > new Date(start).getTime()
               );
-              if (nextColumn.programs[nextIndex]) {
-                dispatch(open(nextColumn.programs, nextIndex));
+              if (index >= 0) {
+                dispatch(open(programs, index));
+                return;
+              }
+              index = programs.length - 1;
+              if (programs[index]) {
+                dispatch(open(programs, index));
                 return;
               }
             }
-            dispatch(setOffset(roundOffset(offset + 1, columns.length)));
+          }
+        }
+        for (let i = 0; i < columns.length; i++) {
+          const { programs } = columns[i];
+          if (programs[0]) {
+            dispatch(open(programs, 0));
             return;
           }
         }
-        for (const column of tableColumns) {
-          if (column.programs[0]) {
-            dispatch(open(column.programs, 0));
-            return;
-          }
-        }
-        dispatch(setOffset(roundOffset(offset + 1, columns.length)));
       },
       {
         enabled: isFocused,
         preventDefault: true
       },
-      [offset, tableColumns, viewerProgram, columns.length]
+      [columns, offset, viewerProgram, columns.length]
     );
   }
 

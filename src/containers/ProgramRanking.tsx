@@ -239,42 +239,46 @@ const ProgramRanking = memo(() => {
     useHotkeys(
       "up",
       () => {
-        if (programs[viewerIndex]?.id === selectedId) {
-          const index = viewerIndex - 1;
+        let index = programs.findIndex(({ id }) => id === selectedId);
+        if (index >= 0) {
+          index--;
           if (programs[index]) {
             dispatch(open(programs, index));
           }
           return;
         }
-        if (programs[0]) {
-          dispatch(open(programs, 0));
+        index = 0;
+        if (programs[index]) {
+          dispatch(open(programs, index));
         }
       },
       {
         enabled: isFocused,
         preventDefault: true
       },
-      [programs, viewerIndex, selectedId]
+      [programs, selectedId]
     );
     useHotkeys(
       "down",
       () => {
-        if (programs[viewerIndex]?.id === selectedId) {
-          const index = viewerIndex + 1;
+        let index = programs.findIndex(({ id }) => id === selectedId);
+        if (index >= 0) {
+          index++;
           if (programs[index]) {
             dispatch(open(programs, index));
           }
           return;
         }
-        if (programs[0]) {
-          dispatch(open(programs, 0));
+        index = 0;
+        if (programs[index]) {
+          dispatch(open(programs, index));
         }
       },
       {
         enabled: isFocused,
         preventDefault: true
       },
-      [programs, viewerIndex, selectedId]
+      [programs, selectedId]
     );
     useHotkeys(
       "left",

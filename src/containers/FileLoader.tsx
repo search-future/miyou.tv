@@ -31,7 +31,7 @@ import {
 } from "react-native";
 import { Input, ListItem, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import Toast from "react-native-root-toast";
 
@@ -61,6 +61,7 @@ const FileLoader = memo(() => {
   const count = useRef(0);
 
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
 
   const dispatch = useDispatch();
   const programs = useSelector<State, FileProgram[]>(
@@ -125,6 +126,54 @@ const FileLoader = memo(() => {
       }
     }
   }, [selectedId]);
+
+  if (Platform.OS === "web") {
+    const { useHotkeys } = require("react-hotkeys-hook");
+    useHotkeys(
+      "up",
+      () => {
+        let index = programs.findIndex(({ id }) => id === selectedId);
+        if (index >= 0) {
+          index--;
+          if (programs[index]) {
+            dispatch(ViewerActions.open(programs, index));
+          }
+          return;
+        }
+        index = 0;
+        if (programs[index]) {
+          dispatch(ViewerActions.open(programs, index));
+        }
+      },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
+      [programs, selectedId]
+    );
+    useHotkeys(
+      "down",
+      () => {
+        let index = programs.findIndex(({ id }) => id === selectedId);
+        if (index >= 0) {
+          index++;
+          if (programs[index]) {
+            dispatch(ViewerActions.open(programs, index));
+          }
+          return;
+        }
+        index = 0;
+        if (programs[index]) {
+          dispatch(ViewerActions.open(programs, index));
+        }
+      },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
+      []
+    );
+  }
 
   const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
     if (layoutCallbackId.current != null) {

@@ -232,17 +232,22 @@ const ProgramList = memo(() => {
     useHotkeys(
       "up",
       () => {
-        if (selectedId) {
-          const index = programs.findIndex(({ id }) => id === selectedId);
-          if (index >= 0) {
-            if (programs[index - 1]) {
-              dispatch(open(programs, index - 1));
-            }
+        let index = programs.findIndex(({ id }) => id === selectedId);
+        if (index >= 0) {
+          index--;
+          if (programs[index]) {
+            dispatch(open(programs, index));
             return;
           }
+          const p = page - 1;
+          if (p > 0) {
+            dispatch(setPage(p));
+          }
+          return;
         }
-        if (programs[0]) {
-          dispatch(open(programs, 0));
+        index = programs.length - 1;
+        if (programs[index]) {
+          dispatch(open(programs, index));
         }
       },
       {
@@ -254,17 +259,22 @@ const ProgramList = memo(() => {
     useHotkeys(
       "down",
       () => {
-        if (selectedId) {
-          const index = programs.findIndex(({ id }) => id === selectedId);
-          if (index >= 0) {
-            if (programs[index + 1]) {
-              dispatch(open(programs, index + 1));
-            }
+        let index = programs.findIndex(({ id }) => id === selectedId);
+        if (index >= 0) {
+          index++;
+          if (programs[index]) {
+            dispatch(open(programs, index));
             return;
           }
+          const p = page + 1;
+          if (p <= pageCount) {
+            dispatch(setPage(p));
+          }
+          return;
         }
-        if (programs[0]) {
-          dispatch(open(programs, 0));
+        index = 0;
+        if (programs[index]) {
+          dispatch(open(programs, index));
         }
       },
       {
