@@ -22,12 +22,15 @@ import React, {
 } from "react";
 import {
   FlatList,
-  TouchableOpacity,
+  Pressable,
   View,
   StyleSheet,
   Platform,
   ListRenderItem,
-  LayoutChangeEvent
+  LayoutChangeEvent,
+  PressableStateCallbackType,
+  StyleProp,
+  ViewStyle
 } from "react-native";
 import { Input, ListItem, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
@@ -273,14 +276,14 @@ const FileLoader = memo(() => {
           { backgroundColor: theme.colors?.controlBg }
         ]}
       >
-        <TouchableOpacity style={styles.button} onPress={back}>
+        <Pressable style={buttonStyle} onPress={back}>
           <FontAwesome5Icon
             name="chevron-circle-left"
             solid
             size={24}
             color={theme.colors?.control}
           />
-        </TouchableOpacity>
+        </Pressable>
         <Text h2 style={[{ color: theme.colors?.control }]}>
           ファイル再生
         </Text>
@@ -299,14 +302,14 @@ const FileLoader = memo(() => {
           renderItem={listRenderer}
         />
         <View style={[containerStyle.row, containerStyle.center]}>
-          <TouchableOpacity style={styles.button} onPress={selectFile}>
+          <Pressable style={buttonStyle} onPress={selectFile}>
             <FontAwesome5Icon
               name="plus"
               solid
               color={theme.colors?.default}
               size={24}
             />
-          </TouchableOpacity>
+          </Pressable>
         </View>
         <View
           style={[
@@ -461,23 +464,23 @@ const ListProgram = memo(
             />
           </View>
           <View style={[containerStyle.row, styles.row]}>
-            <TouchableOpacity style={[styles.button]} onPress={onRemovePress}>
+            <Pressable style={buttonStyle} onPress={onRemovePress}>
               <FontAwesome5Icon
                 name="minus"
                 solid
                 size={24}
                 color={theme.colors?.default}
               />
-            </TouchableOpacity>
+            </Pressable>
             <View style={styles.spacer} />
-            <TouchableOpacity style={[styles.button]} onPress={onPlayPress}>
+            <Pressable style={buttonStyle} onPress={onPlayPress}>
               <FontAwesome5Icon
                 name="play"
                 solid
                 size={24}
                 color={theme.colors?.default}
               />
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </ListItem.Content>
       </ListItem>
@@ -494,13 +497,6 @@ const styles = StyleSheet.create({
     lineHeight: 40,
     marginHorizontal: 16,
     overflow: "hidden"
-  },
-  button: {
-    alignItems: "center",
-    flexDirection: "row",
-    height: 40,
-    justifyContent: "center",
-    width: 40
   },
   view: {
     flex: 1
@@ -525,4 +521,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     height: Platform.OS === "web" ? "auto" : 58
   }
+});
+
+const buttonStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => ({
+  alignItems: "center",
+  flexDirection: "row",
+  height: 40,
+  justifyContent: "center",
+  opacity: pressed ? 0.5 : 1,
+  width: 40
 });

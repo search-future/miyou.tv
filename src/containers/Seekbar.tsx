@@ -12,7 +12,14 @@ limitations under the License.
 */
 
 import React, { memo, useContext, useCallback, useMemo } from "react";
-import { TouchableOpacity, View, StyleSheet } from "react-native";
+import {
+  Pressable,
+  View,
+  StyleSheet,
+  PressableStateCallbackType,
+  StyleProp,
+  ViewStyle
+} from "react-native";
 import { Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
@@ -97,8 +104,8 @@ const Seekbar = () => {
   return (
     <View style={[containerStyle.row, styles.container]}>
       {program.recorded && (
-        <TouchableOpacity
-          style={styles.button}
+        <Pressable
+          style={buttonStyle}
           disabled={!program.recorded[extraIndex - 1]}
           onPress={prev}
         >
@@ -112,7 +119,7 @@ const Seekbar = () => {
             }
             size={24}
           />
-        </TouchableOpacity>
+        </Pressable>
       )}
       <StartText
         useClock={useClock}
@@ -131,8 +138,8 @@ const Seekbar = () => {
         onPress={timePress}
       />
       {program.recorded && (
-        <TouchableOpacity
-          style={styles.button}
+        <Pressable
+          style={buttonStyle}
           disabled={!program.recorded[extraIndex + 1]}
           onPress={next}
         >
@@ -146,7 +153,7 @@ const Seekbar = () => {
             }
             size={24}
           />
-        </TouchableOpacity>
+        </Pressable>
       )}
     </View>
   );
@@ -184,9 +191,9 @@ const TimeText = memo(
     }, [onPress]);
 
     return (
-      <TouchableOpacity onPress={onPressHandler}>
+      <Pressable style={pressableStyle} onPress={onPressHandler}>
         <Text style={[{ color: theme.colors?.control }]}>{timeText}</Text>
-      </TouchableOpacity>
+      </Pressable>
     );
   }
 );
@@ -292,12 +299,19 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     top: 0
-  },
-  button: {
-    alignItems: "center",
-    flexDirection: "row",
-    height: 40,
-    justifyContent: "center",
-    width: 40
   }
 });
+
+const buttonStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => ({
+  alignItems: "center",
+  flexDirection: "row",
+  height: 40,
+  justifyContent: "center",
+  opacity: pressed ? 0.5 : 1,
+  width: 40
+});
+const pressableStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => ({ opacity: pressed ? 0.5 : 1 });

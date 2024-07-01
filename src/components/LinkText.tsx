@@ -12,7 +12,13 @@ limitations under the License.
 */
 
 import React, { useCallback, PropsWithChildren, useContext } from "react";
-import { TouchableOpacity, StyleProp, ViewStyle, Linking } from "react-native";
+import {
+  Pressable,
+  PressableStateCallbackType,
+  StyleProp,
+  ViewStyle,
+  Linking
+} from "react-native";
 import { Text, TextProps, ThemeContext } from "react-native-elements";
 
 type Props = PropsWithChildren<
@@ -31,18 +37,23 @@ const LinkText = ({
 }: Props) => {
   const { theme } = useContext(ThemeContext);
 
+  const pressableStyle = useCallback<
+    (state: PressableStateCallbackType) => StyleProp<ViewStyle>
+  >(
+    ({ pressed }) => [
+      containerStyle,
+      pressed && { opacity: activeOpacity }
+    ],
+    [activeOpacity]
+  );
   const openUrl = useCallback(() => {
     Linking.openURL(url);
   }, [url]);
 
   return (
-    <TouchableOpacity
-      activeOpacity={activeOpacity}
-      style={[containerStyle]}
-      onPress={openUrl}
-    >
+    <Pressable style={pressableStyle} onPress={openUrl}>
       <Text style={[{ color: theme.colors?.primary }, style]} {...props} />
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 export default LinkText;

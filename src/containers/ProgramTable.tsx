@@ -21,8 +21,8 @@ import React, {
   useRef
 } from "react";
 import {
+  Pressable,
   ScrollView,
-  TouchableOpacity,
   View,
   StyleSheet,
   Platform,
@@ -30,7 +30,10 @@ import {
   PanResponder,
   LayoutChangeEvent,
   NativeScrollEvent,
-  NativeSyntheticEvent
+  NativeSyntheticEvent,
+  PressableStateCallbackType,
+  StyleProp,
+  ViewStyle
 } from "react-native";
 import { Badge, CheckBox, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
@@ -803,7 +806,7 @@ const ProgramTable = memo(() => {
             </Animated.View>
             <HourHeader />
           </ScrollView>
-          <TouchableOpacity style={styles.buttonLeft} onPress={onLeftPress}>
+          <Pressable style={leftButtonStyle} onPress={onLeftPress}>
             <FontAwesome5Icon
               name="angle-left"
               solid
@@ -811,8 +814,8 @@ const ProgramTable = memo(() => {
               color={theme.colors?.control}
               size={16}
             />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonRight} onPress={onRightPress}>
+          </Pressable>
+          <Pressable style={rightButtonStyle} onPress={onRightPress}>
             <FontAwesome5Icon
               name="angle-right"
               solid
@@ -820,8 +823,8 @@ const ProgramTable = memo(() => {
               color={theme.colors?.control}
               size={16}
             />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonTop} onPress={onTopPress}>
+          </Pressable>
+          <Pressable style={topButtonStyle} onPress={onTopPress}>
             <FontAwesome5Icon
               name={hasPrevious && isTop ? "angle-double-up" : "angle-up"}
               solid
@@ -829,8 +832,8 @@ const ProgramTable = memo(() => {
               color={theme.colors?.control}
               size={16}
             />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonBottom} onPress={onBottomPress}>
+          </Pressable>
+          <Pressable style={bottomButtonStyle} onPress={onBottomPress}>
             <FontAwesome5Icon
               name={hasNext && isBottom ? "angle-double-down" : "angle-down"}
               solid
@@ -838,7 +841,7 @@ const ProgramTable = memo(() => {
               color={theme.colors?.control}
               size={16}
             />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       )}
     </View>
@@ -890,6 +893,18 @@ const ChannelCell = memo(
 
     const { theme } = useContext(ThemeContext);
 
+    const cellStyle = useCallback<
+      (state: PressableStateCallbackType) => StyleProp<ViewStyle>
+    >(
+      ({ pressed }) => [
+        styles.channelCell,
+        {
+          borderColor: theme.colors?.controlBorder,
+          opacity: pressed ? 0.5 : 1
+        }
+      ],
+      []
+    );
     const onPressWithProps = useCallback(() => {
       if (onPress) {
         onPress(props);
@@ -897,19 +912,11 @@ const ChannelCell = memo(
     }, [props, onPress]);
 
     return (
-      <TouchableOpacity
-        style={[
-          styles.channelCell,
-          {
-            borderColor: theme.colors?.controlBorder
-          }
-        ]}
-        onPress={onPressWithProps}
-      >
+      <Pressable style={cellStyle} onPress={onPressWithProps}>
         <Text style={[textStyle.center, { color: theme.colors?.control }]}>
           {channelName}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
     );
   }
 );
@@ -1047,6 +1054,16 @@ const TableCell = memo(
 
     const { theme } = useContext(ThemeContext);
 
+    const cellStyle = useCallback<
+      (state: PressableStateCallbackType) => StyleProp<ViewStyle>
+    >(
+      ({ pressed }) => [
+        styles.tableCell,
+        selected && { backgroundColor: theme.colors?.selected },
+        pressed && { opacity: 0.5 }
+      ],
+      [selected]
+    );
     const onPressWithProps = useCallback(() => {
       if (onPress) {
         onPress(props);
@@ -1065,13 +1082,7 @@ const TableCell = memo(
           }
         ]}
       >
-        <TouchableOpacity
-          style={[
-            styles.tableCell,
-            selected && { backgroundColor: theme.colors?.selected }
-          ]}
-          onPress={onPressWithProps}
-        >
+        <Pressable style={cellStyle} onPress={onPressWithProps}>
           <View style={[containerStyle.row, containerStyle.wrap]}>
             <Text style={[textStyle.bold]}>
               <Text style={[{ color: theme.colors?.primary }]}>
@@ -1085,7 +1096,7 @@ const TableCell = memo(
             />
           </View>
           <Text>{detail}</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     );
   }
@@ -1286,25 +1297,38 @@ const styles = StyleSheet.create({
     lineHeight: 32,
     textAlign: "center",
     width: 32
-  },
-  buttonLeft: {
-    position: "absolute",
-    top: 0,
-    left: hourWidth
-  },
-  buttonRight: {
-    position: "absolute",
-    right: scrollbarWidth,
-    top: 0
-  },
-  buttonTop: {
-    position: "absolute",
-    left: 0,
-    top: 32
-  },
-  buttonBottom: {
-    bottom: 0,
-    position: "absolute",
-    left: 0
   }
+});
+
+const leftButtonStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => ({
+  opacity: pressed ? 0.5 : 1,
+  position: "absolute",
+  top: 0,
+  left: hourWidth
+});
+const rightButtonStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => ({
+  opacity: pressed ? 0.5 : 1,
+  position: "absolute",
+  right: scrollbarWidth,
+  top: 0
+});
+const topButtonStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => ({
+  opacity: pressed ? 0.5 : 1,
+  position: "absolute",
+  left: 0,
+  top: 32
+});
+const bottomButtonStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => ({
+  opacity: pressed ? 0.5 : 1,
+  bottom: 0,
+  position: "absolute",
+  left: 0
 });

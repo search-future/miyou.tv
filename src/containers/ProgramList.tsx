@@ -23,7 +23,7 @@ import React, {
 } from "react";
 import {
   FlatList,
-  TouchableOpacity,
+  Pressable,
   View,
   StyleSheet,
   Platform,
@@ -32,7 +32,10 @@ import {
   ListRenderItem,
   LayoutChangeEvent,
   NativeSyntheticEvent,
-  NativeScrollEvent
+  NativeScrollEvent,
+  PressableStateCallbackType,
+  StyleProp,
+  ViewStyle
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { Badge, ListItem, Text, ThemeContext } from "react-native-elements";
@@ -577,7 +580,7 @@ const ProgramList = memo(() => {
       )}
       {containerWidth > 0 && pages.length > 1 && (
         <View style={[containerStyle.row, containerStyle.center, styles.pager]}>
-          <TouchableOpacity onPress={firstPage}>
+          <Pressable style={pressableStyle} onPress={firstPage}>
             <FontAwesome5Icon
               name="angle-double-left"
               solid
@@ -585,8 +588,8 @@ const ProgramList = memo(() => {
               color={theme.colors?.primary}
               size={16}
             />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={previousPage}>
+          </Pressable>
+          <Pressable style={pressableStyle} onPress={previousPage}>
             <FontAwesome5Icon
               name="angle-left"
               solid
@@ -594,7 +597,7 @@ const ProgramList = memo(() => {
               color={theme.colors?.primary}
               size={16}
             />
-          </TouchableOpacity>
+          </Pressable>
           <View
             style={[
               styles.pagePickerWrapper,
@@ -627,7 +630,7 @@ const ProgramList = memo(() => {
               {pages.map(pagePickerRenderer)}
             </Picker>
           </View>
-          <TouchableOpacity onPress={nextPage}>
+          <Pressable style={pressableStyle} onPress={nextPage}>
             <FontAwesome5Icon
               name="angle-right"
               solid
@@ -635,8 +638,8 @@ const ProgramList = memo(() => {
               color={theme.colors?.primary}
               size={16}
             />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={lastPage}>
+          </Pressable>
+          <Pressable style={pressableStyle} onPress={lastPage}>
             <FontAwesome5Icon
               name="angle-double-right"
               solid
@@ -644,7 +647,7 @@ const ProgramList = memo(() => {
               color={theme.colors?.primary}
               size={16}
             />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       )}
     </View>
@@ -809,3 +812,7 @@ const styles = StyleSheet.create({
     maxHeight: 96
   }
 });
+
+const pressableStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => ({ opacity: pressed ? 0.5 : 1 });

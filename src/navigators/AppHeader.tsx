@@ -21,18 +21,20 @@ import React, {
   useMemo
 } from "react";
 import {
-  TouchableOpacity,
+  Pressable,
   View,
   TextInput,
   StyleSheet,
   Platform,
-  LayoutChangeEvent
+  LayoutChangeEvent,
+  PressableStateCallbackType,
+  StyleProp,
+  ViewStyle
 } from "react-native";
 import {
   Button,
   ButtonProps,
   Image,
-  InputProps,
   SearchBar,
   Text,
   ThemeContext
@@ -225,14 +227,14 @@ const NarrowHeader = memo(() => {
             source={require("../../assets/icon_32x32.png")}
           />
         )}
-        <TouchableOpacity style={styles.iconButton} onPress={openFile}>
+        <Pressable style={iconButtonStyle} onPress={openFile}>
           <FontAwesome5Icon
             name="folder-open"
             solid
             color={theme.colors?.control}
             size={24}
           />
-        </TouchableOpacity>
+        </Pressable>
       </View>
       <View
         style={[
@@ -252,22 +254,22 @@ const NarrowHeader = memo(() => {
           containerStyle.right
         ]}
       >
-        <TouchableOpacity style={styles.iconButton} onPress={reload}>
+        <Pressable style={iconButtonStyle} onPress={reload}>
           <FontAwesome5Icon
             name="sync"
             solid
             size={24}
             color={theme.colors?.control}
           />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton} onPress={openSetup}>
+        </Pressable>
+        <Pressable style={iconButtonStyle} onPress={openSetup}>
           <FontAwesome5Icon
             name="cog"
             solid
             size={24}
             color={theme.colors?.control}
           />
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </>
   );
@@ -346,7 +348,8 @@ const HeaderSearchBar = memo(() => {
   }, []);
 
   return (
-    <TouchableOpacity
+    <Pressable
+      style={pressableStyle}
       onPress={() => {
         searchRef.current?.focus();
       }}
@@ -363,7 +366,7 @@ const HeaderSearchBar = memo(() => {
         onSubmitEditing={onSubmitQuery}
         onClear={onClearQuery}
       />
-    </TouchableOpacity>
+    </Pressable>
   );
 });
 
@@ -392,12 +395,19 @@ const styles = StyleSheet.create({
   },
   searchInputContainer: {
     minWidth: 200
-  },
-  iconButton: {
-    alignItems: "center",
-    flexDirection: "row",
-    height: 40,
-    justifyContent: "center",
-    width: 40
   }
+});
+
+const pressableStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => ({ opacity: pressed ? 0.5 : 1 });
+const iconButtonStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => ({
+  alignItems: "center",
+  flexDirection: "row",
+  height: 40,
+  justifyContent: "center",
+  width: 40,
+  opacity: pressed ? 0.5 : 1
 });

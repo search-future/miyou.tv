@@ -21,12 +21,15 @@ import React, {
   ReactText
 } from "react";
 import {
+  Pressable,
   ScrollView,
   Switch,
-  TouchableOpacity,
   View,
   StyleSheet,
-  Platform
+  Platform,
+  PressableStateCallbackType,
+  StyleProp,
+  ViewStyle
 } from "react-native";
 import { Input, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
@@ -101,14 +104,14 @@ const Setup = () => {
           { backgroundColor: theme.colors?.controlBg }
         ]}
       >
-        <TouchableOpacity style={styles.button} onPress={back}>
+        <Pressable style={buttonStyle} onPress={back}>
           <FontAwesome5Icon
             name="chevron-circle-left"
             solid
             color={theme.colors?.control}
             size={24}
           />
-        </TouchableOpacity>
+        </Pressable>
         <Text h2 style={[{ color: theme.colors?.control }]}>
           MiyouTVの設定
         </Text>
@@ -1351,13 +1354,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     overflow: "hidden"
   },
-  button: {
-    alignItems: "center",
-    flexDirection: "row",
-    height: 40,
-    justifyContent: "center",
-    width: 40
-  },
   group: {
     alignSelf: "stretch",
     padding: 16,
@@ -1372,4 +1368,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     height: Platform.OS === "web" ? 36 : 60
   }
+});
+
+const buttonStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => ({
+  alignItems: "center",
+  flexDirection: "row",
+  height: 40,
+  justifyContent: "center",
+  opacity: pressed ? 0.5 : 1,
+  width: 40
 });

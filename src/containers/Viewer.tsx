@@ -21,13 +21,16 @@ import React, {
   useRef
 } from "react";
 import {
-  TouchableOpacity,
+  Pressable,
   View,
   StyleSheet,
   Platform,
   LayoutChangeEvent,
   ImageSourcePropType,
-  BackHandler
+  BackHandler,
+  PressableStateCallbackType,
+  StyleProp,
+  ViewStyle
 } from "react-native";
 import { ButtonGroup, Image, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
@@ -293,30 +296,22 @@ const Viewer = memo(() => {
                   containerStyle.center
                 ]}
               >
-                <TouchableOpacity
-                  style={styles.button}
-                  activeOpacity={0.8}
-                  onPress={play}
-                >
+                <Pressable style={buttonStyle} onPress={play}>
                   <FontAwesome5Icon
                     name="play"
                     solid
                     color={theme.colors?.control}
                     size={24}
                   />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button}
-                  activeOpacity={0.8}
-                  onPress={peakPlay}
-                >
+                </Pressable>
+                <Pressable style={buttonStyle} onPress={peakPlay}>
                   <FontAwesome5Icon
                     name="star"
                     solid
                     color={theme.colors?.control}
                     size={24}
                   />
-                </TouchableOpacity>
+                </Pressable>
               </View>
               {playing && (
                 <PlayerContainer
@@ -357,57 +352,53 @@ const Viewer = memo(() => {
                 ]}
               >
                 {mode === "stack" && (
-                  <TouchableOpacity style={styles.button} onPress={close}>
+                  <Pressable style={headerButtonStyle} onPress={close}>
                     <FontAwesome5Icon
                       name="chevron-circle-left"
                       solid
                       color={theme.colors?.control}
                       size={24}
                     />
-                  </TouchableOpacity>
+                  </Pressable>
                 )}
                 {mode === "view" && (
-                  <TouchableOpacity style={styles.button} onPress={undock}>
+                  <Pressable style={headerButtonStyle} onPress={undock}>
                     <FontAwesome5Icon
                       name="external-link-alt"
                       solid
                       color={theme.colors?.control}
                       size={24}
                     />
-                  </TouchableOpacity>
+                  </Pressable>
                 )}
                 {mode === "child" && (
-                  <TouchableOpacity style={styles.button} onPress={dock}>
+                  <Pressable style={headerButtonStyle} onPress={dock}>
                     <FontAwesome5Icon
                       name="columns"
                       solid
                       color={theme.colors?.control}
                       size={24}
                     />
-                  </TouchableOpacity>
+                  </Pressable>
                 )}
                 <Text h2 style={[[{ color: theme.colors?.control }]]}>
                   {program.rank ? `${program.rank}. ` : ""}
                   {program.fullTitle}
                 </Text>
                 {mode === "view" && (
-                  <TouchableOpacity style={styles.button} onPress={close}>
+                  <Pressable style={headerButtonStyle} onPress={close}>
                     <FontAwesome5Icon
                       name="times"
                       solid
                       color={theme.colors?.control}
                       size={24}
                     />
-                  </TouchableOpacity>
+                  </Pressable>
                 )}
               </View>
             )}
             {(!playing || controlEnabled) && programs[index - 1] && (
-              <TouchableOpacity
-                style={[styles.button, styles.buttonPrevious]}
-                activeOpacity={0.8}
-                onPress={previous}
-              >
+              <Pressable style={previousButtonStyle} onPress={previous}>
                 <FontAwesome5Icon
                   name="chevron-left"
                   solid
@@ -415,14 +406,10 @@ const Viewer = memo(() => {
                   size={24}
                   color={theme.colors?.control}
                 />
-              </TouchableOpacity>
+              </Pressable>
             )}
             {(!playing || controlEnabled) && programs[index + 1] && (
-              <TouchableOpacity
-                style={[styles.button, styles.buttonNext]}
-                activeOpacity={0.8}
-                onPress={next}
-              >
+              <Pressable style={nextButtonStyle} onPress={next}>
                 <FontAwesome5Icon
                   name="chevron-right"
                   solid
@@ -430,7 +417,7 @@ const Viewer = memo(() => {
                   color={theme.colors?.control}
                   size={24}
                 />
-              </TouchableOpacity>
+              </Pressable>
             )}
           </View>
           {(!playing || !expand) && (
@@ -527,15 +514,44 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: "center",
     width: 40
-  },
-  buttonPrevious: {
+  }
+});
+
+const buttonStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => [
+  styles.button,
+  {
+    opacity: pressed ? 0.8 : 1
+  }
+];
+const headerButtonStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => [
+  styles.button,
+  {
+    opacity: pressed ? 0.5 : 1
+  }
+];
+const previousButtonStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => [
+  styles.button,
+  {
     left: 0,
+    opacity: pressed ? 0.8 : 1,
     position: "absolute",
     top: 40
-  },
-  buttonNext: {
+  }
+];
+const nextButtonStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => [
+  styles.button,
+  {
+    opacity: pressed ? 0.8 : 1,
     position: "absolute",
     right: 0,
     top: 40
   }
-});
+];

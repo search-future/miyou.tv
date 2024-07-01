@@ -1,10 +1,13 @@
 import React, { useContext, useCallback, memo } from "react";
 import {
   Switch,
-  TouchableOpacity,
+  Pressable,
   View,
   Platform,
-  StyleSheet
+  StyleSheet,
+  PressableStateCallbackType,
+  StyleProp,
+  ViewStyle
 } from "react-native";
 import { Text, ThemeContext } from "react-native-elements";
 import { Menu, MenuTrigger, MenuOptions } from "react-native-popup-menu";
@@ -153,25 +156,25 @@ const PropertySwitch = memo(
 
     return (
       <View style={[containerStyle.row, containerStyle.center]}>
-        <TouchableOpacity style={styles.button} onPress={onPrevious}>
+        <Pressable style={buttonStyle} onPress={onPrevious}>
           <FontAwesome5Icon
             name="caret-left"
             solid
             color={theme.colors?.control}
             size={24}
           />
-        </TouchableOpacity>
+        </Pressable>
         <Text style={[styles.optionValue, { color: theme.colors?.control }]}>
           {value}
         </Text>
-        <TouchableOpacity style={styles.button} onPress={onNext}>
+        <Pressable style={buttonStyle} onPress={onNext}>
           <FontAwesome5Icon
             name="caret-right"
             solid
             color={theme.colors?.control}
             size={24}
           />
-        </TouchableOpacity>
+        </Pressable>
       </View>
     );
   }
@@ -515,3 +518,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 8
   }
 });
+
+const buttonStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => [
+  styles.button,
+  pressed ? { opacity: 0.5 } : null
+];

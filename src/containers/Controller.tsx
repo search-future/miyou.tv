@@ -12,7 +12,15 @@ limitations under the License.
 */
 
 import React, { memo, useContext, useCallback, useMemo } from "react";
-import { TouchableOpacity, View, StyleSheet, Platform } from "react-native";
+import {
+  Pressable,
+  View,
+  StyleSheet,
+  Platform,
+  PressableStateCallbackType,
+  StyleProp,
+  ViewStyle
+} from "react-native";
 import { Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon, {
   FontAwesome5IconProps
@@ -73,9 +81,9 @@ const TogglePlayButton = memo(() => {
   }, []);
 
   return (
-    <TouchableOpacity style={styles.button} onPress={onPress}>
+    <Pressable style={buttonStyle} onPress={onPress}>
       <ControlIcon name={pause ? "play" : "pause"} solid />
-    </TouchableOpacity>
+    </Pressable>
   );
 });
 
@@ -90,7 +98,7 @@ const JumpButton = memo(({ seconds }: { seconds: number }) => {
   }, [time, seconds]);
 
   return (
-    <TouchableOpacity style={styles.button} onPress={onPress}>
+    <Pressable style={buttonStyle} onPress={onPress}>
       {seconds < 0 && (
         <FontAwesome5Icon
           name="caret-left"
@@ -110,7 +118,7 @@ const JumpButton = memo(({ seconds }: { seconds: number }) => {
           size={24}
         />
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 });
 
@@ -168,9 +176,9 @@ const VolumeController = memo(() => {
             }
           ]}
         >
-          <TouchableOpacity style={styles.button} onPress={toggleMute}>
+          <Pressable style={buttonStyle} onPress={toggleMute}>
             <ControlIcon name={volumeIcon} solid />
-          </TouchableOpacity>
+          </Pressable>
           <CustomSlider
             style={styles.slider}
             allowTouchTrack
@@ -201,9 +209,9 @@ const ToggleCommentButton = memo(() => {
   }, [enabled]);
 
   return (
-    <TouchableOpacity style={styles.button} onPress={onPress}>
+    <Pressable style={buttonStyle} onPress={onPress}>
       <ControlIcon name={enabled ? "comment-dots" : "comment-slash"} solid />
-    </TouchableOpacity>
+    </Pressable>
   );
 });
 
@@ -218,9 +226,9 @@ const ToggleExpandButton = memo(() => {
   }, [expand]);
 
   return (
-    <TouchableOpacity style={styles.button} onPress={onPress}>
+    <Pressable style={buttonStyle} onPress={onPress}>
       <ControlIcon name={expand ? "bars" : "arrows-alt"} solid />
-    </TouchableOpacity>
+    </Pressable>
   );
 });
 
@@ -235,9 +243,9 @@ const ToggleFullScreenButton = memo(() => {
   }, [fullScreen]);
 
   return (
-    <TouchableOpacity style={styles.button} onPress={onPress}>
+    <Pressable style={buttonStyle} onPress={onPress}>
       <ControlIcon name={fullScreen ? "compress" : "expand"} solid />
-    </TouchableOpacity>
+    </Pressable>
   );
 });
 
@@ -287,3 +295,10 @@ const styles = StyleSheet.create({
     height: 40
   }
 });
+
+const buttonStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => [
+  styles.button,
+  pressed ? { opacity: 0.5 } : null
+];
