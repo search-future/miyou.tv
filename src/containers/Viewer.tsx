@@ -154,22 +154,23 @@ const Viewer = memo(() => {
       }
     }
   }, [program]);
-  useEffect(() => {
-    const subscription = BackHandler.addEventListener(
-      "hardwareBackPress",
-      () => {
-        if (playing && controlEnabled) {
-          dispatch(ViewerActions.update({ control: false }));
-          return true;
+  if (Platform.OS !== "web") {
+    useEffect(() => {
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        () => {
+          if (playing && controlEnabled) {
+            dispatch(ViewerActions.update({ control: false }));
+            return true;
+          }
+          return false;
         }
-        return false;
-      }
-    );
-    return () => {
-      subscription.remove();
-    };
-  }, [playing, controlEnabled]);
-
+      );
+      return () => {
+        subscription.remove();
+      };
+    }, [playing, controlEnabled]);
+  }
   const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
     if (layoutCallbackId.current != null) {
       clearTimeout(layoutCallbackId.current);
