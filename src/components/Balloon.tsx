@@ -11,17 +11,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { useMemo, PropsWithChildren } from "react";
+import React, { useMemo, PropsWithChildren, useCallback } from "react";
 import {
+  Pressable,
   Text,
-  TouchableOpacity,
-  TouchableOpacityProps,
   View,
-  ViewProps,
-  ViewStyle,
   StyleSheet,
+  PressableProps,
+  PressableStateCallbackType,
   StyleProp,
-  TextStyle
+  TextStyle,
+  ViewStyle
 } from "react-native";
 
 type Props = PropsWithChildren<
@@ -33,7 +33,7 @@ type Props = PropsWithChildren<
     containerStyle?: StyleProp<ViewStyle>;
     triangleStyle?: StyleProp<ViewStyle>;
     textStyle?: StyleProp<TextStyle>;
-  } & TouchableOpacityProps
+  } & PressableProps
 >;
 const Balloon = ({
   children,
@@ -60,19 +60,22 @@ const Balloon = ({
     }
     return pointingStyle;
   }, [pointing]);
-  const Wrapper = useMemo(
-    () => (props: PropsWithChildren<TouchableOpacityProps | ViewProps>) =>
-      onPress || onLongPress ? (
-        <TouchableOpacity {...props} />
-      ) : (
-        <View {...(props as ViewProps)} />
-      ),
-    [onPress, onLongPress]
+
+  const pressableStyle = useCallback<
+    (state: PressableStateCallbackType) => StyleProp<ViewStyle>
+  >(
+    ({ pressed }) => [
+      styles.wrapper,
+      wrapperStyle,
+      !onPress && !onLongPress && { pointerEvents:  "none" },
+      pressed && { opacity: 0.5 }
+    ],
+    [wrapperStyle, onPress, onLongPress]
   );
 
   return (
-    <Wrapper
-      style={[styles.wrapper, wrapperStyle]}
+    <Pressable
+      style={pressableStyle}
       onPress={onPress}
       onLongPress={onLongPress}
     >
@@ -89,7 +92,7 @@ const Balloon = ({
           triangleStyle
         ])}
       />
-    </Wrapper>
+    </Pressable>
   );
 };
 export default Balloon;

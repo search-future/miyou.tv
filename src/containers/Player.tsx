@@ -24,7 +24,6 @@ import KeepAwake from "react-native-keep-awake";
 import Toast from "react-native-root-toast";
 import { useDispatch, useSelector } from "react-redux";
 import qs from "qs";
-// @ts-ignore
 import { VLCPlayer } from "react-native-vlc-media-player";
 // @ts-ignore
 import { Immersive } from "react-native-immersive";
@@ -47,6 +46,7 @@ type Setting = SettingState & {
     volume?: string;
     speed?: string;
     repeat?: string;
+    deinterlace?: boolean;
   };
 };
 type State = RootState & {
@@ -72,7 +72,7 @@ const Player = () => {
     ({ setting }) => setting.backend?.mobileStreamParams || ""
   );
   const mute = useSelector<State, boolean>(
-    ({ setting }) => setting.player?.mute
+    ({ setting }) => !!setting.player?.mute
   );
   const volume = useSelector<State, number>(({ setting }) =>
     parseInt(
@@ -100,8 +100,10 @@ const Player = () => {
   const dualMonoMode = useSelector<State, string>(
     ({ player }) => player.dualMonoMode
   );
-  const seekTime = useSelector<State, number>(({ player }) => player.seekTime);
-  const seekPosition = useSelector<State, number>(
+  const seekTime = useSelector<State, number | null | undefined>(
+    ({ player }) => player.seekTime
+  );
+  const seekPosition = useSelector<State, number | null | undefined>(
     ({ player }) => player.seekPosition
   );
   const programs = useSelector<State, ViewerProgram[]>(
@@ -338,6 +340,7 @@ const Player = () => {
   useEffect(() => {
     if (seekPosition != null) {
       if (vlcRef.current && seekable.current) {
+        // @ts-ignore
         vlcRef.current.seek(seekPosition);
       } else {
         dispatch(PlayerActions.time(seekPosition * duration));
@@ -484,6 +487,7 @@ const Player = () => {
         volume={volume}
         source={{
           uri,
+          // @ts-ignore
           initType: 0,
           initOptions: [...initOptions]
         }}
@@ -504,7 +508,7 @@ const Player = () => {
       rate={speed}
       muted={mute}
       volume={volume / 100}
-      source={{ uri, type: "m3u8" } as any}
+      source={{ uri, type: "m3u8" }}
       selectedAudioTrack={{ type: "index", value: audioTrack }}
       stereoPan={stereoPan}
       ref={videoRef}

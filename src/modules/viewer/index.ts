@@ -11,32 +11,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { AnyAction } from "redux";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { LayoutRectangle } from "react-native";
 
-import {
-  VIEWER_INIT,
-  VIEWER_OPEN,
-  VIEWER_CLOSE,
-  VIEWER_RESIZE,
-  VIEWER_UPDATE,
-  ViewerProgram
-} from "./actions";
+import { Program } from "../../services/BackendService";
 
-export {
-  VIEWER_INIT,
-  VIEWER_READY,
-  VIEWER_OPEN,
-  VIEWER_CLOSE,
-  VIEWER_DOCK,
-  VIEWER_UNDOCK,
-  VIEWER_SEARCH,
-  VIEWER_RESIZE,
-  VIEWER_UPDATE,
-  ViewerProgram,
-  ViewerActions
-} from "./actions";
 export { viewerSaga } from "./saga";
+
+export type ViewerProgram = Program & {
+  commentCount?: number;
+  commentSpeed?: number;
+  commentMaxSpeed?: number;
+  commentMaxSpeedTime?: Date;
+  rank?: number;
+};
 
 export type ViewerState = {
   isOpened: boolean;
@@ -62,34 +50,53 @@ const initialState: ViewerState = {
   peakPlay: false,
   control: true
 };
-export default function viewerReducer(state = initialState, action: AnyAction) {
-  switch (action.type) {
-    case VIEWER_INIT: {
-      const { mode } = action;
-      return { ...state, mode };
-    }
-    case VIEWER_OPEN: {
-      const { programs = [], index = 0 } = action;
-      return { ...state, programs, index, isOpened: true, extraIndex: 0 };
-    }
-    case VIEWER_CLOSE: {
-      return { ...state, isOpened: false, playing: false };
-    }
-    case VIEWER_RESIZE: {
-      const { layout } = action;
-      return {
+const viewerSlice = createSlice({
+  name: "viewer",
+  initialState,
+  reducers: {
+    init: (state, action: PayloadAction<"stack" | "view" | "child">) => ({
+      ...state,
+      mode: action.payload
+    }),
+    ready: state => state,
+    open: {
+      reducer: (
+        state,
+        action: PayloadAction<{ programs: ViewerProgram[]; index: number }>
+      ) => ({
         ...state,
-        layout
-      };
-    }
-    case VIEWER_UPDATE: {
-      const { data = {} } = action;
-      return {
-        ...state,
-        ...data
-      };
-    }
-    default:
-      return state;
+        ...action.payload,
+        isOpened: true,
+        extraIndex: 0
+      }),
+      prepare: (programs: ViewerProgram[], index: number) => ({
+        payload: { programs, index },
+        meta: null,
+        error: null
+      })
+    },
+    close: state => ({ ...state, isOpened: false, playing: false }),
+    dock: state => state,
+    undock: state => state,
+    search: (state, action: PayloadAction<string>) => state,
+    resize: (state, action: PayloadAction<LayoutRectangle>) => ({
+      ...state,
+      layout: action.payload
+    }),
+    update: (
+      state,
+      action: PayloadAction<{
+        programs?: ViewerProgram[];
+        index?: number;
+        extraIndex?: number;
+        stacking?: boolean;
+        playing?: boolean;
+        peakPlay?: boolean;
+        control?: boolean;
+      }>
+    ) => ({ ...state, ...action.payload })
   }
-}
+});
+
+export const ViewerActions = viewerSlice.actions;
+export default viewerSlice.reducer;

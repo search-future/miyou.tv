@@ -11,57 +11,37 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { AnyAction } from "redux";
-
-export const SETTING_UPDATE = "SETTING_UPDATE";
-function update(key: string, setting: any) {
-  return {
-    type: SETTING_UPDATE,
-    key,
-    setting
-  };
-}
-
-export const SETTING_RESTORE = "SETTING_RESTORE";
-function restore(setting: any) {
-  return {
-    type: SETTING_RESTORE,
-    setting
-  };
-}
-
-export const SettingActions = { update, restore };
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 export type SettingState = {
   [key: string]: any;
 };
 const initialState: SettingState = {};
-export default function settingReducer(
-  state = initialState,
-  action: AnyAction
-) {
-  switch (action.type) {
-    case SETTING_UPDATE: {
-      const { key, setting } = action;
-      if (typeof setting === "object" && setting != null) {
-        return {
-          ...state,
-          [key]: { ...state[key], ...setting }
-        };
-      }
+const settingSlice = createSlice({
+  name: "setting",
+  initialState,
+  reducers: {
+    update: {
+      reducer: (state, action) => {
+        const { key, setting } = action.payload;
+        if (typeof setting === "object" && setting != null) {
+          return { ...state, [key]: { ...state[key], ...setting } };
+        }
+        return { ...state, [key]: setting };
+      },
+      prepare: (key: string, setting: any) => ({
+        payload: { key, setting },
+        meta: null,
+        error: null
+      })
+    },
+    restore: (state, action: PayloadAction<SettingState>) => {
       return {
-        ...state,
-        [key]: setting
+        ...action.payload
       };
-    }
-    case SETTING_RESTORE: {
-      const { setting } = action;
-      return {
-        ...setting
-      };
-    }
-    default: {
-      return state;
     }
   }
-}
+});
+
+export const SettingActions = settingSlice.actions;
+export default settingSlice.reducer;

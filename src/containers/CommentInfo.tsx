@@ -22,12 +22,15 @@ import React, {
 } from "react";
 import {
   FlatList,
+  Pressable,
   ScrollView,
-  TouchableOpacity,
   View,
   StyleSheet,
   Platform,
-  ListRenderItem
+  ListRenderItem,
+  PressableStateCallbackType,
+  StyleProp,
+  ViewStyle
 } from "react-native";
 import { Text, CheckBox, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
@@ -38,6 +41,7 @@ import {
   MenuOption
 } from "react-native-popup-menu";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
+import Toast from "react-native-root-toast";
 
 import containerStyle from "../styles/container";
 import textStyle from "../styles/text";
@@ -150,7 +154,14 @@ const CommentInfo = memo(() => {
     if (autoScroll) {
       const updater = () => {
         if (data[pointer]) {
-          listRef.current?.scrollToIndex({ index: pointer, viewPosition: 1 });
+          try {
+            listRef.current?.scrollToIndex({
+              index: pointer,
+              viewPosition: 1
+            });
+          } catch (e: any) {
+            Toast.show(e.message);
+          }
         }
         lastUpdate.current = Date.now();
       };
@@ -319,14 +330,14 @@ const CommentInfo = memo(() => {
           </MenuOptions>
         </Menu>
         <View style={styles.spacer} />
-        <TouchableOpacity style={styles.button} onPress={toggleAutoScroll}>
+        <Pressable style={buttonStyle} onPress={toggleAutoScroll}>
           <FontAwesome5Icon
             name="sort-amount-down"
             solid
             color={autoScroll ? theme.colors?.primary : theme.colors?.control}
             size={16}
           />
-        </TouchableOpacity>
+        </Pressable>
       </View>
       <FlatList
         style={[
@@ -463,18 +474,28 @@ const CommentListItem = memo(
         onSelect(props);
       }
     }, [props, onSelect]);
+    const anchorContentStyle = useCallback<
+      (state: PressableStateCallbackType) => StyleProp<ViewStyle>
+    >(
+      ({ pressed }) => [
+        styles.anchorContent,
+        { borderColor: theme.colors?.border, opacity: pressed ? 0.5 : 1 }
+      ],
+      []
+    );
     const anchorRenderer = useCallback(
       ({ index, comment }: { index: number; comment: CommentData }) => (
-        <TouchableOpacity
+        <Pressable
           key={index}
-          style={[
+          style={({ pressed }) => [
             styles.anchorButton,
             {
               backgroundColor:
                 comment === anchorComment
                   ? theme.colors?.selected
                   : theme.colors?.background,
-              borderColor: theme.colors?.border
+              borderColor: theme.colors?.border,
+              opacity: pressed ? 0.5 : 1
             }
           ]}
           onPress={() => {
@@ -482,7 +503,7 @@ const CommentListItem = memo(
           }}
         >
           <Text>{`>>${index}`}</Text>
-        </TouchableOpacity>
+        </Pressable>
       ),
       [anchorComment]
     );
@@ -574,11 +595,8 @@ const CommentListItem = memo(
             </View>
           )}
           {anchorComment && (
-            <TouchableOpacity
-              style={[
-                styles.anchorContent,
-                { borderColor: theme.colors?.border }
-              ]}
+            <Pressable
+              style={anchorContentStyle}
               onPress={onAnchorCommentSelect}
             >
               <Text style={[styles.itemMenuText]}>
@@ -588,7 +606,7 @@ const CommentListItem = memo(
               <Text style={[textStyle.bold, styles.itemMenuContent]}>
                 {anchorComment.text.trim()}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           )}
         </MenuOptions>
       </Menu>
@@ -706,3 +724,10 @@ const styles = StyleSheet.create({
     padding: 8
   }
 });
+
+const buttonStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => [
+  styles.button,
+  { opacity: pressed ? 0.5 : 1 }
+];

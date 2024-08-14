@@ -21,10 +21,13 @@ import React, {
   useMemo
 } from "react";
 import {
-  TouchableOpacity,
+  Pressable,
   View,
   StyleSheet,
-  LayoutChangeEvent
+  LayoutChangeEvent,
+  PressableStateCallbackType,
+  StyleProp,
+  ViewStyle
 } from "react-native";
 import { Image, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
@@ -48,7 +51,9 @@ const Titlebar = memo(() => {
   const maximized = useSelector<RootState, boolean>(
     ({ window }) => window.maximized
   );
-  const title = useSelector<RootState, string>(({ window }) => window.title);
+  const title = useSelector<RootState, string>(
+    ({ window }) => window.title || ""
+  );
 
   const [containerWidth, setContainerWidth] = useState(0);
 
@@ -153,7 +158,7 @@ const Titlebar = memo(() => {
           style={[styles.contents, containerStyle.row, containerStyle.right]}
         >
           <div className="button">
-            <TouchableOpacity style={styles.button} onPress={toggleAlwaysOnTop}>
+            <Pressable style={buttonStyle} onPress={toggleAlwaysOnTop}>
               <FontAwesome5Icon
                 name="thumbtack"
                 solid
@@ -161,55 +166,55 @@ const Titlebar = memo(() => {
                   alwaysOnTop ? theme.colors?.primary : theme.colors?.titlebar
                 }
               />
-            </TouchableOpacity>
+            </Pressable>
           </div>
           <div className="button">
-            <TouchableOpacity style={styles.button} onPress={minimize}>
+            <Pressable style={buttonStyle} onPress={minimize}>
               <FontAwesome5Icon
                 name="window-minimize"
                 solid
                 color={theme.colors?.titlebar}
               />
-            </TouchableOpacity>
+            </Pressable>
           </div>
           {maximized ? (
             <div className="button">
-              <TouchableOpacity style={styles.button} onPress={restore}>
+              <Pressable style={buttonStyle} onPress={restore}>
                 <FontAwesome5Icon
                   name="window-restore"
                   solid
                   color={theme.colors?.titlebar}
                 />
-              </TouchableOpacity>
+              </Pressable>
             </div>
           ) : (
             <div className="button">
-              <TouchableOpacity style={styles.button} onPress={maximize}>
+              <Pressable style={buttonStyle} onPress={maximize}>
                 <FontAwesome5Icon
                   name="window-maximize"
                   solid
                   color={theme.colors?.titlebar}
                 />
-              </TouchableOpacity>
+              </Pressable>
             </div>
           )}
           <div className="button">
-            <TouchableOpacity style={styles.button} onPress={toggleFullScreen}>
+            <Pressable style={buttonStyle} onPress={toggleFullScreen}>
               <FontAwesome5Icon
                 name="square-full"
                 solid
                 color={theme.colors?.titlebar}
               />
-            </TouchableOpacity>
+            </Pressable>
           </div>
           <div className="button close">
-            <TouchableOpacity style={styles.button} onPress={close}>
+            <Pressable style={buttonStyle} onPress={close}>
               <FontAwesome5Icon
                 name="times"
                 solid
                 color={theme.colors?.titlebar}
               />
-            </TouchableOpacity>
+            </Pressable>
           </div>
         </View>
       </View>
@@ -236,12 +241,16 @@ const styles = StyleSheet.create({
   title: {
     height: 19,
     overflow: "hidden"
-  },
-  button: {
-    alignItems: "center",
-    flexDirection: "row",
-    height: 24,
-    justifyContent: "center",
-    width: 32
   }
+});
+
+const buttonStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => ({
+  alignItems: "center",
+  flexDirection: "row",
+  height: 24,
+  justifyContent: "center",
+  opacity: pressed ? 0.5 : 1,
+  width: 32
 });

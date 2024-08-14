@@ -14,7 +14,7 @@ limitations under the License.
 import { call, delay, put, select } from "redux-saga/effects";
 import Toast from "react-native-root-toast";
 
-import { ProgramActions } from "./actions";
+import { ProgramActions } from ".";
 import { LoadingActions } from "../loading";
 import { getBackendService, getCommentService } from "../../services";
 import BackendService, {
@@ -248,7 +248,6 @@ export function* rankingSaga() {
     }
     intervals.sort((a, b) => a.n_hits - b.n_hits);
 
-    const programs: ProgramRankingProgram[] = [];
     const limit = parseInt(view, 10);
     let current = 0;
     let index = 0;
@@ -256,6 +255,7 @@ export function* rankingSaga() {
 
     yield put(LoadingActions.start());
 
+    let programs: ProgramRankingProgram[] = [];
     while (programs.length < limit) {
       const interval = intervals.pop();
       if (interval == null) {
@@ -331,15 +331,16 @@ export function* rankingSaga() {
             rank = index;
             current = commentMaxSpeed;
           }
-          programs.push({
-            ...program,
-            commentMaxSpeed,
-            commentMaxSpeedTime,
-            rank
-          });
-          yield put(
-            ProgramActions.update("ranking", { programs: [...programs] })
-          );
+          programs = [
+            ...programs,
+            {
+              ...program,
+              commentMaxSpeed,
+              commentMaxSpeedTime,
+              rank
+            }
+          ];
+          yield put(ProgramActions.update("ranking", { programs }));
           yield delay(0);
         }
       }

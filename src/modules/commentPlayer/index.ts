@@ -11,32 +11,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { AnyAction } from "redux";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
-import {
-  COMMENT_PLAYER_INIT,
-  COMMENT_PLAYER_INTERVALS,
-  COMMENT_PLAYER_PUSH,
-  COMMENT_PLAYER_SEEK,
-  COMMENT_PLAYER_FILTERS,
-  COMMENT_PLAYER_AUTOSCROLL,
-  CommentInterval,
-  CommentData
-} from "./actions";
-
-export {
-  COMMENT_PLAYER_INIT,
-  COMMENT_PLAYER_LOAD,
-  COMMENT_PLAYER_INTERVALS,
-  COMMENT_PLAYER_PUSH,
-  COMMENT_PLAYER_SEEK,
-  COMMENT_PLAYER_FILTERS,
-  COMMENT_PLAYER_AUTOSCROLL,
-  CommentPlayerActions,
-  CommentInterval,
-  CommentData
-} from "./actions";
 export { commentPlayerSaga } from "./saga";
+
+export type CommentInterval = {
+  n_hits: number;
+  start: number;
+  isLoaded?: boolean;
+};
+
+export type CommentData = {
+  title: string;
+  name: string;
+  email: string;
+  text: string;
+  id: string;
+  time: number;
+};
 
 export type CommentPlayerState = {
   channel: string;
@@ -62,36 +54,40 @@ const initialState: CommentPlayerState = {
   speed: 0,
   autoScroll: true
 };
-export default function commentPlayerReducer(
-  state = initialState,
-  action: AnyAction
-) {
-  switch (action.type) {
-    case COMMENT_PLAYER_INIT: {
-      const { channel, start, end } = action;
-      return {
+const commentPlayerSlice = createSlice({
+  name: "commentPlayer",
+  initialState,
+  reducers: {
+    init: {
+      reducer: (
+        state,
+        action: PayloadAction<{ channel: string; start: number; end: number }>
+      ) => ({
         ...state,
-        channel,
-        start,
-        end,
+        ...action.payload,
         intervals: [],
         data: [],
         titles: [],
         speed: 0
-      };
-    }
-    case COMMENT_PLAYER_INTERVALS: {
-      const { intervals } = action;
-      return { ...state, intervals };
-    }
-    case COMMENT_PLAYER_PUSH: {
-      if (action.data && action.data.length > 0) {
-        const data = [...state.data];
-        data.push(...action.data);
+      }),
+      prepare: (channel: string, start: number, end: number) => ({
+        payload: { channel, start, end },
+        meta: null,
+        error: null
+      })
+    },
+    load: (state, action: PayloadAction<number>) => state,
+    intervals: (state, action: PayloadAction<CommentInterval[]>) => ({
+      ...state,
+      intervals: action.payload
+    }),
+    push: (state, action: PayloadAction<CommentData[]>) => {
+      if (action.payload && action.payload.length > 0) {
+        const data = [...state.data, ...action.payload];
         data.sort((a, b) => a.time - b.time);
         const titles = [...state.titles];
         const filters = [...state.filters];
-        for (const comment of action.data) {
+        for (const comment of action.payload) {
           const { title } = comment;
           if (titles.indexOf(title) < 0) {
             titles.push(title);
@@ -102,9 +98,9 @@ export default function commentPlayerReducer(
         return { ...state, data, titles, filters };
       }
       return state;
-    }
-    case COMMENT_PLAYER_SEEK: {
-      let { pointer } = action;
+    },
+    seek: (state, action: PayloadAction<number>) => {
+      let pointer = action.payload;
       const { intervals, data } = state;
       let { speed } = state;
       if (pointer >= data.length) {
@@ -120,16 +116,17 @@ export default function commentPlayerReducer(
         }
       }
       return { ...state, pointer, speed };
-    }
-    case COMMENT_PLAYER_FILTERS: {
-      const { filters } = action;
-      return { ...state, filters };
-    }
-    case COMMENT_PLAYER_AUTOSCROLL: {
-      const { enabled } = action;
-      return { ...state, autoScroll: enabled };
-    }
-    default:
-      return state;
+    },
+    setFilters: (state, action: PayloadAction<string[]>) => ({
+      ...state,
+      filters: action.payload
+    }),
+    setAutoScroll: (state, action: PayloadAction<boolean>) => ({
+      ...state,
+      autoScroll: action.payload
+    })
   }
-}
+});
+
+export const CommentPlayerActions = commentPlayerSlice.actions;
+export default commentPlayerSlice.reducer;

@@ -13,11 +13,14 @@ limitations under the License.
 
 import React, { useState, useCallback, useRef, useMemo } from "react";
 import {
+  Pressable,
   Text,
-  TouchableOpacity,
   View,
   StyleSheet,
-  Platform
+  Platform,
+  PressableStateCallbackType,
+  StyleProp,
+  ViewStyle
 } from "react-native";
 import ReactNativeBlobUtil, {
   FetchBlobResponse,
@@ -107,6 +110,27 @@ const DownloadButton = ({
     [progress]
   );
 
+  const pressableStyle = useCallback<
+  (state: PressableStateCallbackType) => StyleProp<ViewStyle>
+>(
+    ({ pressed }: PressableStateCallbackType) => [
+      [
+        styles.container,
+        {
+          borderColor,
+          backgroundColor: buttonColor,
+          opacity: pressed ? 0.5 : 1
+        }
+      ]
+    ],
+    [borderColor, buttonColor]
+  );
+  const cancelButtonStyle = useCallback<
+    (state: PressableStateCallbackType) => StyleProp<ViewStyle>
+  >(
+    ({ pressed }) => [[styles.cancel, { opacity: pressed ? 0.5 : 1 }]],
+    [borderColor, backgroundColor]
+  );
   const onPress = useCallback(async () => {
     try {
       const { uri, filename } = source;
@@ -148,12 +172,7 @@ const DownloadButton = ({
     case "started": {
       const { started = `${title} ダウンロード中` } = statusText;
       return (
-        <View
-          style={[
-            styles.container,
-            { borderColor, backgroundColor: backgroundColor }
-          ]}
-        >
+        <View style={[styles.container, { borderColor, backgroundColor }]}>
           <Text style={[styles.progressText, { color }]}>{started}</Text>
           {Platform.OS !== "ios" && (
             <Text style={[styles.progressText, { color }]}>
@@ -171,9 +190,9 @@ const DownloadButton = ({
               }
             ]}
           />
-          <TouchableOpacity style={styles.cancel} onPress={onCancelPress}>
+          <Pressable style={cancelButtonStyle} onPress={onCancelPress}>
             <Text style={[styles.text, { color }]}>&times;</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       );
     }
@@ -195,14 +214,11 @@ const DownloadButton = ({
   }
   const { stopped = title } = statusText;
   return (
-    <TouchableOpacity
-      style={[styles.container, { borderColor, backgroundColor: buttonColor }]}
-      onPress={onPress}
-    >
+    <Pressable style={pressableStyle} onPress={onPress}>
       <Text style={[styles.text, { color }]}>
         {stopped} {total && `(${total})`}
       </Text>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 

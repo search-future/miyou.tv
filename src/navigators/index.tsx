@@ -36,7 +36,7 @@ const AppNavigator = () => {
   );
 
   useEffect(() => {
-    replaceTheme(getTheme(colorScheme));
+    replaceTheme(getTheme(colorScheme) as any);
     if (Platform.OS === "ios") {
       setReset(true);
     }

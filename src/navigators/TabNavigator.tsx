@@ -41,7 +41,7 @@ const TabNavigator = () => {
 
   useEffect(() => {
     if (route) {
-      dispatch(NavActions.saveTab(route.routeNames[route.index]));
+      dispatch(NavActions.change(route.routeNames[route.index]));
     }
   }, [route]);
 

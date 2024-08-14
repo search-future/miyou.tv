@@ -21,8 +21,8 @@ import React, {
   useRef
 } from "react";
 import {
+  Pressable,
   ScrollView,
-  TouchableOpacity,
   View,
   StyleSheet,
   Platform,
@@ -30,12 +30,15 @@ import {
   PanResponder,
   LayoutChangeEvent,
   NativeScrollEvent,
-  NativeSyntheticEvent
+  NativeSyntheticEvent,
+  PressableStateCallbackType,
+  StyleProp,
+  ViewStyle
 } from "react-native";
 import { Badge, CheckBox, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { Menu, MenuTrigger, MenuOptions } from "react-native-popup-menu";
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
 import Balloon from "../components/Balloon";
@@ -100,6 +103,7 @@ const ProgramTable = memo(() => {
   ).current;
   const viewX = useRef(new Animated.Value(0)).current;
 
+  const isFocused = useIsFocused();
   const navigation = useNavigation();
 
   const dispatch = useDispatch();
@@ -241,189 +245,30 @@ const ProgramTable = memo(() => {
     dispatch(ProgramActions.load("table"));
   }, [useArchive, start.toDateString()]);
   useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "up";
-      Mousetrap.bind(key, () => {
-        if (viewerProgram) {
-          const { type, channel } = viewerProgram;
-          const column = tableColumns.find(
-            a => a.type === type && a.channel === channel
-          );
-          if (column) {
-            const { id } = viewerProgram;
-            const index = column.programs.findIndex(a => a.id === id);
-            if (index >= 0) {
-              const prevIndex = index - 1;
-              if (column.programs[prevIndex]) {
-                dispatch(open(column.programs, prevIndex));
-                return false;
-              }
-              const date = new Date(start);
-              date.setDate(date.getDate() - 1);
-              if (!minDate || date.getTime() > new Date(minDate).getTime()) {
-                dispatch(setStart(date));
-                viewRef.current?.scrollToEnd({ animated: false });
-              }
-              return false;
-            }
-          }
-        }
-        for (const column of tableColumns) {
-          if (column.programs[column.programs.length - 1]) {
-            dispatch(open(column.programs, column.programs.length - 1));
-            return false;
-          }
-        }
-        return true;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [
-    tableColumns,
-    minDate,
-    tableColumns,
-    viewerProgram,
-    start.toDateString()
-  ]);
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "down";
-      Mousetrap.bind(key, () => {
-        if (viewerProgram) {
-          const { type, channel } = viewerProgram;
-          const column = tableColumns.find(
-            a => a.type === type && a.channel === channel
-          );
-          if (column) {
-            const { id } = viewerProgram;
-            const index = column.programs.findIndex(a => a.id === id);
-            if (index >= 0) {
-              const nextIndex = index + 1;
-              if (column.programs[nextIndex]) {
-                dispatch(open(column.programs, nextIndex));
-                return false;
-              }
-              const date = new Date(start);
-              date.setDate(date.getDate() + 1);
-              if (!maxDate || date.getTime() < new Date(maxDate).getTime()) {
-                dispatch(setStart(date));
-                viewRef.current?.scrollTo({ y: 0, animated: false });
-              }
-              return false;
-            }
-          }
-        }
-        for (const column of tableColumns) {
-          if (column.programs[0]) {
-            dispatch(open(column.programs, 0));
-            return false;
-          }
-        }
-        return true;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [
-    tableColumns,
-    maxDate,
-    tableColumns,
-    viewerProgram,
-    start.toDateString()
-  ]);
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "left";
-      Mousetrap.bind(key, () => {
-        if (viewerProgram) {
-          const { type, channel } = viewerProgram;
-          const columnIndex = tableColumns.findIndex(
-            a => a.type === type && a.channel === channel
-          );
-          if (columnIndex >= 0) {
-            const prevColumn = tableColumns[columnIndex - 1];
-            if (prevColumn?.programs?.length > 0) {
-              const startTime = new Date(viewerProgram.start).getTime();
-              const nextIndex = prevColumn.programs.findIndex(
-                a => new Date(a.end).getTime() > startTime
-              );
-              if (prevColumn.programs[nextIndex]) {
-                dispatch(open(prevColumn.programs, nextIndex));
-                return false;
-              }
-            }
-            dispatch(setOffset(roundOffset(offset - 1, columns.length)));
-            return false;
-          }
-        }
-        for (const column of tableColumns) {
-          if (column.programs[0]) {
-            dispatch(open(column.programs, 0));
-            return false;
-          }
-        }
-        dispatch(setOffset(roundOffset(offset - 1, columns.length)));
-        return false;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [offset, tableColumns, viewerProgram, columns.length]);
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "right";
-      Mousetrap.bind(key, () => {
-        if (viewerProgram) {
-          const { type, channel } = viewerProgram;
-          const columnIndex = tableColumns.findIndex(
-            a => a.type === type && a.channel === channel
-          );
-          if (columnIndex >= 0) {
-            const nextColumn = tableColumns[columnIndex + 1];
-            if (nextColumn?.programs?.length > 0) {
-              const startTime = new Date(viewerProgram.start).getTime();
-              const nextIndex = nextColumn.programs.findIndex(
-                a => new Date(a.end).getTime() > startTime
-              );
-              if (nextColumn.programs[nextIndex]) {
-                dispatch(open(nextColumn.programs, nextIndex));
-                return false;
-              }
-            }
-            dispatch(setOffset(roundOffset(offset + 1, columns.length)));
-            return false;
-          }
-        }
-        for (const column of tableColumns) {
-          if (column.programs[0]) {
-            dispatch(open(column.programs, 0));
-            return false;
-          }
-        }
-        dispatch(setOffset(roundOffset(offset + 1, columns.length)));
-        return false;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [offset, tableColumns, viewerProgram, columns.length]);
-  useEffect(() => {
     if (viewerProgram && viewRef.current) {
       const { type, channel } = viewerProgram;
-      const columnIndex = tableColumns.findIndex(
+      let column = tableColumns.find(
         a => a.type === type && a.channel === channel
       );
-      if (columnIndex >= 0) {
-        const column = tableColumns[columnIndex];
+      if (!column) {
+        const columnIndex = columns.findIndex(
+          a => a.type === type && a.channel === channel
+        );
+        if (columnIndex >= 0) {
+          column = columns[columnIndex];
+          const end = offset + tableColumns.length - 1;
+          const leftDiff = roundOffset(offset - columnIndex, columns.length);
+          const rightDiff = roundOffset(columnIndex - end, columns.length);
+          if (rightDiff > leftDiff) {
+            dispatch(setOffset(roundOffset(offset - leftDiff, columns.length)));
+          } else {
+            dispatch(
+              setOffset(roundOffset(offset + rightDiff, columns.length))
+            );
+          }
+        }
+      }
+      if (column) {
         const program = column.programs.find(a => a.id === selectedId);
         if (program?.position) {
           const y = (program.position - 0.5) * hourHeight;
@@ -431,7 +276,193 @@ const ProgramTable = memo(() => {
         }
       }
     }
-  }, [selectedId]);
+  }, [viewerProgram, selectedId, containerWidth]);
+
+  if (Platform.OS === "web") {
+    const { useHotkeys } = require("react-hotkeys-hook");
+    useHotkeys(
+      "tab",
+      () => {
+        headerHeightRef.current = 256;
+        headerHeight.setValue(headerHeightRef.current);
+      },
+      { enabled: isFocused }
+    );
+    useHotkeys(
+      "up",
+      () => {
+        if (viewerProgram) {
+          const { type, channel, id } = viewerProgram;
+          const column = columns.find(
+            a => a.type === type && a.channel === channel
+          );
+          if (column) {
+            const { programs } = column;
+            let index = programs.findIndex(a => a.id === id);
+            if (index >= 0) {
+              index--;
+              if (programs[index]) {
+                dispatch(open(programs, index));
+                return;
+              }
+              const date = new Date(start);
+              date.setDate(date.getDate() - 1);
+              if (!minDate || date.getTime() > new Date(minDate).getTime()) {
+                dispatch(setStart(date));
+                viewRef.current?.scrollToEnd({ animated: false });
+              }
+              return;
+            }
+            index = programs.length - 1;
+            if (programs[index]) {
+              dispatch(open(programs, index));
+              return;
+            }
+          }
+        }
+        for (let i = 0; i < columns.length; i++) {
+          const { programs } = columns[i];
+          if (programs[0]) {
+            dispatch(open(programs, 0));
+            return;
+          }
+        }
+      },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
+      [columns, minDate, viewerProgram, start.toDateString()]
+    );
+    useHotkeys(
+      "down",
+      () => {
+        if (viewerProgram) {
+          const { type, channel, id } = viewerProgram;
+          const column = columns.find(
+            a => a.type === type && a.channel === channel
+          );
+          if (column) {
+            const { programs } = column;
+            let index = programs.findIndex(a => a.id === id);
+            if (index >= 0) {
+              index++;
+              if (programs[index]) {
+                dispatch(open(programs, index));
+                return;
+              }
+              const date = new Date(start);
+              date.setDate(date.getDate() + 1);
+              if (!maxDate || date.getTime() < new Date(maxDate).getTime()) {
+                dispatch(setStart(date));
+                viewRef.current?.scrollTo({ y: 0, animated: false });
+              }
+              return;
+            }
+            index = 0;
+            if (programs[index]) {
+              dispatch(open(programs, index));
+              return;
+            }
+          }
+        }
+        for (let i = 0; i < columns.length; i++) {
+          const { programs } = columns[i];
+          if (programs[0]) {
+            dispatch(open(programs, 0));
+            return;
+          }
+        }
+      },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
+      [columns, maxDate, viewerProgram, start.toDateString()]
+    );
+    useHotkeys(
+      "left",
+      () => {
+        if (viewerProgram) {
+          const { type, channel, start } = viewerProgram;
+          const columnIndex = columns.findIndex(
+            a => a.type === type && a.channel === channel
+          );
+          if (columnIndex >= 0) {
+            for (let i = 1; i < columns.length; i++) {
+              const { programs } =
+                columns[roundOffset(columnIndex - i, columns.length)];
+              let index = programs.findIndex(
+                a => new Date(a.end).getTime() > new Date(start).getTime()
+              );
+              if (index >= 0) {
+                dispatch(open(programs, index));
+                return;
+              }
+              index = programs.length - 1;
+              if (programs[index]) {
+                dispatch(open(programs, index));
+                return;
+              }
+            }
+          }
+        }
+        for (let i = 0; i < columns.length; i++) {
+          const { programs } = columns[i];
+          if (programs[0]) {
+            dispatch(open(programs, 0));
+            return;
+          }
+        }
+      },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
+      [columns, offset, viewerProgram, columns.length]
+    );
+    useHotkeys(
+      "right",
+      () => {
+        if (viewerProgram) {
+          const { type, channel, start } = viewerProgram;
+          const columnIndex = columns.findIndex(
+            a => a.type === type && a.channel === channel
+          );
+          if (columnIndex >= 0) {
+            for (let i = 1; i < columns.length; i++) {
+              const { programs } =
+                columns[roundOffset(columnIndex + i, columns.length)];
+              let index = programs.findIndex(
+                a => new Date(a.end).getTime() > new Date(start).getTime()
+              );
+              if (index >= 0) {
+                dispatch(open(programs, index));
+                return;
+              }
+              index = programs.length - 1;
+              if (programs[index]) {
+                dispatch(open(programs, index));
+                return;
+              }
+            }
+          }
+        }
+        for (let i = 0; i < columns.length; i++) {
+          const { programs } = columns[i];
+          if (programs[0]) {
+            dispatch(open(programs, 0));
+            return;
+          }
+        }
+      },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
+      [columns, offset, viewerProgram, columns.length]
+    );
+  }
 
   const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
     if (layoutCallbackId.current != null) {
@@ -529,7 +560,7 @@ const ProgramTable = memo(() => {
     []
   );
   const useArchiveChange = useCallback((value: string | number) => {
-    dispatch(SettingActions.update("useArchive", value > 0));
+    dispatch(SettingActions.update("useArchive", (value as number) > 0));
   }, []);
   const startChange = useCallback((start: Date) => {
     dispatch(setStart(start));
@@ -775,7 +806,7 @@ const ProgramTable = memo(() => {
             </Animated.View>
             <HourHeader />
           </ScrollView>
-          <TouchableOpacity style={styles.buttonLeft} onPress={onLeftPress}>
+          <Pressable style={leftButtonStyle} onPress={onLeftPress}>
             <FontAwesome5Icon
               name="angle-left"
               solid
@@ -783,8 +814,8 @@ const ProgramTable = memo(() => {
               color={theme.colors?.control}
               size={16}
             />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonRight} onPress={onRightPress}>
+          </Pressable>
+          <Pressable style={rightButtonStyle} onPress={onRightPress}>
             <FontAwesome5Icon
               name="angle-right"
               solid
@@ -792,8 +823,8 @@ const ProgramTable = memo(() => {
               color={theme.colors?.control}
               size={16}
             />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonTop} onPress={onTopPress}>
+          </Pressable>
+          <Pressable style={topButtonStyle} onPress={onTopPress}>
             <FontAwesome5Icon
               name={hasPrevious && isTop ? "angle-double-up" : "angle-up"}
               solid
@@ -801,8 +832,8 @@ const ProgramTable = memo(() => {
               color={theme.colors?.control}
               size={16}
             />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonBottom} onPress={onBottomPress}>
+          </Pressable>
+          <Pressable style={bottomButtonStyle} onPress={onBottomPress}>
             <FontAwesome5Icon
               name={hasNext && isBottom ? "angle-double-down" : "angle-down"}
               solid
@@ -810,7 +841,7 @@ const ProgramTable = memo(() => {
               color={theme.colors?.control}
               size={16}
             />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       )}
     </View>
@@ -862,6 +893,18 @@ const ChannelCell = memo(
 
     const { theme } = useContext(ThemeContext);
 
+    const cellStyle = useCallback<
+      (state: PressableStateCallbackType) => StyleProp<ViewStyle>
+    >(
+      ({ pressed }) => [
+        styles.channelCell,
+        {
+          borderColor: theme.colors?.controlBorder,
+          opacity: pressed ? 0.5 : 1
+        }
+      ],
+      []
+    );
     const onPressWithProps = useCallback(() => {
       if (onPress) {
         onPress(props);
@@ -869,19 +912,11 @@ const ChannelCell = memo(
     }, [props, onPress]);
 
     return (
-      <TouchableOpacity
-        style={[
-          styles.channelCell,
-          {
-            borderColor: theme.colors?.controlBorder
-          }
-        ]}
-        onPress={onPressWithProps}
-      >
+      <Pressable style={cellStyle} onPress={onPressWithProps}>
         <Text style={[textStyle.center, { color: theme.colors?.control }]}>
           {channelName}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
     );
   }
 );
@@ -1019,6 +1054,16 @@ const TableCell = memo(
 
     const { theme } = useContext(ThemeContext);
 
+    const cellStyle = useCallback<
+      (state: PressableStateCallbackType) => StyleProp<ViewStyle>
+    >(
+      ({ pressed }) => [
+        styles.tableCell,
+        selected && { backgroundColor: theme.colors?.selected },
+        pressed && { opacity: 0.5 }
+      ],
+      [selected]
+    );
     const onPressWithProps = useCallback(() => {
       if (onPress) {
         onPress(props);
@@ -1037,13 +1082,7 @@ const TableCell = memo(
           }
         ]}
       >
-        <TouchableOpacity
-          style={[
-            styles.tableCell,
-            selected && { backgroundColor: theme.colors?.selected }
-          ]}
-          onPress={onPressWithProps}
-        >
+        <Pressable style={cellStyle} onPress={onPressWithProps}>
           <View style={[containerStyle.row, containerStyle.wrap]}>
             <Text style={[textStyle.bold]}>
               <Text style={[{ color: theme.colors?.primary }]}>
@@ -1057,7 +1096,7 @@ const TableCell = memo(
             />
           </View>
           <Text>{detail}</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     );
   }
@@ -1258,25 +1297,38 @@ const styles = StyleSheet.create({
     lineHeight: 32,
     textAlign: "center",
     width: 32
-  },
-  buttonLeft: {
-    position: "absolute",
-    top: 0,
-    left: hourWidth
-  },
-  buttonRight: {
-    position: "absolute",
-    right: scrollbarWidth,
-    top: 0
-  },
-  buttonTop: {
-    position: "absolute",
-    left: 0,
-    top: 32
-  },
-  buttonBottom: {
-    bottom: 0,
-    position: "absolute",
-    left: 0
   }
+});
+
+const leftButtonStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => ({
+  opacity: pressed ? 0.5 : 1,
+  position: "absolute",
+  top: 0,
+  left: hourWidth
+});
+const rightButtonStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => ({
+  opacity: pressed ? 0.5 : 1,
+  position: "absolute",
+  right: scrollbarWidth,
+  top: 0
+});
+const topButtonStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => ({
+  opacity: pressed ? 0.5 : 1,
+  position: "absolute",
+  left: 0,
+  top: 32
+});
+const bottomButtonStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => ({
+  opacity: pressed ? 0.5 : 1,
+  bottom: 0,
+  position: "absolute",
+  left: 0
 });

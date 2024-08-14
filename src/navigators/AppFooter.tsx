@@ -21,10 +21,13 @@ import React, {
   useMemo
 } from "react";
 import {
+  Pressable,
   View,
-  TouchableOpacity,
   StyleSheet,
-  LayoutChangeEvent
+  LayoutChangeEvent,
+  PressableStateCallbackType,
+  StyleProp,
+  ViewStyle
 } from "react-native";
 import { ButtonGroup, SearchBar, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
@@ -74,14 +77,14 @@ const AppFooter = memo(({ route }: { route?: NavigationState }) => {
       {containerWidth <= breakpoint && (
         <>
           <FooterButtons route={route} />
-          <TouchableOpacity style={styles.searchButton} onPress={openSearchBar}>
+          <Pressable style={searchButtonStyle} onPress={openSearchBar}>
             <FontAwesome5Icon
               name="search"
               solid
               size={24}
               color={theme.colors?.control}
             />
-          </TouchableOpacity>
+          </Pressable>
           {searchBarVisible && (
             <View
               style={[
@@ -91,17 +94,14 @@ const AppFooter = memo(({ route }: { route?: NavigationState }) => {
               ]}
             >
               <FooterSearchBar />
-              <TouchableOpacity
-                style={styles.searchButton}
-                onPress={closeSearchBar}
-              >
+              <Pressable style={searchButtonStyle} onPress={closeSearchBar}>
                 <FontAwesome5Icon
                   name="caret-down"
                   solid
                   size={24}
                   color={theme.colors?.control}
                 />
-              </TouchableOpacity>
+              </Pressable>
             </View>
           )}
         </>
@@ -252,12 +252,6 @@ const styles = StyleSheet.create({
   menuContainer: {
     width: "100%"
   },
-  searchButton: {
-    alignItems: "center",
-    height: 40,
-    justifyContent: "center",
-    width: 40
-  },
   searchBox: {
     bottom: 0,
     height: "100%",
@@ -265,4 +259,14 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 0
   }
+});
+
+const searchButtonStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => ({
+  alignItems: "center",
+  height: 40,
+  justifyContent: "center",
+  opacity: pressed ? 0.5 : 1,
+  width: 40
 });

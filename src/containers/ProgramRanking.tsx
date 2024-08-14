@@ -35,7 +35,9 @@ import {
 } from "react-native";
 import { Badge, ListItem, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
+import { useIsFocused } from "@react-navigation/native";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
+import Toast from "react-native-root-toast";
 
 import DatePicker from "../components/DatePicker";
 import IconSelector from "../components/IconSelector";
@@ -95,6 +97,8 @@ const ProgramRanking = memo(() => {
     new Animated.Value(headerHeightRef.current)
   ).current;
   const viewX = useRef(new Animated.Value(0)).current;
+
+  const isFocused = useIsFocused();
 
   const dispatch = useDispatch();
   const useArchive = useSelector<State, boolean>(
@@ -204,82 +208,6 @@ const ProgramRanking = memo(() => {
     listRef.current?.scrollToOffset({ offset: 0, animated: false });
   }, [useArchive, unique, view, target, start.toDateString()]);
   useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "up";
-      Mousetrap.bind(key, () => {
-        if (programs[viewerIndex]?.id === selectedId) {
-          const index = viewerIndex - 1;
-          if (programs[index]) {
-            dispatch(open(programs, index));
-          }
-          return false;
-        }
-        if (programs[0]) {
-          dispatch(open(programs, 0));
-          return false;
-        }
-        return true;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [programs, viewerIndex, selectedId]);
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "down";
-      Mousetrap.bind(key, () => {
-        if (programs[viewerIndex]?.id === selectedId) {
-          const index = viewerIndex + 1;
-          if (programs[index]) {
-            dispatch(open(programs, index));
-          }
-          return false;
-        }
-        if (programs[0]) {
-          dispatch(open(programs, 0));
-          return false;
-        }
-        return true;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [programs, viewerIndex, selectedId]);
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "left";
-      Mousetrap.bind(key, () => {
-        const [, , days] = target.split(",");
-        start.setDate(start.getDate() - parseInt(days, 10));
-        dispatch(setStart(start));
-        return false;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [target]);
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "right";
-      Mousetrap.bind(key, () => {
-        const [, , days] = target.split(",");
-        start.setDate(start.getDate() + parseInt(days, 10));
-        dispatch(setStart(start));
-        return false;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [target]);
-  useEffect(() => {
     if (isOpened && !playing && programs[viewerIndex]?.id === selectedId) {
       const updater = () => {
         dispatch(open(programs, viewerIndex));
@@ -295,12 +223,98 @@ const ProgramRanking = memo(() => {
   }, [programs, isOpened, playing]);
   useEffect(() => {
     if (listRef.current && programs[viewerIndex]?.id === selectedId) {
-      listRef.current.scrollToIndex({
-        index: viewerIndex,
-        viewPosition: 0.5
-      });
+      try {
+        listRef.current.scrollToIndex({
+          index: viewerIndex,
+          viewPosition: 0.5
+        });
+      } catch (e: any) {
+        Toast.show(e.message);
+      }
     }
   }, [viewerIndex]);
+
+  if (Platform.OS === "web") {
+    const { useHotkeys } = require("react-hotkeys-hook");
+    useHotkeys(
+      "tab",
+      () => {
+        headerHeightRef.current = 256;
+        headerHeight.setValue(headerHeightRef.current);
+      },
+      { enabled: isFocused }
+    );
+    useHotkeys(
+      "up",
+      () => {
+        let index = programs.findIndex(({ id }) => id === selectedId);
+        if (index >= 0) {
+          index--;
+          if (programs[index]) {
+            dispatch(open(programs, index));
+          }
+          return;
+        }
+        index = 0;
+        if (programs[index]) {
+          dispatch(open(programs, index));
+        }
+      },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
+      [programs, selectedId]
+    );
+    useHotkeys(
+      "down",
+      () => {
+        let index = programs.findIndex(({ id }) => id === selectedId);
+        if (index >= 0) {
+          index++;
+          if (programs[index]) {
+            dispatch(open(programs, index));
+          }
+          return;
+        }
+        index = 0;
+        if (programs[index]) {
+          dispatch(open(programs, index));
+        }
+      },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
+      [programs, selectedId]
+    );
+    useHotkeys(
+      "left",
+      () => {
+        const [, , days] = target.split(",");
+        start.setDate(start.getDate() - parseInt(days, 10));
+        dispatch(setStart(start));
+      },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
+      [target]
+    );
+    useHotkeys(
+      "right",
+      () => {
+        const [, , days] = target.split(",");
+        start.setDate(start.getDate() + parseInt(days, 10));
+        dispatch(setStart(start));
+      },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
+      [target]
+    );
+  }
 
   const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
     if (layoutCallbackId.current != null) {
@@ -334,7 +348,7 @@ const ProgramRanking = memo(() => {
     []
   );
   const useArchiveChange = useCallback((value: string | number) => {
-    dispatch(SettingActions.update("useArchive", value > 0));
+    dispatch(SettingActions.update("useArchive", (value as number) > 0));
   }, []);
   const targetChange = useCallback((target: string | number) => {
     dispatch(setTarget(String(target)));

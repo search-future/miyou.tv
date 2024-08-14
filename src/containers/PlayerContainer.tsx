@@ -21,13 +21,14 @@ import React, {
   PropsWithChildren
 } from "react";
 import {
-  TouchableOpacity,
+  Pressable,
   View,
   ViewProps,
   StyleSheet,
   Animated,
   PanResponder,
-  Platform
+  Platform,
+  CursorValue
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -78,10 +79,10 @@ const PlayerContainer = memo(
     const dualMonoMode = useSelector<State, string>(
       ({ player }) => player.dualMonoMode
     );
-    const seekTime = useSelector<State, number>(
+    const seekTime = useSelector<State, number | null | undefined>(
       ({ player }) => player.seekTime
     );
-    const seekPosition = useSelector<State, number>(
+    const seekPosition = useSelector<State, number | null | undefined>(
       ({ player }) => player.seekPosition
     );
     const commentDelay = useSelector<State, number>(({ setting }) =>
@@ -97,7 +98,7 @@ const PlayerContainer = memo(
       parseInt(setting.commentPlayer?.maxLines || "10", 10)
     );
     const mute = useSelector<State, boolean>(
-      ({ setting }) => setting.player?.mute
+      ({ setting }) => !!setting.player?.mute
     );
     const repeat = useSelector<State, string>(
       ({ setting }) => setting.player?.repeat || "repeat"
@@ -322,11 +323,7 @@ const PlayerContainer = memo(
 
     return (
       <View {...props} {...panResponder.panHandlers}>
-        <TouchableOpacity
-          style={styles.touchable}
-          activeOpacity={0.8}
-          onPress={onPress}
-        >
+        <Pressable style={styles.pressable} onPress={onPress}>
           {children}
           <View
             style={[
@@ -334,13 +331,12 @@ const PlayerContainer = memo(
               containerStyle.column,
               containerStyle.center
             ]}
-            pointerEvents="none"
           >
             <Animated.Text style={[styles.text, { opacity: textOpacity }]}>
               {text}
             </Animated.Text>
           </View>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     );
   }
@@ -348,8 +344,9 @@ const PlayerContainer = memo(
 export default PlayerContainer;
 
 const styles = StyleSheet.create({
-  touchable: {
-    flex: 1
+  pressable: {
+    flex: 1,
+    cursor: Platform.OS === "web" ? ("default" as CursorValue) : "auto"
   },
   text: {
     marginBottom: 40,
