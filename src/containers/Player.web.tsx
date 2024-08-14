@@ -22,7 +22,7 @@ import React, {
 import Toast from "react-native-root-toast";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import qs from "qs";
-import Mousetrap from "mousetrap";
+import { useHotkeys } from "react-hotkeys-hook";
 // @ts-ignore
 import { ReactMPV } from "mpv.js";
 
@@ -131,7 +131,7 @@ const Player = memo(() => {
     parseInt(setting.commentPlayer?.delay || "0", 10)
   );
   const mute = useSelector<State, boolean>(
-    ({ setting }) => setting.player?.mute
+    ({ setting }) => !!setting.player?.mute
   );
   const volume = useSelector<State, number>(({ setting }) =>
     parseInt(
@@ -505,74 +505,69 @@ const Player = memo(() => {
       }
     }
   }, [seekPosition]);
-  useEffect(() => {
-    const keys: (string | string[])[] = [];
-    keys.push("s");
-    Mousetrap.bind("s", () => {
+
+  useHotkeys(
+    "s",
+    () => {
       dispatch(ViewerActions.update({ playing: false }));
-    });
-    keys.push("=");
-    Mousetrap.bind("=", () => {
+    },
+    { preventDefault: true }
+  );
+  useHotkeys(
+    "=",
+    () => {
       dispatch(SettingActions.update("player", { speed: "1" }));
-    });
-    return () => {
-      for (const key of keys) {
-        Mousetrap.unbind(key);
-      }
-    };
-  }, []);
-  useEffect(() => {
-    const key = ["+", "pageup"];
-    Mousetrap.bind(key, () => {
+    },
+    { preventDefault: true }
+  );
+  useHotkeys(
+    "+",
+    () => {
       let value = speed + 0.1;
       if (value > 8) {
         value = 8;
       }
       dispatch(SettingActions.update("player", { speed: value.toFixed(1) }));
-    });
-    return () => {
-      Mousetrap.unbind(key);
-    };
-  }, [speed]);
-  useEffect(() => {
-    const key = ["-", "pagedown"];
-    Mousetrap.bind(key, () => {
+    },
+    { preventDefault: true },
+    [speed]
+  );
+  useHotkeys(
+    "-",
+    () => {
       let value = speed - 0.1;
       if (value <= 0) {
         value = 0.1;
       }
       dispatch(SettingActions.update("player", { speed: value.toFixed(1) }));
-    });
-    return () => {
-      Mousetrap.unbind(key);
-    };
-  }, [speed]);
-  useEffect(() => {
-    const key = "b";
-    Mousetrap.bind(key, () => {
+    },
+    { preventDefault: true },
+    [speed]
+  );
+  useHotkeys(
+    "b",
+    () => {
       const audiotrack = track.audio + 1;
       if (audiotrack <= trackCount.audio) {
         dispatch(PlayerActions.track({ audio: audiotrack }));
       } else {
         dispatch(PlayerActions.track({ audio: 1 }));
       }
-    });
-    return () => {
-      Mousetrap.unbind(key);
-    };
-  }, [track, trackCount]);
-  useEffect(() => {
-    const key = "m";
-    Mousetrap.bind(key, () => {
+    },
+    { preventDefault: true },
+    [track, trackCount]
+  );
+  useHotkeys(
+    "m",
+    () => {
       dispatch(SettingActions.update("player", { mute: !mute }));
-    });
-    return () => {
-      Mousetrap.unbind(key);
-    };
-  }, [mute]);
-  useEffect(() => {
-    const key = "p";
-    Mousetrap.bind(key, () => {
+    },
+    { preventDefault: true },
+    [mute]
+  );
+  useHotkeys(
+    "p",
+    () => {
       const program = programs[index];
       const prevExtraIndex = extraIndex - 1;
       const prevIndex = index - 1;
@@ -592,14 +587,13 @@ const Player = memo(() => {
           })
         );
       }
-    });
-    return () => {
-      Mousetrap.unbind(key);
-    };
-  }, [programs, index, extraIndex]);
-  useEffect(() => {
-    const key = "n";
-    Mousetrap.bind(key, () => {
+    },
+    { preventDefault: true },
+    [programs, index, extraIndex]
+  );
+  useHotkeys(
+    "n",
+    () => {
       const program = programs[index];
       const nextExtraIndex = extraIndex + 1;
       const nextIndex = index + 1;
@@ -619,102 +613,84 @@ const Player = memo(() => {
           })
         );
       }
-    });
-    return () => {
-      Mousetrap.unbind(key);
-    };
-  }, [programs, index, extraIndex]);
-  useEffect(() => {
-    const key = "f";
-    Mousetrap.bind(key, () => {
+    },
+    { preventDefault: true },
+    [programs, index, extraIndex]
+  );
+  useHotkeys(
+    "f",
+    () => {
       dispatch(WindowActions.setFullScreen(!fullScreen));
-    });
-    return () => {
-      Mousetrap.unbind(key);
-    };
-  }, [fullScreen]);
-  useEffect(() => {
-    const key = ["up", "mod+up"];
-    Mousetrap.bind(key, () => {
+    },
+    { preventDefault: true },
+    [fullScreen]
+  );
+  useHotkeys(
+    "mod+up",
+    () => {
       let value = volume + 5;
       if (value > 100) {
         value = 100;
       }
       dispatch(SettingActions.update("player", { volume: value }));
-    });
-    return () => {
-      Mousetrap.unbind(key);
-    };
-  }, [volume]);
-  useEffect(() => {
-    const key = ["down", "mod+down"];
-    Mousetrap.bind(key, () => {
+    },
+    { preventDefault: true },
+    [volume]
+  );
+  useHotkeys(
+    "mod+down",
+    () => {
       let newVolume = volume - 5;
       if (newVolume < 0) {
         newVolume = 0;
       }
       dispatch(SettingActions.update("player", { volume: newVolume }));
-    });
-    return () => {
-      Mousetrap.unbind(key);
-    };
-  }, [volume]);
-  useEffect(() => {
-    const key = ["left", "mod+left"];
-    Mousetrap.bind(key, () => {
+    },
+    { preventDefault: true },
+    [volume]
+  );
+  useHotkeys(
+    "mod+left",
+    () => {
       dispatch(PlayerActions.time(time - 10000));
-    });
-    return () => {
-      Mousetrap.unbind(key);
-    };
-  }, [time]);
-  useEffect(() => {
-    const key = ["right", "mod+right"];
-    Mousetrap.bind(key, () => {
+    },
+    { preventDefault: true },
+    [time]
+  );
+  useHotkeys(
+    "mod+right",
+    () => {
       dispatch(PlayerActions.time(time + 30000));
-    });
-    return () => {
-      Mousetrap.unbind(key);
-    };
-  }, [time]);
-  useEffect(() => {
-    const key = ["right", "mod+right"];
-    Mousetrap.bind(key, () => {
-      dispatch(PlayerActions.time(time + 30000));
-    });
-    return () => {
-      Mousetrap.unbind(key);
-    };
-  }, [time]);
-  useEffect(() => {
-    const key = ["shift+left", "["];
-    Mousetrap.bind(key, () => {
+    },
+    { preventDefault: true },
+    [time]
+  );
+  useHotkeys(
+    "[",
+    () => {
       const delay = commentDelay - 500;
       dispatch(SettingActions.update("commentPlayer", { delay }));
-    });
-    return () => {
-      Mousetrap.unbind(key);
-    };
-  }, [commentDelay]);
-  useEffect(() => {
-    const key = ["shift+right", "]"];
-    Mousetrap.bind(key, () => {
+    },
+    { preventDefault: true },
+    [commentDelay]
+  );
+  useHotkeys(
+    "]",
+    () => {
       const delay = commentDelay + 500;
       dispatch(SettingActions.update("commentPlayer", { delay }));
-    });
-    return () => {
-      Mousetrap.unbind(key);
-    };
-  }, [commentDelay]);
-  useEffect(() => {
-    const key = ["o", "mod+s"];
-    Mousetrap.bind(key, () => {
+    },
+    { preventDefault: true },
+    [commentDelay]
+  );
+  useHotkeys(
+    "mod+s",
+    () => {
       dispatch(SettingActions.update("viewer", { expand: !expand }));
-    });
-    return () => {
-      Mousetrap.unbind(key);
-    };
-  }, [expand]);
+    },
+    { preventDefault: true },
+    [expand]
+  );
 
   const onReady = useCallback((mpv: MPV) => {
     mpvRef.current = mpv;

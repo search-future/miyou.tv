@@ -11,27 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { AnyAction } from "redux";
-
-export const LOADING_START = "LOADING_START";
-function start(blocking = false) {
-  return {
-    type: LOADING_START,
-    blocking
-  };
-}
-
-export const LOADING_COMPLETE = "LOADING_COMPLETE";
-function complete() {
-  return {
-    type: LOADING_COMPLETE
-  };
-}
-
-export const LoadingActions = {
-  start,
-  complete
-};
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 export type LoadingState = {
   enabled: boolean;
@@ -41,25 +21,20 @@ const initialState: LoadingState = {
   enabled: false,
   blocking: false
 };
-export default function loadingReducer(
-  state = initialState,
-  action: AnyAction
-) {
-  switch (action.type) {
-    case LOADING_START: {
-      const { blocking } = action;
-      return {
-        enabled: true,
-        blocking
-      };
-    }
-    case LOADING_COMPLETE: {
-      return {
-        enabled: false,
-        blocking: false
-      };
-    }
-    default:
-      return state;
+const loadingSlice = createSlice({
+  name: "loading",
+  initialState,
+  reducers: {
+    start: (state, action: PayloadAction<boolean|undefined>) => ({
+      enabled: true,
+      blocking: !!action.payload
+    }),
+    complete: () => ({
+      enabled: false,
+      blocking: false
+    })
   }
-}
+});
+
+export const LoadingActions = loadingSlice.actions;
+export default loadingSlice.reducer;

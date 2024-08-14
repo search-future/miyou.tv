@@ -406,6 +406,7 @@ export default class GaraponV4Service extends BackendService {
       method: "POST",
       params: {},
       data: {},
+      transformRequest: data => qs.stringify(data),
       ...config
     };
     const key = `${conf.url}?${qs.stringify(conf.params)}?${qs.stringify(

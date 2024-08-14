@@ -18,7 +18,15 @@ import React, {
   useMemo,
   useRef
 } from "react";
-import { Text, TouchableOpacity, View, StyleSheet } from "react-native";
+import {
+  Pressable,
+  Text,
+  View,
+  StyleSheet,
+  PressableStateCallbackType,
+  StyleProp,
+  ViewStyle
+} from "react-native";
 import { IpcRendererEvent } from "electron";
 import { Progress } from "electron-dl";
 
@@ -159,6 +167,27 @@ const DownloadButton = ({
     };
   }, []);
 
+  const pressableStyle = useCallback<
+    (state: PressableStateCallbackType) => StyleProp<ViewStyle>
+  >(
+    ({ pressed }) => [
+      styles.container,
+      { borderColor, backgroundColor: buttonColor, opacity: pressed ? 0.5 : 1 }
+    ],
+    [borderColor, failureColor]
+  );
+  const failurePressableStyle = useCallback<
+    (state: PressableStateCallbackType) => StyleProp<ViewStyle>
+  >(
+    ({ pressed }) => [
+      styles.container,
+      { borderColor, backgroundColor: failureColor, opacity: pressed ? 0.5 : 1 }
+    ],
+    [borderColor, failureColor]
+  );
+  const cancelButtonStyle = useCallback<
+    (state: PressableStateCallbackType) => StyleProp<ViewStyle>
+  >(({ pressed }) => [styles.cancel, { opacity: pressed ? 0.5 : 1 }], []);
   const onPress = useCallback(() => {
     const { uri, filename } = source;
     statusRef.current = "started";
@@ -194,21 +223,16 @@ const DownloadButton = ({
               }
             ]}
           />
-          <TouchableOpacity style={styles.cancel} onPress={onCancelPress}>
+          <Pressable style={cancelButtonStyle} onPress={onCancelPress}>
             <Text style={[styles.text, { color }]}>&times;</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       );
     }
     case "wait": {
       const { wait = title } = statusText;
       return (
-        <View
-          style={[
-            styles.container,
-            { borderColor, backgroundColor: backgroundColor }
-          ]}
-        >
+        <View style={[styles.container, { borderColor, backgroundColor }]}>
           <Text style={[styles.text, { color }]}>{wait}</Text>
         </View>
       );
@@ -231,30 +255,21 @@ const DownloadButton = ({
     case "failure": {
       const { failure = `${title} ダウンロード失敗` } = statusText;
       return (
-        <TouchableOpacity
-          style={[
-            styles.container,
-            { borderColor, backgroundColor: failureColor }
-          ]}
-          onPress={onPress}
-        >
+        <Pressable style={failurePressableStyle} onPress={onPress}>
           <Text style={[styles.text, { color }]}>
             {failure} {total && `(${total})`}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       );
     }
   }
   const { stopped = title } = statusText;
   return (
-    <TouchableOpacity
-      style={[styles.container, { borderColor, backgroundColor: buttonColor }]}
-      onPress={onPress}
-    >
+    <Pressable style={pressableStyle} onPress={onPress}>
       <Text style={[styles.text, { color }]}>
         {stopped} {total && `(${total})`}
       </Text>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 

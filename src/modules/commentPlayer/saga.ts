@@ -12,19 +12,15 @@ limitations under the License.
 */
 
 import { all, put, takeLatest, throttle } from "redux-saga/effects";
-import { AnyAction } from "redux";
+import { PayloadAction } from "@reduxjs/toolkit";
 
-import {
-  COMMENT_PLAYER_INIT,
-  COMMENT_PLAYER_LOAD,
-  CommentPlayerActions,
-  CommentInterval,
-  CommentData
-} from "./actions";
+import { CommentPlayerActions, CommentInterval, CommentData } from ".";
 import { requestIntervals, requestComments } from "./service";
 
-function* initSaga(action: AnyAction) {
-  const { channel, start, end } = action;
+function* initSaga(
+  action: PayloadAction<{ channel: string; start: number; end: number }>
+) {
+  const { channel, start, end } = action.payload;
   const intervals: CommentInterval[] = yield requestIntervals(
     channel,
     start,
@@ -36,15 +32,15 @@ function* initSaga(action: AnyAction) {
   yield put(CommentPlayerActions.intervals(intervals));
 }
 
-function* loadSaga(action: AnyAction) {
-  const { time } = action;
+function* loadSaga(action: PayloadAction<number>) {
+  const time = action.payload;
   const data: CommentData[] = yield requestComments(time);
   yield put(CommentPlayerActions.push(data));
 }
 
 export function* commentPlayerSaga() {
   yield all([
-    takeLatest(COMMENT_PLAYER_INIT, initSaga),
-    throttle(500, COMMENT_PLAYER_LOAD, loadSaga)
+    takeLatest("commentPlayer/init", initSaga),
+    throttle(500, "commentPlayer/load", loadSaga)
   ]);
 }

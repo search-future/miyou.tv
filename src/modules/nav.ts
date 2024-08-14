@@ -11,19 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { AnyAction } from "redux";
-
-export const NAV_CHANGE = "NAV_CHANGE";
-function saveTab(tab: string) {
-  return {
-    type: NAV_CHANGE,
-    tab
-  };
-}
-
-export const NavActions = {
-  saveTab
-};
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 export type NavState = {
   tab: string;
@@ -31,11 +19,15 @@ export type NavState = {
 const initialState: NavState = {
   tab: "table"
 };
-export default function navReducer(state = initialState, action: AnyAction) {
-  switch (action.type) {
-    case NAV_CHANGE:
-      return { tab: action.tab };
-    default:
-      return state;
+const navSlice = createSlice({
+  name: "nav",
+  initialState,
+  reducers: {
+    change: (state, action: PayloadAction<string>) => ({
+      tab: action.payload
+    })
   }
-}
+});
+
+export const NavActions = navSlice.actions;
+export default navSlice.reducer;

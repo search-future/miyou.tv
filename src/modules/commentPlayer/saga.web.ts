@@ -12,20 +12,14 @@ limitations under the License.
 */
 
 import { all, put, select, takeLatest, throttle } from "redux-saga/effects";
-import { AnyAction } from "redux";
+import { PayloadAction } from "@reduxjs/toolkit";
 import Toast from "react-native-root-toast";
 
-import {
-  COMMENT_PLAYER_INIT,
-  COMMENT_PLAYER_LOAD,
-  CommentPlayerActions,
-  CommentInterval,
-  CommentData
-} from "./actions";
+import { CommentPlayerActions, CommentInterval, CommentData } from ".";
 import { requestIntervals, requestComments } from "./service";
 import { toastOptions } from "../../config/constants";
 
-function dispatchMain(action: AnyAction) {
+function dispatchMain(action: PayloadAction<any>) {
   try {
     window.ipc.dispatchMain(action);
   } catch (e: any) {
@@ -36,7 +30,7 @@ function dispatchMain(action: AnyAction) {
   }
 }
 
-function dispatchViewer(action: AnyAction) {
+function dispatchViewer(action: PayloadAction<any>) {
   try {
     window.ipc.dispatchView(action);
     window.ipc.dispatchChild(action);
@@ -48,10 +42,12 @@ function dispatchViewer(action: AnyAction) {
   }
 }
 
-function* initSaga(action: AnyAction) {
+function* initSaga(
+  action: PayloadAction<{ channel: string; start: number; end: number }>
+) {
   const { mode } = yield select(({ viewer }) => viewer);
   if (mode === "stack") {
-    const { channel, start, end } = action;
+    const { channel, start, end } = action.payload;
     const intervals: CommentInterval[] = yield requestIntervals(
       channel,
       start,
@@ -67,8 +63,8 @@ function* initSaga(action: AnyAction) {
   }
 }
 
-function* loadSaga(action: AnyAction) {
-  const { time } = action;
+function* loadSaga(action: PayloadAction<number>) {
+  const time = action.payload;
   const { mode } = yield select(({ viewer }) => viewer);
   if (mode === "stack") {
     const data: CommentData[] = yield requestComments(time);
@@ -80,7 +76,7 @@ function* loadSaga(action: AnyAction) {
 
 export function* commentPlayerSaga() {
   yield all([
-    takeLatest(COMMENT_PLAYER_INIT, initSaga),
-    throttle(500, COMMENT_PLAYER_LOAD, loadSaga)
+    takeLatest("commentPlayer/init", initSaga),
+    throttle(500, "commentPlayer/load", loadSaga)
   ]);
 }

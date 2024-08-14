@@ -15,13 +15,14 @@ import React from "react";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { ThemeProvider } from "react-native-elements";
-import { createStore, applyMiddleware } from "redux";
+import { Reducer } from "redux";
+import { configureStore } from "@reduxjs/toolkit";
 import createSagaMiddleware from "redux-saga";
-import { persistReducer, persistStore, PersistConfig } from "redux-persist";
+import { persistReducer, persistStore } from "redux-persist";
 
 import AppNavigator from "./navigators";
 import Splash from "./components/Splash";
-import rootReducer, { rootSaga, RootState } from "./modules";
+import rootReducer, { rootSaga } from "./modules";
 import init from "./utils/init";
 import persistConfig from "./config/persist";
 
@@ -41,11 +42,12 @@ const App = () => (
 export default App;
 
 const sagaMiddleware = createSagaMiddleware();
-const persistedReducer = persistReducer(
-  persistConfig as PersistConfig<RootState>,
-  rootReducer
-);
-const store = createStore(persistedReducer, applyMiddleware(sagaMiddleware));
+const persistedReducer = persistReducer(persistConfig, rootReducer as Reducer);
+const store = configureStore({
+  reducer: persistedReducer,
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware({ serializableCheck: false }).concat(sagaMiddleware)
+});
 const persistor = persistStore(store);
 sagaMiddleware.run(rootSaga);
 

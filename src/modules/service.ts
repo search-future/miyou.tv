@@ -11,8 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { all, delay, call, put, select, takeLatest } from "redux-saga/effects";
-import { AnyAction } from "redux";
 import Toast from "react-native-root-toast";
 
 import {
@@ -28,18 +28,58 @@ import { SettingState } from "./setting";
 import { toastOptions } from "../config/constants";
 import { Platform } from "react-native";
 
+export type CommentChannel = {
+  id: string;
+  type: string;
+};
+export type ServiceState = {
+  backendActive: boolean;
+  archiveActive: boolean;
+  commentActive: boolean;
+  commentChannels: CommentChannel[];
+};
+const initialState: ServiceState = {
+  backendActive: false,
+  archiveActive: false,
+  commentActive: false,
+  commentChannels: []
+};
+const serviceSlice = createSlice({
+  name: "service",
+  initialState,
+  reducers: {
+    backendInit: state => ({
+      ...state,
+      backendActive: false,
+      archiveActive: false
+    }),
+    backendReady: (state, action: PayloadAction<boolean>) => ({
+      ...state,
+      backendActive: true,
+      archiveActive: action.payload
+    }),
+    commentInit: state => ({
+      ...state,
+      commentActive: false,
+      commentChannels: []
+    }),
+    commentReady: (state, action: PayloadAction<CommentChannel[]>) => ({
+      ...state,
+      commentActive: true,
+      commentChannels: action.payload
+    })
+  }
+});
+
+export const ServiceActions = serviceSlice.actions;
+export default serviceSlice.reducer;
+
 const backendSettingBase = {
   streamType: Platform.OS === "web" ? "m2ts" : "mp4",
   streamParams: "c:v=copy&c:a=copy",
   previewParams: "size=1280x720"
 };
 
-export const BACKEND_INIT = "BACKEND_INIT";
-function backendInit() {
-  return {
-    type: BACKEND_INIT
-  };
-}
 function* backendInitSaga() {
   try {
     yield put(LoadingActions.start(true));
@@ -60,14 +100,14 @@ function* backendInitSaga() {
       })
     );
     yield put(LoadingActions.complete());
-    yield put(backendReady(backendService.hasArchive));
+    yield put(ServiceActions.backendReady(backendService.hasArchive));
     const reloadIntervalSeconds = parseInt(
       backendSetting.reloadIntervalSeconds || "0",
       10
     );
     if (reloadIntervalSeconds > 10) {
       yield delay(reloadIntervalSeconds * 1000);
-      yield put(backendInit());
+      yield put(ServiceActions.backendInit());
     }
   } catch (e: any) {
     yield put(LoadingActions.complete());
@@ -78,20 +118,6 @@ function* backendInitSaga() {
   }
 }
 
-export const BACKEND_READY = "BACKEND_READY";
-function backendReady(archiveActive = false) {
-  return {
-    type: BACKEND_READY,
-    archiveActive
-  };
-}
-
-export const COMMENT_INIT = "COMMENT_INIT";
-function commentInit() {
-  return {
-    type: COMMENT_INIT
-  };
-}
 function* commentInitSaga() {
   try {
     yield put(LoadingActions.start(true));
@@ -119,7 +145,7 @@ function* commentInitSaga() {
       return (aType - bType) * 100 + (aNum - bNum);
     });
     yield put(LoadingActions.complete());
-    yield put(commentReady(channels));
+    yield put(ServiceActions.commentReady(channels));
   } catch (e: any) {
     yield put(LoadingActions.complete());
     Toast.show(e.message || JSON.stringify(e, null, 2), {
@@ -129,68 +155,9 @@ function* commentInitSaga() {
   }
 }
 
-export const COMMENT_READY = "COMMENT_READY";
-function commentReady(channels: CommentChannel[] = []) {
-  return {
-    type: COMMENT_READY,
-    channels
-  };
-}
-
-export const ServiceActions = {
-  backendInit,
-  backendReady,
-  commentInit,
-  commentReady
-};
-
-export type CommentChannel = {
-  id: string;
-  type: string;
-};
-export type ServiceState = {
-  backendActive: boolean;
-  archiveActive: boolean;
-  commentActive: boolean;
-  commentChannels: CommentChannel[];
-};
-const initialState: ServiceState = {
-  backendActive: false,
-  archiveActive: false,
-  commentActive: false,
-  commentChannels: []
-};
-export default function serviceReducer(
-  state = initialState,
-  action: AnyAction
-) {
-  switch (action.type) {
-    case BACKEND_INIT: {
-      return { ...state, backendActive: false, archiveActive: false };
-    }
-    case BACKEND_READY: {
-      const { archiveActive } = action;
-      return { ...state, backendActive: true, archiveActive };
-    }
-    case COMMENT_INIT: {
-      return { ...state, commentActive: false, commentChannels: [] };
-    }
-    case COMMENT_READY: {
-      const { channels: commentChannels } = action;
-      return {
-        ...state,
-        commentActive: true,
-        commentChannels
-      };
-    }
-    default:
-      return state;
-  }
-}
-
 export function* serviceSaga() {
   yield all([
-    takeLatest(BACKEND_INIT, backendInitSaga),
-    takeLatest(COMMENT_INIT, commentInitSaga)
+    takeLatest("service/backendInit", backendInitSaga),
+    takeLatest("service/commentInit", commentInitSaga)
   ]);
 }

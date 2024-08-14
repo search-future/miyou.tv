@@ -14,7 +14,7 @@ limitations under the License.
 import { call, delay, put, select } from "redux-saga/effects";
 import Toast from "react-native-root-toast";
 
-import { ProgramActions } from "./actions";
+import { ProgramActions } from ".";
 import { LoadingActions } from "../loading";
 import { ServiceState } from "../service";
 import { getBackendService, getCommentService } from "../../services";
@@ -81,8 +81,8 @@ export function* listSaga() {
       })
     );
     const { hits } = result;
-    const programs: ProgramListProgram[] = result.programs;
-    yield put(ProgramActions.update("list", { hits, programs: [...programs] }));
+    let programs = result.programs;
+    yield put(ProgramActions.update("list", { hits, programs }));
     yield delay(0);
 
     const { commentActive }: ServiceState = yield select(
@@ -98,7 +98,9 @@ export function* listSaga() {
         getCommentService(commentSetting)
       );
 
-      for (let program of programs) {
+      const basePrograms = programs;
+      programs = [];
+      for (const program of basePrograms) {
         const {
           data: result
         }: {
@@ -123,19 +125,26 @@ export function* listSaga() {
           })
         );
         const { n_hits, intervals } = result;
-        program.commentCount = n_hits;
+        const commentInfo: {
+          commentCount?: number;
+          commentSpeed?: number;
+          commentMaxSpeed?: number;
+          commentMaxSpeedTime?: Date;
+        } = {};
         if (n_hits > 0) {
+          commentInfo.commentCount = n_hits;
           const minutes =
             (program.end.getTime() - program.start.getTime()) / 60000;
           intervals.sort((a, b) => b.n_hits - a.n_hits);
           const [maxInterval] = intervals;
-          program.commentSpeed = program.commentCount / minutes;
-          program.commentMaxSpeed = maxInterval && maxInterval.n_hits;
-          program.commentMaxSpeedTime =
+          commentInfo.commentSpeed = commentInfo.commentCount / minutes;
+          commentInfo.commentMaxSpeed = maxInterval && maxInterval.n_hits;
+          commentInfo.commentMaxSpeedTime =
             maxInterval && new Date(maxInterval.start);
         }
+        programs.push({ ...program, ...commentInfo });
       }
-      yield put(ProgramActions.update("list", { programs: [...programs] }));
+      yield put(ProgramActions.update("list", { programs }));
       yield delay(0);
     }
   } catch (e: any) {

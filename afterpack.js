@@ -13,6 +13,8 @@ exports.default = context => {
     fs.renameSync(execPath, appPath);
     fs.copyFileSync(wrapperPath, execPath);
     const libffmpeg = path.join(context.appOutDir, "libffmpeg.so");
-    execSync(`gcc -Wl,--no-as-needed -shared -lavformat -Wl,-rpath,/tmp/miyoutv -o "${libffmpeg}"`);
+    execSync(
+      `gcc -Wl,--no-as-needed -shared -lavformat -Wl,-rpath,/tmp/miyoutv -o "${libffmpeg}"`
+    );
   }
 };

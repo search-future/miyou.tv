@@ -11,12 +11,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { Store, AnyAction } from "redux";
+import { Store } from "redux";
+import { PayloadAction } from "@reduxjs/toolkit";
 import Toast from "react-native-root-toast";
-import Mousetrap from "mousetrap";
 
 import { FileActions } from "../../modules/file";
-import { ServiceActions } from "../../modules/service";
 import { SettingActions } from "../../modules/setting";
 import { ViewerActions } from "../../modules/viewer";
 import { WindowActions } from "../../modules/window";
@@ -38,11 +37,6 @@ export default function init(store: Store) {
     boundsSettingName = "bounds";
     window.addEventListener("beforeunload", () => {
       window.win.closeAll();
-    });
-    Mousetrap.bind("mod+r", () => {
-      store.dispatch(ServiceActions.backendInit());
-      store.dispatch(ServiceActions.commentInit());
-      return false;
     });
 
     (async () => {
@@ -112,16 +106,9 @@ export default function init(store: Store) {
     store.dispatch(action);
   });
 
-  Mousetrap.bind("esc", () => {
-    dispatchWindow(WindowActions.setFullScreen(false));
-  });
-  Mousetrap.bind("mod+I", () => {
-    window.utils.toggleDevTools();
-    return false;
-  });
 }
 
-function dispatchWindow(action: AnyAction) {
+function dispatchWindow(action: PayloadAction<any>) {
   try {
     window.ipc.dispatchWindow(action);
   } catch (e: any) {

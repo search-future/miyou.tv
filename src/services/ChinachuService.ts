@@ -518,10 +518,9 @@ export default class ChinachuService extends BackendService {
     }[] = [];
     for (const program of recorded) {
       const channel = channels.find(
-        ({ type, channel, channelName }) =>
+        ({ type, channel }) =>
           type === program.channel.type &&
-          channel === String(program.channel.sid) &&
-          channelName === program.channel.name
+          channel === String(program.channel.sid)
       );
       if (channel) {
         channel.channelName = program.channel.name;

@@ -11,20 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { AnyAction } from "redux";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { NetInfoState } from "@react-native-community/netinfo";
-
-export const NETWORK_UPDATE = "NETWORK_UPDATE";
-function update(info: NetInfoState) {
-  return {
-    type: NETWORK_UPDATE,
-    info
-  };
-}
-
-export const NetworkActions = {
-  update
-};
 
 export type NetworkState = {
   type: string;
@@ -38,14 +26,13 @@ const initialState: NetworkState = {
   isConnected: true,
   isInternetReachable: true
 };
-export default function networkReducer(
-  state = initialState,
-  action: AnyAction
-) {
-  switch (action.type) {
-    case NETWORK_UPDATE:
-      return action.info;
-    default:
-      return state;
+const networkSlice = createSlice({
+  name: "network",
+  initialState,
+  reducers: {
+    update: (state, action: PayloadAction<NetInfoState>) => action.payload
   }
-}
+});
+
+export const NetworkActions = networkSlice.actions;
+export default networkSlice.reducer;

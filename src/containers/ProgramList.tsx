@@ -23,7 +23,7 @@ import React, {
 } from "react";
 import {
   FlatList,
-  TouchableOpacity,
+  Pressable,
   View,
   StyleSheet,
   Platform,
@@ -32,12 +32,17 @@ import {
   ListRenderItem,
   LayoutChangeEvent,
   NativeSyntheticEvent,
-  NativeScrollEvent
+  NativeScrollEvent,
+  PressableStateCallbackType,
+  StyleProp,
+  ViewStyle
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { Badge, ListItem, Text, ThemeContext } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
+import { useIsFocused } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
+import Toast from "react-native-root-toast";
 
 import Balloon from "../components/Balloon";
 import IconSelector from "../components/IconSelector";
@@ -95,6 +100,8 @@ const ProgramList = memo(() => {
   ).current;
   const viewX = useRef(new Animated.Value(0)).current;
 
+  const isFocused = useIsFocused();
+
   const dispatch = useDispatch();
   const useArchive = useSelector<State, boolean>(
     ({ setting }) => setting.useArchive == null || setting.useArchive
@@ -111,7 +118,7 @@ const ProgramList = memo(() => {
   const view = useSelector<State, number>(({ setting }) =>
     parseInt(setting.listOptions?.view || "25", 10)
   );
-  const reverse = useSelector<State, number>(
+  const reverse = useSelector<State, boolean>(
     ({ setting }) =>
       setting.listOptions?.reverse == null || setting.listOptions?.reverse
   );
@@ -127,7 +134,7 @@ const ProgramList = memo(() => {
   const query = useSelector<State, string>(
     ({ program }) => program.list?.query || ""
   );
-  const archiveActive = useSelector<State, SettingState>(
+  const archiveActive = useSelector<State, boolean>(
     ({ service }) => service.archiveActive
   );
   const selectedId = useSelector<State, string | undefined>(
@@ -208,100 +215,114 @@ const ProgramList = memo(() => {
     dispatch(setPage(1));
   }, [useArchive, view, reverse, query]);
   useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "up";
-      Mousetrap.bind(key, () => {
-        if (selectedId) {
-          const index = programs.findIndex(({ id }) => id === selectedId);
-          if (index >= 0) {
-            if (programs[index - 1]) {
-              dispatch(open(programs, index - 1));
-            }
-            return false;
-          }
-        }
-        if (programs[0]) {
-          dispatch(open(programs, 0));
-          return false;
-        }
-        return true;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [programs, selectedId]);
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "down";
-      Mousetrap.bind(key, () => {
-        if (selectedId) {
-          const index = programs.findIndex(({ id }) => id === selectedId);
-          if (index >= 0) {
-            if (programs[index + 1]) {
-              dispatch(open(programs, index + 1));
-            }
-            return false;
-          }
-        }
-        if (programs[0]) {
-          dispatch(open(programs, 0));
-          return false;
-        }
-        return true;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [programs, selectedId]);
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "left";
-      Mousetrap.bind(key, () => {
-        const p = page - 1;
-        if (p > 0) {
-          dispatch(setPage(p));
-          return false;
-        }
-        return true;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [page]);
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      const Mousetrap = require("mousetrap");
-      const key = "right";
-      Mousetrap.bind(key, () => {
-        const p = page + 1;
-        if (p <= pageCount) {
-          dispatch(setPage(p));
-          return false;
-        }
-        return true;
-      });
-      return () => {
-        Mousetrap.unbind(key);
-      };
-    }
-  }, [page, pageCount]);
-  useEffect(() => {
     listRef.current?.scrollToOffset({ offset: 0, animated: false });
   }, [page]);
   useEffect(() => {
     if (selectedId && listRef.current) {
       const index = programs.findIndex(({ id }) => id === selectedId);
       if (index >= 0) {
-        listRef.current.scrollToIndex({ index, viewPosition: 0.5 });
+        try {
+          listRef.current.scrollToIndex({ index, viewPosition: 0.5 });
+        } catch (e: any) {
+          Toast.show(e.message);
+        }
       }
     }
   }, [selectedId]);
+
+  if (Platform.OS === "web") {
+    const { useHotkeys } = require("react-hotkeys-hook");
+    useHotkeys(
+      "tab",
+      () => {
+        headerHeightRef.current = 256;
+        headerHeight.setValue(headerHeightRef.current);
+      },
+      { enabled: isFocused }
+    );
+    useHotkeys(
+      "up",
+      () => {
+        let index = programs.findIndex(({ id }) => id === selectedId);
+        if (index >= 0) {
+          index--;
+          if (programs[index]) {
+            dispatch(open(programs, index));
+            return;
+          }
+          const p = page - 1;
+          if (p > 0) {
+            dispatch(setPage(p));
+          }
+          return;
+        }
+        index = programs.length - 1;
+        if (programs[index]) {
+          dispatch(open(programs, index));
+        }
+      },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
+      [programs, selectedId]
+    );
+    useHotkeys(
+      "down",
+      () => {
+        let index = programs.findIndex(({ id }) => id === selectedId);
+        if (index >= 0) {
+          index++;
+          if (programs[index]) {
+            dispatch(open(programs, index));
+            return;
+          }
+          const p = page + 1;
+          if (p <= pageCount) {
+            dispatch(setPage(p));
+          }
+          return;
+        }
+        index = 0;
+        if (programs[index]) {
+          dispatch(open(programs, index));
+        }
+      },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
+      [programs, selectedId]
+    );
+    useHotkeys(
+      "left",
+      () => {
+        const p = page - 1;
+        if (p > 0) {
+          dispatch(setPage(p));
+        }
+      },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
+      [page]
+    );
+    useHotkeys(
+      "right",
+      () => {
+        const p = page + 1;
+        if (p <= pageCount) {
+          dispatch(setPage(p));
+        }
+      },
+      {
+        enabled: isFocused,
+        preventDefault: true
+      },
+      [page, pageCount]
+    );
+  }
 
   const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
     if (layoutCallbackId.current != null) {
@@ -335,10 +356,10 @@ const ProgramList = memo(() => {
     []
   );
   const useArchiveChange = useCallback((value: string | number) => {
-    dispatch(SettingActions.update("useArchive", value > 0));
+    dispatch(SettingActions.update("useArchive", (value as number) > 0));
   }, []);
   const reverseChange = useCallback((value: string | number) => {
-    dispatch(save({ reverse: value > 0 }));
+    dispatch(save({ reverse: (value as number) > 0 }));
   }, []);
   const viewChange = useCallback((view: string | number) => {
     dispatch(save({ view: String(view) }));
@@ -559,7 +580,7 @@ const ProgramList = memo(() => {
       )}
       {containerWidth > 0 && pages.length > 1 && (
         <View style={[containerStyle.row, containerStyle.center, styles.pager]}>
-          <TouchableOpacity onPress={firstPage}>
+          <Pressable style={pressableStyle} onPress={firstPage}>
             <FontAwesome5Icon
               name="angle-double-left"
               solid
@@ -567,8 +588,8 @@ const ProgramList = memo(() => {
               color={theme.colors?.primary}
               size={16}
             />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={previousPage}>
+          </Pressable>
+          <Pressable style={pressableStyle} onPress={previousPage}>
             <FontAwesome5Icon
               name="angle-left"
               solid
@@ -576,7 +597,7 @@ const ProgramList = memo(() => {
               color={theme.colors?.primary}
               size={16}
             />
-          </TouchableOpacity>
+          </Pressable>
           <View
             style={[
               styles.pagePickerWrapper,
@@ -609,7 +630,7 @@ const ProgramList = memo(() => {
               {pages.map(pagePickerRenderer)}
             </Picker>
           </View>
-          <TouchableOpacity onPress={nextPage}>
+          <Pressable style={pressableStyle} onPress={nextPage}>
             <FontAwesome5Icon
               name="angle-right"
               solid
@@ -617,8 +638,8 @@ const ProgramList = memo(() => {
               color={theme.colors?.primary}
               size={16}
             />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={lastPage}>
+          </Pressable>
+          <Pressable style={pressableStyle} onPress={lastPage}>
             <FontAwesome5Icon
               name="angle-double-right"
               solid
@@ -626,7 +647,7 @@ const ProgramList = memo(() => {
               color={theme.colors?.primary}
               size={16}
             />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       )}
     </View>
@@ -791,3 +812,7 @@ const styles = StyleSheet.create({
     maxHeight: 96
   }
 });
+
+const pressableStyle: (
+  state: PressableStateCallbackType
+) => StyleProp<ViewStyle> = ({ pressed }) => ({ opacity: pressed ? 0.5 : 1 });

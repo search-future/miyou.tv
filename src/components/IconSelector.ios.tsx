@@ -13,11 +13,12 @@ limitations under the License.
 
 import React, { useCallback } from "react";
 import {
+  Pressable,
   View,
   ViewStyle,
   StyleSheet,
+  PressableStateCallbackType,
   StyleProp,
-  TouchableOpacity,
   TextStyle,
   ActionSheetIOS
 } from "react-native";
@@ -44,6 +45,17 @@ const IconSelector = ({
   onValueChange
 }: Props) => {
   const selected = items.find(({ value }) => value === selectedValue);
+
+  const pressableStyle = useCallback<
+    (state: PressableStateCallbackType) => StyleProp<ViewStyle>
+  >(
+    ({ pressed }) => [
+      styles.container,
+      containerStyle,
+      pressed && { opacity: 0.5 }
+    ],
+    [containerStyle]
+  );
   const onPress = useCallback(() => {
     if (onValueChange) {
       const options = items.map(({ label }) => label);
@@ -63,17 +75,14 @@ const IconSelector = ({
   }, [items, onValueChange]);
 
   return (
-    <TouchableOpacity
-      style={[styles.container, containerStyle]}
-      onPress={onPress}
-    >
+    <Pressable style={pressableStyle} onPress={onPress}>
       {icon && <View style={styles.iconWrapper}>{icon}</View>}
       <View style={[styles.textWrapper, style]}>
         <Text style={[{ color }, itemStyle]}>
           {selected ? selected.label : selectedValue}
         </Text>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 export default IconSelector;

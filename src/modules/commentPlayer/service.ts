@@ -16,7 +16,7 @@ import Toast from "react-native-root-toast";
 
 import { getCommentService } from "../../services";
 import CommentService from "../../services/CommentService";
-import { CommentPlayerActions, CommentInterval, CommentData } from "./actions";
+import { CommentPlayerActions, CommentInterval, CommentData, CommentPlayerState } from ".";
 import { toastOptions } from "../../config/constants";
 
 export function* requestIntervals(channel: string, start: number, end: number) {
@@ -66,28 +66,29 @@ export function* requestIntervals(channel: string, start: number, end: number) {
 
 export function* requestComments(time: number) {
   try {
-    const {
-      channel,
-      start: offset,
-      intervals
-    }: {
-      channel: string;
-      start: number;
-      intervals: CommentInterval[];
-    } = yield select(({ commentPlayer }) => commentPlayer);
+    const state: CommentPlayerState = yield select(({ commentPlayer }) => commentPlayer);
     const { commentPlayer: commentPlayerSetting = {} } = yield select(
       ({ setting }) => setting
     );
     const { delay = 0 } = commentPlayerSetting;
-    const start = offset + time + delay - 60000;
-    const end = offset + time + delay + 60000;
-    const targets = intervals.filter(
-      a => !a.isLoaded && a.n_hits > 0 && a.start > start && a.start < end
-    );
-    if (targets.length > 0) {
-      for (const target of targets) {
-        target.isLoaded = true;
+    const start = state.start + time + delay - 60000;
+    const end = state.start + time + delay + 60000;
+    const intervals: CommentInterval[] = [];
+    const targets: CommentInterval[] = [];
+    for (const interval of state.intervals) {
+      if (
+        !interval.isLoaded &&
+        interval.n_hits > 0 &&
+        interval.start > start &&
+        interval.start < end
+      ) {
+        targets.push(interval);
+        intervals.push({ ...interval, isLoaded: true });
+      } else {
+        intervals.push(interval);
       }
+    }
+    if (targets.length > 0) {
       yield put(CommentPlayerActions.intervals(intervals));
       const { comment: commentSetting = {}, queryTable = {} } = yield select(
         ({ setting }) => setting
@@ -106,7 +107,7 @@ export function* requestComments(time: number) {
       } = yield call(() =>
         commentService.request("comments", {
           params: {
-            channel: CommentService.channelToQueries(channel, queryTable).join(
+            channel: CommentService.channelToQueries(state.channel, queryTable).join(
               "||"
             ),
             start: targets[0].start,
