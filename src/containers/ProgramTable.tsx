@@ -535,7 +535,7 @@ const ProgramTable = memo(() => {
     } else {
       viewRef.current?.scrollTo({ y: 0 });
     }
-  }, [maxDate, isTop, start.toDateString()]);
+  }, [minDate, isTop, start.toDateString()]);
   const onBottomPress = useCallback(() => {
     if (isBottom) {
       const date = new Date(start);
@@ -547,7 +547,7 @@ const ProgramTable = memo(() => {
     } else {
       viewRef.current?.scrollToEnd();
     }
-  }, [minDate, isBottom, start.toDateString()]);
+  }, [maxDate, isBottom, start.toDateString()]);
   const onItemPress = useCallback(
     ({ programs }: ProgramTableColumn, { id }: ProgramTableProgram) => {
       if (programs) {
