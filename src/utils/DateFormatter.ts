@@ -22,7 +22,7 @@ export default class DateFormatter {
     this.hourFormat = hourFormat;
   }
 
-  format(value: Date, format: string) {
+  format(value: number | string | Date, format: string) {
     const useMarker = /12$/.test(this.hourFormat);
     const date = new Date(value);
     const hour = this.getHour(date);
@@ -36,7 +36,7 @@ export default class DateFormatter {
     return moment(date).format(convertedFormat);
   }
 
-  getHour(value: Date) {
+  getHour(value: number | string | Date) {
     const formatArray = this.hourFormat.split(":");
     let start = this.hourFirst;
     let limit = 24;
