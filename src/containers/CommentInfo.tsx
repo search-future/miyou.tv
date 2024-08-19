@@ -230,7 +230,7 @@ const CommentInfo = memo(() => {
     []
   );
   const listDateFormatter = useCallback(
-    (time: number) => dateFormatter.format(new Date(time), "HHHH:mm:ss"),
+    (time: number) => dateFormatter.format(time, "HHHH:mm:ss"),
     [dateFormatter]
   );
   const onListSelect = useCallback(

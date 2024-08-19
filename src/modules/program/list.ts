@@ -29,7 +29,7 @@ export type ProgramListProgram = Program & {
   commentCount?: number;
   commentSpeed?: number;
   commentMaxSpeed?: number;
-  commentMaxSpeedTime?: Date;
+  commentMaxSpeedTime?: number;
 };
 export type ProgramListData = {
   hits?: number;
@@ -129,18 +129,18 @@ export function* listSaga() {
           commentCount?: number;
           commentSpeed?: number;
           commentMaxSpeed?: number;
-          commentMaxSpeedTime?: Date;
+          commentMaxSpeedTime?: number;
         } = {};
         if (n_hits > 0) {
           commentInfo.commentCount = n_hits;
           const minutes =
-            (program.end.getTime() - program.start.getTime()) / 60000;
+            (program.end - program.start) / 60000;
           intervals.sort((a, b) => b.n_hits - a.n_hits);
           const [maxInterval] = intervals;
           commentInfo.commentSpeed = commentInfo.commentCount / minutes;
           commentInfo.commentMaxSpeed = maxInterval && maxInterval.n_hits;
           commentInfo.commentMaxSpeedTime =
-            maxInterval && new Date(maxInterval.start);
+            maxInterval && maxInterval.start;
         }
         programs.push({ ...program, ...commentInfo });
       }

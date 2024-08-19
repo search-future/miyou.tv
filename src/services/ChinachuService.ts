@@ -201,8 +201,8 @@ export default class ChinachuService extends BackendService {
       detail,
       category: ChinachuService.parseCategory(category),
       duration: seconds * 1000,
-      start: new Date(start),
-      end: new Date(end),
+      start,
+      end,
       preview: this.getUrl(
         [
           `/api/recorded/${id}/preview.png?pos=${this.previewPos}`,
@@ -418,8 +418,8 @@ export default class ChinachuService extends BackendService {
           detail: program.description,
           category: ChinachuService.parseCategory(category),
           duration: program.duration,
-          start: new Date(program.startAt),
-          end: new Date(program.startAt + program.duration),
+          start: program.startAt,
+          end: program.startAt + program.duration,
           recorded: recordedPrograms.map(program =>
             this.convertRecordedProgram(program)
           ),

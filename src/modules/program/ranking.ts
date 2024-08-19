@@ -34,15 +34,15 @@ export type ProgramRankingProgram = Program & {
   commentCount?: number;
   commentSpeed?: number;
   commentMaxSpeed?: number;
-  commentMaxSpeedTime?: Date;
+  commentMaxSpeedTime?: number;
 };
 export type ProgramRankingData = {
   channels?: Channel[];
-  end?: Date;
-  maxDate?: Date;
-  minDate?: Date;
+  end?: number;
+  maxDate?: number;
+  minDate?: number;
   programs?: ProgramRankingProgram[];
-  start?: Date;
+  start?: number;
   target?: string;
   targets?: ProgramRankingTarget[];
   unique?: boolean;
@@ -167,34 +167,34 @@ export function* rankingSaga() {
     const [channelType, channelNum, length] = target.split(",");
     const maxDate = new Date(data.maxDate || Date.now());
     const minDate = new Date(data.minDate || Date.now() - 86400000);
-    const start = data.start
+    const date = data.start
       ? new Date(data.start)
       : new Date(
           maxDate.getFullYear(),
           maxDate.getMonth(),
           maxDate.getDate() - 1
         );
-    start.setHours(hourFirst);
-    start.setMinutes(0);
-    start.setSeconds(0);
-    start.setMilliseconds(0);
-    if (start.getTime() < minDate.getTime()) {
-      start.setTime(minDate.getTime());
+    date.setHours(hourFirst);
+    date.setMinutes(0);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+    if (date.getTime() < minDate.getTime()) {
+      date.setTime(minDate.getTime());
     }
-
-    const end = new Date(start);
-    end.setDate(start.getDate() + parseInt(length, 10));
-    end.setHours(hourFirst);
-    end.setMinutes(0);
-    end.setSeconds(0);
-    end.setMilliseconds(0);
-    if (end.getTime() > maxDate.getTime()) {
-      end.setTime(maxDate.getTime());
-      start.setDate(end.getDate() - parseInt(length, 10));
-      if (start.getTime() < minDate.getTime()) {
-        start.setTime(minDate.getTime());
+    const start = date.getTime();
+    date.setDate(date.getDate() + parseInt(length, 10));
+    date.setHours(hourFirst);
+    date.setMinutes(0);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+    if (date.getTime() > maxDate.getTime()) {
+      date.setTime(maxDate.getTime());
+      date.setDate(date.getDate() - parseInt(length, 10));
+      if (date.getTime() < minDate.getTime()) {
+        date.setTime(minDate.getTime());
       }
     }
+    const end = date.getTime();
 
     yield put(ProgramActions.update("ranking", { start, end }));
     yield delay(0);
@@ -236,8 +236,8 @@ export function* rankingSaga() {
               channel.channelName,
               queryTable
             ).join("||"),
-            start: start.getTime(),
-            end: end.getTime(),
+            start,
+            end,
             interval: "1m"
           }
         })
@@ -265,8 +265,8 @@ export function* rankingSaga() {
         ({ type, channel, start, end }) =>
           type === interval.type &&
           channel === interval.channel &&
-          start.getTime() <= interval.start + 60000 &&
-          end.getTime() > interval.start
+          start <= interval.start + 60000 &&
+          end > interval.start
       );
       if (program == null || !unique) {
         if (program == null) {
@@ -284,12 +284,10 @@ export function* rankingSaga() {
 
           program = programs.find(
             ({ start, end }) =>
-              start.getTime() <= interval.start + 60000 &&
-              end.getTime() > interval.start
+              start <= interval.start + 60000 && end > interval.start
           );
           if (program != null) {
-            const minutes =
-              (program.end.getTime() - program.start.getTime()) / 60000;
+            const minutes = (program.end - program.start) / 60000;
             let commentCount = 0;
             try {
               const {
@@ -306,8 +304,8 @@ export function* rankingSaga() {
                         program.channelName,
                         queryTable
                       ).join("||"),
-                      start: program.start.getTime(),
-                      end: program.end.getTime(),
+                      start: program.start,
+                      end: program.end,
                       limit: 0
                     }
                   }),
@@ -325,7 +323,7 @@ export function* rankingSaga() {
         }
         if (program != null) {
           const commentMaxSpeed = interval.n_hits;
-          const commentMaxSpeedTime = new Date(interval.start);
+          const commentMaxSpeedTime = interval.start;
           index++;
           if (current !== interval.n_hits) {
             rank = index;

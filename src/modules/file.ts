@@ -108,8 +108,8 @@ function* addSaga(action: PayloadAction<string[]>) {
       detail: uri,
       category: { code: 15, name: "etc" },
       duration: 0,
-      start: time.isValid() ? time.toDate() : new Date(),
-      end: time.isValid() ? time.toDate() : new Date(),
+      start: time.isValid() ? +time : Date.now(),
+      end: time.isValid() ? +time : Date.now(),
       preview: Platform.OS === "web" ? "" : uri,
       stream: uri
     });

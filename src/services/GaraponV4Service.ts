@@ -273,8 +273,8 @@ export default class GaraponV4Service extends BackendService {
             detail: description,
             category: GaraponV4Service.parseCategory(genre[0]),
             duration: durationtime * 1000,
-            start: new Date(starttime * 1000),
-            end: new Date(endtime * 1000),
+            start: starttime * 1000,
+            end: endtime * 1000,
             preview: thumbnail_url,
             stream: `${this.url}${m3u8_url}&gtvsession=${this.gtvsession}`
           })

@@ -32,7 +32,7 @@ export type ProgramTableProgram = Program & {
   commentCount?: number;
   commentSpeed?: number;
   commentMaxSpeed?: number;
-  commentMaxSpeedTime?: Date;
+  commentMaxSpeedTime?: number;
 };
 
 export type ProgramTableColumn = Channel & {
@@ -41,10 +41,10 @@ export type ProgramTableColumn = Channel & {
 
 export type ProgramTableData = {
   columns?: ProgramTableColumn[];
-  maxDate?: Date;
-  minDate?: Date;
+  maxDate?: number;
+  minDate?: number;
   offset?: number;
-  start?: Date;
+  start?: number;
 };
 
 function* init() {
@@ -188,7 +188,7 @@ export function* tableSaga() {
         hits = result.hits;
         programs.push(
           ...result.programs.map(program => {
-            let position = (program.start.getTime() - start) / 3600000;
+            let position = (program.start - start) / 3600000;
             let size = program.duration / 3600000;
             if (position < 0) {
               size += position;
@@ -249,8 +249,7 @@ export function* tableSaga() {
         let programs: ProgramTableProgram[] = column.programs;
         if (result.n_hits > 0) {
           programs = column.programs.map(program => {
-            const start = program.start.getTime();
-            const end = program.end.getTime();
+            const { start, end } = program;
             const minutes = (end - start) / 60000;
             const intervals = result.intervals.filter(
               a => a.start >= start && a.start < end
@@ -263,8 +262,7 @@ export function* tableSaga() {
             const commentSpeed = commentCount / minutes;
 
             const commentMaxSpeed = maxInterval && maxInterval.n_hits;
-            const commentMaxSpeedTime =
-              maxInterval && new Date(maxInterval.start);
+            const commentMaxSpeedTime = maxInterval && maxInterval.start;
             return {
               ...program,
               commentCount,
@@ -276,12 +274,7 @@ export function* tableSaga() {
         }
         columns.push({ ...column, programs });
       }
-      yield put(
-        ProgramActions.update("table", {
-          columns,
-          start: new Date(start)
-        })
-      );
+      yield put(ProgramActions.update("table", { columns, start }));
       yield delay(0);
     }
   } catch (e: any) {

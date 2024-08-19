@@ -46,8 +46,8 @@ export type Program = {
     color?: string;
   };
   duration: number;
-  start: Date;
-  end: Date;
+  start: number;
+  end: number;
   preview: string;
   stream: string;
   authHeaders?: { [key: string]: string };

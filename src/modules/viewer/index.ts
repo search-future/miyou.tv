@@ -22,7 +22,7 @@ export type ViewerProgram = Program & {
   commentCount?: number;
   commentSpeed?: number;
   commentMaxSpeed?: number;
-  commentMaxSpeedTime?: Date;
+  commentMaxSpeedTime?: number;
   rank?: number;
 };
 

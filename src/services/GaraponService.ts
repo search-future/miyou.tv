@@ -201,8 +201,10 @@ export default class GaraponService extends BackendService {
           const { gtvid, startdate, ch, title, description, genre, bc } =
             program;
           const duration = GaraponService.parseDuration(program.duration);
-          const start = new Date(startdate.replace(" ", "T") + "+09:00");
-          const end = new Date(start.getTime() + duration);
+          const start = new Date(
+            startdate.replace(" ", "T") + "+09:00"
+          ).getTime();
+          const end = start + duration;
           return {
             id: gtvid,
             type: gtvid.slice(0, 2),

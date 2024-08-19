@@ -170,8 +170,8 @@ export default class MirakcTimeshiftService extends BackendService {
                 Array.isArray(program.genres) ? program.genres[0].lv1 : 15
               ),
               duration: duration,
-              start: new Date(startTime),
-              end: new Date(startTime + duration),
+              start: startTime,
+              end: startTime + duration,
               preview: "",
               stream: this.getAuthUrl(
                 `/api/timeshift/${recorderName}/records/${id}/stream`
@@ -193,9 +193,9 @@ export default class MirakcTimeshiftService extends BackendService {
       }
     }
     if (reverse) {
-      programs.sort((a, b) => b.start.getTime() - a.start.getTime());
+      programs.sort((a, b) => b.start - a.start);
     } else {
-      programs.sort((a, b) => a.start.getTime() - b.start.getTime());
+      programs.sort((a, b) => a.start - b.start);
     }
     const result = {
       hits: programs.length,

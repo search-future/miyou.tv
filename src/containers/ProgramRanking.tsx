@@ -79,8 +79,8 @@ const save = (options = {}) => {
 const setTarget = (target: string) => {
   return ProgramActions.update("ranking", { target });
 };
-const setStart = (start: Date) => {
-  return ProgramActions.update("ranking", { start });
+const setStart = (date: Date) => {
+  return ProgramActions.update("ranking", { start: date.getTime() });
 };
 const open = (programs: ProgramRankingProgram[], index: number) => {
   return ViewerActions.open(programs, index);
@@ -117,20 +117,22 @@ const ProgramRanking = memo(() => {
   const view = useSelector<State, number>(({ setting }) =>
     parseInt(setting.rankingOptions?.view || "25", 10)
   );
-  const end = useSelector<State, Date>(
-    ({ program }) => program.ranking?.end || new Date()
+  const end = useSelector<State, Date>(({ program }) =>
+    program.ranking?.end ? new Date(program.ranking?.end) : new Date()
   );
-  const maxDate = useSelector<State, Date | undefined>(
-    ({ program }) => program.ranking?.maxDate
+  const maxDate = useSelector<State, Date | undefined>(({ program }) =>
+    program.ranking?.maxDate ? new Date(program.ranking?.maxDate) : undefined
   );
-  const minDate = useSelector<State, Date | undefined>(
-    ({ program }) => program.ranking?.minDate
+  const minDate = useSelector<State, Date | undefined>(({ program }) =>
+    program.ranking?.minDate ? new Date(program.ranking?.minDate) : undefined
   );
   const programs = useSelector<State, ProgramRankingProgram[]>(
     ({ program }) => program.ranking?.programs || []
   );
-  const start = useSelector<State, Date>(
-    ({ program }) => program.ranking?.start || new Date(Date.now() - 86400000)
+  const start = useSelector<State, Date>(({ program }) =>
+    program.ranking?.start
+      ? new Date(program.ranking?.start)
+      : new Date(Date.now() - 86400000)
   );
   const target = useSelector<State, string>(
     ({ program }) => program.ranking?.target || ",,1"
@@ -374,7 +376,8 @@ const ProgramRanking = memo(() => {
     []
   );
   const listDateFormatter = useCallback(
-    (date: Date) => dateFormatter.format(date, "YYYY/MM/DD(dd) A HHHH:mm"),
+    (time: number) =>
+      dateFormatter.format(time, "YYYY/MM/DD(dd) A HHHH:mm"),
     [dateFormatter]
   );
   const listRenderer: ListRenderItem<ProgramRankingProgram> = useCallback(
@@ -605,12 +608,12 @@ const ListHeader = memo(
 const ListProgram = memo(
   ({
     selected = false,
-    dateFormatter = date => date.toString(),
+    dateFormatter = time => new Date(time).toString(),
     onPress,
     ...props
   }: ProgramRankingProgram & {
     selected?: boolean;
-    dateFormatter?: (date: Date) => string;
+    dateFormatter?: (time: number) => string;
     onPress?: (program: ProgramRankingProgram) => void;
   }) => {
     const {

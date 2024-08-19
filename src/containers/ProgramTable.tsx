@@ -83,8 +83,8 @@ function save(options: Options = {}) {
 function setOffset(offset: number) {
   return ProgramActions.update("table", { offset });
 }
-function setStart(start: Date) {
-  return ProgramActions.update("table", { start });
+function setStart(date: Date) {
+  return ProgramActions.update("table", { start: date.getTime() });
 }
 function open(programs: ProgramTableProgram[], index: number) {
   return ViewerActions.open(programs, index);
@@ -126,17 +126,17 @@ const ProgramTable = memo(() => {
   const columns = useSelector<State, ProgramTableColumn[]>(
     ({ program }) => program.table?.columns || []
   );
-  const maxDate = useSelector<State, Date | undefined>(
-    ({ program }) => program.table?.maxDate
+  const maxDate = useSelector<State, Date | undefined>(({ program }) =>
+    program.table?.maxDate ? new Date(program.table?.maxDate) : undefined
   );
-  const minDate = useSelector<State, Date | undefined>(
-    ({ program }) => program.table?.minDate
+  const minDate = useSelector<State, Date | undefined>(({ program }) =>
+    program.table?.minDate ? new Date(program.table?.minDate) : undefined
   );
   const offset = useSelector<State, number>(
     ({ program }) => program.table?.offset || 0
   );
-  const start = useSelector<State, Date>(
-    ({ program }) => program.table?.start || new Date()
+  const start = useSelector<State, Date>(({ program }) =>
+    program.table?.start ? new Date(program.table?.start) : new Date()
   );
   const archiveActive = useSelector<State, boolean>(
     ({ service }) => service.archiveActive
@@ -307,7 +307,7 @@ const ProgramTable = memo(() => {
               }
               const date = new Date(start);
               date.setDate(date.getDate() - 1);
-              if (!minDate || date.getTime() > new Date(minDate).getTime()) {
+              if (!minDate || date.getTime() > minDate.getTime()) {
                 dispatch(setStart(date));
                 viewRef.current?.scrollToEnd({ animated: false });
               }
@@ -353,7 +353,7 @@ const ProgramTable = memo(() => {
               }
               const date = new Date(start);
               date.setDate(date.getDate() + 1);
-              if (!maxDate || date.getTime() < new Date(maxDate).getTime()) {
+              if (!maxDate || date.getTime() < maxDate.getTime()) {
                 dispatch(setStart(date));
                 viewRef.current?.scrollTo({ y: 0, animated: false });
               }
@@ -528,7 +528,7 @@ const ProgramTable = memo(() => {
     if (isTop) {
       const date = new Date(start);
       date.setDate(date.getDate() - 1);
-      if (!minDate || date.getTime() > new Date(minDate).getTime()) {
+      if (!minDate || date.getTime() > minDate.getTime()) {
         dispatch(setStart(date));
         viewRef.current?.scrollToEnd({ animated: false });
       }
@@ -540,7 +540,7 @@ const ProgramTable = memo(() => {
     if (isBottom) {
       const date = new Date(start);
       date.setDate(date.getDate() + 1);
-      if (!maxDate || date.getTime() < new Date(maxDate).getTime()) {
+      if (!maxDate || date.getTime() < maxDate.getTime()) {
         dispatch(setStart(date));
         viewRef.current?.scrollTo({ y: 0, animated: false });
       }
@@ -566,7 +566,7 @@ const ProgramTable = memo(() => {
     dispatch(setStart(start));
   }, []);
   const cellDateFormatter = useCallback(
-    (date: Date) => dateFormatter.format(date, "HHHH:mm"),
+    (time: number) => dateFormatter.format(time, "HHHH:mm"),
     [dateFormatter]
   );
   const categoryCheckRenderer = useCallback(
@@ -977,13 +977,14 @@ const TableColumn = memo(
   ({
     selectedId,
     countMode = "speed",
-    dateFormatter = (date: Date) => `${date.getHours()}:${date.getMinutes()}`,
+    dateFormatter = (time: number) =>
+      `${new Date(time).getHours()}:${new Date(time).getMinutes()}`,
     onItemPress,
     ...props
   }: ProgramTableColumn & {
     selectedId?: string;
     countMode?: string;
-    dateFormatter?: (date: Date) => string;
+    dateFormatter?: (time: number) => string;
     onItemPress?: (
       column: ProgramTableColumn,
       program: ProgramTableProgram
@@ -1035,12 +1036,13 @@ const TableColumn = memo(
 const TableCell = memo(
   ({
     selected = false,
-    dateFormatter = date => `${date.getHours()}:${date.getMinutes()}`,
+    dateFormatter = time =>
+      `${new Date(time).getHours()}:${new Date(time).getMinutes()}`,
     onPress,
     ...props
   }: ProgramTableProgram & {
     selected?: boolean;
-    dateFormatter?: (date: Date) => string;
+    dateFormatter?: (time: number) => string;
     onPress?: (column: ProgramTableProgram) => void;
   }) => {
     const {

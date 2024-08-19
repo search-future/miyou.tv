@@ -333,8 +333,8 @@ export default class EPGStationService extends BackendService {
           name: "etc"
         },
         duration: endAt - startAt,
-        start: new Date(startAt),
-        end: new Date(endAt),
+        start: startAt,
+        end: endAt,
         preview: this.getUrl(`/api/recorded/${id}/thumbnail`),
         stream: this.getAuthUrl(streamPath),
         download,
@@ -449,8 +449,8 @@ export default class EPGStationService extends BackendService {
           name: "etc"
         },
         duration: endAt - startAt,
-        start: new Date(startAt),
-        end: new Date(endAt),
+        start: startAt,
+        end: endAt,
         preview:
           thumbnails.length > 0
             ? this.getUrl(`/api/thumbnails/${thumbnails[0]}`)

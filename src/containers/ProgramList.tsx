@@ -404,7 +404,7 @@ const ProgramList = memo(() => {
   );
   const keyExtractor = useCallback(({ id }: ProgramListProgram) => id, []);
   const listDateFormatter = useCallback(
-    (date: Date) => dateFormatter.format(date, "YYYY/MM/DD(dd) A HHHH:mm"),
+    (time: number) => dateFormatter.format(time, "YYYY/MM/DD(dd) A HHHH:mm"),
     [dateFormatter]
   );
   const listRenderer = useCallback<ListRenderItem<ProgramListProgram>>(
@@ -668,13 +668,13 @@ const ListProgram = memo(
   ({
     selected = false,
     countMode = "speed",
-    dateFormatter = date => date.toString(),
+    dateFormatter = time => new Date(time).toString(),
     onPress,
     ...props
   }: ProgramListProgram & {
     selected?: boolean;
     countMode?: string;
-    dateFormatter?: (date: Date) => string;
+    dateFormatter?: (time: number) => string;
     onPress?: (program: ProgramListProgram) => void;
   }) => {
     const {

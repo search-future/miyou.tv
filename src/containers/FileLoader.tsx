@@ -213,7 +213,9 @@ const FileLoader = memo(() => {
     }
   }, []);
   const onItemDateChange = useCallback(({ id }: FileProgram, date: Date) => {
-    dispatch(FileActions.update(id, { start: date, end: date }));
+    dispatch(
+      FileActions.update(id, { start: date.getTime(), end: date.getTime() })
+    );
   }, []);
   const onItemChannelChange = useCallback(
     ({ id }: FileProgram, value: string) => {
@@ -366,6 +368,7 @@ const ListProgram = memo(
 
     const { theme } = useContext(ThemeContext);
 
+    const startDate = useMemo(() => new Date(start), [start]);
     const channelItems = useMemo(
       () => [
         { label: "チャンネル未設定", value: "" },
@@ -427,7 +430,7 @@ const ListProgram = memo(
               ]}
               color={theme.colors?.default}
               backgroundColor={theme.colors?.background}
-              value={start}
+              value={startDate}
               onChange={dateChange}
             />
             <TimePicker
@@ -437,7 +440,7 @@ const ListProgram = memo(
               ]}
               color={theme.colors?.default}
               backgroundColor={theme.colors?.background}
-              value={start}
+              value={startDate}
               onChange={dateChange}
             />
             <IconSelector

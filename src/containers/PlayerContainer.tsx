@@ -118,7 +118,7 @@ const PlayerContainer = memo(
     const hourFormat = useSelector<State, string>(
       ({ setting }) => setting.view?.hourFormat || ""
     );
-    const start = useSelector<State, Date>(
+    const start = useSelector<State, number>(
       ({ viewer }) =>
         viewer.programs[viewer.index]?.recorded?.[viewer.extraIndex]?.start ||
         viewer.programs[viewer.index]?.start
