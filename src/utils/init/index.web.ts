@@ -119,9 +119,10 @@ function dispatchWindow(action: PayloadAction<any>) {
   }
 }
 
-function dropFileDispatcher({ dataTransfer }: DragEvent) {
-  if (dataTransfer) {
-    const { files } = dataTransfer;
+function dropFileDispatcher(event: DragEvent) {
+  event.preventDefault();
+  if (event.dataTransfer) {
+    const { files } = event.dataTransfer;
     const uris = [];
     for (let i = 0; i < files.length; i++) {
       const file = files.item(i);
