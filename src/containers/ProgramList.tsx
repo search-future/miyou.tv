@@ -208,9 +208,11 @@ const ProgramList = memo(() => {
     []
   );
   useEffect(() => {
-    dispatch(ProgramActions.load("list"));
-    viewX.setValue(0);
-  }, [useArchive, view, reverse, page, query]);
+    if (isFocused) {
+      dispatch(ProgramActions.load("list"));
+      viewX.setValue(0);
+    }
+  }, [isFocused, useArchive, view, reverse, page, query]);
   useEffect(() => {
     dispatch(setPage(1));
   }, [useArchive, view, reverse, query]);

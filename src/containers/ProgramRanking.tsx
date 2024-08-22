@@ -205,10 +205,12 @@ const ProgramRanking = memo(() => {
     []
   );
   useEffect(() => {
-    dispatch(ProgramActions.load("ranking"));
-    viewX.setValue(0);
-    listRef.current?.scrollToOffset({ offset: 0, animated: false });
-  }, [useArchive, unique, view, target, start.toDateString()]);
+    if (isFocused) {
+      dispatch(ProgramActions.load("ranking"));
+      viewX.setValue(0);
+      listRef.current?.scrollToOffset({ offset: 0, animated: false });
+    }
+  }, [isFocused, useArchive, unique, view, target, start.toDateString()]);
   useEffect(() => {
     if (isOpened && !playing && programs[viewerIndex]?.id === selectedId) {
       const updater = () => {
@@ -376,8 +378,7 @@ const ProgramRanking = memo(() => {
     []
   );
   const listDateFormatter = useCallback(
-    (time: number) =>
-      dateFormatter.format(time, "YYYY/MM/DD(dd) A HHHH:mm"),
+    (time: number) => dateFormatter.format(time, "YYYY/MM/DD(dd) A HHHH:mm"),
     [dateFormatter]
   );
   const listRenderer: ListRenderItem<ProgramRankingProgram> = useCallback(

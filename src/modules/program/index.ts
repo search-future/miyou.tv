@@ -69,13 +69,14 @@ export type ProgramState = {
   [key: string]: any;
 };
 const initialState: ProgramState = {
-  initialized: false
+  initialized: false,
+  module: "table"
 };
 const programSlice = createSlice({
   name: "program",
   initialState,
   reducers: {
-    init: state => ({ ...state, initialized: false }),
+    init: ({module}) => ({ module, initialized: false }),
     load: (state, action: PayloadAction<string | undefined>) => ({
       ...state,
       module: action.payload || state.module

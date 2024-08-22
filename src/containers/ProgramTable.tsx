@@ -242,8 +242,10 @@ const ProgramTable = memo(() => {
     []
   );
   useEffect(() => {
-    dispatch(ProgramActions.load("table"));
-  }, [useArchive, start.toDateString()]);
+    if (isFocused) {
+      dispatch(ProgramActions.load("table"));
+    }
+  }, [isFocused, useArchive, start.toDateString()]);
   useEffect(() => {
     if (viewerProgram && viewRef.current) {
       const { type, channel } = viewerProgram;
