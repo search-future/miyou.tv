@@ -187,7 +187,7 @@ const CommentPlayer = memo(() => {
       setTimeout(() => {
         element.style.transitionProperty = "right";
         element.style.right = "100%";
-      }, 0);
+      }, updateInterval);
     };
     const selectLine = (comment: Comment) => {
       const containerWidth = screenRef.current
