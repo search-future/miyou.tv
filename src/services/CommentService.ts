@@ -27,6 +27,7 @@ export default class CommentService {
       .replace(/[！-～]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xfee0))
       .replace("　", " ")
       .replace("!", "")
+      .replace(/^テレ東.*$/, "テレビ東京")
       .replace(/^(NHK[^0-9 ]+[0-9 ]).*$/, "$1")
       .replace(/^([^0-9]+)[0-9]$/, "$1")
       .replace(/(◆.+|・[0-9]+)$/, "")

@@ -87,6 +87,8 @@ function* addSaga(action: PayloadAction<string[]>) {
     const normalizedName = basename
       .replace(/\.[^.]+$/, "")
       .replace(/[！-～]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xfee0))
+      .replace("テレ東", "テレビ東京")
+      .replace("BSテレビ東京", "BSテレ東")
       .replace("　", " ");
     const channel = commentChannels
       .filter(({ id }) => normalizedName.indexOf(id) >= 0)
