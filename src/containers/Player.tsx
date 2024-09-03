@@ -19,7 +19,11 @@ import React, {
   useMemo
 } from "react";
 import { StatusBar, Platform, StyleSheet } from "react-native";
-import Video, { OnProgressData } from "react-native-video";
+import Video, {
+  SelectedTrackType,
+  OnProgressData,
+  VideoRef
+} from "react-native-video";
 import KeepAwake from "react-native-keep-awake";
 import Toast from "react-native-root-toast";
 import { useDispatch, useSelector } from "react-redux";
@@ -53,7 +57,7 @@ type State = RootState & {
   setting: Setting;
 };
 const Player = () => {
-  const videoRef = useRef<Video>(null);
+  const videoRef = useRef<VideoRef>(null);
   const vlcRef = useRef<VLCPlayer>(null);
   const preseek = useRef(0);
   const seekable = useRef(true);
@@ -211,15 +215,6 @@ const Player = () => {
 
     return options;
   }, [deinterlace, audioTrack, dualMonoMode]);
-  const stereoPan = useMemo(() => {
-    switch (dualMonoMode) {
-      case "main":
-        return -1;
-      case "sub":
-        return 1;
-    }
-    return 0;
-  }, [dualMonoMode]);
 
   useEffect(() => {
     if (Platform.OS === "android") {
@@ -509,8 +504,7 @@ const Player = () => {
       muted={mute}
       volume={volume / 100}
       source={{ uri, type: "m3u8" }}
-      selectedAudioTrack={{ type: "index", value: audioTrack }}
-      stereoPan={stereoPan}
+      selectedAudioTrack={{ type: SelectedTrackType.INDEX, value: audioTrack }}
       ref={videoRef}
       onLoadStart={onLoadStart}
       onProgress={onVideoProgress}
