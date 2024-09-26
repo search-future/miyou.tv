@@ -65,6 +65,7 @@ const Player = memo(() => {
     videoTrack: 0,
     audioTrack: 0,
     subtitleTrack: 0,
+    trackCount: {} as { [key: string]: number },
     dualMonoMode: "auto"
   });
   const observers = useRef<{ [name: string]: ((value: any) => void) | null }>({
@@ -90,16 +91,49 @@ const Player = memo(() => {
     "options/mute": value => {
       status.current.mute = value;
     },
-    "track-list/count": null,
+    "track-list/count": count => {
+      if (count > 0) {
+        for (let i = 0; i < count; i++) {
+          const name = `track-list/${i}/type`;
+          if (!observers.current[name]) {
+            mpvRef.current?.observe(name);
+          }
+          observers.current[name] = type => {
+            if (status.current.trackCount[type] != null) {
+              status.current.trackCount[type]++;
+            } else {
+              status.current.trackCount[type] = 1;
+            }
+            dispatch(PlayerActions.trackCount(status.current.trackCount));
+          };
+        }
+      } else {
+        status.current.trackCount = {};
+        dispatch(PlayerActions.trackCount({ video: 0, audio: 0, sub: 0 }));
+      }
+    },
     "playback-abort": null,
     vid: value => {
-      status.current.videoTrack = value;
+      if (value !== "auto") {
+        status.current.videoTrack = value || 0;
+        dispatch(
+          PlayerActions.track({ video: status.current.videoTrack || 1 })
+        );
+      }
     },
     aid: value => {
-      status.current.audioTrack = value;
+      if (value !== "auto") {
+        status.current.audioTrack = value || 0;
+        dispatch(
+          PlayerActions.track({ audio: status.current.audioTrack || 1 })
+        );
+      }
     },
     sid: value => {
-      status.current.subtitleTrack = value;
+      if (value !== "auto") {
+        status.current.subtitleTrack = value || 0;
+        dispatch(PlayerActions.track({ sub: status.current.subtitleTrack }));
+      }
     },
     speed: value => {
       status.current.speed = value;
@@ -364,59 +398,32 @@ const Player = memo(() => {
     };
   }, [repeat, programs, index, extraIndex]);
   useEffect(() => {
-    observers.current["track-list/count"] = count => {
-      dispatch(
-        PlayerActions.trackCount({
-          video: 0,
-          audio: 0,
-          subtitle: 0
-        })
-      );
-      for (let i = 0; i < count; i++) {
-        const name = `track-list/${i}/type`;
-        if (!observers.current[name]) {
-          mpvRef.current?.observe(name);
-        }
-        observers.current[name] = type => {
-          if (trackCount[type] != null) {
-            trackCount[type]++;
-            track[type] = 1;
-          } else {
-            trackCount[type] = 1;
-          }
-          dispatch(PlayerActions.trackCount(trackCount));
-          dispatch(PlayerActions.track(track));
-        };
-      }
-    };
-  }, [track, trackCount]);
-  useEffect(() => {
     if (mute !== status.current.mute) {
       mpvRef.current?.property("options/mute", mute);
     }
     if (volume !== status.current.volume) {
       mpvRef.current?.property("options/volume", volume);
     }
-    if (
-      trackCount.video > 0 &&
-      track.video !== status.current.videoTrack &&
-      (status.current.videoTrack > 0 || track.video > 0)
-    ) {
-      mpvRef.current?.property("vid", track.video);
+    if (trackCount.video > 0 && track.video !== status.current.videoTrack) {
+      if (track.video >= 0 && track.video <= trackCount.video) {
+        mpvRef.current?.property("vid", track.video);
+      } else {
+        dispatch(PlayerActions.track({ video: status.current.videoTrack }));
+      }
     }
-    if (
-      trackCount.audio > 0 &&
-      track.audio !== status.current.audioTrack &&
-      (status.current.audioTrack > 0 || track.audio > 0)
-    ) {
-      mpvRef.current?.property("aid", track.audio);
+    if (trackCount.audio > 0 && track.audio !== status.current.audioTrack) {
+      if (track.audio >= 0 && track.audio <= trackCount.audio) {
+        mpvRef.current?.property("aid", track.audio);
+      } else {
+        dispatch(PlayerActions.track({ audio: status.current.audioTrack }));
+      }
     }
-    if (
-      trackCount.subtitle > 0 &&
-      track.subtitle !== status.current.subtitleTrack &&
-      (status.current.subtitleTrack > 0 || track.subtitle > 0)
-    ) {
-      mpvRef.current?.property("sid", track.subtitle);
+    if (trackCount.sub > 0 && track.sub !== status.current.subtitleTrack) {
+      if (track.sub >= 0 && track.sub <= trackCount.sub) {
+        mpvRef.current?.property("sid", track.sub);
+      } else {
+        dispatch(PlayerActions.track({ sub: status.current.subtitleTrack }));
+      }
     }
     if (speed.toFixed(1) !== status.current.speed.toFixed(1)) {
       mpvRef.current?.property("speed", speed);

@@ -220,7 +220,6 @@ const AudioTrackSwitch = memo(() => {
   const onPrevious = useCallback(() => {
     const audio = value - 1;
     if (Platform.OS === "web") {
-      dispatch(PlayerActions.track({ audio }));
       if (audio > 0) {
         dispatch(PlayerActions.track({ audio }));
       } else {
