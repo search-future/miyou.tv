@@ -146,7 +146,8 @@ const Player = memo(() => {
     }
   });
   const options = useRef<{ [key: string]: string }>({
-    "ad-lavc-o": "dual_mono_mode=auto"
+    "ad-lavc-o": "dual_mono_mode=auto",
+    "sub-back-color": "0.0/0.5"
   });
   const startSeconds = useRef(0);
   const initializing = useRef(true);
