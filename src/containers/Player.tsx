@@ -101,6 +101,9 @@ const Player = () => {
   const audioTrack = useSelector<State, number>(
     ({ player }) => (player.track.audio || 0) - 1
   );
+  const subtitleTrack = useSelector<State, number>(
+    ({ player }) => (player.track.sub || 0) - 1
+  );
   const dualMonoMode = useSelector<State, string>(
     ({ player }) => player.dualMonoMode
   );
@@ -212,9 +215,12 @@ const Player = () => {
     if (audioTrack >= 0) {
       options.push(`--audio-track=${audioTrack}`);
     }
+    if (subtitleTrack >= 0) {
+      options.push(`--sub-track=${subtitleTrack}`);
+    }
 
     return options;
-  }, [deinterlace, audioTrack, dualMonoMode]);
+  }, [deinterlace, audioTrack, dualMonoMode, subtitleTrack]);
 
   useEffect(() => {
     if (Platform.OS === "android") {

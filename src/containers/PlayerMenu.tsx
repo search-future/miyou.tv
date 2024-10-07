@@ -43,6 +43,9 @@ const PlayerMenu = memo(
         ? player.trackCount.audio
         : player.trackCount.audio || 9
     );
+    const subtitleTrackCount = useSelector<State, number>(({ player }) =>
+      Platform.OS === "web" ? player.trackCount.sub : player.trackCount.sub || 9
+    );
 
     const { theme } = useContext(ThemeContext);
 
@@ -95,6 +98,16 @@ const PlayerMenu = memo(
             </Text>
             <DualMonoModeSwitch />
           </View>
+          {Platform.OS === "web" && subtitleTrackCount > 0 && (
+            <View style={[containerStyle.row, styles.optionRow]}>
+              <Text
+                style={[styles.optionLabel, { color: theme.colors?.control }]}
+              >
+                字幕トラック
+              </Text>
+              <SubtitleTrackSwitch />
+            </View>
+          )}
           <View style={[containerStyle.row, styles.optionRow]}>
             <Text
               style={[styles.optionLabel, { color: theme.colors?.control }]}
@@ -286,6 +299,37 @@ const DualMonoModeSwitch = memo(() => {
       onPrevious={onPrevious}
       onNext={onNext}
     />
+  );
+});
+
+const SubtitleTrackSwitch = memo(() => {
+  const dispatch = useDispatch();
+  const value = useSelector<State, number>(
+    ({ player }) => player.track.sub || 0
+  );
+  const max = useSelector<State, number>(({ player }) =>
+    Platform.OS === "web" ? player.trackCount.sub : player.trackCount.sub || 9
+  );
+
+  const onPrevious = useCallback(() => {
+    const sub = value - 1;
+    if (sub < 0) {
+      dispatch(PlayerActions.track({ sub: max }));
+    } else {
+      dispatch(PlayerActions.track({ sub }));
+    }
+  }, [value, max]);
+  const onNext = useCallback(() => {
+    const sub = value + 1;
+    if (sub > max) {
+      dispatch(PlayerActions.track({ sub: 0 }));
+    } else {
+      dispatch(PlayerActions.track({ sub }));
+    }
+  }, [value, max]);
+
+  return (
+    <PropertySwitch value={value} onPrevious={onPrevious} onNext={onNext} />
   );
 });
 
