@@ -38,8 +38,10 @@ type State = RootState & {
 
 const PlayerMenu = memo(
   ({ triggerComponent }: { triggerComponent: JSX.Element }) => {
-    const audioTrackCount = useSelector<State, number>(
-      ({ player }) => player.trackCount.audio
+    const audioTrackCount = useSelector<State, number>(({ player }) =>
+      Platform.OS === "web"
+        ? player.trackCount.audio
+        : player.trackCount.audio || 9
     );
 
     const { theme } = useContext(ThemeContext);
@@ -75,7 +77,7 @@ const PlayerMenu = memo(
               <DeinterlaceSwitch />
             </View>
           )}
-          {(Platform.OS !== "web" || audioTrackCount > 1) && (
+          {audioTrackCount > 1 && (
             <View style={[containerStyle.row, styles.optionRow]}>
               <Text
                 style={[styles.optionLabel, { color: theme.colors?.control }]}
@@ -85,16 +87,14 @@ const PlayerMenu = memo(
               <AudioTrackSwitch />
             </View>
           )}
-          {
-            <View style={[containerStyle.row, styles.optionRow]}>
-              <Text
-                style={[styles.optionLabel, { color: theme.colors?.control }]}
-              >
-                {Platform.OS === "web" ? "デュアルモノラル" : "ステレオモード"}
-              </Text>
-              <DualMonoModeSwitch />
-            </View>
-          }
+          <View style={[containerStyle.row, styles.optionRow]}>
+            <Text
+              style={[styles.optionLabel, { color: theme.colors?.control }]}
+            >
+              {Platform.OS === "web" ? "デュアルモノラル" : "ステレオモード"}
+            </Text>
+            <DualMonoModeSwitch />
+          </View>
           <View style={[containerStyle.row, styles.optionRow]}>
             <Text
               style={[styles.optionLabel, { color: theme.colors?.control }]}
@@ -211,44 +211,30 @@ const SpeedSwitch = memo(() => {
 const AudioTrackSwitch = memo(() => {
   const dispatch = useDispatch();
   const value = useSelector<State, number>(
-    ({ player }) => player.track.audio || 0
+    ({ player }) => player.track.audio || 1
   );
-  const track = useSelector<State, number>(
-    ({ player }) => player.trackCount.audio
+  const max = useSelector<State, number>(({ player }) =>
+    Platform.OS === "web"
+      ? player.trackCount.audio
+      : player.trackCount.audio || 9
   );
 
   const onPrevious = useCallback(() => {
     const audio = value - 1;
-    if (Platform.OS === "web") {
-      if (audio > 0) {
-        dispatch(PlayerActions.track({ audio }));
-      } else {
-        dispatch(PlayerActions.track({ audio: track }));
-      }
+    if (audio > 0) {
+      dispatch(PlayerActions.track({ audio }));
     } else {
-      if (audio >= 0) {
-        dispatch(PlayerActions.track({ audio }));
-      } else {
-        dispatch(PlayerActions.track({ audio: 9 }));
-      }
+      dispatch(PlayerActions.track({ audio: max }));
     }
-  }, [value, track]);
+  }, [value, max]);
   const onNext = useCallback(() => {
     const audio = value + 1;
-    if (Platform.OS === "web") {
-      if (audio <= track) {
-        dispatch(PlayerActions.track({ audio }));
-      } else {
-        dispatch(PlayerActions.track({ audio: 1 }));
-      }
+    if (audio > max) {
+      dispatch(PlayerActions.track({ audio: 1 }));
     } else {
-      if (audio <= 9) {
-        dispatch(PlayerActions.track({ audio }));
-      } else {
-        dispatch(PlayerActions.track({ audio: 0 }));
-      }
+      dispatch(PlayerActions.track({ audio }));
     }
-  }, [value, track]);
+  }, [value, max]);
 
   return (
     <PropertySwitch value={value} onPrevious={onPrevious} onNext={onNext} />

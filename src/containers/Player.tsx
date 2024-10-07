@@ -99,7 +99,7 @@ const Player = () => {
   const duration = useSelector<State, number>(({ player }) => player.duration);
   const time = useSelector<State, number>(({ player }) => player.time);
   const audioTrack = useSelector<State, number>(
-    ({ player }) => player.track.audio || 0
+    ({ player }) => (player.track.audio || 0) - 1
   );
   const dualMonoMode = useSelector<State, string>(
     ({ player }) => player.dualMonoMode
@@ -209,7 +209,7 @@ const Player = () => {
         options.push("--stereo-mode=4");
         break;
     }
-    if (audioTrack > 0) {
+    if (audioTrack >= 0) {
       options.push(`--audio-track=${audioTrack}`);
     }
 
