@@ -1,4 +1,4 @@
-import React, { useContext, useCallback, memo } from "react";
+import React, { useContext, useCallback, memo, useEffect } from "react";
 import {
   Switch,
   Pressable,
@@ -23,6 +23,7 @@ type Setting = SettingState & {
   player?: {
     speed?: string;
     deinterlace?: boolean;
+    subtitleTrack?: number;
     repeat?: string;
   };
   commentPlayer?: {
@@ -304,6 +305,9 @@ const DualMonoModeSwitch = memo(() => {
 
 const SubtitleTrackSwitch = memo(() => {
   const dispatch = useDispatch();
+  const subtitleTrack = useSelector<State, number>(
+    ({ setting }) => setting.player?.subtitleTrack || 0
+  );
   const value = useSelector<State, number>(
     ({ player }) => player.track.sub || 0
   );
@@ -311,20 +315,26 @@ const SubtitleTrackSwitch = memo(() => {
     Platform.OS === "web" ? player.trackCount.sub : player.trackCount.sub || 9
   );
 
+  useEffect(() => {
+    if (max > 0 && subtitleTrack !== value) {
+      dispatch(PlayerActions.track({ sub: subtitleTrack }));
+    }
+  }, [subtitleTrack, value]);
+
   const onPrevious = useCallback(() => {
-    const sub = value - 1;
-    if (sub < 0) {
-      dispatch(PlayerActions.track({ sub: max }));
+    const subtitleTrack = value - 1;
+    if (subtitleTrack < 0) {
+      dispatch(SettingActions.update("player", { subtitleTrack: max }));
     } else {
-      dispatch(PlayerActions.track({ sub }));
+      dispatch(SettingActions.update("player", { subtitleTrack }));
     }
   }, [value, max]);
   const onNext = useCallback(() => {
-    const sub = value + 1;
-    if (sub > max) {
-      dispatch(PlayerActions.track({ sub: 0 }));
+    const subtitleTrack = value + 1;
+    if (subtitleTrack > max) {
+      dispatch(SettingActions.update("player", { subtitleTrack: 0 }));
     } else {
-      dispatch(PlayerActions.track({ sub }));
+      dispatch(SettingActions.update("player", { subtitleTrack }));
     }
   }, [value, max]);
 
