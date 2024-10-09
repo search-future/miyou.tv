@@ -55,6 +55,8 @@ type State = RootState & {
 };
 
 const Player = memo(() => {
+  const dispatch = useDispatch();
+
   const mpvRef = useRef<MPV>();
   const status = useRef({
     mute: false,
@@ -158,7 +160,6 @@ const Player = memo(() => {
   const pcrWraparound = useRef(true);
   const seekId = useRef<NodeJS.Timeout | null>(null);
 
-  const dispatch = useDispatch();
   const backendType = useSelector<State, string>(
     ({ setting }) => setting.backend?.type || "chinachu"
   );

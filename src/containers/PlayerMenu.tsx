@@ -222,6 +222,22 @@ const SpeedSwitch = memo(() => {
   );
 });
 
+const DeinterlaceSwitch = memo(() => {
+  const dispatch = useDispatch();
+  const value = useSelector<State, boolean>(
+    ({ setting }) =>
+      setting.player?.deinterlace == null || setting.player?.deinterlace
+  );
+
+  const onChange = useCallback((deinterlace: boolean) => {
+    dispatch(SettingActions.update("player", { deinterlace }));
+  }, []);
+
+  return (
+    <Switch style={styles.optionValue} value={value} onValueChange={onChange} />
+  );
+});
+
 const AudioTrackSwitch = memo(() => {
   const dispatch = useDispatch();
   const value = useSelector<State, number>(
@@ -252,22 +268,6 @@ const AudioTrackSwitch = memo(() => {
 
   return (
     <PropertySwitch value={value} onPrevious={onPrevious} onNext={onNext} />
-  );
-});
-
-const DeinterlaceSwitch = memo(() => {
-  const dispatch = useDispatch();
-  const value = useSelector<State, boolean>(
-    ({ setting }) =>
-      setting.player?.deinterlace == null || setting.player?.deinterlace
-  );
-
-  const onChange = useCallback((deinterlace: boolean) => {
-    dispatch(SettingActions.update("player", { deinterlace }));
-  }, []);
-
-  return (
-    <Switch style={styles.optionValue} value={value} onValueChange={onChange} />
   );
 });
 
