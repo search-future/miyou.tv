@@ -2408,12 +2408,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.25.9":
-  version: 7.25.9
-  resolution: "@babel/runtime@npm:7.25.9"
+"@babel/runtime@npm:^7.26.10":
+  version: 7.26.10
+  resolution: "@babel/runtime@npm:7.26.10"
   dependencies:
     regenerator-runtime: ^0.14.0
-  checksum: ce1c87b166ff728eaee91658a67fb7835314ed157b7a36d49602ffdaaa37fb1fcf2784afd00b55fe1672bec53fb38cba622a056c913611af2a44503097216229
+  checksum: 22d2e0abb86e90de489ab16bb578db6fe2b63a88696db431198b24963749820c723f1982298cdbbea187f7b2b80fb4d98a514faf114ddb2fdc14a4b96277b955
   languageName: node
   linkType: hard
 
@@ -12445,7 +12445,7 @@ __metadata:
     "@babel/core": ^7.25.9
     "@babel/plugin-proposal-class-static-block": ^7.21.0
     "@babel/preset-env": ^7.25.9
-    "@babel/runtime": ^7.25.9
+    "@babel/runtime": ^7.26.10
     "@react-native-community/async-storage": ^1.12.1
     "@react-native-community/datetimepicker": ^8.2.0
     "@react-native-community/masked-view": ^0.1.11
