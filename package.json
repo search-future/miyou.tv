@@ -63,7 +63,7 @@
     "@babel/core": "^7.25.9",
     "@babel/plugin-proposal-class-static-block": "^7.21.0",
     "@babel/preset-env": "^7.25.9",
-    "@babel/runtime": "^7.25.9",
+    "@babel/runtime": "^7.26.10",
     "@react-native/babel-preset": "^0.74.88",
     "@react-native/eslint-config": "^0.74.88",
     "@react-native/metro-config": "^0.74.88",
