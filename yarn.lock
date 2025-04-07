@@ -5905,14 +5905,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.7.7":
-  version: 1.7.7
-  resolution: "axios@npm:1.7.7"
+"axios@npm:^1.8.2":
+  version: 1.8.4
+  resolution: "axios@npm:1.8.4"
   dependencies:
     follow-redirects: ^1.15.6
     form-data: ^4.0.0
     proxy-from-env: ^1.1.0
-  checksum: 882d4fe0ec694a07c7f5c1f68205eb6dc5a62aecdb632cc7a4a3d0985188ce3030e0b277e1a8260ac3f194d314ae342117660a151fabffdc5081ca0b5a8b47fe
+  checksum: e901dc1730bdcd769839b3d93ae6d6457a53d79b19a0eb623ebfea333441259ab51e63ca118baa47a5156567401466ac739f31087b4ee5e6770ab2e227484538
   languageName: node
   linkType: hard
 
@@ -12474,7 +12474,7 @@ __metadata:
     "@types/react-test-renderer": ^18.3.0
     "@types/redux-persist-transform-encrypt": ^2.0.4
     "@types/webpack": ^4.41.40
-    axios: ^1.7.7
+    axios: ^1.8.2
     babel-jest: ^29.7.0
     babel-loader: ^8.4.1
     babel-plugin-react-native-web: ^0.19.13
