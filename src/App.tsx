@@ -17,7 +17,6 @@ import { PersistGate } from "redux-persist/integration/react";
 import { ThemeProvider } from "react-native-elements";
 import { Reducer } from "redux";
 import { configureStore } from "@reduxjs/toolkit";
-import createSagaMiddleware from "redux-saga";
 import { persistReducer, persistStore } from "redux-persist";
 
 import AppNavigator from "./navigators";
@@ -41,6 +40,7 @@ const App = () => (
 );
 export default App;
 
+const { default: createSagaMiddleware } = require("redux-saga");
 const sagaMiddleware = createSagaMiddleware();
 const persistedReducer = persistReducer(persistConfig, rootReducer as Reducer);
 const store = configureStore({

@@ -21,7 +21,7 @@ switch (Platform.OS) {
     moment.locale(NativeModules.I18nManager.localeIdentifier);
     break;
   case "ios":
-    moment.locale(NativeModules.SettingsManager.settings.AppleLocale);
+    moment.locale(NativeModules.SettingsManager.getConstants().settings.AppleLocale);
     break;
   case "web":
     moment.locale(window.navigator.language);

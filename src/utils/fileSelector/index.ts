@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import DocumentPicker from "react-native-document-picker";
+import DocumentPicker from "@react-native-documents/picker";
 
 export default async function fileSelector({
   type = [DocumentPicker.types.allFiles],
@@ -23,18 +23,13 @@ export default async function fileSelector({
   multiSelections?: boolean;
 }) {
   try {
-    const result = await DocumentPicker.pick({
+    return await DocumentPicker.pick({
       type,
       copyTo: "cachesDirectory",
       allowMultiSelection: multiSelections
     });
-
-    return result.map(
-      ({ fileCopyUri, uri }) =>
-        fileCopyUri?.replace(/file:\/*/, "file:///") || uri
-    );
   } catch (e) {
-    if (DocumentPicker.isCancel(e)) {
+    if (DocumentPicker.isErrorWithCode(e)) {
       return;
     }
     throw e;

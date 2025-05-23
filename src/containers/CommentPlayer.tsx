@@ -121,10 +121,10 @@ const CommentPlayer = memo(() => {
     [program, extraIndex]
   );
   const height = useMemo(
-    () => containerHeight / (lines.current.length + 1),
+    () => Math.floor(containerHeight / (lines.current.length + 1)),
     [containerHeight, lines.current.length]
   );
-  const fontSize = useMemo(() => (height * 2) / 3, [height]);
+  const fontSize = useMemo(() => (height * 2) / 3 || 1, [height]);
 
   useEffect(
     () => () => {
