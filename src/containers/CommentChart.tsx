@@ -18,16 +18,17 @@ import React, {
   useContext,
   useCallback,
   useRef,
-  useMemo
+  useMemo,
+  SVGProps
 } from "react";
 import {
   View,
   StyleSheet,
+  Platform,
   DimensionValue,
   LayoutChangeEvent
 } from "react-native";
 import { ThemeContext } from "react-native-elements";
-import { Svg, Path } from "react-native-svg";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
 import Balloon from "../components/Balloon";
@@ -166,6 +167,21 @@ export default CommentChart;
 
 const displayPeaks = 5;
 const minPeakThreshold = 10;
+
+const Svg = (props: SVGProps<SVGSVGElement>) => {
+  if (Platform.OS === "web") {
+    return <svg {...props} />;
+  }
+  const { Svg } = require("react-native-svg");
+  return <Svg {...props} />;
+};
+const Path = (props: SVGProps<SVGPathElement>) => {
+  if (Platform.OS === "web") {
+    return <path {...props} />;
+  }
+  const { Path } = require("react-native-svg");
+  return <Path {...props} />;
+};
 
 const PeakBalloon = memo(
   ({

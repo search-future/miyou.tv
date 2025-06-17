@@ -166,7 +166,7 @@ const VolumeController = memo(() => {
       >
         <ControlIcon name={volumeIcon} solid />
       </MenuTrigger>
-      <MenuOptions>
+      <MenuOptions customStyles={{}}>
         <View
           style={[
             containerStyle.row,
