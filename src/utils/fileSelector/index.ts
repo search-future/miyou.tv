@@ -11,10 +11,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import DocumentPicker from "@react-native-documents/picker";
+import {
+  isErrorWithCode,
+  keepLocalCopy,
+  pick,
+  types
+} from "@react-native-documents/picker";
 
 export default async function fileSelector({
-  type = [DocumentPicker.types.allFiles],
+  type = [types.allFiles],
   multiSelections
 }: {
   title?: string;
@@ -23,13 +28,21 @@ export default async function fileSelector({
   multiSelections?: boolean;
 }) {
   try {
-    return await DocumentPicker.pick({
+    const files = await pick({
       type,
       copyTo: "cachesDirectory",
       allowMultiSelection: multiSelections
     });
+    const uris = (await keepLocalCopy({
+      files: files.map(({ name, uri }) => ({
+        uri,
+        fileName: name || ""
+      })) as any,
+      destination: "cachesDirectory"
+    })) as any[];
+    return uris.map(({ localUri }) => localUri);
   } catch (e) {
-    if (DocumentPicker.isErrorWithCode(e)) {
+    if (isErrorWithCode(e)) {
       return;
     }
     throw e;

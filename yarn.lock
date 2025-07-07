@@ -12949,7 +12949,7 @@ __metadata:
     react-dom: 19.0.0
     react-hotkeys-hook: ^4.6.2
     react-native: ^0.79.3
-    react-native-blob-util: ^0.19.11
+    react-native-blob-util: ^0.22.2
     react-native-elements: ^3.4.3
     react-native-gesture-handler: ^2.26.0
     react-native-get-random-values: ^1.11.0
@@ -14464,16 +14464,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-blob-util@npm:^0.19.11":
-  version: 0.19.11
-  resolution: "react-native-blob-util@npm:0.19.11"
+"react-native-blob-util@npm:^0.22.2":
+  version: 0.22.2
+  resolution: "react-native-blob-util@npm:0.22.2"
   dependencies:
     base-64: 0.1.0
     glob: ^10.3.10
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 13f18e4fdca5b93236f309734aad625164c6fb5bf7191d1dc2fe4fdb385961c6802418968026fb2012ad01bda0ac092dbbcf3639d1efcd4a6361064d5b6957d0
+  checksum: b07830a301ba89545a58f63d7ee972478ea7748d4d0444cfe9a7f54e229d7cefc6bd0b23af161a03d33aa3daee44cf70c2e2f2d56eb5eb61a4d84e1bd6e0752a
   languageName: node
   linkType: hard
 
