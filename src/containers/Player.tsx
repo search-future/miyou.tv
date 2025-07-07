@@ -254,7 +254,6 @@ const Player = () => {
             new Date(recordedProgram.start).getTime();
         }
         setStartSeconds(0);
-        dispatch(PlayerActions.position(0));
       }
     }
     setBootstrap(false);
