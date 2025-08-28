@@ -197,16 +197,17 @@ const FileLoader = memo(() => {
   const selectFile = useCallback(async () => {
     const uris = await fileSelector({
       multiSelections: true,
-      type:
-        Platform.OS === "web"
-          ? [
-              {
-                name: "Movies",
-                extensions: ["mp4", "mkv", "m2ts", "ts"]
-              },
-              { name: "All", extensions: ["*"] }
-            ]
-          : ["video/*", "*/*"]
+      type: Platform.select({
+        android: ["video/*", "*/*"],
+        ios: ["public.item", "public.movie"],
+        web: [
+          {
+            name: "Movies",
+            extensions: ["mp4", "mkv", "m2ts", "ts"]
+          },
+          { name: "All", extensions: ["*"] }
+        ]
+      })
     });
     if (uris) {
       dispatch(FileActions.add(uris));
@@ -458,7 +459,6 @@ const ListProgram = memo(
                   borderColor: theme.colors?.border
                 }
               ]}
-              itemStyle={[styles.input]}
               style={[{ backgroundColor: theme.colors?.background }]}
               color={theme.colors?.default}
               items={channelItems}
