@@ -6296,14 +6296,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.11.0":
-  version: 1.11.0
-  resolution: "axios@npm:1.11.0"
+"axios@npm:^1.12.0":
+  version: 1.12.0
+  resolution: "axios@npm:1.12.0"
   dependencies:
     follow-redirects: ^1.15.6
     form-data: ^4.0.4
     proxy-from-env: ^1.1.0
-  checksum: 0a33dc600b588bfd3111b198d5985527ed89f722817455d7cdb66c1d055e5f8859cc2bebb7320888957fc8458ebe77d5f83af02af9cd260217c91c4e92b6dfb6
+  checksum: f2a109efea16711907ae86acc46434d52da28e889bf1d2fc2b66844e82c9908f6d96d988ad9043b37d4146abc182e67d61abd87367152bbbc1cd73afa3c5de71
   languageName: node
   linkType: hard
 
@@ -13148,7 +13148,7 @@ __metadata:
     "@types/react-test-renderer": 19.0.0
     "@types/redux-persist-transform-encrypt": ^2.0.4
     "@types/webpack": ^4.41.40
-    axios: ^1.11.0
+    axios: ^1.12.0
     babel-jest: ^29.7.0
     babel-loader: ^8.4.1
     babel-plugin-react-native-web: ^0.21.1
