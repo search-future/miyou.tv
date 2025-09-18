@@ -1,5 +1,5 @@
 /*!
-Copyright 2016-2023 Brazil Ltd.
+Copyright 2016-2025 Brazil Ltd.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -197,16 +197,17 @@ const FileLoader = memo(() => {
   const selectFile = useCallback(async () => {
     const uris = await fileSelector({
       multiSelections: true,
-      type:
-        Platform.OS === "web"
-          ? [
-              {
-                name: "Movies",
-                extensions: ["mp4", "mkv", "m2ts", "ts"]
-              },
-              { name: "All", extensions: ["*"] }
-            ]
-          : ["video/*", "*/*"]
+      type: Platform.select({
+        android: ["video/*", "*/*"],
+        ios: ["public.item", "public.movie"],
+        web: [
+          {
+            name: "Movies",
+            extensions: ["mp4", "mkv", "m2ts", "ts"]
+          },
+          { name: "All", extensions: ["*"] }
+        ]
+      })
     });
     if (uris) {
       dispatch(FileActions.add(uris));
@@ -458,7 +459,6 @@ const ListProgram = memo(
                   borderColor: theme.colors?.border
                 }
               ]}
-              itemStyle={[styles.input]}
               style={[{ backgroundColor: theme.colors?.background }]}
               color={theme.colors?.default}
               items={channelItems}
