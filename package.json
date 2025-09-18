@@ -90,7 +90,7 @@
     "babel-plugin-react-native-web": "^0.21.1",
     "babel-plugin-transform-inline-environment-variables": "^0.4.4",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
-    "electron": "^29.4.6",
+    "electron": "^35.7.5",
     "electron-builder": "^25.1.8",
     "electron-notarize": "^1.2.2",
     "electron-reload": "^1.5.0",
