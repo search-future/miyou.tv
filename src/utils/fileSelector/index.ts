@@ -1,5 +1,5 @@
 /*!
-Copyright 2016-2023 Brazil Ltd.
+Copyright 2016-2025 Brazil Ltd.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -11,10 +11,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import DocumentPicker from "react-native-document-picker";
+import {
+  isErrorWithCode,
+  keepLocalCopy,
+  pick,
+  types
+} from "@react-native-documents/picker";
 
 export default async function fileSelector({
-  type = [DocumentPicker.types.allFiles],
+  type = [types.allFiles],
   multiSelections
 }: {
   title?: string;
@@ -23,18 +28,21 @@ export default async function fileSelector({
   multiSelections?: boolean;
 }) {
   try {
-    const result = await DocumentPicker.pick({
+    const files = await pick({
       type,
       copyTo: "cachesDirectory",
       allowMultiSelection: multiSelections
     });
-
-    return result.map(
-      ({ fileCopyUri, uri }) =>
-        fileCopyUri?.replace(/file:\/*/, "file:///") || uri
-    );
+    const uris = (await keepLocalCopy({
+      files: files.map(({ name, uri }) => ({
+        uri,
+        fileName: name || ""
+      })) as any,
+      destination: "cachesDirectory"
+    })) as any[];
+    return uris.map(({ localUri }) => localUri);
   } catch (e) {
-    if (DocumentPicker.isCancel(e)) {
+    if (isErrorWithCode(e)) {
       return;
     }
     throw e;

@@ -1,5 +1,5 @@
 /*!
-Copyright 2016-2023 Brazil Ltd.
+Copyright 2016-2025 Brazil Ltd.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -257,13 +257,13 @@ const EndText = memo(
 const SeekSlider = memo(
   ({ onChange }: { onChange?: (position: number) => void }) => {
     const position = useSelector<State, number>(({ player }) =>
-      isNaN(player.position) ? 0 : player.position
+      isNaN(player.position) ? 0 : Math.floor(player.position * 10000)
     );
 
     const onChangeHandler = useCallback(
       (position: number) => {
         if (onChange) {
-          onChange(position);
+          onChange(position / 10000);
         }
       },
       [onChange]
@@ -273,9 +273,9 @@ const SeekSlider = memo(
       <CustomSlider
         style={styles.slider}
         allowTouchTrack
-        maximumValue={1}
+        maximumValue={10000}
         minimumValue={0}
-        step={0.00001}
+        step={1}
         value={position}
         maximumTrackTintColor="#ffffff20"
         minimumTrackTintColor="#ffffffe2"

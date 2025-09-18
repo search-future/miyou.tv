@@ -1,5 +1,5 @@
 /*!
-Copyright 2016-2023 Brazil Ltd.
+Copyright 2016-2025 Brazil Ltd.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -121,10 +121,10 @@ const CommentPlayer = memo(() => {
     [program, extraIndex]
   );
   const height = useMemo(
-    () => containerHeight / (lines.current.length + 1),
+    () => Math.floor(containerHeight / (lines.current.length + 1)),
     [containerHeight, lines.current.length]
   );
-  const fontSize = useMemo(() => (height * 2) / 3, [height]);
+  const fontSize = useMemo(() => (height * 2) / 3 || 1, [height]);
 
   useEffect(
     () => () => {
