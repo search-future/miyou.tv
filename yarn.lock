@@ -13182,7 +13182,7 @@ __metadata:
     react-native-svg: ^15.14.0
     react-native-vector-icons: ^10.3.0
     react-native-video: ^6.17.0
-    react-native-vlc-media-player: 1.0.70
+    react-native-vlc-media-player: ^1.0.96
     react-native-web: ^0.21.2
     react-redux: ^9.2.0
     react-test-renderer: 19.1.0
@@ -14889,13 +14889,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-vlc-media-player@npm:1.0.70":
-  version: 1.0.70
-  resolution: "react-native-vlc-media-player@npm:1.0.70"
+"react-native-vlc-media-player@npm:^1.0.96":
+  version: 1.0.96
+  resolution: "react-native-vlc-media-player@npm:1.0.96"
   dependencies:
     react-native-slider: ^0.11.0
     react-native-vector-icons: ^9.2.0
-  checksum: 48d2208c91874dbf202170b4d6b6021ecba595ad5a13532dafe6f0a9635794d57cb81222bd5380b931f01dae524a814775297458ca0f4667f8bc96a4fa5f4615
+  checksum: 097f1b5fe55c001dbfa61b9431a2ea425c757c4945fd8c9d43e6aa14193e4ef57b44e295cbe0d3c6286da8e05423f99150fbff7d073edea0b5851bb4d891ee89
   languageName: node
   linkType: hard
 

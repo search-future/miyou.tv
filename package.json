@@ -51,7 +51,7 @@
     "react-native-svg": "^15.14.0",
     "react-native-vector-icons": "^10.3.0",
     "react-native-video": "^6.17.0",
-    "react-native-vlc-media-player": "1.0.70",
+    "react-native-vlc-media-player": "^1.0.96",
     "react-native-web": "^0.21.2",
     "react-redux": "^9.2.0",
     "redux": "^5.0.1",
