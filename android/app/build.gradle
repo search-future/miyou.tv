@@ -82,8 +82,8 @@ android {
         applicationId "jp.razil.miyoutv"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1080301
-        versionName "1.8.3"
+        versionCode 1080401
+        versionName "1.8.4"
     }
     signingConfigs {
         release {
