@@ -13190,7 +13190,7 @@ __metadata:
     redux-persist: ^6.0.0
     redux-persist-transform-encrypt: ^4.0.0
     redux-saga: ^1.4.2
-    tar: ^7.5.2
+    tar: ^7.5.4
     ts-node: ^10.9.2
     tslint: ^6.1.3
     tslint-config-prettier: ^1.18.0
@@ -16719,16 +16719,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tar@npm:^7.5.2":
-  version: 7.5.2
-  resolution: "tar@npm:7.5.2"
+"tar@npm:^7.5.4":
+  version: 7.5.5
+  resolution: "tar@npm:7.5.5"
   dependencies:
     "@isaacs/fs-minipass": ^4.0.0
     chownr: ^3.0.0
     minipass: ^7.1.2
     minizlib: ^3.1.0
     yallist: ^5.0.0
-  checksum: 192559b0e7af17d57c7747592ef22c14d5eba2d9c35996320ccd20c3e2038160fe8d928fc5c08b2aa1b170c4d0a18c119441e81eae8f227ca2028d5bcaa6bf23
+  checksum: 2f0a51c09c5a0fb148ad7088d5fe035323225b41bc78b133160fc869d8b8b325808c7ddc0dc3e2dab4777c1beddd2886059d49f756333c7a8bfd4fdff5034be1
   languageName: node
   linkType: hard
 
