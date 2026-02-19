@@ -14,9 +14,7 @@ limitations under the License.
 import { Store } from "redux";
 import { StatusBar, Platform } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
-import KeepAwake from "react-native-keep-awake";
-// @ts-ignore
-import { Immersive } from "react-native-immersive";
+import ImmersiveMode  from "react-native-immersive-mode";
 
 import { NetworkActions } from "../../modules/network";
 import common from "./common";
@@ -32,10 +30,9 @@ export default function init(store: Store) {
   });
 
   if (Platform.OS === "android") {
-    Immersive.off();
+    ImmersiveMode.fullLayout(false);
     StatusBar.setHidden(false);
   }
-  KeepAwake.deactivate();
 
   common(store);
 }

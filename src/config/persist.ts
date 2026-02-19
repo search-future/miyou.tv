@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import storage from "@react-native-community/async-storage";
+import storage from "@react-native-async-storage/async-storage";
 import { encryptTransform } from "redux-persist-transform-encrypt";
 
 import { persistSecretKey } from "../config/constants";

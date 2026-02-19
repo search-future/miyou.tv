@@ -24,13 +24,12 @@ import Video, {
   OnProgressData,
   VideoRef
 } from "react-native-video";
-import KeepAwake from "react-native-keep-awake";
+import { useKeepAwake } from "@sayem314/react-native-keep-awake";
 import Toast from "react-native-root-toast";
 import { useDispatch, useSelector } from "react-redux";
 import qs from "qs";
 import { VLCPlayer } from "react-native-vlc-media-player";
-// @ts-ignore
-import { Immersive } from "react-native-immersive";
+import ImmersiveMode from "react-native-immersive-mode";
 
 import { RootState } from "../modules";
 import { LoadingActions } from "../modules/loading";
@@ -64,6 +63,8 @@ const Player = () => {
   const seekId = useRef<NodeJS.Timeout | null>(null);
   const initializing = useRef(true);
   const retryCount = useRef(0);
+
+  useKeepAwake();
 
   const dispatch = useDispatch();
   const type = useSelector<State, string>(
@@ -224,24 +225,21 @@ const Player = () => {
 
   useEffect(() => {
     if (Platform.OS === "android") {
-      Immersive.on();
+      ImmersiveMode.fullLayout(true);
       StatusBar.setHidden(true);
     }
-    KeepAwake.activate();
   });
   useEffect(
     () => () => {
       if (Platform.OS === "android") {
-        Immersive.off();
+        ImmersiveMode.fullLayout(false);
         StatusBar.setHidden(false);
       }
-      KeepAwake.deactivate();
     },
     []
   );
   useEffect(() => {
     if (bootstrap) {
-      KeepAwake.activate();
       const program = programs[index];
       if (program && recordedProgram) {
         if (peakPlay && program.commentMaxSpeedTime) {
