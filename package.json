@@ -60,7 +60,7 @@
     "redux-saga": "^1.4.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.29.0",
+    "@babel/core": "^7.29.6",
     "@babel/plugin-proposal-class-static-block": "^7.21.0",
     "@babel/preset-env": "^7.29.0",
     "@babel/runtime": "^7.28.6",
